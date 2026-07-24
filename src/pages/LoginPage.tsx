@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { login } = useAuth();
@@ -16,7 +17,21 @@ export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }
     setError(null);
     
     try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) {
+        if (signInError.message.includes('Invalid login credentials')) {
+          throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        }
+        throw signInError;
+      }
+
+      // Update the local context to keep the app UI in sync
       await login(email, password);
+      
       onNavigate('#/dashboard');
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
@@ -85,7 +100,7 @@ export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }
             className="w-full h-12 text-lg"
             disabled={isLoading}
           >
-            {isLoading ? 'جاري الدخول...' : 'تسجيل الدخول'}
+            {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </Button>
         </form>
 

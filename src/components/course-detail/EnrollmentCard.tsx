@@ -1,10 +1,121 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
-import { BookOpen, Clock, Award, ShieldCheck, Play } from 'lucide-react';
+import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { useParams, useNavigate } from 'react-router-dom';
 
-export function EnrollmentCard() {
+export function EnrollmentCard({ onNavigate }: { onNavigate?: (path: string) => void }) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [courseId, setCourseId] = useState<string | null>(id || null);
+  const [enrollmentStatus, setEnrollmentStatus] = useState<'none' | 'pending' | 'active'>('none');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    async function checkStatus() {
+      try {
+        setIsLoading(true);
+        let targetCourseId = id;
+        
+        if (!targetCourseId) {
+          const { data: firstCourse } = await supabase
+            .from('courses')
+            .select('id')
+            .limit(1)
+            .single();
+          if (firstCourse) {
+            targetCourseId = firstCourse.id;
+          }
+        }
+        
+        if (targetCourseId) {
+          setCourseId(targetCourseId);
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            const { data: enrollment } = await supabase
+              .from('enrollments')
+              .select('status')
+              .eq('course_id', targetCourseId)
+              .eq('user_id', session.user.id)
+              .single();
+              
+            if (enrollment) {
+              setEnrollmentStatus(enrollment.status as 'pending' | 'active');
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error checking enrollment:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    checkStatus();
+  }, [id]);
+
+  const handleEnroll = async () => {
+    if (!courseId) return;
+    try {
+      setIsEnrolling(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
+        navigate('/login');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('enrollments')
+        .insert({
+          user_id: session.user.id,
+          course_id: courseId,
+          status: 'pending'
+        });
+
+      if (error) {
+        console.error("Enrollment error:", error);
+        return;
+      }
+
+      setEnrollmentStatus('pending');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+      
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
+  const renderButtonContent = () => {
+    if (isLoading) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
+    if (enrollmentStatus === 'active') return 'الذهاب للدرس (تم الاشتراك)';
+    if (enrollmentStatus === 'pending') return 'الطلب قيد المراجعة';
+    return isEnrolling ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'سجلي الآن';
+  };
+
+  const handleButtonClick = () => {
+    if (enrollmentStatus === 'active') {
+      navigate(`/lesson?courseId=${courseId}`);
+    } else if (enrollmentStatus === 'none') {
+      handleEnroll();
+    }
+  };
+
   return (
     <>
+      {showToast && (
+        <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <CheckCircle2 className="w-6 h-6 text-success-600" />
+          <p className="font-bold">تم إرسال طلبك بنجاح. سيتم تفعيل الكورس بمجرد تأكيد الدفع.</p>
+        </div>
+      )}
+
       <div className="bg-white border border-primary-200 rounded-2xl shadow-lg overflow-hidden lg:sticky lg:top-28 mb-8 lg:mb-0">
         {/* Course Image */}
       <div className="relative aspect-video bg-primary-100">
@@ -58,8 +169,13 @@ export function EnrollmentCard() {
 
         {/* CTAs */}
         <div className="flex flex-col gap-3 mt-2">
-          <Button variant="primary" className="w-full h-14 text-lg">
-            سجلي الآن
+          <Button 
+            variant="primary" 
+            className="w-full h-14 text-lg"
+            onClick={handleButtonClick}
+            disabled={isLoading || isEnrolling || enrollmentStatus === 'pending'}
+          >
+            {renderButtonContent()}
           </Button>
           <Button variant="secondary" className="w-full h-14 text-lg bg-white" icon={<Play className="w-4 h-4 fill-current" />}>
             شاهدي درسًا مجانيًا
@@ -80,8 +196,13 @@ export function EnrollmentCard() {
         <span className="text-sm text-primary-500 line-through font-medium leading-none mb-1">$249</span>
         <span className="text-2xl font-bold text-primary-900 leading-none">$199</span>
       </div>
-      <Button variant="primary" className="flex-grow h-12 text-lg font-bold">
-        سجلي الآن
+      <Button 
+        variant="primary" 
+        className="flex-grow h-12 text-lg font-bold"
+        onClick={handleButtonClick}
+        disabled={isLoading || isEnrolling || enrollmentStatus === 'pending'}
+      >
+        {renderButtonContent()}
       </Button>
     </div>
     </>

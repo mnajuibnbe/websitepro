@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { CourseCard } from '../ui/CourseCard';
 import { X, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
 import { getCourses, Course } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function CourseGrid() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function CourseGrid() {
             price={course.price}
             imageUrl={course.thumbnail}
             ctaText="استعرضي الكورس"
-            onEnroll={() => {}}
+            onEnroll={() => navigate(`/course/${course.id}`)}
           />
         ))}
       </div>

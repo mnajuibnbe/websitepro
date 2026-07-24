@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+let code = fs.readFileSync('src/pages/Dashboard.tsx', 'utf8');
+code = `import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { ContinueLearning } from '../components/dashboard/ContinueLearning';
 import { MyCoursesList } from '../components/dashboard/MyCoursesList';
@@ -29,8 +31,6 @@ export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }
           } else {
             setHasEnrollments(false);
           }
-        } else {
-           onNavigate('#/login');
         }
       } catch (err) {
         console.error(err);
@@ -104,7 +104,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }
                  </p>
                  <Button 
                    variant="primary" 
-                   onClick={() => onNavigate('#/courses')}
+                   onClick={() => onNavigate('#/')}
                    className="h-12 px-8 text-lg"
                  >
                    استكشاف الكورسات
@@ -145,3 +145,5 @@ export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }
     </div>
   );
 }
+`;
+fs.writeFileSync('src/pages/Dashboard.tsx', code);

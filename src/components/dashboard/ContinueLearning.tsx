@@ -1,7 +1,60 @@
-import React from 'react';
-import { PlayCircle, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PlayCircle, Clock, Loader2 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 export function ContinueLearning() {
+  const [course, setCourse] = useState<any>(null);
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadLatestCourse() {
+      try {
+        const { data, error } = await supabase
+          .from('courses')
+          .select('*')
+          .limit(1)
+          .single();
+        
+        if (data) {
+          setCourse(data);
+          
+          const { data: userData } = await supabase.auth.getUser();
+          if (userData?.user) {
+             const [lessonsCountRes, progressRes] = await Promise.all([
+               supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', data.id),
+               supabase.from('user_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', userData.user.id)
+             ]);
+             
+             const totalLessons = lessonsCountRes.count || 0;
+             const completedLessons = progressRes.data?.length || 0;
+             
+             if (totalLessons > 0) {
+               setProgress(Math.round((completedLessons / totalLessons) * 100));
+             }
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadLatestCourse();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm flex items-center justify-center min-h-[200px]">
+        <Loader2 className="w-8 h-8 text-accent-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!course) {
+    return null; // Or return a placeholder if no courses exist
+  }
+
   return (
     <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
       {/* Background Accent */}
@@ -16,28 +69,21 @@ export function ContinueLearning() {
             قيد الدراسة
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-2">
-            دبلومة العناية بالبشرة والشعر
+            {course.title}
           </h2>
           <p className="text-primary-600 font-medium mb-6">
-            الدرس الحالي: <strong className="text-primary-800">حاجز البشرة (Skin Barrier)</strong>
+            الدرس الحالي: <strong className="text-primary-800">مقدمة الكورس</strong>
           </p>
           
           {/* Progress */}
           <div className="w-full max-w-md">
             <div className="flex justify-between text-sm font-bold mb-2">
               <span className="text-primary-900">التقدم الإجمالي</span>
-              <span className="text-accent-600">35%</span>
+              <span className="text-accent-600">{progress}%</span>
             </div>
             <div className="w-full h-2.5 bg-primary-100 rounded-full overflow-hidden">
-              <div className="h-full bg-accent-500 rounded-full w-[35%] relative">
-                <div className="absolute inset-0 bg-white/20 overflow-hidden">
-                  <div className="w-full h-full -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
-                </div>
+              <div className="h-full bg-accent-500 rounded-full relative transition-all duration-1000" style={{ width: `${progress}%` }}>
               </div>
-            </div>
-            <div className="text-xs text-primary-500 font-medium mt-2 flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              <span>متبقي 45 ساعة تقريباً</span>
             </div>
           </div>
         </div>
@@ -45,7 +91,7 @@ export function ContinueLearning() {
         {/* CTA */}
         <div className="w-full md:w-auto flex-shrink-0">
           <button 
-            onClick={() => window.location.hash = '#/lesson'}
+            onClick={() => window.location.hash = `#/lesson?courseId=${course.id}`}
             className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent-600 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-md shadow-accent-600/20 hover:bg-accent-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
             <PlayCircle className="w-6 h-6" />

@@ -106,15 +106,24 @@ const MOCK_USERS: User[] = [
 export async function login(email: string, password: string):Promise<{token: string, user: User}> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const user = MOCK_USERS.find(u => u.email === email);
-      if (user && password === 'password123') { // Hardcoded password for mock
-        resolve({
-          token: `mock-jwt-token-${user.id}`,
-          user
-        });
-      } else {
-        reject(new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة.'));
+      // In the new flow, we already verified credentials with Supabase, 
+      // so this is just to hydrate our local AuthContext mock state.
+      let user = MOCK_USERS.find(u => u.email === email);
+      
+      if (!user) {
+        user = {
+          id: `usr_${Date.now()}`,
+          name: email.split('@')[0],
+          email: email,
+          role: 'student',
+          joinedAt: new Date().toISOString()
+        };
       }
+      
+      resolve({
+        token: `mock-jwt-token-${user.id}`,
+        user
+      });
     }, 800);
   });
 }
@@ -205,7 +214,18 @@ export async function getUserProfile(token: string): Promise<User | null> {
       }
       // Simple mock: extract user ID from the token structure "mock-jwt-token-<id>"
       const userId = token.replace('mock-jwt-token-', '');
-      const user = MOCK_USERS.find(u => u.id === userId) || null;
+      let user = MOCK_USERS.find(u => u.id === userId);
+      
+      if (!user) {
+        // Synthesize user to prevent logout on refresh for non-hardcoded users
+        user = {
+          id: userId,
+          name: 'طالب (تم التحقق عبر Supabase)',
+          email: 'user@example.com',
+          role: 'student',
+          joinedAt: new Date().toISOString()
+        };
+      }
       resolve(user);
     }, 500);
   });

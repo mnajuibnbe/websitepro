@@ -1,8 +1,10 @@
 import React from 'react';
 import { CourseCard } from '../ui/CourseCard';
 import { Button } from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 export function FeaturedCourses() {
+  const navigate = useNavigate();
   const courses = [
     {
       id: 1,
@@ -63,18 +65,17 @@ export function FeaturedCourses() {
               price={course.price}
               imageUrl={course.imageUrl}
               ctaText="استعرضي الكورس"
-              onEnroll={() => window.location.hash = '#/course'}
+              onEnroll={() => navigate(`/course/${course.id}`)}
             />
           ))}
         </div>
         
         {/* Bottom CTA */}
         <div className="flex justify-center">
-          <Button variant="secondary" className="px-8" onClick={() => window.location.hash = '#/courses'}>
+          <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
             عرض جميع الكورسات
           </Button>
         </div>
-
       </div>
     </section>
   );

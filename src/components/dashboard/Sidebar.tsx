@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, BookOpen, Award, Settings, LogOut, Menu, X } from 'lucide-react';
 import { FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +12,17 @@ interface SidebarProps {
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { logout } = useAuth();
   const currentPath = window.location.hash || '#/dashboard';
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user?.email === 'm.najuib.nbe@gmail.com') {
+        setIsAdmin(true);
+      }
+    }
+    checkAdmin();
+  }, []);
   
   const navItems = [
     { icon: Home, label: 'لوحة التحكم', href: '#/dashboard' },
@@ -37,13 +49,13 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       >
         {/* Header / Logo */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-primary-100">
-          <div className="flex items-center gap-2">
+          <a href="#/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="relative flex items-center justify-center text-accent-600">
               <FlaskConical className="w-8 h-8" strokeWidth={1.5} />
               <Droplet className="w-3 h-3 absolute bottom-0 right-0 text-accent-400 fill-current" />
             </div>
             <span className="font-bold text-xl tracking-tight text-primary-900 uppercase">Tutiba</span>
-          </div>
+          </a>
           <button 
             className="lg:hidden text-primary-500 hover:text-primary-900"
             onClick={() => setIsOpen(false)}
@@ -76,10 +88,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
         {/* Footer / Logout */}
         <div className="p-4 border-t border-primary-100">
-          <a href="#/admin" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
-            <Settings className="w-5 h-5" />
-            <span>لوحة الإدارة (للتجربة)</span>
-          </a>
+          {isAdmin && (
+            <a href="#/admin" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
+              <Settings className="w-5 h-5" />
+              <span>لوحة الإدارة</span>
+            </a>
+          )}
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>تسجيل الخروج</span>

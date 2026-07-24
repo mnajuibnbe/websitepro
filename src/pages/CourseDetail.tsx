@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { CourseHero } from '../components/course-detail/CourseHero';
@@ -9,8 +9,49 @@ import { Requirements } from '../components/course-detail/Requirements';
 import { CurriculumAccordion } from '../components/course-detail/CurriculumAccordion';
 import { CourseInstructor } from '../components/course-detail/CourseInstructor';
 import { CourseReviews } from '../components/course-detail/CourseReviews';
+import { useParams } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { Loader2 } from 'lucide-react';
 
-export function CourseDetail() {
+export function CourseDetail({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const { id } = useParams<{ id: string }>();
+  const [course, setCourse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCourse() {
+      try {
+        setIsLoading(true);
+        if (id) {
+          const { data, error } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('id', id)
+            .single();
+            
+          if (data) {
+            setCourse(data);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching course:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchCourse();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <MarketingNavbar />
+        <Loader2 className="w-12 h-12 text-accent-600 animate-spin mt-20" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <MarketingNavbar />
@@ -23,7 +64,7 @@ export function CourseDetail() {
             
             {/* Content Area (8 columns on Desktop) */}
             <div className="lg:col-span-8 order-1">
-              <CourseHero />
+              <CourseHero course={course} />
               
               {/* Additional content sections */}
               <LearningOutcomes />
@@ -36,11 +77,10 @@ export function CourseDetail() {
 
             {/* Sidebar Area (4 columns on Desktop) */}
             <div className="lg:col-span-4 order-2">
-              <EnrollmentCard />
+              <EnrollmentCard onNavigate={onNavigate} />
             </div>
             
           </div>
-
         </div>
       </main>
 

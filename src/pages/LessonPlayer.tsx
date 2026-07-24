@@ -21,20 +21,33 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
     const lessonId = params.get('lessonId');
 
     async function loadData() {
-      if (!courseId) {
-        setError('رقم الكورس مفقود. يرجى العودة للوحة التحكم واختيار كورس.');
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
         setError(null);
+        
+        let targetCourseId = courseId;
+        
+        if (!targetCourseId) {
+          // If no courseId in URL, try to fetch the first available course
+          const { data: firstCourse, error: fcError } = await supabase
+            .from('courses')
+            .select('id')
+            .limit(1)
+            .single();
+            
+          if (firstCourse) {
+            targetCourseId = firstCourse.id;
+          } else {
+            setError('لا توجد كورسات متاحة حالياً.');
+            setIsLoading(false);
+            return;
+          }
+        }
 
         const { data: courseData, error: courseError } = await supabase
           .from('courses')
           .select('*')
-          .eq('id', courseId)
+          .eq('id', targetCourseId)
           .single();
 
         if (courseError || !courseData) throw new Error('لم يتم العثور على الكورس.');
@@ -42,7 +55,7 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
         const { data: lessonsData, error: lessonsError } = await supabase
           .from('lessons')
           .select('*')
-          .eq('course_id', courseId)
+          .eq('course_id', targetCourseId)
           .order('order_index', { ascending: true });
 
         if (lessonsError) throw new Error('حدث خطأ أثناء تحميل الدروس.');
@@ -56,6 +69,19 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
             setCurrentLesson(found || lessonsData[0]);
           } else {
             setCurrentLesson(lessonsData[0]);
+          }
+        }
+
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          const { data: progressData } = await supabase
+            .from('user_progress')
+            .select('lesson_id')
+            .eq('course_id', targetCourseId)
+            .eq('user_id', userData.user.id);
+          
+          if (progressData) {
+            setCompletedLessons(progressData.map((p: any) => p.lesson_id));
           }
         }
       } catch (err: any) {
@@ -77,9 +103,42 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
     }
   };
 
-  const handleCompleteLesson = () => {
-    if (currentLesson && !completedLessons.includes(currentLesson.id)) {
-      setCompletedLessons([...completedLessons, currentLesson.id]);
+  const [isCompleting, setIsCompleting] = useState(false);
+
+  const handleCompleteLesson = async () => {
+    if (!currentLesson || completedLessons.includes(currentLesson.id) || isCompleting) return;
+
+    try {
+      setIsCompleting(true);
+      const { data: userData } = await supabase.auth.getUser();
+      
+      if (userData?.user) {
+        const { error } = await supabase
+          .from('user_progress')
+          .insert({
+            user_id: userData.user.id,
+            course_id: course.id,
+            lesson_id: currentLesson.id
+          });
+          
+        if (error) {
+          console.error("Error saving progress:", error);
+          // If already exists, it might throw a unique constraint error, we can ignore it
+        }
+      }
+
+      setCompletedLessons(prev => [...prev, currentLesson.id]);
+      
+      // Auto move to next lesson
+      const currentIndex = lessons.findIndex(l => l.id === currentLesson.id);
+      if (currentIndex < lessons.length - 1) {
+        const nextLesson = lessons[currentIndex + 1];
+        handleLessonSelect(nextLesson);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsCompleting(false);
     }
   };
 
