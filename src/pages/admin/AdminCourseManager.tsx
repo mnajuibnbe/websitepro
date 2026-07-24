@@ -30,32 +30,12 @@ export function AdminCourseManager() {
       if (error) {
         console.error('Error fetching DB courses:', error);
       }
-
-      // Fetch mock courses to maintain legacy UI completeness
-      const { getCourses } = await import('../../services/api');
-      const mockCourses = await getCourses();
-
-      const merged = [...(dbCourses || [])];
       
-      // Append mocks that don't share IDs with DB courses
-      mockCourses.forEach(mock => {
-        if (!merged.find(c => String(c.id) === String(mock.id))) {
-          merged.push({
-            ...mock,
-            created_at: new Date().toISOString(), // stub
-            status: mock.status === 'active' ? 'نشط' : 'مسودة',
-            price: mock.price ? `${mock.price} ر.س` : 'مجاني',
-            students: Math.floor(Math.random() * 100) // stub since we don't have this in mock DB
-          });
-        }
-      });
-      
-      // Map DB courses to view format
-      const viewCourses = merged.map(c => ({
+      const viewCourses = (dbCourses || []).map(c => ({
         ...c,
         status: c.status === 'active' || c.status === 'نشط' ? 'نشط' : 'مسودة',
         price: typeof c.price === 'number' ? `${c.price} ر.س` : c.price,
-        students: c.students || 0
+        students: 0
       }));
 
       setCourses(viewCourses);
