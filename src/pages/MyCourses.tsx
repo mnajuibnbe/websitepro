@@ -1,3 +1,4 @@
+import { useAuth } from '../contexts/AuthContext';
 import React, { useEffect, useState } from 'react';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { PlayCircle, Clock, Award, BookOpen, Loader2, Menu } from 'lucide-react';
@@ -6,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 export function MyCourses() {
+  const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,9 +21,9 @@ export function MyCourses() {
   async function fetchMyCourses() {
     try {
       setIsLoading(true);
-      const { data: userData } = await supabase.auth.getUser();
       
-      if (!userData?.user) {
+      
+      if (!user) {
         navigate('/login');
         return;
       }
@@ -30,7 +32,7 @@ export function MyCourses() {
       const { data: enrollmentsData, error: enrollmentsError } = await supabase
         .from('enrollments')
         .select('*')
-        .eq('user_id', userData.user.id)
+        .eq('user_id', user.id)
         .eq('status', 'active');
 
       if (enrollmentsError) {

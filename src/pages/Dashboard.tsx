@@ -1,3 +1,4 @@
+import { useAuth } from '../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/dashboard/Sidebar';
@@ -10,6 +11,7 @@ import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 
 export function Dashboard() {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,12 +21,11 @@ export function Dashboard() {
   useEffect(() => {
     async function checkEnrollments() {
       try {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user) {
+        if (user) {
           const { count, error } = await supabase
             .from('enrollments')
             .select('*', { count: 'exact', head: true })
-            .eq('user_id', userData.user.id)
+            .eq('user_id', user.id)
             .eq('status', 'active');
             
           if (count && count > 0) {

@@ -3,43 +3,31 @@ import { useNavigate , Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { User as UserIcon, Mail, Lock, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-
   const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
     
     try {
-      // 1. استخدام دالة التسجيل الخاصة بـ Supabase مع تمرير الاسم (full_name)
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: name // الاسم المأخوذ من حقل الاسم في النموذج
-          }
-        }
-      });
-
-      if (signUpError) {
-        throw signUpError;
-      }
-
-      // 2. تحديث الـ Context المحلي للمحافظة على واجهة المستخدم الحالية أثناء العرض
-      await register(name, email, password);
+      const result = await register(name.trim(), email.trim(), password);
       
-      navigate('/dashboard');
+      if (result.requiresEmailConfirmation) {
+        setSuccessMessage('تم إنشاء حسابك بنجاح. يرجى مراجعة بريدك الإلكتروني لتفعيل الحساب.');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء التسجيل');
     } finally {
@@ -61,6 +49,12 @@ export function RegisterPage() {
           </div>
         )}
 
+        {successMessage && (
+          <div className="bg-success-50 text-success-700 px-4 py-3 rounded-xl border border-success-200 text-sm mb-6 font-medium text-center">
+            {successMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-primary-900 mb-2">الاسم الكامل</label>
@@ -75,6 +69,7 @@ export function RegisterPage() {
                 required
                 className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
                 placeholder="الاسم الثلاثي"
+                disabled={!!successMessage}
               />
             </div>
           </div>
@@ -93,6 +88,7 @@ export function RegisterPage() {
                 className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
                 placeholder="name@example.com"
                 dir="ltr"
+                disabled={!!successMessage}
               />
             </div>
           </div>
@@ -111,6 +107,7 @@ export function RegisterPage() {
                 className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
                 placeholder="••••••••"
                 dir="ltr"
+                disabled={!!successMessage}
               />
             </div>
           </div>
@@ -119,7 +116,7 @@ export function RegisterPage() {
             type="submit" 
             variant="primary" 
             className="w-full h-12 text-lg"
-            disabled={isLoading}
+            disabled={isLoading || !!successMessage}
           >
             {isLoading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}
           </Button>

@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2 } from 'lucide-react';
@@ -5,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate } from 'react-router-dom';
 
 export function EnrollmentCard() {
+  const { user, session } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState<string | null>(id || null);
@@ -33,13 +35,13 @@ export function EnrollmentCard() {
         if (targetCourseId) {
           setCourseId(targetCourseId);
           
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user) {
+          
+          if (user) {
             const { data: enrollment } = await supabase
               .from('enrollments')
               .select('status')
               .eq('course_id', targetCourseId)
-              .eq('user_id', session.user.id)
+              .eq('user_id', user?.id)
               .single();
               
             if (enrollment) {
@@ -61,9 +63,9 @@ export function EnrollmentCard() {
     if (!courseId) return;
     try {
       setIsEnrolling(true);
-      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session?.user) {
+      
+      if (!user) {
         navigate('/login');
         return;
       }
@@ -71,7 +73,7 @@ export function EnrollmentCard() {
       const { error } = await supabase
         .from('enrollments')
         .insert({
-          user_id: session.user.id,
+          user_id: user?.id,
           course_id: courseId,
           status: 'pending'
         });

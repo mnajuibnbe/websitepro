@@ -11,6 +11,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
+  const { user } = useAuth();
   const { logout } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -18,8 +19,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   useEffect(() => {
     async function checkAdmin() {
-      const { data } = await supabase.auth.getUser();
-      if (data?.user?.email === 'm.najuib.nbe@gmail.com') {
+      
+      if (user?.email === 'm.najuib.nbe@gmail.com') {
         setIsAdmin(true);
       }
     }

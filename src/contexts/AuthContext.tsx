@@ -1,72 +1,117 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin, register as apiRegister, getUserProfile, User } from '../services/api';
+import { supabase } from '../lib/supabase';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
+import { User } from '../services/api';
+
+export interface RegisterResult {
+  user: User | null;
+  session: Session | null;
+  requiresEmailConfirmation: boolean;
+}
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
-  token: string | null;
+  register: (name: string, email: string, password: string) => Promise<RegisterResult>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function mapSupabaseUserToLocalUser(supabaseUser: SupabaseUser): User {
+  const appRole = supabaseUser.app_metadata?.role;
+  const role = appRole === 'admin' ? 'admin' : 'student';
+
+  let name = supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name;
+  if (!name && supabaseUser.email) {
+    name = supabaseUser.email.split('@')[0];
+  }
+  if (!name) name = 'User';
+
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email || '',
+    name: name,
+    role: role,
+    joinedAt: supabaseUser.created_at || new Date().toISOString(),
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
-    async function checkSession() {
-      const savedToken = localStorage.getItem('auth_token');
-      if (savedToken) {
-        try {
-          const profile = await getUserProfile(savedToken);
-          if (profile) {
-            setUser(profile);
-            setToken(savedToken);
-          } else {
-            localStorage.removeItem('auth_token');
-          }
-        } catch (e) {
-          console.error('Session check failed', e);
-          localStorage.removeItem('auth_token');
-        }
-      }
+    localStorage.removeItem('auth_token');
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ? mapSupabaseUserToLocalUser(session.user) : null);
       setIsLoading(false);
-    }
-    
-    checkSession();
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ? mapSupabaseUserToLocalUser(session.user) : null);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await apiLogin(email, password);
-    setUser(res.user);
-    setToken(res.token);
-    localStorage.setItem('auth_token', res.token);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      if (error.message.includes('Invalid login credentials')) {
+        throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      }
+      throw error;
+    }
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    const res = await apiRegister(name, email, password);
-    setUser(res.user);
-    setToken(res.token);
-    localStorage.setItem('auth_token', res.token);
+  const register = async (name: string, email: string, password: string): Promise<RegisterResult> => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    const requiresEmailConfirmation = !data.session;
+    
+    return {
+      user: data.user ? mapSupabaseUserToLocalUser(data.user) : null,
+      session: data.session,
+      requiresEmailConfirmation
+    };
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('auth_token');
+  const logout = async () => {
+    await supabase.auth.signOut();
     navigate('/login');
   };
 
+  const token = session?.access_token || null;
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout, token }}>
+    <AuthContext.Provider value={{ user, session, token, isAuthenticated: !!session, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

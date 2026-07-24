@@ -3,11 +3,9 @@ import { useNavigate , Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 export function LoginPage() {
   const navigate = useNavigate();
-
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,21 +18,7 @@ export function LoginPage() {
     setError(null);
     
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (signInError) {
-        if (signInError.message.includes('Invalid login credentials')) {
-          throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-        }
-        throw signInError;
-      }
-
-      // Update the local context to keep the app UI in sync
-      await login(email, password);
-      
+      await login(email.trim(), password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');

@@ -77,13 +77,12 @@ export function LessonPlayer() { const navigate = useNavigate();
           }
         }
 
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user) {
+        if (user) {
           const { data: progressData } = await supabase
             .from('user_progress')
             .select('lesson_id')
             .eq('course_id', targetCourseId)
-            .eq('user_id', userData.user.id);
+            .eq('user_id', user.id);
           
           if (progressData) {
             setCompletedLessons(progressData.map((p: any) => p.lesson_id));
@@ -115,13 +114,13 @@ export function LessonPlayer() { const navigate = useNavigate();
 
     try {
       setIsCompleting(true);
-      const { data: userData } = await supabase.auth.getUser();
       
-      if (userData?.user) {
+      
+      if (user) {
         const { error } = await supabase
           .from('user_progress')
           .insert({
-            user_id: userData.user.id,
+            user_id: user.id,
             course_id: course.id,
             lesson_id: currentLesson.id
           });

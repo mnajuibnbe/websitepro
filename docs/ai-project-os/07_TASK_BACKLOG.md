@@ -10,3 +10,7 @@
 ## Low Priority
 4. **Implement Quiz Logic**: Connect `Quiz.tsx` to the backend to persist grades/completion.
 5. **Implement Certificate Generation**: Populate `CertificatePage.tsx` with dynamic user and course data.
+
+## Completed Tasks
+- **TASK ROUTING-001**: Unified routing under React Router.
+- **TASK AUTH-001**: Unified authentication using Supabase Auth as single source of truth.

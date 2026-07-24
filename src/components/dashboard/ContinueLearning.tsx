@@ -1,9 +1,11 @@
+import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Clock, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export function ContinueLearning() {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [course, setCourse] = useState<any>(null);
@@ -22,11 +24,11 @@ export function ContinueLearning() {
         if (data) {
           setCourse(data);
           
-          const { data: userData } = await supabase.auth.getUser();
-          if (userData?.user) {
+          
+          if (user) {
              const [lessonsCountRes, progressRes] = await Promise.all([
                supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', data.id),
-               supabase.from('user_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', userData.user.id)
+               supabase.from('user_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', user.id)
              ]);
              
              const totalLessons = lessonsCountRes.count || 0;

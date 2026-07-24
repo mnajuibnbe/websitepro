@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
@@ -5,6 +6,7 @@ import { Users, BookOpen, DollarSign, TrendingUp, CheckCircle, Loader2, CheckCir
 import { supabase } from '../../lib/supabase';
 
 export function AdminDashboard() {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,20 +22,12 @@ export function AdminDashboard() {
   }, []);
 
   async function checkAuthAndLoadData() {
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      
-      if (!userData?.user || userData.user.email !== 'm.najuib.nbe@gmail.com') {
-        navigate('/dashboard');
-        return;
-      }
-      
-      setIsCheckingAuth(false);
-      loadPendingEnrollments();
-    } catch (e) {
-      console.error(e);
+    if (!user || user.email !== 'm.najuib.nbe@gmail.com') {
       navigate('/dashboard');
+      return;
     }
+    setIsCheckingAuth(false);
+    loadPendingEnrollments();
   }
 
   async function loadPendingEnrollments() {
