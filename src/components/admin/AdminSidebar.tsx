@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Users, Settings, LogOut, Menu, X, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -9,12 +10,13 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout } = useAuth();
-  const currentPath = window.location.hash || '#/admin';
+  const location = useLocation();
+  const currentPath = location.pathname;
   
   const navItems = [
-    { icon: BarChart3, label: 'لوحة القيادة', href: '#/admin' },
-    { icon: BookOpen, label: 'إدارة الكورسات', href: '#/admin/courses' },
-    { icon: Users, label: 'إدارة الطلاب', href: '#/admin/users' },
+    { icon: BarChart3, label: 'لوحة القيادة', href: '/admin' },
+    { icon: BookOpen, label: 'إدارة الكورسات', href: '/admin/courses' },
+    { icon: Users, label: 'إدارة الطلاب', href: '/admin/users' },
   ];
 
   return (
@@ -43,11 +45,11 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         <nav className="flex-grow py-8 px-4 flex flex-col gap-2">
           {navItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href || (item.href === '#/admin/courses' && currentPath === '#/admin/courses/edit');
+            const isActive = currentPath === item.href || (item.href === '/admin/courses' && currentPath === '/admin/courses/edit');
             return (
-              <a 
+              <Link 
                 key={index} 
-                href={item.href}
+                to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
                   isActive 
                     ? 'bg-accent-50 text-accent-700' 
@@ -56,17 +58,17 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-accent-600' : 'text-primary-400'}`} />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
 
         {/* Footer / Logout */}
         <div className="p-4 border-t border-primary-100">
-          <a href="#/dashboard" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
+          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
             <Home className="w-5 h-5" />
             <span>لوحة الطالب</span>
-          </a>
+          </Link>
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>تسجيل الخروج</span>

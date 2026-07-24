@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-export function CourseDetail({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,7 +77,7 @@ export function CourseDetail({ onNavigate }: { onNavigate: (path: string) => voi
 
             {/* Sidebar Area (4 columns on Desktop) */}
             <div className="lg:col-span-4 order-2">
-              <EnrollmentCard onNavigate={onNavigate} />
+              <EnrollmentCard />
             </div>
             
           </div>

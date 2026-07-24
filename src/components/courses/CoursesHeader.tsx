@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 
 export function CoursesHeader() {
@@ -15,7 +16,7 @@ export function CoursesHeader() {
     <div className="pt-24 md:pt-32 pb-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
-        <a href="#/" className="hover:text-accent-600 transition-colors">الرئيسية</a>
+        <Link to="/" className="hover:text-accent-600 transition-colors">الرئيسية</Link>
         <ChevronLeft className="w-4 h-4" />
         <span className="text-primary-900 font-bold">الكورسات</span>
       </nav>

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Lock, Eye, EyeOff, Loader2, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-export function UpdatePassword({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function UpdatePassword() {
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -110,7 +113,7 @@ export function UpdatePassword({ onNavigate }: { onNavigate: (path: string) => v
 
       setSuccess(true);
       setTimeout(() => {
-        onNavigate('#/login');
+        navigate('/login');
       }, 3000);
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء تحديث كلمة المرور.');
@@ -144,13 +147,13 @@ export function UpdatePassword({ onNavigate }: { onNavigate: (path: string) => v
           </p>
           <div className="space-y-3">
             <button
-              onClick={() => onNavigate('#/forgot-password')}
+              onClick={() => navigate('/forgot-password')}
               className="w-full py-3 px-4 bg-accent-600 hover:bg-accent-700 text-white font-bold rounded-xl transition-colors text-sm"
             >
               طلب رابط جديد لإعادة التعيين
             </button>
             <button
-              onClick={() => onNavigate('#/login')}
+              onClick={() => navigate('/login')}
               className="w-full py-3 px-4 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold rounded-xl transition-colors text-sm"
             >
               العودة لتسجيل الدخول
@@ -187,7 +190,7 @@ export function UpdatePassword({ onNavigate }: { onNavigate: (path: string) => v
                 جاري توجيهك إلى صفحة تسجيل الدخول...
               </p>
               <button
-                onClick={() => onNavigate('#/login')}
+                onClick={() => navigate('/login')}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors"
               >
                 الذهاب لتسجيل الدخول
@@ -268,7 +271,7 @@ export function UpdatePassword({ onNavigate }: { onNavigate: (path: string) => v
         
         <div className="mt-6 text-center">
           <button 
-            onClick={() => onNavigate('#/login')}
+            onClick={() => navigate('/login')}
             className="inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />

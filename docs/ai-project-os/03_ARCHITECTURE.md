@@ -1,20 +1,17 @@
 # Architecture
 
 ## Application Structure
-- `src/App.tsx`: Main entry point declaring the `HashRouter`, `AuthProvider`, and `AppContent` which maps standard React Router `<Route>` components.
+- `src/App.tsx`: Main entry point declaring the `HashRouter`, `AuthProvider`, and standard React Router `<Route>` components.
 - `src/pages/`: Contains page-level components.
 - `src/components/`: Contains reusable UI widgets and sections.
 - `src/lib/`: Contains utility configurations, notably `supabase.ts`.
 
-## Routing Architecture (In transition)
-The app is currently transitioning to `react-router-dom`, utilizing `HashRouter`.
+## Routing Architecture
+The app uses a strict `react-router-dom` architecture utilizing `HashRouter`.
+- **Navigation Components:** Internal routing is managed using `<Link>` components to maintain correct history context.
+- **Programmatic Navigation:** Uses `useNavigate()` securely within components.
+- **Exception Flow:** Password recovery redirects emitted by Supabase are trapped directly in `App.tsx` by inspecting `location.hash` and `location.search` to mount the `<UpdatePassword />` component.
 
-### Inconsistencies
-The codebase uses four different paradigms for navigation simultaneously:
-1. `useNavigate()` hook from `react-router-dom` (The intended architecture).
-2. The `onNavigate` prop passed down from `AppContent` (Legacy wrapper acting as an intermediary).
-3. Direct DOM manipulation: `window.location.hash = '#/...'` (Legacy).
-4. Direct HTML links: `<a href="#/...">` (Legacy).
-
-### The `onNavigate` anti-pattern
-`App.tsx` defines a function `onNavigate` that strips `#/` prefixes and invokes `navigate()`. This prop is drilled into almost every page component, which is unnecessary when `useNavigate` is globally available inside the `<HashRouter>` context.
+## Security Architecture
+- Route protection is managed via `<ProtectedRoute>`.
+- **NOTE:** Admin routes (e.g., `/admin`) are currently `Authenticated only` at the routing level. `requiredRole="admin"` logic is implemented but not strictly enforced on the routes themselves. Authorization heavily relies on hardcoded email checks within the frontend components.

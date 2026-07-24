@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export function ForgotPassword({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function ForgotPassword() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +52,7 @@ export function ForgotPassword({ onNavigate }: { onNavigate: (path: string) => v
               يرجى التحقق من بريدك الإلكتروني ({email}) واتباع الرابط لإعادة تعيين كلمة المرور.
             </p>
             <Button 
-              onClick={() => onNavigate('#/login')}
+              onClick={() => navigate('/login')}
               variant="primary"
               className="w-full h-12 text-lg"
             >
@@ -96,17 +99,16 @@ export function ForgotPassword({ onNavigate }: { onNavigate: (path: string) => v
         )}
                 
         <div className="mt-8 text-center">
-          <a
-            href="#/login"
+          <Link to="/login"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('#/login');
+              navigate('/login');
             }}
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors font-medium"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة لتسجيل الدخول</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

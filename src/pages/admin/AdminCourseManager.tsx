@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
-export function AdminCourseManager({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function AdminCourseManager() {
+  const navigate = useNavigate();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -24,7 +27,7 @@ export function AdminCourseManager({ onNavigate }: { onNavigate: (path: string) 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h1 className="text-3xl font-bold text-primary-900">إدارة الكورسات</h1>
-            <Button variant="primary" className="flex items-center gap-2" onClick={() => onNavigate('#/admin/courses/edit')}>
+            <Button variant="primary" className="flex items-center gap-2" onClick={() => navigate('/admin/courses/edit')}>
               <Plus className="w-5 h-5" />
               إضافة كورس جديد
             </Button>
@@ -67,7 +70,7 @@ export function AdminCourseManager({ onNavigate }: { onNavigate: (path: string) 
                         </span>
                       </td>
                       <td className="py-4 px-6 flex justify-center gap-2">
-                        <button onClick={() => onNavigate('#/admin/courses/edit')} className="p-2 text-primary-500 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors" title="تعديل">
+                        <button onClick={() => navigate('/admin/courses/edit')} className="p-2 text-primary-500 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors" title="تعديل">
                           <Edit className="w-5 h-5" />
                         </button>
                         <button className="p-2 text-primary-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors" title="حذف">

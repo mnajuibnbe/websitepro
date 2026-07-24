@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function LoginPage() {
+  const navigate = useNavigate();
+
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,7 +35,7 @@ export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }
       // Update the local context to keep the app UI in sync
       await login(email, password);
       
-      onNavigate('#/dashboard');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
     } finally {
@@ -76,7 +79,7 @@ export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-bold text-primary-900">كلمة المرور</label>
-              <a href="#/forgot-password" onClick={(e) => { e.preventDefault(); onNavigate("#/forgot-password"); }} className="text-sm font-medium text-accent-600 hover:text-accent-700">نسيت كلمة المرور؟</a>
+              <Link to="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }} className="text-sm font-medium text-accent-600 hover:text-accent-700">نسيت كلمة المرور؟</Link>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
@@ -106,30 +109,28 @@ export function LoginPage({ onNavigate }: { onNavigate: (path: string) => void }
 
         <div className="mt-8 text-center text-primary-600">
           ليس لديك حساب؟{' '}
-          <a 
-            href="#/register" 
+          <Link to="/register" 
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('#/register');
+              navigate('/register');
             }}
             className="font-bold text-accent-600 hover:text-accent-700"
           >
             إنشاء حساب جديد
-          </a>
+          </Link>
         </div>
         
         <div className="mt-6 text-center">
-          <a
-            href="#/"
+          <Link to="/"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('#/');
+              navigate('/');
             }}
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BookOpen, FileText, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/Button';
 
@@ -55,7 +56,7 @@ export function PlayerTabs() {
           <div>
             <h3 className="text-xl font-bold text-primary-900 mb-6">الملفات المرفقة</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <a href="#/lesson" className="flex items-center justify-between p-4 rounded-xl border border-primary-200 hover:border-accent-500 hover:bg-accent-50 transition-colors group">
+              <Link to="/lesson" className="flex items-center justify-between p-4 rounded-xl border border-primary-200 hover:border-accent-500 hover:bg-accent-50 transition-colors group">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-600 group-hover:bg-white group-hover:text-accent-600">
                     <FileText className="w-5 h-5" />
@@ -65,8 +66,8 @@ export function PlayerTabs() {
                     <span className="text-xs text-primary-500">2.4 MB</span>
                   </div>
                 </div>
-              </a>
-              <a href="#/lesson" className="flex items-center justify-between p-4 rounded-xl border border-primary-200 hover:border-accent-500 hover:bg-accent-50 transition-colors group">
+              </Link>
+              <Link to="/lesson" className="flex items-center justify-between p-4 rounded-xl border border-primary-200 hover:border-accent-500 hover:bg-accent-50 transition-colors group">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-600 group-hover:bg-white group-hover:text-accent-600">
                     <BookOpen className="w-5 h-5" />
@@ -76,7 +77,7 @@ export function PlayerTabs() {
                     <span className="text-xs text-primary-500">Links</span>
                   </div>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
         )}

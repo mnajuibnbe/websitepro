@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Tag, ShieldCheck, Loader2 } from 'lucide-react';
 
 export function OrderSummary() {
+  const navigate = useNavigate();
+
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = () => {
@@ -11,7 +14,7 @@ export function OrderSummary() {
     // Simulate API call
     setTimeout(() => {
       setIsProcessing(false);
-      window.location.hash = '#/dashboard';
+      navigate('/dashboard');
     }, 1500);
   };
 

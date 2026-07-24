@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FlaskConical, Droplet, ChevronDown, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
 
 export function Footer() {
@@ -76,18 +77,18 @@ export function Footer() {
               المرجع العلمي العربي الأول في الكوسميسوتيكال للمهنيين الصحيين. نبني ثقتك العلمية بأسس تطبيقية دقيقة.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Facebook">
+              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Facebook">
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Instagram">
+              </Link>
+              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Instagram">
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="LinkedIn">
+              </Link>
+              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="LinkedIn">
                 <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Twitter">
+              </Link>
+              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Twitter">
                 <Twitter className="w-5 h-5" />
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2 } from
 import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate } from 'react-router-dom';
 
-export function EnrollmentCard({ onNavigate }: { onNavigate?: (path: string) => void }) {
+export function EnrollmentCard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState<string | null>(id || null);

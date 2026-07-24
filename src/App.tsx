@@ -27,18 +27,19 @@ import { UpdatePassword } from './pages/UpdatePassword';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { AdminUserManagement } from './pages/admin/AdminUserManagement';
 
-function ProtectedRoute({ children, onNavigate, requiredRole }: { children: React.ReactNode, onNavigate: (path: string) => void, requiredRole?: 'student' | 'admin' }) {
+function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'student' | 'admin' }) {
+  const navigate = useNavigate();
   const { isAuthenticated, isLoading, user } = useAuth();
   
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        onNavigate('#/login');
+        navigate('/login');
       } else if (requiredRole && user?.role !== requiredRole) {
-        onNavigate('#/dashboard');
+        navigate('/dashboard');
       }
     }
-  }, [isAuthenticated, isLoading, user, onNavigate, requiredRole]);
+  }, [isAuthenticated, isLoading, user, requiredRole, navigate]);
 
   if (isLoading) {
     return (
@@ -57,48 +58,39 @@ function ProtectedRoute({ children, onNavigate, requiredRole }: { children: Reac
 }
 
 function AppContent() {
-  const navigate = useNavigate();
   const location = useLocation();
   
-  const onNavigate = (path: string) => {
-    if (path.startsWith('#/')) {
-      navigate(path.substring(1));
-    } else {
-      navigate(path);
-    }
-  };
-
   if (location.hash.startsWith('#access_token=') || location.hash.startsWith('#recovery_token=') || location.pathname === '/update-password' || location.search.includes('type=recovery')) {
-    return <UpdatePassword onNavigate={onNavigate} />;
+    return <UpdatePassword />;
   }
 
   return (
     <Routes>
-      <Route path="/" element={<Home onNavigate={onNavigate} />} />
-      <Route path="/about" element={<About onNavigate={onNavigate} />} />
-      <Route path="/faq" element={<FAQ onNavigate={onNavigate} />} />
-      <Route path="/courses" element={<CoursesListing onNavigate={onNavigate} />} />
-      <Route path="/course/:id" element={<CourseDetail onNavigate={onNavigate} />} />
-      <Route path="/blog" element={<Blog onNavigate={onNavigate} />} />
-      <Route path="/blog-post" element={<BlogPost onNavigate={onNavigate} />} />
-      <Route path="/checkout" element={<ProtectedRoute onNavigate={onNavigate}><CheckoutPage onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute onNavigate={onNavigate}><Dashboard onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute onNavigate={onNavigate}><UserProfile onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/my-courses" element={<ProtectedRoute onNavigate={onNavigate}><MyCourses onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/lesson" element={<ProtectedRoute onNavigate={onNavigate}><LessonPlayer onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/quiz" element={<ProtectedRoute onNavigate={onNavigate}><QuizPage onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/certificate" element={<ProtectedRoute onNavigate={onNavigate}><CertificatePage onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/login" element={<LoginPage onNavigate={onNavigate} />} />
-      <Route path="/forgot-password" element={<ForgotPassword onNavigate={onNavigate} />} />
-      <Route path="/register" element={<RegisterPage onNavigate={onNavigate} />} />
-      <Route path="/contact" element={<ContactPage onNavigate={onNavigate} />} />
-      <Route path="/privacy" element={<PrivacyPolicy onNavigate={onNavigate} />} />
-      <Route path="/terms" element={<Terms onNavigate={onNavigate} />} />
-      <Route path="/admin" element={<ProtectedRoute onNavigate={onNavigate}><AdminDashboard onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/admin/courses" element={<ProtectedRoute onNavigate={onNavigate}><AdminCourseManager onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/admin/courses/edit" element={<ProtectedRoute onNavigate={onNavigate}><CourseEditor onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="/admin/users" element={<ProtectedRoute onNavigate={onNavigate}><AdminUserManagement onNavigate={onNavigate} /></ProtectedRoute>} />
-      <Route path="*" element={<Home onNavigate={onNavigate} />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/courses" element={<CoursesListing />} />
+      <Route path="/course/:id" element={<CourseDetail />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog-post" element={<BlogPost />} />
+      <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+      <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+      <Route path="/lesson" element={<ProtectedRoute><LessonPlayer /></ProtectedRoute>} />
+      <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+      <Route path="/certificate" element={<ProtectedRoute><CertificatePage /></ProtectedRoute>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/courses" element={<ProtectedRoute><AdminCourseManager /></ProtectedRoute>} />
+      <Route path="/admin/courses/edit" element={<ProtectedRoute><CourseEditor /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute><AdminUserManagement /></ProtectedRoute>} />
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 }

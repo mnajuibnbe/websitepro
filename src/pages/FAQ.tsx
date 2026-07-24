@@ -3,7 +3,7 @@ import { HelpCircle, ChevronDown } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 
-export function FAQ({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function FAQ() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Clock, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export function ContinueLearning() {
+  const navigate = useNavigate();
+
   const [course, setCourse] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +94,7 @@ export function ContinueLearning() {
         {/* CTA */}
         <div className="w-full md:w-auto flex-shrink-0">
           <button 
-            onClick={() => window.location.hash = `#/lesson?courseId=${course.id}`}
+            onClick={() => navigate(`/lesson?courseId=${course.id}`)}
             className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent-600 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-md shadow-accent-600/20 hover:bg-accent-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
             <PlayCircle className="w-6 h-6" />

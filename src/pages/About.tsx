@@ -3,7 +3,7 @@ import { ArrowRight, Info, Award, Users, BookOpen } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 
-export function About({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function About() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

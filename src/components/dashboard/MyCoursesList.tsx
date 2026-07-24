@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { Play, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export function MyCoursesList() {
+  const navigate = useNavigate();
+
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -58,7 +61,7 @@ export function MyCoursesList() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-primary-900">كورساتي الأخرى</h3>
-        <a href="#/courses" className="text-lg font-bold text-accent-600 hover:text-accent-700">عرض الكل</a>
+        <Link to="/courses" className="text-lg font-bold text-accent-600 hover:text-accent-700">عرض الكل</Link>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -66,7 +69,7 @@ export function MyCoursesList() {
           <div 
             key={course.id} 
             className="bg-white border border-primary-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 group cursor-pointer"
-            onClick={() => window.location.hash = `#/lesson?courseId=${course.id}`}
+            onClick={() => navigate(`/lesson?courseId=${course.id}`)}
           >
             <div className="flex h-32">
               <div className="w-1/3 relative overflow-hidden">

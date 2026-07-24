@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { ArrowRight, Calendar, User, ChevronRight } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 
-export function BlogPost({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function BlogPost() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -16,9 +19,9 @@ export function BlogPost({ onNavigate }: { onNavigate: (path: string) => void })
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
-            <a href="#/" onClick={(e) => { e.preventDefault(); onNavigate('#/'); }} className="hover:text-accent-600 transition-colors">الرئيسية</a>
+            <Link to="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-accent-600 transition-colors">الرئيسية</Link>
             <ChevronRight className="w-4 h-4" />
-            <a href="#/blog" onClick={(e) => { e.preventDefault(); onNavigate('#/blog'); }} className="hover:text-accent-600 transition-colors">المدونة</a>
+            <Link to="/blog" onClick={(e) => { e.preventDefault(); navigate('/blog'); }} className="hover:text-accent-600 transition-colors">المدونة</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-primary-900 font-bold truncate">دليلك الشامل لفهم المكونات النشطة</span>
           </nav>

@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { ArrowRight, Shield } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 
-export function PrivacyPolicy({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function PrivacyPolicy() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -67,17 +70,16 @@ export function PrivacyPolicy({ onNavigate }: { onNavigate: (path: string) => vo
             </div>
 
             <div className="mt-12 pt-8 border-t border-primary-200">
-              <a
-                href="#/"
+              <Link to="/"
                 onClick={(e) => {
                   e.preventDefault();
-                  onNavigate('#/');
+                  navigate('/');
                 }}
                 className="inline-flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors font-bold"
               >
                 <ArrowRight className="w-5 h-5" />
                 العودة للصفحة الرئيسية
-              </a>
+              </Link>
             </div>
           </div>
         </div>

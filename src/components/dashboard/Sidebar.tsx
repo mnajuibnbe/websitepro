@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Award, Settings, LogOut, Menu, X } from 'lucide-react';
 import { FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,7 +12,8 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { logout } = useAuth();
-  const currentPath = window.location.hash || '#/dashboard';
+  const location = useLocation();
+  const currentPath = location.pathname;
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -25,10 +27,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   }, []);
   
   const navItems = [
-    { icon: Home, label: 'لوحة التحكم', href: '#/dashboard' },
-    { icon: BookOpen, label: 'كورساتي', href: '#/my-courses' },
-    { icon: Award, label: 'الشهادات', href: '#/certificate' },
-    { icon: Settings, label: 'الإعدادات', href: '#/profile' },
+    { icon: Home, label: 'لوحة التحكم', href: '/dashboard' },
+    { icon: BookOpen, label: 'كورساتي', href: '/my-courses' },
+    { icon: Award, label: 'الشهادات', href: '/certificate' },
+    { icon: Settings, label: 'الإعدادات', href: '/profile' },
   ];
 
   return (
@@ -49,13 +51,13 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       >
         {/* Header / Logo */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-primary-100">
-          <a href="#/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="relative flex items-center justify-center text-accent-600">
               <FlaskConical className="w-8 h-8" strokeWidth={1.5} />
               <Droplet className="w-3 h-3 absolute bottom-0 right-0 text-accent-400 fill-current" />
             </div>
             <span className="font-bold text-xl tracking-tight text-primary-900 uppercase">Tutiba</span>
-          </a>
+          </Link>
           <button 
             className="lg:hidden text-primary-500 hover:text-primary-900"
             onClick={() => setIsOpen(false)}
@@ -70,9 +72,9 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             const Icon = item.icon;
             const isActive = currentPath === item.href;
             return (
-              <a 
+              <Link 
                 key={index} 
-                href={item.href}
+                to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
                   isActive 
                     ? 'bg-accent-50 text-accent-700' 
@@ -81,7 +83,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-accent-600' : 'text-primary-400'}`} />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -89,10 +91,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         {/* Footer / Logout */}
         <div className="p-4 border-t border-primary-100">
           {isAdmin && (
-            <a href="#/admin" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
+            <Link to="/admin" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
               <Settings className="w-5 h-5" />
               <span>لوحة الإدارة</span>
-            </a>
+            </Link>
           )}
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />

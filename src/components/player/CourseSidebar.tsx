@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, PlayCircle, Lock, MonitorPlay, FileText, ChevronDown } from 'lucide-react';
 
 interface CourseSidebarProps {
@@ -6,6 +7,8 @@ interface CourseSidebarProps {
 }
 
 export function CourseSidebar({ onLessonSelect }: CourseSidebarProps) {
+  const navigate = useNavigate();
+
   const [openSection, setOpenSection] = useState<number | null>(2);
 
   const toggleSection = (id: number) => {
@@ -85,7 +88,7 @@ export function CourseSidebar({ onLessonSelect }: CourseSidebarProps) {
                     key={lesson.id} 
                     onClick={() => {
                       if (lesson.type === 'quiz') {
-                        window.location.hash = '#/quiz';
+                        navigate('/quiz');
                       }
                       if (onLessonSelect) onLessonSelect();
                     }}

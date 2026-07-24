@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Search, Edit, Ban, CheckCircle } from 'lucide-react';
 
-export function AdminUserManagement({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function AdminUserManagement() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {

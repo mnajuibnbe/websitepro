@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { CheckCircle2, BookOpen, Award, Play } from 'lucide-react';
 
 export function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden bg-primary-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,10 +28,10 @@ export function HeroSection() {
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 mb-12">
-              <Button variant="primary" className="w-full sm:w-auto text-lg h-14" onClick={() => window.location.hash = '#/courses'}>
+              <Button variant="primary" className="w-full sm:w-auto text-lg h-14" onClick={() => navigate('/courses')}>
                 استكشفي الكورسات
               </Button>
-              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => window.location.hash = '#/lesson'}>
+              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => navigate('/lesson')}>
                 شاهدي درسًا مجانيًا
               </Button>
             </div>

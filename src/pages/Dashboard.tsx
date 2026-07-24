@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { ContinueLearning } from '../components/dashboard/ContinueLearning';
 import { MyCoursesList } from '../components/dashboard/MyCoursesList';
@@ -8,7 +9,9 @@ import { Menu, Bell, Search, Loader2, BookOpen } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 
-export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function Dashboard() {
+  const navigate = useNavigate();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasEnrollments, setHasEnrollments] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +33,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }
             setHasEnrollments(false);
           }
         } else {
-           onNavigate('#/login');
+           navigate('/login');
         }
       } catch (err) {
         console.error(err);
@@ -104,7 +107,7 @@ export function Dashboard({ onNavigate }: { onNavigate: (path: string) => void }
                  </p>
                  <Button 
                    variant="primary" 
-                   onClick={() => onNavigate('#/courses')}
+                   onClick={() => navigate('/courses')}
                    className="h-12 px-8 text-lg"
                  >
                    استكشاف الكورسات

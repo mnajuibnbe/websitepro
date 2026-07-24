@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Menu, X, Loader2, PlayCircle, FileText, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
-export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => void }) {
+export function LessonPlayer() { const navigate = useNavigate();
+  const location = useLocation();
+
   const { user } = useAuth();
   const [course, setCourse] = useState<any>(null);
   const [lessons, setLessons] = useState<any[]>([]);
@@ -15,12 +19,13 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const params = new URLSearchParams(location.search);
     const courseId = params.get('courseId');
     const lessonId = params.get('lessonId');
 
     async function loadData() {
+
+
       try {
         setIsLoading(true);
         setError(null);
@@ -99,7 +104,7 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
     setIsMobileSidebarOpen(false);
     setIsPlaying(false);
     if (course) {
-      window.location.hash = `#/lesson?courseId=${course.id}&lessonId=${lesson.id}`;
+      navigate(`/lesson?courseId=${course.id}&lessonId=${lesson.id}`);
     }
   };
 
@@ -158,7 +163,7 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
           <p className="font-bold mb-2">عذراً</p>
           <p>{error}</p>
           <button 
-            onClick={() => onNavigate ? onNavigate('#/dashboard') : (window.location.hash = '#/dashboard')} 
+            onClick={() => navigate('/dashboard')} 
             className="mt-4 inline-block font-bold underline hover:text-danger-800"
           >
             العودة للوحة التحكم
@@ -177,7 +182,7 @@ export function LessonPlayer({ onNavigate }: { onNavigate?: (path: string) => vo
       <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => onNavigate ? onNavigate('#/dashboard') : (window.location.hash = '#/dashboard')}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]"
           >
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />

@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
-export function MyCourses({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function MyCourses() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +22,7 @@ export function MyCourses({ onNavigate }: { onNavigate: (path: string) => void }
       const { data: userData } = await supabase.auth.getUser();
       
       if (!userData?.user) {
-        onNavigate('/login');
+        navigate('/login');
         return;
       }
 

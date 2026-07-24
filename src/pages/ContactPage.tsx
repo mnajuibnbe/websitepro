@@ -4,7 +4,7 @@ import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 
-export function ContactPage({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 

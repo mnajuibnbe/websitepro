@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Sidebar } from '../components/dashboard/Sidebar';
 
-export function UserProfile({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function UserProfile() {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 

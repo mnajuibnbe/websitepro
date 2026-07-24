@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Download, Share2, ShieldCheck, Linkedin } from 'lucide-react';
 import { CelebrationStats } from '../components/certificate/CelebrationStats';
 import { NameConfirmation } from '../components/certificate/NameConfirmation';
@@ -20,10 +21,10 @@ export function CertificatePage() {
     <div className="min-h-screen bg-primary-50 flex flex-col">
       {/* Header */}
       <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
-        <a href="#/dashboard" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
+        <Link to="/dashboard" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
           <ArrowRight className="w-5 h-5 group-hover:-translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />
           <span className="font-bold text-sm hidden sm:block">العودة للوحة التحكم</span>
-        </a>
+        </Link>
         <div className="font-bold text-primary-900 text-sm md:text-base">
           إصدار الشهادة
         </div>

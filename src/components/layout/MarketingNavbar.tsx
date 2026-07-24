@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Menu, Search, ChevronDown, X, FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function MarketingNavbar() {
+  const navigate = useNavigate();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -26,7 +29,7 @@ export function MarketingNavbar() {
         <div className="flex items-center justify-between h-16 md:h-20">
           
           {/* Logo */}
-          <a href="#/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="relative flex items-center justify-center text-accent-600">
                <FlaskConical className="w-8 h-8" strokeWidth={1.5} />
                <Droplet className="w-3 h-3 absolute bottom-0 right-0 text-accent-400 fill-current" />
@@ -35,16 +38,16 @@ export function MarketingNavbar() {
               <span className="font-bold text-xl tracking-tight text-primary-900 leading-none font-sans uppercase">TUTIBA</span>
               <span className="text-[10px] text-primary-500 font-medium tracking-widest uppercase">Cosmeceutical Education</span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-8">
-            <a href="#/courses" className="flex items-center gap-1 cursor-pointer text-primary-900 hover:text-accent-600 font-medium transition-colors">
+            <Link to="/courses" className="flex items-center gap-1 cursor-pointer text-primary-900 hover:text-accent-600 font-medium transition-colors">
               <span>Courses</span>
               <ChevronDown className="w-4 h-4" />
-            </a>
-            <a href="#/about" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">About</a>
-            <a href="#/blog" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Blog</a>
+            </Link>
+            <Link to="/about" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">About</Link>
+            <Link to="/blog" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Blog</Link>
             
             <div className="h-6 w-px bg-primary-200 mx-2"></div>
             
@@ -53,12 +56,12 @@ export function MarketingNavbar() {
             </button>
 
             {isAuthenticated ? (
-              <a href="#/dashboard" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Dashboard</a>
+              <Link to="/dashboard" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Dashboard</Link>
             ) : (
-              <a href="#/login" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Login</a>
+              <Link to="/login" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Login</Link>
             )}
 
-            <Button variant="primary" onClick={() => window.location.hash = '#/courses'}>
+            <Button variant="primary" onClick={() => navigate('/courses')}>
               Enroll Now
             </Button>
           </div>
@@ -90,10 +93,10 @@ export function MarketingNavbar() {
           {/* Drawer */}
           <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform">
             <div className="flex items-center justify-between h-20 px-6 border-b border-primary-100">
-              <a href="#/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
                 <FlaskConical className="w-7 h-7 text-accent-600" />
                 <span className="font-bold text-lg text-primary-900 uppercase">TUTIBA</span>
-              </a>
+              </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-primary-500 hover:text-primary-900 focus:outline-none bg-primary-50 p-2 rounded-full"
@@ -103,17 +106,17 @@ export function MarketingNavbar() {
             </div>
 
             <div className="flex flex-col py-6 px-6 space-y-6 overflow-y-auto">
-              <a href="#/courses" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Courses</a>
-              <a href="#/about" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</a>
-              <a href="#/blog" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Blog</a>
+              <Link to="/courses" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
+              <Link to="/about" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+              <Link to="/blog" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
               <hr className="border-primary-100" />
               {isAuthenticated ? (
-                <a href="#/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</a>
+                <Link to="/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
               ) : (
-                <a href="#/login" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Login</a>
+                <Link to="/login" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
               )}
               <Button variant="primary" className="w-full" onClick={() => {
-                window.location.hash = '#/courses';
+                navigate('/courses');
                 setIsMobileMenuOpen(false);
               }}>
                 Enroll Now

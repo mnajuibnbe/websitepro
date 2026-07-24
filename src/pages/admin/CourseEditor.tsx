@@ -3,7 +3,7 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Save, Image as ImageIcon, Video, Plus, Trash2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
-export function CourseEditor({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function CourseEditor() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [lessons, setLessons] = useState([{ id: 1, title: '', url: '' }]);
 

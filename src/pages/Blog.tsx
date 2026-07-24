@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 
-export function Blog({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function Blog() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -62,20 +65,19 @@ export function Blog({ onNavigate }: { onNavigate: (path: string) => void }) {
                     <span className="flex items-center gap-1"><User className="w-4 h-4" /> {post.author}</span>
                   </div>
                   <h2 className="text-xl font-bold text-primary-900 mb-3 leading-tight group-hover:text-accent-600 transition-colors">
-                    <a href="#/blog-post" onClick={(e) => { e.preventDefault(); onNavigate('#/blog-post'); }}>
+                    <Link to="/blog-post" onClick={(e) => { e.preventDefault(); navigate('/blog-post'); }}>
                       {post.title}
-                    </a>
+                    </Link>
                   </h2>
                   <p className="text-primary-600 text-sm leading-relaxed mb-6 flex-1">
                     {post.excerpt}
                   </p>
-                  <a 
-                    href="#/blog-post"
-                    onClick={(e) => { e.preventDefault(); onNavigate('#/blog-post'); }}
+                  <Link to="/blog-post"
+                    onClick={(e) => { e.preventDefault(); navigate('/blog-post'); }}
                     className="inline-flex items-center gap-2 text-accent-600 font-bold hover:text-accent-700 transition-colors"
                   >
                     اقرأ المزيد <ArrowRight className="w-4 h-4" />
-                  </a>
+                  </Link>
                 </div>
               </article>
             ))}

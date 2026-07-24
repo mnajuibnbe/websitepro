@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Users, BookOpen, DollarSign, TrendingUp, CheckCircle, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-export function AdminDashboard({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function AdminDashboard() {
+  const navigate = useNavigate();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [pendingEnrollments, setPendingEnrollments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +24,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (path: string) => v
       const { data: userData } = await supabase.auth.getUser();
       
       if (!userData?.user || userData.user.email !== 'm.najuib.nbe@gmail.com') {
-        onNavigate('/dashboard');
+        navigate('/dashboard');
         return;
       }
       
@@ -29,7 +32,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (path: string) => v
       loadPendingEnrollments();
     } catch (e) {
       console.error(e);
-      onNavigate('/dashboard');
+      navigate('/dashboard');
     }
   }
 

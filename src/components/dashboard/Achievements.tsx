@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Award, Trophy } from 'lucide-react';
 
 export function Achievements() {
@@ -6,7 +7,7 @@ export function Achievements() {
     <div className="bg-white border border-primary-200 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-bold text-primary-900">الإنجازات</h3>
-        <a href="#/certificate" className="text-sm font-bold text-accent-600 hover:text-accent-700">عرض الشهادات</a>
+        <Link to="/certificate" className="text-sm font-bold text-accent-600 hover:text-accent-700">عرض الشهادات</Link>
       </div>
       
       <div className="space-y-4">

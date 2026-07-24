@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { AccountDetails } from '../components/checkout/AccountDetails';
@@ -16,9 +17,9 @@ export function CheckoutPage() {
           
           <div className="mb-8 lg:mb-12">
             <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-4">
-              <a href="#/courses" className="hover:text-accent-600 transition-colors">الكورسات</a>
+              <Link to="/courses" className="hover:text-accent-600 transition-colors">الكورسات</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-              <a href="#/course" className="hover:text-accent-600 transition-colors">دبلومة العناية بالبشرة</a>
+              <Link to="/course" className="hover:text-accent-600 transition-colors">دبلومة العناية بالبشرة</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
               <span className="text-primary-900 font-bold">إتمام الدفع</span>
             </nav>

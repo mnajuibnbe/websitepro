@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate , Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { User as UserIcon, Mail, Lock, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-export function RegisterPage({ onNavigate }: { onNavigate: (path: string) => void }) {
+export function RegisterPage() {
+  const navigate = useNavigate();
+
   const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -36,7 +39,7 @@ export function RegisterPage({ onNavigate }: { onNavigate: (path: string) => voi
       // 2. تحديث الـ Context المحلي للمحافظة على واجهة المستخدم الحالية أثناء العرض
       await register(name, email, password);
       
-      onNavigate('#/dashboard');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'حدث خطأ أثناء التسجيل');
     } finally {
@@ -124,30 +127,28 @@ export function RegisterPage({ onNavigate }: { onNavigate: (path: string) => voi
 
         <div className="mt-8 text-center text-primary-600">
           لديك حساب بالفعل؟{' '}
-          <a 
-            href="#/login" 
+          <Link to="/login" 
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('#/login');
+              navigate('/login');
             }}
             className="font-bold text-accent-600 hover:text-accent-700"
           >
             تسجيل الدخول
-          </a>
+          </Link>
         </div>
         
         <div className="mt-6 text-center">
-          <a
-            href="#/"
+          <Link to="/"
             onClick={(e) => {
               e.preventDefault();
-              onNavigate('#/');
+              navigate('/');
             }}
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
