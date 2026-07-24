@@ -18,3 +18,10 @@
 - Supabase Auth is now the primary single source of truth (`AuthContext`).
 - Local legacy mock token (`auth_token`) usage has been completely removed across the app.
 - Tests (Manual/Browser): Registration, Login, Logout, Session Refresh, and Protected Routing require manual verification in the browser to ensure edge cases (e.g., Email Confirmation requirements) run correctly with live Supabase config.
+
+## Security & RBAC Review
+- **SECURITY-001 (COMPLETED):** Centralized RBAC implemented successfully. 
+- Hardcoded email (`m.najuib.nbe@gmail.com`) removed.
+- Validated route protection mechanisms applied via `RequireAuth` with Permission mapping against Supabase `app_metadata.role`.
+- `UnauthorizedPage` UI created and responding to 403 authorization failures appropriately.
+- **Manual verification remaining:** Supabase Backend Administrator creation (SQL metadata update) is required for full manual verification of admin dashboard flows in browser environments. RLS implementation is completely missing and requires backend resolution prior to production.

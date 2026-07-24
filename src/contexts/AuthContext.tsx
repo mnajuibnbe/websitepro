@@ -25,7 +25,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function mapSupabaseUserToLocalUser(supabaseUser: SupabaseUser): User {
   const appRole = supabaseUser.app_metadata?.role;
-  const role = appRole === 'admin' ? 'admin' : 'student';
+  let role: any = 'student';
+  if (appRole === 'admin') role = 'admin';
+  else if (appRole === 'instructor') role = 'instructor';
 
   let name = supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name;
   if (!name && supabaseUser.email) {
@@ -55,6 +57,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ? mapSupabaseUserToLocalUser(session.user) : null);
       setIsLoading(false);
+    }).catch((err) => {
+      console.error('Session retrieval failed', err);
+      setIsLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -69,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -78,6 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
       }
       throw error;
+    }
+    
+    if (!data.session) {
+      throw new Error('تعذر إنشاء الجلسة بنجاح، يرجى المحاولة لاحقاً');
     }
   };
 
@@ -104,7 +113,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+    }
     navigate('/login');
   };
 

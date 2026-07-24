@@ -1,3 +1,5 @@
+import { Role } from '../types/auth';
+
 /**
  * API Service for Database Operations
  * 
@@ -14,7 +16,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'admin';
+  role: Role;
   joinedAt: string;
 }
 

@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Award, Settings, LogOut, Menu, X } from 'lucide-react';
 import { FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAuthorization } from '../../hooks/useAuthorization';
+import { Permission } from '../../types/auth';
 import { supabase } from '../../lib/supabase';
 
 interface SidebarProps {
@@ -15,17 +17,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { logout } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    async function checkAdmin() {
-      
-      if (user?.email === 'm.najuib.nbe@gmail.com') {
-        setIsAdmin(true);
-      }
-    }
-    checkAdmin();
-  }, []);
+  const { hasPermission } = useAuthorization();
+  const isAdmin = hasPermission(Permission.ADMIN_ACCESS);
   
   const navItems = [
     { icon: Home, label: 'لوحة التحكم', href: '/dashboard' },

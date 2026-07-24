@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { RequirePermission } from '../../components/auth/RequirePermission';
+import { Permission } from '../../types/auth';
 
 export function AdminCourseManager() {
   const navigate = useNavigate();
@@ -27,10 +29,12 @@ export function AdminCourseManager() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h1 className="text-3xl font-bold text-primary-900">إدارة الكورسات</h1>
-            <Button variant="primary" className="flex items-center gap-2" onClick={() => navigate('/admin/courses/edit')}>
-              <Plus className="w-5 h-5" />
-              إضافة كورس جديد
-            </Button>
+            <RequirePermission permission={Permission.CREATE_COURSE}>
+              <Button variant="primary" className="flex items-center gap-2" onClick={() => navigate('/admin/courses/edit')}>
+                <Plus className="w-5 h-5" />
+                إضافة كورس جديد
+              </Button>
+            </RequirePermission>
           </div>
 
           <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden">

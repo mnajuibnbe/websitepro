@@ -1,19 +1,26 @@
-# Architecture
+# Architecture Document
 
-## Application Structure
-- `src/App.tsx`: Main entry point declaring the `HashRouter`, `AuthProvider`, and standard React Router `<Route>` components.
-- `src/pages/`: Contains page-level components.
-- `src/components/`: Contains reusable UI widgets and sections.
-- `src/lib/`: Contains utility configurations, notably `supabase.ts`.
+## Tech Stack
+- Frontend: React 18, React Router v6, Tailwind CSS, Vite.
+- Backend/Services: Supabase (Auth currently, DB planned).
+- UI Components: Lucide React (Icons).
 
-## Routing Architecture
-The app uses a strict `react-router-dom` architecture utilizing `HashRouter`.
-- **Navigation Components:** Internal routing is managed using `<Link>` components to maintain correct history context.
-- **Programmatic Navigation:** Uses `useNavigate()` securely within components.
-- **Exception Flow:** Password recovery redirects emitted by Supabase are trapped directly in `App.tsx` by inspecting `location.hash` and `location.search` to mount the `<UpdatePassword />` component.
+## Project Structure
+`src/`
+- `components/`: Reusable UI elements (e.g. `auth/RequireAuth.tsx`, `auth/RequirePermission.tsx`).
+- `contexts/`: React Context providers (e.g., `AuthContext.tsx`).
+- `hooks/`: Custom React hooks (e.g., `useAuthorization.ts`).
+- `pages/`: Route-level components.
+- `services/`: API mocking logic (to be replaced by Supabase Data API).
+- `auth/`: Authorization definitions (e.g., `permissions.ts`).
+- `types/`: Global TS definitions (e.g., `auth.ts`).
 
-## Authentication & Security Architecture
-- **Single Source of Truth:** `AuthContext.tsx` integrates purely with Supabase Auth (`getSession`, `onAuthStateChange`). All `user` state and session handling are centralized.
-- **Token Management:** The app utilizes Supabase's built-in session storage. Manual mock tokens (`auth_token`) have been removed.
-- **Route Protection:** Route protection is managed via `<ProtectedRoute>`.
-- **Role Base Access Control (RBAC):** Admin routes (e.g., `/admin`) are currently `Authenticated only` at the routing level. `requiredRole="admin"` logic is implemented but not strictly enforced on the routes themselves. Authorization heavily relies on hardcoded email checks within the frontend components.
+## Core Concepts
+- **Authentication**: Handled via `supabase.auth`. Stored globally via `AuthContext`.
+- **Authorization (RBAC)**: Centralized logic based strictly on Supabase `app_metadata.role`.
+  - Defined in `src/types/auth.ts` and `src/auth/permissions.ts`.
+  - Roles map to broad capabilities (`student`, `instructor`, `admin`).
+  - `RequireAuth` acts as the primary Route guard.
+  - `RequirePermission` acts as the primary Component guard.
+- **Data Flow**: Top-down state using Contexts (e.g. `AuthContext`), passing variables down. Mock DB service encapsulates API layers (`src/services/api.ts`).
+- **Responsive Design**: Mobile-first approaches heavily utilizing Tailwind grid and flex utilities. Special 403 `UnauthorizedPage` respects smaller 360px viewports without scrolling.

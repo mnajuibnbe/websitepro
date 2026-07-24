@@ -22,7 +22,7 @@ export function AdminDashboard() {
   }, []);
 
   async function checkAuthAndLoadData() {
-    if (!user || user.email !== 'm.najuib.nbe@gmail.com') {
+    if (!user) {
       navigate('/dashboard');
       return;
     }

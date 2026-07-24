@@ -50,3 +50,13 @@
 ## المخاطر المتبقية
 - **البيانات الوهمية:** بعض دوال `api.ts` لا تزال تعتمد على بيانات وهمية (`saveProgress` وغيرها). هذه الدوال تقبل الآن الـ Token الصحيح من Supabase، لكنها لم تُربط بعد بجداول قواعد البيانات الفعلية، مما يعني أن التقدم الفعلي لا يحفظ بشكل دائم في السحابة وإنما فقط يتم محاكاته.
 - **الصلاحيات (Admin):** التحقق من المسؤول مازال يعتمد على إيميل صلب (hardcoded) في `AdminDashboard.tsx`، وسيتطلب ذلك معالجة في مهمة RBAC لاحقة كما هو مدرج بالـ Backlog.
+
+## Cleanup and Token Consumer Verification
+- **Temporary files removed:** The temporary `.cjs` modification scripts created during this migration (`fix_components.cjs`, `fix_components2.cjs`, `fix_final.cjs`, `fix_imports2.cjs`, `fix_imports3.cjs`) have been successfully removed. Other old historical fix scripts have been logged but ignored.
+- **Full token consumer results:** A complete `grep` verification has been run across `src/` checking for legacy token mechanisms.
+- **CourseGrid result:** `CourseGrid.tsx` successfully reads the actual Supabase `session.access_token` provided by `useAuth()` as `token`, and passes it to `getCourses`.
+- **LessonInfo result:** `LessonInfo.tsx` correctly extracts `token` from `useAuth()` and successfully passes it to `saveProgress` safely.
+- **Remaining localStorage usages:** Only a single `localStorage.removeItem('auth_token')` was left in `AuthContext` to ensure previous stale sessions are cleaned up automatically upon first boot.
+- **Lint result:** `npm run lint` (`tsc --noEmit`) passes with 0 errors. All imports and Typescript structures are solid.
+- **Build result:** `npm run build` succeeds completely without errors.
+- **Manual tests still required:** Verify actual functionality by creating an account and logging in via the Preview iframe, ensuring Supabase connects properly and creates the session without email confirmations blocking navigation unintentionally.

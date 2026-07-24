@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+
 import { Home } from './pages/Home';
 import { CoursesListing } from './pages/CoursesListing';
 import { CourseDetail } from './pages/CourseDetail';
@@ -27,45 +28,20 @@ import { UpdatePassword } from './pages/UpdatePassword';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { AdminUserManagement } from './pages/admin/AdminUserManagement';
 
-function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'student' | 'admin' }) {
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading, user } = useAuth();
-  
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        navigate('/login');
-      } else if (requiredRole && user?.role !== requiredRole) {
-        navigate('/dashboard');
-      }
-    }
-  }, [isAuthenticated, isLoading, user, requiredRole, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary-200 border-t-accent-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-primary-600 font-medium">جاري التحقق من الجلسة...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || (requiredRole && user?.role !== requiredRole)) {
-    return null;
-  }
-
-  return <>{children}</>;
-}
+import { RequireAuth } from './components/auth/RequireAuth';
+import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { Permission } from './types/auth';
 
 function AppContent() {
   const location = useLocation();
-  
+
   if (location.hash.startsWith('#access_token=') || location.hash.startsWith('#recovery_token=') || location.pathname === '/update-password' || location.search.includes('type=recovery')) {
     return <UpdatePassword />;
   }
 
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/faq" element={<FAQ />} />
@@ -73,23 +49,29 @@ function AppContent() {
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog-post" element={<BlogPost />} />
-      <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-      <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
-      <Route path="/lesson" element={<ProtectedRoute><LessonPlayer /></ProtectedRoute>} />
-      <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
-      <Route path="/certificate" element={<ProtectedRoute><CertificatePage /></ProtectedRoute>} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/courses" element={<ProtectedRoute><AdminCourseManager /></ProtectedRoute>} />
-      <Route path="/admin/courses/edit" element={<ProtectedRoute><CourseEditor /></ProtectedRoute>} />
-      <Route path="/admin/users" element={<ProtectedRoute><AdminUserManagement /></ProtectedRoute>} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+      {/* Authenticated Routes (Students, Instructors, Admins) */}
+      <Route path="/checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
+      <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+      <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
+      <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
+      <Route path="/lesson" element={<RequireAuth><LessonPlayer /></RequireAuth>} />
+      <Route path="/quiz" element={<RequireAuth><QuizPage /></RequireAuth>} />
+      <Route path="/certificate" element={<RequireAuth><CertificatePage /></RequireAuth>} />
+
+      {/* Admin Routes */}
+      <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />
+      <Route path="/admin/courses" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseManager /></RequireAuth>} />
+      <Route path="/admin/courses/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><CourseEditor /></RequireAuth>} />
+      <Route path="/admin/users" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminUserManagement /></RequireAuth>} />
+
       <Route path="*" element={<Home />} />
     </Routes>
   );
