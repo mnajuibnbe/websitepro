@@ -46,3 +46,16 @@ Unify all internal navigation using `react-router-dom`, preserving the `HashRout
 ## Confirmations
 - **UI/Styles**: No Tailwind classes, HTML semantics, or styles were altered.
 - **Business Logic**: Progress calculations, Quiz behaviors, Authentication loops, and Database Queries were left strictly intact.
+
+## Cleanup Review
+
+- **Temporary scripts removed**: `fix_imports.cjs`, `migrate.cjs` were successfully deleted.
+- **Other temporary scripts discovered**: `patch-login.js`, `fix_my_courses.cjs`, `fix_progress.cjs`, `fix_uuid.cjs`, `fix_error_log.cjs` (Intentionally left alone per prompt instructions).
+- **Remaining legacy routing results**:
+  - `src/pages/UpdatePassword.tsx` line 73: `window.location.hash.includes('access_token=')` (Valid and intentionally retained for Supabase password recovery).
+  - `src/App.tsx` line 63: `location.hash.startsWith('#access_token=')` (Valid and intentionally retained for Supabase password recovery).
+- **Lint result**: Passed (`tsc --noEmit` successful, 0 errors).
+- **Build result**: Passed (built in ~6 seconds).
+- **Files changed in cleanup**:
+  - `fix_imports.cjs` (Deleted)
+  - `migrate.cjs` (Deleted)
