@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Input } from '../ui/Input';
+import { CreditCard, Wallet, Smartphone } from 'lucide-react';
+
+export function PaymentMethod() {
+  const [method, setMethod] = useState<'card' | 'paypal' | 'local'>('card');
+
+  return (
+    <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm mb-8">
+      <h2 className="text-xl font-bold text-primary-900 mb-6">طريقة الدفع</h2>
+      
+      {/* Tabs */}
+      <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
+        <button 
+          onClick={() => setMethod('card')}
+          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${method === 'card' ? 'border-accent-600 bg-accent-50 text-accent-700' : 'border-primary-200 bg-white text-primary-600 hover:border-primary-300'}`}
+        >
+          <CreditCard className="w-6 h-6 mb-2" />
+          <span className="text-sm font-bold">بطاقة ائتمان</span>
+        </button>
+        <button 
+          onClick={() => setMethod('paypal')}
+          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${method === 'paypal' ? 'border-accent-600 bg-accent-50 text-accent-700' : 'border-primary-200 bg-white text-primary-600 hover:border-primary-300'}`}
+        >
+          <Wallet className="w-6 h-6 mb-2" />
+          <span className="text-sm font-bold">PayPal</span>
+        </button>
+        <button 
+          onClick={() => setMethod('local')}
+          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${method === 'local' ? 'border-accent-600 bg-accent-50 text-accent-700' : 'border-primary-200 bg-white text-primary-600 hover:border-primary-300'}`}
+        >
+          <Smartphone className="w-6 h-6 mb-2" />
+          <span className="text-sm font-bold">محفظة إلكترونية</span>
+        </button>
+      </div>
+
+      {/* Card Details */}
+      {method === 'card' && (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-bold text-primary-700 mb-2">رقم البطاقة</label>
+            <div className="relative">
+              <Input type="text" placeholder="0000 0000 0000 0000" className="w-full text-left pl-12" dir="ltr" />
+              <CreditCard className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-primary-400" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
+            <div>
+              <label className="block text-sm font-bold text-primary-700 mb-2">تاريخ الانتهاء</label>
+              <Input type="text" placeholder="MM/YY" className="w-full text-left" dir="ltr" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-primary-700 mb-2">رمز التحقق (CVC)</label>
+              <Input type="text" placeholder="123" className="w-full text-left" dir="ltr" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-primary-700 mb-2">الاسم على البطاقة</label>
+            <Input type="text" placeholder="MOHAMED AHMED" className="w-full text-left" dir="ltr" />
+          </div>
+        </div>
+      )}
+
+      {method === 'paypal' && (
+        <div className="text-center py-8">
+          <p className="text-primary-600 font-medium mb-4">سيتم تحويلك إلى موقع PayPal لإتمام عملية الدفع بأمان.</p>
+        </div>
+      )}
+
+      {method === 'local' && (
+        <div className="text-center py-8">
+          <p className="text-primary-600 font-medium mb-4">يرجى إدخال رقم المحفظة الإلكترونية الخاصة بك.</p>
+          <Input type="text" placeholder="رقم الهاتف" className="w-full max-w-sm mx-auto text-center" dir="ltr" />
+        </div>
+      )}
+    </div>
+  );
+}

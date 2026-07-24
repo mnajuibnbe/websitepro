@@ -1,0 +1,87 @@
+import React, { useState, useEffect } from 'react';
+import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+
+export function AdminCourseManager({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const courses = [
+    { id: 1, title: 'دبلومة العناية بالبشرة الشاملة', price: '1,500 ر.س', students: 120, status: 'نشط' },
+    { id: 2, title: 'أساسيات التركيبات التجميلية', price: '900 ر.س', students: 85, status: 'نشط' },
+    { id: 3, title: 'علاج تساقط الشعر المتقدم', price: '1,200 ر.س', students: 45, status: 'مسودة' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+      <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      
+      <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <h1 className="text-3xl font-bold text-primary-900">إدارة الكورسات</h1>
+            <Button variant="primary" className="flex items-center gap-2" onClick={() => onNavigate('#/admin/courses/edit')}>
+              <Plus className="w-5 h-5" />
+              إضافة كورس جديد
+            </Button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-primary-200 flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
+                <input 
+                  type="text" 
+                  placeholder="ابحث عن كورس..." 
+                  className="w-full pl-4 pr-10 py-2 bg-primary-50 border border-primary-200 rounded-lg focus:ring-2 focus:ring-accent-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-right">
+                <thead className="bg-primary-50 text-primary-600 font-medium border-b border-primary-200">
+                  <tr>
+                    <th className="py-4 px-6 text-sm">اسم الكورس</th>
+                    <th className="py-4 px-6 text-sm">السعر</th>
+                    <th className="py-4 px-6 text-sm">عدد الطلاب</th>
+                    <th className="py-4 px-6 text-sm">الحالة</th>
+                    <th className="py-4 px-6 text-sm text-center">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-primary-100">
+                  {courses.map(course => (
+                    <tr key={course.id} className="hover:bg-primary-50/50 transition-colors">
+                      <td className="py-4 px-6 font-bold text-primary-900">{course.title}</td>
+                      <td className="py-4 px-6 text-primary-600" dir="ltr">{course.price}</td>
+                      <td className="py-4 px-6 text-primary-600">{course.students}</td>
+                      <td className="py-4 px-6">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                          course.status === 'نشط' ? 'bg-success-100 text-success-700' : 'bg-primary-100 text-primary-700'
+                        }`}>
+                          {course.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 flex justify-center gap-2">
+                        <button onClick={() => onNavigate('#/admin/courses/edit')} className="p-2 text-primary-500 hover:text-accent-600 hover:bg-accent-50 rounded-lg transition-colors" title="تعديل">
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 text-primary-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors" title="حذف">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
