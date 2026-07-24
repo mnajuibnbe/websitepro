@@ -11,64 +11,73 @@ export function MyCourses() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorState, setErrorState] = useState<'none' | 'inconsistent' | 'error'>('none');
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchMyCourses();
-  }, []);
+    if (user?.id) {
+      fetchMyCourses();
+    }
+  }, [user?.id]);
 
   async function fetchMyCourses() {
     try {
       setIsLoading(true);
+      setErrorState('none');
       
-      
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-
-      // Step 1: Fetch enrollments without attempting to join 'courses' to avoid PGRST200 if FK is missing
       const { data: enrollmentsData, error: enrollmentsError } = await supabase
         .from('enrollments')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', user!.id)
         .eq('status', 'active');
 
       if (enrollmentsError) {
         console.error('Error fetching enrollments:', enrollmentsError);
+        setErrorState('error');
         return;
       }
       
       if (enrollmentsData && enrollmentsData.length > 0) {
-        // Step 2: Fetch courses manually
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const courseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && uuidRegex.test(id));
+        const dbCourseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && uuidRegex.test(id));
         
-        if (courseIds.length > 0) {
+        let dbCourses: any[] = [];
+        if (dbCourseIds.length > 0) {
           const { data: coursesData, error: coursesError } = await supabase
             .from('courses')
             .select('*')
-            .in('id', courseIds);
+            .in('id', dbCourseIds);
             
           if (coursesError) {
             console.error('Error fetching courses:', coursesError);
+            setErrorState('error');
+            return;
+          } else if (coursesData) {
+            dbCourses = coursesData;
           }
-          
-          const merged = enrollmentsData.map(enrollment => ({
-            ...enrollment,
-            courses: coursesData?.find(c => c.id === enrollment.course_id)
-          }));
-          
-          setEnrollments(merged);
-        } else {
-          setEnrollments(enrollmentsData);
         }
+
+        const merged = enrollmentsData.map(enrollment => {
+          const courseId = String(enrollment.course_id);
+          const course = dbCourses.find(c => String(c.id) === courseId);
+          return {
+            ...enrollment,
+            courses: course
+          };
+        }).filter(e => e.courses);
+
+        if (merged.length === 0) {
+           setErrorState('inconsistent');
+        }
+
+        setEnrollments(merged);
       } else {
         setEnrollments([]);
       }
     } catch (e) {
       console.error(e);
+      setErrorState('error');
     } finally {
       setIsLoading(false);
     }
@@ -76,12 +85,9 @@ export function MyCourses() {
 
   return (
     <div className="min-h-screen bg-primary-50 flex font-sans rtl" dir="rtl">
-      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       
-      {/* Main Content Area */}
       <div className="flex-grow flex flex-col min-h-screen overflow-hidden">
-        {/* Top Header - Mobile Only */}
         <header className="lg:hidden h-20 bg-white border-b border-primary-200 px-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-4">
             <button 
@@ -101,6 +107,40 @@ export function MyCourses() {
             {isLoading ? (
               <div className="flex justify-center py-20">
                 <Loader2 className="w-10 h-10 animate-spin text-accent-600" />
+              </div>
+            ) : errorState === 'error' ? (
+              <div className="bg-white rounded-2xl border border-danger-200 shadow-sm p-12 flex flex-col items-center justify-center text-center">
+                <div className="w-24 h-24 bg-danger-50 rounded-full flex items-center justify-center mb-6">
+                  <PlayCircle className="w-12 h-12 text-danger-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-danger-900 mb-3">عذراً، حدث خطأ</h2>
+                <p className="text-danger-600 mb-8 max-w-md">
+                  حدث خطأ أثناء تحميل الكورسات الخاصة بك. يرجى المحاولة مرة أخرى.
+                </p>
+                <Button 
+                  variant="primary" 
+                  onClick={() => fetchMyCourses()}
+                  className="h-12 px-8 text-lg"
+                >
+                  إعادة المحاولة
+                </Button>
+              </div>
+            ) : errorState === 'inconsistent' ? (
+              <div className="bg-white rounded-2xl border border-warning-200 shadow-sm p-12 flex flex-col items-center justify-center text-center">
+                <div className="w-24 h-24 bg-warning-50 rounded-full flex items-center justify-center mb-6">
+                  <BookOpen className="w-12 h-12 text-warning-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-warning-900 mb-3">بيانات غير متطابقة</h2>
+                <p className="text-warning-600 mb-8 max-w-md">
+                  يبدو أنك مسجل في كورسات غير متوفرة حالياً. يرجى مراجعة الدعم الفني أو استكشاف كورسات أخرى.
+                </p>
+                <Button 
+                  variant="primary" 
+                  onClick={() => navigate('/courses')}
+                  className="h-12 px-8 text-lg"
+                >
+                  استكشاف الكورسات
+                </Button>
               </div>
             ) : enrollments.length === 0 ? (
               <div className="bg-white rounded-2xl border border-primary-200 shadow-sm p-12 flex flex-col items-center justify-center text-center">
