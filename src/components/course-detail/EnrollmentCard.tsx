@@ -1,52 +1,65 @@
 import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
-import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate } from 'react-router-dom';
+import { isValidUUID } from '../../lib/uuid';
 
 export function EnrollmentCard() {
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [courseId, setCourseId] = useState<string | null>(id || null);
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [courseDetails, setCourseDetails] = useState<any>(null);
   const [enrollmentStatus, setEnrollmentStatus] = useState<'none' | 'pending' | 'active'>('none');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [errorState, setErrorState] = useState<'invalid_uuid' | 'not_found' | 'already_enrolled' | null>(null);
 
   useEffect(() => {
     async function checkStatus() {
       try {
         setIsLoading(true);
-        let targetCourseId = id;
-        
-        if (!targetCourseId) {
-          const { data: firstCourse } = await supabase
-            .from('courses')
-            .select('id')
-            .limit(1)
-            .single();
-          if (firstCourse) {
-            targetCourseId = firstCourse.id;
-          }
+        setErrorState(null);
+
+        if (!id) {
+          setErrorState('invalid_uuid');
+          return;
         }
-        
-        if (targetCourseId) {
-          setCourseId(targetCourseId);
-          
-          
-          if (user) {
-            const { data: enrollment } = await supabase
-              .from('enrollments')
-              .select('status')
-              .eq('course_id', targetCourseId)
-              .eq('user_id', user?.id)
-              .single();
-              
-            if (enrollment) {
-              setEnrollmentStatus(enrollment.status as 'pending' | 'active');
-            }
+
+        if (!isValidUUID(id)) {
+          setErrorState('invalid_uuid');
+          return;
+        }
+
+        // Verify course exists
+        const { data: course, error: courseError } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (courseError || !course) {
+          setErrorState('not_found');
+          return;
+        }
+
+        setCourseId(id);
+        setCourseDetails(course);
+
+        // Check enrollment if user is logged in
+        if (user) {
+          const { data: enrollment } = await supabase
+            .from('enrollments')
+            .select('status')
+            .eq('course_id', id)
+            .eq('user_id', user.id)
+            .single();
+            
+          if (enrollment) {
+            setEnrollmentStatus(enrollment.status as 'pending' | 'active');
           }
         }
       } catch (err) {
@@ -57,23 +70,38 @@ export function EnrollmentCard() {
     }
     
     checkStatus();
-  }, [id]);
+  }, [id, user]);
 
   const handleEnroll = async () => {
     if (!courseId) return;
+    
     try {
       setIsEnrolling(true);
-      
-      
+      setErrorState(null);
+            
       if (!user) {
         navigate('/login');
+        return;
+      }
+
+      // Final check for existing enrollment before insert
+      const { data: existing } = await supabase
+        .from('enrollments')
+        .select('status')
+        .eq('course_id', courseId)
+        .eq('user_id', user.id)
+        .single();
+        
+      if (existing) {
+        setErrorState('already_enrolled');
+        setEnrollmentStatus(existing.status as 'pending' | 'active');
         return;
       }
 
       const { error } = await supabase
         .from('enrollments')
         .insert({
-          user_id: user?.id,
+          user_id: user.id,
           course_id: courseId,
           status: 'pending'
         });
@@ -94,11 +122,34 @@ export function EnrollmentCard() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-white border border-primary-200 rounded-2xl shadow-lg p-12 flex justify-center items-center lg:sticky lg:top-28">
+        <Loader2 className="w-10 h-10 animate-spin text-accent-600" />
+      </div>
+    );
+  }
+
+  if (errorState === 'invalid_uuid' || errorState === 'not_found') {
+    return (
+      <div className="bg-white border border-danger-200 rounded-2xl shadow-lg p-8 flex flex-col justify-center items-center text-center lg:sticky lg:top-28">
+        <AlertCircle className="w-12 h-12 text-danger-500 mb-4" />
+        <h3 className="text-xl font-bold text-danger-900 mb-2">كورس غير صالح</h3>
+        <p className="text-danger-600 mb-6">
+          {errorState === 'invalid_uuid' ? 'الرابط غير صحيح أو معطوب.' : 'هذا الكورس غير متوفر حالياً.'}
+        </p>
+        <Button variant="secondary" onClick={() => navigate('/courses')} className="w-full">
+          العودة للكورسات
+        </Button>
+      </div>
+    );
+  }
+
   const renderButtonContent = () => {
-    if (isLoading) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
+    if (isEnrolling) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
     if (enrollmentStatus === 'active') return 'الذهاب للدرس (تم الاشتراك)';
     if (enrollmentStatus === 'pending') return 'الطلب قيد المراجعة';
-    return isEnrolling ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'سجلي الآن';
+    return 'سجلي الآن';
   };
 
   const handleButtonClick = () => {
@@ -108,13 +159,23 @@ export function EnrollmentCard() {
       handleEnroll();
     }
   };
+  
+  const price = courseDetails?.price !== undefined ? 
+    (typeof courseDetails.price === 'number' ? courseDetails.price : parseFloat(courseDetails.price || '0')) : 199;
 
   return (
     <>
       {showToast && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <CheckCircle2 className="w-6 h-6 text-success-600" />
-          <p className="font-bold">تم إرسال طلبك بنجاح. سيتم تفعيل الكورس بمجرد تأكيد الدفع.</p>
+          <p className="font-bold">تم إرسال طلبك بنجاح. سيتم تفعيل الكورس بمجرد المراجعة.</p>
+        </div>
+      )}
+      
+      {errorState === 'already_enrolled' && (
+        <div className="fixed bottom-4 left-4 z-[100] bg-white border border-warning-200 text-warning-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <AlertCircle className="w-6 h-6 text-warning-600" />
+          <p className="font-bold">أنت مسجل بالفعل في هذا الكورس.</p>
         </div>
       )}
 
@@ -122,8 +183,8 @@ export function EnrollmentCard() {
         {/* Course Image */}
       <div className="relative aspect-video bg-primary-100">
         <img 
-          src="https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop" 
-          alt="دبلومة العناية بالبشرة" 
+          src={courseDetails?.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"} 
+          alt={courseDetails?.title || "دبلومة العناية بالبشرة"} 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center">
@@ -137,8 +198,8 @@ export function EnrollmentCard() {
       <div className="p-6 md:p-8 flex flex-col gap-6">
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold text-primary-900">$199</span>
-          <span className="text-lg text-primary-400 line-through">$249</span>
+          <span className="text-4xl font-bold text-primary-900">${price}</span>
+          {price > 0 && <span className="text-lg text-primary-400 line-through">${Math.round(price * 1.2)}</span>}
         </div>
 
         {/* Details List */}
@@ -153,13 +214,13 @@ export function EnrollmentCard() {
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <BookOpen className="w-4 h-4" />
             </div>
-            <span>45 درس مسجل</span>
+            <span>دروس مسجلة</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Clock className="w-4 h-4" />
             </div>
-            <span>80 ساعة تعليمية</span>
+            <span>تعلم بالوتيرة التي تناسبك</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
@@ -175,7 +236,7 @@ export function EnrollmentCard() {
             variant="primary" 
             className="w-full h-14 text-lg"
             onClick={handleButtonClick}
-            disabled={isLoading || isEnrolling || enrollmentStatus === 'pending'}
+            disabled={isEnrolling || enrollmentStatus === 'pending'}
           >
             {renderButtonContent()}
           </Button>
@@ -195,14 +256,14 @@ export function EnrollmentCard() {
     {/* Mobile Sticky Bottom Bar */}
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-primary-200 p-4 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)] z-50 flex items-center justify-between gap-4">
       <div className="flex flex-col">
-        <span className="text-sm text-primary-500 line-through font-medium leading-none mb-1">$249</span>
-        <span className="text-2xl font-bold text-primary-900 leading-none">$199</span>
+        {price > 0 && <span className="text-sm text-primary-500 line-through font-medium leading-none mb-1">${Math.round(price * 1.2)}</span>}
+        <span className="text-2xl font-bold text-primary-900 leading-none">${price}</span>
       </div>
       <Button 
         variant="primary" 
         className="flex-grow h-12 text-lg font-bold"
         onClick={handleButtonClick}
-        disabled={isLoading || isEnrolling || enrollmentStatus === 'pending'}
+        disabled={isEnrolling || enrollmentStatus === 'pending'}
       >
         {renderButtonContent()}
       </Button>

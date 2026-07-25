@@ -2,19 +2,36 @@ import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
-import { Users, BookOpen, DollarSign, TrendingUp, CheckCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+
+interface PendingEnrollment {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: string;
+  enrolled_at: string;
+  users: {
+    id: string;
+    full_name: string;
+    email: string;
+  } | null;
+  courses: {
+    id: string;
+    title: string;
+  } | null;
+}
 
 export function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [pendingEnrollments, setPendingEnrollments] = useState<any[]>([]);
+  const [pendingEnrollments, setPendingEnrollments] = useState<PendingEnrollment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,7 +40,7 @@ export function AdminDashboard() {
 
   async function checkAuthAndLoadData() {
     if (!user) {
-      navigate('/dashboard');
+      navigate('/login');
       return;
     }
     setIsCheckingAuth(false);
@@ -33,23 +50,42 @@ export function AdminDashboard() {
   async function loadPendingEnrollments() {
     try {
       setIsLoading(true);
-      console.log('Fetching pending enrollments...');
+      setErrorMsg(null);
       const { data, error } = await supabase
         .from('enrollments')
-        .select('*')
-        .eq('status', 'pending');
-      
-      console.log('Fetch result:', { data, error });
-        
+        .select(`
+          id,
+          user_id,
+          course_id,
+          status,
+          enrolled_at,
+          users (
+            id,
+            full_name,
+            email
+          ),
+          courses (
+            id,
+            title
+          )
+        `)
+        .eq('status', 'pending')
+        .order('enrolled_at', { ascending: false });
+
       if (error) {
         console.error('Error fetching enrollments:', error);
+        setErrorMsg('حدث خطأ أثناء تحميل الطلبات.');
       }
       
       if (data) {
-        setPendingEnrollments(data);
+        // Supabase typings can sometimes return an array for relations if it thinks it's one-to-many, 
+        // but since users/courses are foreign keys on enrollments (many-to-one), they should be objects.
+        // We cast as any to handle potential TS mismatches if the generated types differ, but the runtime shape is correct.
+        setPendingEnrollments(data as any as PendingEnrollment[]);
       }
     } catch (e) {
       console.error('Exception during fetch:', e);
+      setErrorMsg('حدث خطأ غير متوقع.');
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +94,7 @@ export function AdminDashboard() {
   const handleApprove = async (id: string) => {
     try {
       setActionLoadingId(id);
+      setErrorMsg(null);
       const { error } = await supabase
         .from('enrollments')
         .update({ status: 'active' })
@@ -67,9 +104,13 @@ export function AdminDashboard() {
         setPendingEnrollments(prev => prev.filter(e => e.id !== id));
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
+      } else {
+        setErrorMsg('فشل في اعتماد الطلب، يرجى المحاولة مرة أخرى.');
+        console.error('Update error:', error);
       }
     } catch (e) {
       console.error(e);
+      setErrorMsg('حدث خطأ أثناء الاعتماد.');
     } finally {
       setActionLoadingId(null);
     }
@@ -91,6 +132,7 @@ export function AdminDashboard() {
           <p className="font-bold">تم اعتماد الطلب بنجاح</p>
         </div>
       )}
+      
       <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         
@@ -98,6 +140,19 @@ export function AdminDashboard() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold text-primary-900 mb-8">لوحة الاعتمادات (إدارة الطلبات)</h1>
             
+            {errorMsg && (
+              <div className="mb-6 bg-danger-50 text-danger-700 px-6 py-4 rounded-xl border border-danger-200 flex items-center gap-3">
+                <AlertCircle className="w-6 h-6 flex-shrink-0" />
+                <p className="font-bold">{errorMsg}</p>
+                <button 
+                  onClick={loadPendingEnrollments}
+                  className="mr-auto text-sm bg-white px-4 py-2 rounded-lg border border-danger-200 hover:bg-danger-100 transition-colors"
+                >
+                  إعادة المحاولة
+                </button>
+              </div>
+            )}
+
             <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden mb-8">
               <div className="p-6 border-b border-primary-200 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-primary-900">طلبات الاشتراك المعلقة</h2>
@@ -110,7 +165,7 @@ export function AdminDashboard() {
                 <table className="w-full text-right">
                   <thead className="bg-primary-50 border-b border-primary-200">
                     <tr>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">معرف المستخدم</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700">الطالب</th>
                       <th className="py-4 px-6 text-sm font-bold text-primary-700">الكورس</th>
                       <th className="py-4 px-6 text-sm font-bold text-primary-700">تاريخ الطلب</th>
                       <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">الإجراء</th>
@@ -119,8 +174,9 @@ export function AdminDashboard() {
                   <tbody className="divide-y divide-primary-100">
                     {isLoading ? (
                       <tr>
-                        <td colSpan={4} className="py-8 text-center">
-                          <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto" />
+                        <td colSpan={4} className="py-12 text-center">
+                          <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto mb-4" />
+                          <p className="text-primary-500 font-medium">جاري تحميل الطلبات...</p>
                         </td>
                       </tr>
                     ) : pendingEnrollments.length === 0 ? (
@@ -130,33 +186,50 @@ export function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      pendingEnrollments.map((enrollment) => (
-                        <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
-                          <td className="py-4 px-6 text-sm text-primary-900 font-medium font-mono" dir="ltr">
-                            {enrollment.user_id?.substring(0, 8)}...
-                          </td>
-                          <td className="py-4 px-6 text-sm text-primary-900 font-bold">
-                            {enrollment.course_id || 'كورس غير معروف'}
-                          </td>
-                          <td className="py-4 px-6 text-sm text-primary-500">
-                            {new Date(enrollment.created_at || new Date()).toLocaleDateString('ar-SA')}
-                          </td>
-                          <td className="py-4 px-6 text-center">
-                            <button
-                              onClick={() => handleApprove(enrollment.id)}
-                              disabled={actionLoadingId === enrollment.id}
-                              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
-                            >
-                              {actionLoadingId === enrollment.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <CheckCircle className="w-4 h-4" />
-                              )}
-                              اعتماد
-                            </button>
-                          </td>
-                        </tr>
-                      ))
+                      pendingEnrollments.map((enrollment) => {
+                        const studentName = enrollment.users?.full_name || 'مستخدم غير موجود';
+                        const studentEmail = enrollment.users?.email || '';
+                        const courseTitle = enrollment.courses?.title || 'كورس غير موجود';
+                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'غير متوفر';
+
+                        return (
+                          <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
+                            <td className="py-4 px-6">
+                              <div className="flex flex-col">
+                                <span className={`text-sm font-bold ${!enrollment.users ? 'text-danger-600' : 'text-primary-900'}`}>
+                                  {studentName}
+                                </span>
+                                {studentEmail && (
+                                  <span className="text-xs text-primary-500 mt-1">{studentEmail}</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 text-sm">
+                              <span className={`font-bold ${!enrollment.courses ? 'text-danger-600' : 'text-primary-900'}`}>
+                                {courseTitle}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-sm text-primary-500 font-medium" dir="ltr" style={{textAlign: 'right'}}>
+                              {date}
+                            </td>
+                            <td className="py-4 px-6 text-center">
+                              <button
+                                onClick={() => handleApprove(enrollment.id)}
+                                disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-success-600 hover:bg-success-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={(!enrollment.users || !enrollment.courses) ? "لا يمكن الاعتماد لعدم اكتمال البيانات" : "اعتماد الطلب"}
+                              >
+                                {actionLoadingId === enrollment.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="w-4 h-4" />
+                                )}
+                                اعتماد
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

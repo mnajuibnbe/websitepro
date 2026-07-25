@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { CourseCard } from '../ui/CourseCard';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
-import { getCourses, Course } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { Button } from '../ui/Button';
 
 export function CourseGrid() {
-  const { token } = useAuth();
   const navigate = useNavigate();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchCourses() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getCourses(token || undefined);
-        setCourses(data);
-      } catch (err) {
-        setError('حدث خطأ أثناء تحميل الكورسات. يرجى المحاولة لاحقاً.');
-        console.error('Error fetching courses:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchCourses();
-  }, [token]);
+  }, []);
+
+  async function fetchCourses() {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const { data, error: dbError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (dbError) throw dbError;
+      setCourses(data || []);
+    } catch (err) {
+      setError('حدث خطأ أثناء تحميل الكورسات. يرجى المحاولة لاحقاً.');
+      console.error('Error fetching courses:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -43,9 +48,23 @@ export function CourseGrid() {
   if (error) {
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
-        <div className="bg-danger-50 text-danger-600 px-6 py-4 rounded-xl border border-danger-200 text-center max-w-md">
-          <p className="font-bold mb-2">عذراً</p>
-          <p>{error}</p>
+        <div className="bg-danger-50 text-danger-600 px-6 py-6 rounded-xl border border-danger-200 text-center max-w-md">
+          <p className="font-bold mb-4">{error}</p>
+          <Button variant="primary" onClick={fetchCourses} className="mx-auto flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" />
+            إعادة المحاولة
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (courses.length === 0) {
+    return (
+      <div className="flex-grow flex flex-col items-center justify-center py-20">
+        <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
+          <p className="font-bold mb-2">لا توجد كورسات</p>
+          <p>لم يتم العثور على أي كورسات متاحة حالياً.</p>
         </div>
       </div>
     );
@@ -75,12 +94,12 @@ export function CourseGrid() {
           <CourseCard 
             key={course.id}
             title={course.title}
-            category="Course" // Fallback since category isn't in Course interface yet
+            category="Course" 
             description={course.description}
             duration="TBD"
             lessonsCount={0}
-            price={course.price}
-            imageUrl={course.thumbnail}
+            price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
+            imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
             ctaText="استعرضي الكورس"
             onEnroll={() => navigate(`/course/${course.id}`)}
           />
