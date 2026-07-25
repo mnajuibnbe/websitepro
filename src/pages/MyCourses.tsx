@@ -4,6 +4,7 @@ import { Sidebar } from '../components/dashboard/Sidebar';
 import { PlayCircle, Clock, Award, BookOpen, Loader2, Menu } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
+import { isValidUUID } from '../lib/uuid';
 import { useNavigate } from 'react-router-dom';
 
 export function MyCourses() {
@@ -39,8 +40,7 @@ export function MyCourses() {
       }
       
       if (enrollmentsData && enrollmentsData.length > 0) {
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const dbCourseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && uuidRegex.test(id));
+        const dbCourseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && isValidUUID(id));
         
         let dbCourses: any[] = [];
         if (dbCourseIds.length > 0) {

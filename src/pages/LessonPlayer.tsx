@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { isValidUUID } from '../lib/uuid';
 import { Loader2, Lock, ShieldAlert, BookOpen, Clock, AlertTriangle, X } from 'lucide-react';
 
 import { Course, CourseSection, Lesson, LessonProgress } from '../types/database.types';
@@ -43,8 +44,7 @@ export function LessonPlayer() {
   useEffect(() => {
     async function verifyAndLoadLessonData() {
       // 1. Validate route params
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!courseId || !lessonId || !uuidRegex.test(courseId.trim()) || !uuidRegex.test(lessonId.trim())) {
+      if (!courseId || !lessonId || !isValidUUID(courseId) || !isValidUUID(lessonId)) {
         setAccessState('invalid_params');
         return;
       }

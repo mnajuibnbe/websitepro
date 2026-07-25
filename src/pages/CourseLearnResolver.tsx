@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { isValidUUID } from '../lib/uuid';
 import { Loader2, Lock, ShieldAlert, BookOpen, Clock } from 'lucide-react';
 import { CourseSection, Lesson, LessonProgress } from '../types/database.types';
 
@@ -25,13 +26,7 @@ export function CourseLearnResolver() {
   useEffect(() => {
     async function resolveContinueLearning() {
       // 1. Validate courseId param
-      if (!courseId || !courseId.trim()) {
-        setState('invalid_course_id');
-        return;
-      }
-
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(courseId.trim())) {
+      if (!courseId || !isValidUUID(courseId)) {
         setState('invalid_course_id');
         return;
       }
