@@ -1,10 +1,11 @@
 import React from 'react';
-import { ChevronRight, ChevronLeft, CheckCircle2, Loader2, Award } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle2, Loader2, HelpCircle } from 'lucide-react';
 import { Lesson } from '../../types/database.types';
 
 interface LessonNavigationProps {
   prevLesson: Lesson | null;
   nextLesson: Lesson | null;
+  currentLessonType?: string;
   isCurrentCompleted: boolean;
   isCompleting: boolean;
   onNavigate: (lesson: Lesson) => void;
@@ -14,11 +15,14 @@ interface LessonNavigationProps {
 export function LessonNavigation({
   prevLesson,
   nextLesson,
+  currentLessonType,
   isCurrentCompleted,
   isCompleting,
   onNavigate,
   onCompleteAndContinue,
 }: LessonNavigationProps) {
+  const isQuiz = currentLessonType === 'quiz';
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-primary-200 mt-6" dir="rtl">
       {/* Right side in RTL: Previous Lesson */}
@@ -35,31 +39,58 @@ export function LessonNavigation({
         <span>الدرس السابق</span>
       </button>
 
-      {/* Center: Mark Complete and Continue */}
-      <button
-        onClick={onCompleteAndContinue}
-        disabled={isCompleting}
-        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-xs min-h-[48px] ${
-          isCurrentCompleted
-            ? 'bg-success-50 text-success-700 border border-success-200 hover:bg-success-100'
-            : 'bg-accent-600 hover:bg-accent-700 text-white'
-        }`}
-      >
-        {isCompleting ? (
-          <Loader2 className="w-5 h-5 animate-spin" />
-        ) : isCurrentCompleted ? (
-          <CheckCircle2 className="w-5 h-5 text-success-600" />
-        ) : (
-          <CheckCircle2 className="w-5 h-5" />
-        )}
-        <span>
-          {isCompleting
-            ? 'جاري الحفظ...'
-            : isCurrentCompleted
-            ? 'تم إكمال الدرس (مكتمل)'
-            : 'إكمال الدرس والمتابعة'}
-        </span>
-      </button>
+      {/* Center: Completion Status / Action */}
+      {isQuiz ? (
+        <div className="w-full sm:w-auto flex items-center justify-center">
+          {isCurrentCompleted ? (
+            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
+              <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
+              <span>تم اجتياز الاختبار (مكتمل)</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 font-bold text-sm min-h-[48px]">
+              <HelpCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+              <span>يتطلب إكمال هذا الدرس اجتياز الاختبار</span>
+            </div>
+          )}
+        </div>
+      ) : isCurrentCompleted ? (
+        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
+            <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
+            <span>تم إكمال هذا الدرس</span>
+          </div>
+
+          {nextLesson && (
+            <button
+              onClick={() => onNavigate(nextLesson)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm transition-all shadow-xs min-h-[48px]"
+            >
+              <span>الانتقال إلى الدرس التالي</span>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={onCompleteAndContinue}
+          disabled={isCompleting}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-xs min-h-[48px] bg-accent-600 hover:bg-accent-700 text-white"
+        >
+          {isCompleting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <CheckCircle2 className="w-5 h-5" />
+          )}
+          <span>
+            {isCompleting
+              ? 'جاري الحفظ...'
+              : nextLesson
+              ? 'إكمال الدرس والمتابعة'
+              : 'إكمال الدرس'}
+          </span>
+        </button>
+      )}
 
       {/* Left side in RTL: Next Lesson */}
       <button
@@ -77,3 +108,4 @@ export function LessonNavigation({
     </div>
   );
 }
+

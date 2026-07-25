@@ -1,8 +1,9 @@
 import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
-import { useNavigate , Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Play, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { fetchCoursesProgress } from '../../lib/courseProgress';
 
 export function MyCoursesList() {
   const { user } = useAuth();
@@ -14,28 +15,43 @@ export function MyCoursesList() {
   useEffect(() => {
     async function loadCourses() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
-          .select('*')
-          .limit(4);
-        
-        if (data) {
-          
-          if (user) {
-            const coursesWithProgress = await Promise.all(data.map(async (course) => {
-               const [lessonsCountRes, progressRes] = await Promise.all([
-                 supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', course.id).eq('is_published', true),
-                 supabase.from('lesson_progress').select('lesson_id').eq('course_id', course.id).eq('user_id', user.id).eq('is_completed', true)
-               ]);
-               
-               const totalLessons = lessonsCountRes.count || 0;
-               const completedLessons = progressRes.data?.length || 0;
-               const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-               return { ...course, progress };
-            }));
-            setCourses(coursesWithProgress);
+        setIsLoading(true);
+        if (user) {
+          const { data: enrollmentsData } = await supabase
+            .from('enrollments')
+            .select('course_id')
+            .eq('user_id', user.id)
+            .eq('status', 'active');
+
+          let courseIds: string[] = [];
+          if (enrollmentsData && enrollmentsData.length > 0) {
+            courseIds = enrollmentsData.map(e => String(e.course_id)).filter(Boolean);
+          }
+
+          if (courseIds.length > 0) {
+            const [{ data: coursesData }, progressMap] = await Promise.all([
+              supabase.from('courses').select('*').in('id', courseIds).limit(4),
+              fetchCoursesProgress(user.id, courseIds)
+            ]);
+
+            if (coursesData) {
+              const coursesWithProgress = coursesData.map((course) => {
+                const prog = progressMap[course.id] || { percentage: 0 };
+                return { ...course, progress: prog.percentage };
+              });
+              setCourses(coursesWithProgress);
+            }
           } else {
-             setCourses(data.map(c => ({...c, progress: 0})));
+            const { data } = await supabase.from('courses').select('*').limit(4);
+            if (data) {
+              const progressMap = await fetchCoursesProgress(user.id, data.map(c => c.id));
+              setCourses(data.map(c => ({ ...c, progress: progressMap[c.id]?.percentage || 0 })));
+            }
+          }
+        } else {
+          const { data } = await supabase.from('courses').select('*').limit(4);
+          if (data) {
+            setCourses(data.map(c => ({ ...c, progress: 0 })));
           }
         }
       } catch (e) {
@@ -45,7 +61,7 @@ export function MyCoursesList() {
       }
     }
     loadCourses();
-  }, []);
+  }, [user?.id]);
 
   if (isLoading) {
     return (

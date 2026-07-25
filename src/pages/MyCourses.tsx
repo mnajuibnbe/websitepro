@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { isValidUUID } from '../lib/uuid';
 import { useNavigate } from 'react-router-dom';
+import { fetchCoursesProgress } from '../lib/courseProgress';
 
 export function MyCourses() {
   const { user } = useAuth();
@@ -43,11 +44,16 @@ export function MyCourses() {
         const dbCourseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && isValidUUID(id));
         
         let dbCourses: any[] = [];
+        let progressMap: Record<string, any> = {};
+
         if (dbCourseIds.length > 0) {
-          const { data: coursesData, error: coursesError } = await supabase
-            .from('courses')
-            .select('*')
-            .in('id', dbCourseIds);
+          const [{ data: coursesData, error: coursesError }, fetchedProgressMap] = await Promise.all([
+            supabase
+              .from('courses')
+              .select('*')
+              .in('id', dbCourseIds),
+            fetchCoursesProgress(user!.id, dbCourseIds)
+          ]);
             
           if (coursesError) {
             console.error('Error fetching courses:', coursesError);
@@ -56,14 +62,19 @@ export function MyCourses() {
           } else if (coursesData) {
             dbCourses = coursesData;
           }
+          progressMap = fetchedProgressMap;
         }
 
         const merged = enrollmentsData.map(enrollment => {
           const courseId = String(enrollment.course_id);
           const course = dbCourses.find(c => String(c.id) === courseId);
+          const prog = progressMap[courseId] || { totalLessons: 0, completedLessons: 0, percentage: 0 };
           return {
             ...enrollment,
-            courses: course
+            courses: course,
+            progress: prog.percentage,
+            completedLessons: prog.completedLessons,
+            totalLessons: prog.totalLessons,
           };
         }).filter(e => e.courses);
 
@@ -165,8 +176,9 @@ export function MyCourses() {
                   const course = enrollment.courses;
                   if (!course) return null;
                   
-                  // For now, hardcode progress to 0 since we don't track it yet
-                  const progress: number = 0;
+                  const progress: number = enrollment.progress || 0;
+                  const completedLessons: number = enrollment.completedLessons || 0;
+                  const totalLessons: number = enrollment.totalLessons || 0;
                   const thumbnail = course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800';
 
                   return (
@@ -184,7 +196,9 @@ export function MyCourses() {
                         
                         <div className="mb-6 mt-auto">
                           <div className="flex justify-between text-sm mb-2">
-                            <span className="font-medium text-primary-700">نسبة الإنجاز</span>
+                            <span className="font-medium text-primary-700">
+                              {totalLessons > 0 ? `${completedLessons} من ${totalLessons} دروس مكتملة` : 'نسبة الإنجاز'}
+                            </span>
                             <span className="font-bold text-accent-600" dir="ltr">{progress}%</span>
                           </div>
                           <div className="h-2 bg-primary-100 rounded-full overflow-hidden">
@@ -219,3 +233,4 @@ export function MyCourses() {
     </div>
   );
 }
+

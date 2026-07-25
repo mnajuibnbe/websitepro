@@ -10,6 +10,7 @@ import { CourseLearningHeader } from '../components/player/CourseLearningHeader'
 import { CourseSidebar } from '../components/player/CourseSidebar';
 import { VideoLessonRenderer } from '../components/player/VideoLessonRenderer';
 import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
+import { QuizLessonPlaceholder } from '../components/player/QuizLessonPlaceholder';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { LessonDetails } from '../components/player/LessonDetails';
 
@@ -132,7 +133,11 @@ export function LessonPlayer() {
         }
 
         const validSections = (sectionsRes.data || []) as CourseSection[];
-        const validLessons = (lessonsRes.data || []) as Lesson[];
+        const publishedSectionIds = new Set(validSections.map((s) => s.id));
+        const rawLessons = (lessonsRes.data || []) as Lesson[];
+        const validLessons = rawLessons.filter(
+          (l) => !l.section_id || publishedSectionIds.has(l.section_id)
+        );
         const validProgress = (progressRes.data || []) as LessonProgress[];
 
         if (validLessons.length === 0) {
@@ -238,6 +243,12 @@ export function LessonPlayer() {
   // Mark Complete & Continue handler
   const handleCompleteAndContinue = async () => {
     if (!currentLesson || !courseId || !user || isCompleting) return;
+
+    // Backend-facing handler guard: quiz lessons cannot be completed manually
+    if (currentLesson.type === 'quiz') {
+      console.warn('Quiz lessons cannot be completed manually via handleCompleteAndContinue');
+      return;
+    }
 
     try {
       setIsCompleting(true);
@@ -448,8 +459,15 @@ export function LessonPlayer() {
             {/* Viewer Component */}
             {currentLesson.type === 'video' ? (
               <VideoLessonRenderer videoUrl={currentLesson.video_url} title={currentLesson.title} />
-            ) : (
+            ) : currentLesson.type === 'text' ? (
               <TextLessonRenderer content={currentLesson.content} title={currentLesson.title} />
+            ) : currentLesson.type === 'quiz' ? (
+              <QuizLessonPlaceholder title={currentLesson.title} />
+            ) : (
+              <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="rtl">
+                <h3 className="text-xl font-bold text-primary-900 mb-2">نوع الدرس غير مدعوم</h3>
+                <p className="text-primary-500 text-sm">محتوى هذا الدرس ينتمي لنوع غير معرف حالياً.</p>
+              </div>
             )}
 
             {/* Lesson Details */}
@@ -459,6 +477,7 @@ export function LessonPlayer() {
             <LessonNavigation
               prevLesson={prevLesson}
               nextLesson={nextLesson}
+              currentLessonType={currentLesson.type}
               isCurrentCompleted={isCurrentCompleted}
               isCompleting={isCompleting}
               onNavigate={handleNavigateLesson}

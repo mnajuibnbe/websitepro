@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Clock, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { fetchCoursesProgress } from '../../lib/courseProgress';
 
 export function ContinueLearning() {
   const { user } = useAuth();
@@ -15,28 +16,50 @@ export function ContinueLearning() {
   useEffect(() => {
     async function loadLatestCourse() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
-          .select('*')
-          .limit(1)
-          .single();
-        
-        if (data) {
-          setCourse(data);
-          
-          
+        setIsLoading(true);
+        let activeCourseId: string | null = null;
+
+        if (user) {
+          const { data: enrollmentData } = await supabase
+            .from('enrollments')
+            .select('course_id')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .limit(1)
+            .maybeSingle();
+
+          if (enrollmentData?.course_id) {
+            activeCourseId = enrollmentData.course_id;
+          }
+        }
+
+        let courseData = null;
+        if (activeCourseId) {
+          const { data } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('id', activeCourseId)
+            .maybeSingle();
+          courseData = data;
+        }
+
+        if (!courseData) {
+          const { data } = await supabase
+            .from('courses')
+            .select('*')
+            .limit(1)
+            .maybeSingle();
+          courseData = data;
+        }
+
+        if (courseData) {
+          setCourse(courseData);
           if (user) {
-             const [lessonsCountRes, progressRes] = await Promise.all([
-               supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', data.id).eq('is_published', true),
-               supabase.from('lesson_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', user.id).eq('is_completed', true)
-             ]);
-             
-             const totalLessons = lessonsCountRes.count || 0;
-             const completedLessons = progressRes.data?.length || 0;
-             
-             if (totalLessons > 0) {
-               setProgress(Math.round((completedLessons / totalLessons) * 100));
-             }
+            const progressMap = await fetchCoursesProgress(user.id, [courseData.id]);
+            const courseProg = progressMap[courseData.id];
+            if (courseProg) {
+              setProgress(courseProg.percentage);
+            }
           }
         }
       } catch (e) {
@@ -45,8 +68,13 @@ export function ContinueLearning() {
         setIsLoading(false);
       }
     }
-    loadLatestCourse();
-  }, []);
+
+    if (user?.id) {
+      loadLatestCourse();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
 
   if (isLoading) {
     return (
