@@ -337,12 +337,12 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
     moveItemsToSectionId?: string
   ) => {
     try {
-      await CurriculumService.deleteSection(sectionId, { moveItemsToSectionId });
+      await CurriculumService.deleteSection(courseId, sectionId, { moveItemsToSectionId });
       setDeleteSectionModal({ isOpen: false, section: null, moveTargetId: '' });
       await loadCurriculum();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting section:', err);
-      setError('تعذر حذف القسم.');
+      setError(err?.message || 'تعذر حذف القسم.');
     }
   };
 
@@ -426,7 +426,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
     );
 
     try {
-      await CurriculumService.deleteItem(itemId, true);
+      await CurriculumService.deleteItem(itemId);
 
       // Trigger Undo Toast
       if (undoToast.timeoutId) clearTimeout(undoToast.timeoutId);
@@ -511,7 +511,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
     setSelectedItemIds([]);
 
     try {
-      await CurriculumService.bulkDelete(ids, true);
+      await CurriculumService.bulkDelete(ids);
 
       if (undoToast.timeoutId) clearTimeout(undoToast.timeoutId);
       const timeout = setTimeout(() => {

@@ -42,6 +42,8 @@ export function AdminLessonEditor() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId?: string }>();
   const [searchParams] = useSearchParams();
   const initialSectionId = searchParams.get('sectionId') || '';
+  const rawParamType = searchParams.get('lessonType') || searchParams.get('type') || 'video';
+  const initialType = (['quiz', 'assignment'].includes(rawParamType) ? 'video' : rawParamType) as any;
 
   const navigate = useNavigate();
   const isEditMode = Boolean(lessonId && lessonId !== 'new');
@@ -66,7 +68,7 @@ export function AdminLessonEditor() {
   const [sectionId, setSectionId] = useState(initialSectionId);
   const [lessonType, setLessonType] = useState<
     'video' | 'article' | 'pdf' | 'audio' | 'embed' | 'external_link' | 'live' | 'quiz' | 'assignment'
-  >('video');
+  >(initialType);
   const [duration, setDuration] = useState('');
   const [estimatedMinutes, setEstimatedMinutes] = useState<number>(0);
   const [thumbnail, setThumbnail] = useState('');
@@ -139,9 +141,13 @@ export function AdminLessonEditor() {
       const loadedSections = sectionsData || [];
       setSections(loadedSections);
 
-      // Set default section if not provided
+      // Set default section if not provided or if specified section doesn't belong to this course
       let currentSectionId = initialSectionId;
-      if (!currentSectionId && loadedSections.length > 0) {
+      if (currentSectionId && !loadedSections.some((s) => s.id === currentSectionId)) {
+        console.warn('Selected sectionId does not belong to course:', courseId);
+        currentSectionId = loadedSections[0]?.id || '';
+        setSectionId(currentSectionId);
+      } else if (!currentSectionId && loadedSections.length > 0) {
         currentSectionId = loadedSections[0].id;
         setSectionId(currentSectionId);
       }

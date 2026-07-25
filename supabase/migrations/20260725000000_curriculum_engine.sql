@@ -31,21 +31,47 @@ SET search_path = public
 AS $$
 DECLARE
     v_idx INTEGER;
-    v_section_id UUID;
+    v_sec_id UUID;
+    v_found_count INTEGER;
 BEGIN
-    -- Verify Admin Access if is_admin function exists
+    -- Verify Admin Access
     IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
         IF NOT public.is_admin() THEN
-            RAISE EXCEPTION 'Access denied. Admin required.';
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
         END IF;
     END IF;
 
+    IF p_course_id IS NULL THEN
+        RAISE EXCEPTION 'Invalid course_id provided.';
+    END IF;
+
+    IF p_section_ids IS NULL OR array_length(p_section_ids, 1) = 0 THEN
+        RETURN;
+    END IF;
+
+    -- Check for duplicates in p_section_ids
+    IF (SELECT COUNT(DISTINCT elem) FROM unnest(p_section_ids) AS elem) <> array_length(p_section_ids, 1) THEN
+        RAISE EXCEPTION 'Duplicate section IDs are not allowed in reorder array.';
+    END IF;
+
+    -- Verify all section IDs belong to p_course_id and are not soft-deleted
+    SELECT COUNT(*) INTO v_found_count
+    FROM public.course_sections
+    WHERE id = ANY(p_section_ids)
+      AND course_id = p_course_id
+      AND deleted_at IS NULL;
+
+    IF v_found_count <> array_length(p_section_ids, 1) THEN
+        RAISE EXCEPTION 'One or more sections do not belong to the specified course or are deleted.';
+    END IF;
+
+    -- Sequential reorder starting at 0
     FOR v_idx IN 1..array_length(p_section_ids, 1) LOOP
-        v_section_id := p_section_ids[v_idx];
+        v_sec_id := p_section_ids[v_idx];
         UPDATE public.course_sections
         SET order_index = v_idx - 1,
             updated_at = NOW()
-        WHERE id = v_section_id AND course_id = p_course_id;
+        WHERE id = v_sec_id AND course_id = p_course_id;
     END LOOP;
 END;
 $$;
@@ -63,29 +89,55 @@ SET search_path = public
 AS $$
 DECLARE
     v_idx INTEGER;
-    v_lesson_id UUID;
+    v_les_id UUID;
+    v_found_count INTEGER;
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
         IF NOT public.is_admin() THEN
-            RAISE EXCEPTION 'Access denied. Admin required.';
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
         END IF;
     END IF;
 
+    IF p_course_id IS NULL OR p_section_id IS NULL THEN
+        RAISE EXCEPTION 'Course ID and Section ID are required.';
+    END IF;
+
     -- Verify section belongs to course
-    IF NOT EXISTS (SELECT 1 FROM public.course_sections WHERE id = p_section_id AND course_id = p_course_id) THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM public.course_sections 
+        WHERE id = p_section_id AND course_id = p_course_id AND deleted_at IS NULL
+    ) THEN
         RAISE EXCEPTION 'Section does not belong to specified course.';
     END IF;
 
-    IF p_lesson_ids IS NOT NULL AND array_length(p_lesson_ids, 1) > 0 THEN
-        FOR v_idx IN 1..array_length(p_lesson_ids, 1) LOOP
-            v_lesson_id := p_lesson_ids[v_idx];
-            UPDATE public.lessons
-            SET order_index = v_idx - 1,
-                section_id = p_section_id,
-                updated_at = NOW()
-            WHERE id = v_lesson_id AND course_id = p_course_id;
-        END LOOP;
+    IF p_lesson_ids IS NULL OR array_length(p_lesson_ids, 1) = 0 THEN
+        RETURN;
     END IF;
+
+    -- Check duplicates in p_lesson_ids
+    IF (SELECT COUNT(DISTINCT elem) FROM unnest(p_lesson_ids) AS elem) <> array_length(p_lesson_ids, 1) THEN
+        RAISE EXCEPTION 'Duplicate lesson IDs in reorder array.';
+    END IF;
+
+    -- Verify all lessons belong to p_course_id
+    SELECT COUNT(*) INTO v_found_count
+    FROM public.lessons
+    WHERE id = ANY(p_lesson_ids)
+      AND course_id = p_course_id
+      AND deleted_at IS NULL;
+
+    IF v_found_count <> array_length(p_lesson_ids, 1) THEN
+        RAISE EXCEPTION 'One or more lessons do not belong to specified course or are deleted.';
+    END IF;
+
+    FOR v_idx IN 1..array_length(p_lesson_ids, 1) LOOP
+        v_les_id := p_lesson_ids[v_idx];
+        UPDATE public.lessons
+        SET order_index = v_idx - 1,
+            section_id = p_section_id,
+            updated_at = NOW()
+        WHERE id = v_les_id AND course_id = p_course_id;
+    END LOOP;
 END;
 $$;
 
@@ -106,25 +158,28 @@ DECLARE
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
         IF NOT public.is_admin() THEN
-            RAISE EXCEPTION 'Access denied. Admin required.';
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
         END IF;
     END IF;
 
-    -- Fetch current lesson section
+    -- Fetch current lesson section & verify course_id
     SELECT section_id INTO v_source_section_id
     FROM public.lessons
-    WHERE id = p_lesson_id AND course_id = p_course_id;
+    WHERE id = p_lesson_id AND course_id = p_course_id AND deleted_at IS NULL;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Lesson not found in specified course.';
     END IF;
 
     -- Verify destination section belongs to same course
-    IF NOT EXISTS (SELECT 1 FROM public.course_sections WHERE id = p_destination_section_id AND course_id = p_course_id) THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM public.course_sections 
+        WHERE id = p_destination_section_id AND course_id = p_course_id AND deleted_at IS NULL
+    ) THEN
         RAISE EXCEPTION 'Destination section does not belong to specified course.';
     END IF;
 
-    -- Update destination section for moved lesson
+    -- Move lesson to target section
     UPDATE public.lessons
     SET section_id = p_destination_section_id,
         updated_at = NOW()
@@ -137,7 +192,7 @@ BEGIN
                 CASE WHEN id = p_lesson_id THEN p_destination_index * 2 + 1 ELSE order_index * 2 END ASC
         ) - 1 AS new_order
         FROM public.lessons
-        WHERE section_id = p_destination_section_id AND course_id = p_course_id AND (deleted_at IS NULL)
+        WHERE section_id = p_destination_section_id AND course_id = p_course_id AND deleted_at IS NULL
     )
     UPDATE public.lessons l
     SET order_index = d.new_order
@@ -149,7 +204,7 @@ BEGIN
         WITH src_ordered AS (
             SELECT id, ROW_NUMBER() OVER (ORDER BY order_index ASC) - 1 AS new_order
             FROM public.lessons
-            WHERE section_id = v_source_section_id AND course_id = p_course_id AND (deleted_at IS NULL)
+            WHERE section_id = v_source_section_id AND course_id = p_course_id AND deleted_at IS NULL
         )
         UPDATE public.lessons l
         SET order_index = s.new_order
@@ -171,7 +226,7 @@ AS $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
         IF NOT public.is_admin() THEN
-            RAISE EXCEPTION 'Access denied. Admin required.';
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
         END IF;
     END IF;
 
@@ -194,7 +249,7 @@ AS $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
         IF NOT public.is_admin() THEN
-            RAISE EXCEPTION 'Access denied. Admin required.';
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
         END IF;
     END IF;
 
@@ -205,8 +260,106 @@ BEGIN
 END;
 $$;
 
+-- 7. RPC: Soft Delete Section (and optionally its active lessons)
+CREATE OR REPLACE FUNCTION public.admin_soft_delete_section(
+    p_course_id UUID,
+    p_section_id UUID,
+    p_move_items_to_section_id UUID DEFAULT NULL
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
+        IF NOT public.is_admin() THEN
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
+        END IF;
+    END IF;
+
+    -- Verify section belongs to course
+    IF NOT EXISTS (
+        SELECT 1 FROM public.course_sections 
+        WHERE id = p_section_id AND course_id = p_course_id
+    ) THEN
+        RAISE EXCEPTION 'Section does not belong to specified course.';
+    END IF;
+
+    IF p_move_items_to_section_id IS NOT NULL THEN
+        -- Verify target move section belongs to same course
+        IF NOT EXISTS (
+            SELECT 1 FROM public.course_sections 
+            WHERE id = p_move_items_to_section_id AND course_id = p_course_id AND deleted_at IS NULL
+        ) THEN
+            RAISE EXCEPTION 'Target section for lesson reassignment does not belong to specified course.';
+        END IF;
+
+        UPDATE public.lessons
+        SET section_id = p_move_items_to_section_id,
+            updated_at = NOW()
+        WHERE section_id = p_section_id AND course_id = p_course_id;
+    ELSE
+        -- Soft delete lessons in this section
+        UPDATE public.lessons
+        SET deleted_at = NOW(),
+            updated_at = NOW()
+        WHERE section_id = p_section_id AND course_id = p_course_id AND deleted_at IS NULL;
+    END IF;
+
+    -- Soft delete section itself
+    UPDATE public.course_sections
+    SET deleted_at = NOW(),
+        updated_at = NOW()
+    WHERE id = p_section_id AND course_id = p_course_id;
+END;
+$$;
+
+-- 8. RPC: Restore Section
+CREATE OR REPLACE FUNCTION public.admin_restore_section(
+    p_course_id UUID,
+    p_section_id UUID,
+    p_restore_lessons BOOLEAN DEFAULT TRUE
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
+        IF NOT public.is_admin() THEN
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
+        END IF;
+    END IF;
+
+    UPDATE public.course_sections
+    SET deleted_at = NULL,
+        updated_at = NOW()
+    WHERE id = p_section_id AND course_id = p_course_id;
+
+    IF p_restore_lessons THEN
+        UPDATE public.lessons
+        SET deleted_at = NULL,
+            updated_at = NOW()
+        WHERE section_id = p_section_id AND course_id = p_course_id;
+    END IF;
+END;
+$$;
+
+-- Security Hardening: Revoke default PUBLIC permissions & Grant only to authenticated
+REVOKE ALL ON FUNCTION public.admin_reorder_course_sections(UUID, UUID[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_reorder_section_lessons(UUID, UUID, UUID[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_move_lesson(UUID, UUID, UUID, INTEGER) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_soft_delete_lessons(UUID[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_restore_lessons(UUID[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_soft_delete_section(UUID, UUID, UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_restore_section(UUID, UUID, BOOLEAN) FROM PUBLIC;
+
 GRANT EXECUTE ON FUNCTION public.admin_reorder_course_sections(UUID, UUID[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_reorder_section_lessons(UUID, UUID, UUID[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_move_lesson(UUID, UUID, UUID, INTEGER) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_soft_delete_lessons(UUID[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_restore_lessons(UUID[]) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_soft_delete_section(UUID, UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_restore_section(UUID, UUID, BOOLEAN) TO authenticated;

@@ -7,6 +7,52 @@ import {
 } from '../types/database.types';
 import { LessonService } from './lesson.service';
 
+/**
+ * Maps Supabase / PostgreSQL errors into clean Arabic messages
+ */
+export function mapCurriculumError(error: any): Error {
+  if (!error) return new Error('حدث خطأ غير متوقع أثناء معالجة المنهج.');
+
+  const msg = typeof error === 'string' ? error : error.message || error.details || '';
+  const code = error.code || '';
+
+  // Function not found (42883 or PGRST202 or missing RPC)
+  if (
+    code === 'PGRST202' ||
+    code === '42883' ||
+    msg.includes('Could not find the function') ||
+    (msg.includes('function') && msg.includes('does not exist'))
+  ) {
+    return new Error('ميزة ترتيب وإدارة المنهج تحتاج إلى تطبيق تحديث قاعدة البيانات (Migration) في Supabase أولاً.');
+  }
+
+  // Permission denied / RLS
+  if (code === '42501' || msg.includes('permission denied') || msg.includes('row-level security') || msg.includes('Access denied')) {
+    return new Error('ليس لديك الصلاحيات الكافية لتنفيذ هذه العملية على المنهج الدراسي.');
+  }
+
+  // Mismatched course / relation error
+  if (
+    msg.includes('mismatch') ||
+    msg.includes('does not belong to specified course') ||
+    msg.includes('Destination section does not belong')
+  ) {
+    return new Error('لا يمكن تنفيذ العملية: العناصر المحددة لا تنتمي لنفس الدورة التدريبية.');
+  }
+
+  // Duplicate or constraint violation
+  if (code === '23505' || code === '23502' || code === '23503' || msg.includes('Duplicate')) {
+    return new Error('فشلت العملية بسبب وجود تعارض في البيانات أو تكرار في الترتيب.');
+  }
+
+  // Network error
+  if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
+    return new Error('تعذر الاتصال بقاعدة البيانات. يرجى التحقق من اتصال شبكة الإنترنت.');
+  }
+
+  return new Error(msg || 'حدث خطأ في تنفيذ عملية المنهج الدراسي.');
+}
+
 export class CurriculumService {
   /**
    * Helper to map raw DB Lesson row to CurriculumItemViewModel
@@ -64,7 +110,7 @@ export class CurriculumService {
     const { data: sectionsData, error: sectionsErr } = await sectionsQuery;
     if (sectionsErr) {
       console.error('Error fetching course sections:', sectionsErr);
-      throw sectionsErr;
+      throw mapCurriculumError(sectionsErr);
     }
 
     const sections = (sectionsData || []) as CourseSection[];
@@ -83,7 +129,7 @@ export class CurriculumService {
     const { data: lessonsData, error: lessonsErr } = await lessonsQuery;
     if (lessonsErr) {
       console.error('Error fetching course lessons:', lessonsErr);
-      throw lessonsErr;
+      throw mapCurriculumError(lessonsErr);
     }
 
     const lessons = (lessonsData || []) as Lesson[];
@@ -144,7 +190,7 @@ export class CurriculumService {
 
     if (error) {
       console.error('Error creating section:', error);
-      throw error;
+      throw mapCurriculumError(error);
     }
 
     const sec = inserted as CourseSection;
@@ -184,49 +230,53 @@ export class CurriculumService {
 
     if (error) {
       console.error('Error updating section:', error);
-      throw error;
+      throw mapCurriculumError(error);
     }
 
     return updated as CourseSection;
   }
 
   /**
-   * Delete section with option to reassign items or delete
+   * Soft delete section via atomic RPC (or reassign lessons)
    */
   static async deleteSection(
+    courseId: string,
     sectionId: string,
     options?: { moveItemsToSectionId?: string }
   ): Promise<void> {
-    if (options?.moveItemsToSectionId) {
-      // Reassign lessons to target section
-      const { error: moveErr } = await supabase
-        .from('lessons')
-        .update({ section_id: options.moveItemsToSectionId, updated_at: new Date().toISOString() })
-        .eq('section_id', sectionId);
+    const { error } = await supabase.rpc('admin_soft_delete_section', {
+      p_course_id: courseId,
+      p_section_id: sectionId,
+      p_move_items_to_section_id: options?.moveItemsToSectionId || null,
+    });
 
-      if (moveErr) throw moveErr;
-    } else {
-      // Delete lessons in this section
-      const { error: delLessonsErr } = await supabase
-        .from('lessons')
-        .delete()
-        .eq('section_id', sectionId);
-
-      if (delLessonsErr) console.warn('Warning deleting lessons in section:', delLessonsErr);
-    }
-
-    const { error } = await supabase.from('course_sections').delete().eq('id', sectionId);
     if (error) {
-      console.error('Error deleting section:', error);
-      throw error;
+      console.error('RPC admin_soft_delete_section error:', error);
+      throw mapCurriculumError(error);
     }
   }
 
   /**
-   * Duplicate section and all lessons within it
+   * Restore soft-deleted section via RPC
+   */
+  static async restoreSection(courseId: string, sectionId: string): Promise<void> {
+    const { error } = await supabase.rpc('admin_restore_section', {
+      p_course_id: courseId,
+      p_section_id: sectionId,
+      p_restore_lessons: true,
+    });
+
+    if (error) {
+      console.error('RPC admin_restore_section error:', error);
+      throw mapCurriculumError(error);
+    }
+  }
+
+  /**
+   * Duplicate section and lessons
    */
   static async duplicateSection(sectionId: string): Promise<CurriculumSectionViewModel> {
-    // 1. Fetch section
+    // 1. Fetch original section
     const { data: original, error: secErr } = await supabase
       .from('course_sections')
       .select('*')
@@ -237,20 +287,10 @@ export class CurriculumService {
 
     const origSec = original as CourseSection;
 
-    // 2. Shift subsequent sections
+    // 2. Insert new duplicate section
     const existingCurriculum = await this.getCurriculum(origSec.course_id);
     const targetOrder = origSec.order_index + 1;
 
-    for (const sec of existingCurriculum) {
-      if (sec.orderIndex >= targetOrder) {
-        await supabase
-          .from('course_sections')
-          .update({ order_index: sec.orderIndex + 1 })
-          .eq('id', sec.id);
-      }
-    }
-
-    // 3. Insert new section
     const newSecPayload = {
       course_id: origSec.course_id,
       title: `${origSec.title} (نسخة)`,
@@ -266,10 +306,10 @@ export class CurriculumService {
       .select()
       .single();
 
-    if (createSecErr || !createdSec) throw createSecErr;
+    if (createSecErr || !createdSec) throw mapCurriculumError(createSecErr);
     const newSec = createdSec as CourseSection;
 
-    // 4. Duplicate lessons in section
+    // 3. Duplicate active lessons in section
     const originalLessons = await LessonService.getLessonsBySection(sectionId);
     const duplicatedItems: CurriculumItemViewModel[] = [];
 
@@ -287,45 +327,42 @@ export class CurriculumService {
       duplicatedItems.push(this.mapLessonToViewModel(newLesson));
     }
 
+    // 4. Reorder sections atomically
+    const allSecIds = existingCurriculum.map((s) => s.id);
+    const origIdx = allSecIds.indexOf(sectionId);
+    if (origIdx !== -1) {
+      allSecIds.splice(origIdx + 1, 0, newSec.id);
+      await this.reorderSections(origSec.course_id, allSecIds);
+    }
+
     return {
       id: newSec.id,
       courseId: newSec.course_id,
       title: newSec.title,
       description: newSec.description,
-      orderIndex: newSec.order_index,
+      orderIndex: targetOrder,
       isPublished: newSec.is_published,
       items: duplicatedItems,
     };
   }
 
   /**
-   * Reorder Sections (RPC with direct fallback)
+   * Reorder Sections (RPC-only atomic execution)
    */
   static async reorderSections(courseId: string, orderedSectionIds: string[]): Promise<void> {
-    try {
-      const { error: rpcErr } = await supabase.rpc('admin_reorder_course_sections', {
-        p_course_id: courseId,
-        p_section_ids: orderedSectionIds,
-      });
+    const { error } = await supabase.rpc('admin_reorder_course_sections', {
+      p_course_id: courseId,
+      p_section_ids: orderedSectionIds,
+    });
 
-      if (!rpcErr) return;
-      console.warn('RPC admin_reorder_course_sections not available, using direct updates:', rpcErr.message);
-    } catch {
-      // Fallback
-    }
-
-    for (let index = 0; index < orderedSectionIds.length; index++) {
-      const secId = orderedSectionIds[index];
-      await supabase
-        .from('course_sections')
-        .update({ order_index: index, updated_at: new Date().toISOString() })
-        .eq('id', secId)
-        .eq('course_id', courseId);
+    if (error) {
+      console.error('RPC admin_reorder_course_sections failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
   /**
-   * Move an item to a different section and position
+   * Move an item to a different section and position (RPC-only atomic execution)
    */
   static async moveItem(
     itemId: string,
@@ -334,89 +371,36 @@ export class CurriculumService {
     destinationIndex: number,
     courseId: string
   ): Promise<void> {
-    try {
-      const { error: rpcErr } = await supabase.rpc('admin_move_lesson', {
-        p_course_id: courseId,
-        p_lesson_id: itemId,
-        p_destination_section_id: destinationSectionId,
-        p_destination_index: destinationIndex,
-      });
+    const { error } = await supabase.rpc('admin_move_lesson', {
+      p_course_id: courseId,
+      p_lesson_id: itemId,
+      p_destination_section_id: destinationSectionId,
+      p_destination_index: destinationIndex,
+    });
 
-      if (!rpcErr) return;
-      console.warn('RPC admin_move_lesson failed, using fallback updates:', rpcErr.message);
-    } catch {
-      // Fallback
-    }
-
-    // Direct fallback logic
-    // Update target lesson section
-    await supabase
-      .from('lessons')
-      .update({
-        section_id: destinationSectionId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', itemId)
-      .eq('course_id', courseId);
-
-    // Re-index destination section lessons
-    const destLessons = await LessonService.getLessonsBySection(destinationSectionId);
-    // Remove itemId if present
-    const filtered = destLessons.filter((l) => l.id !== itemId);
-
-    // Fetch the lesson object
-    const targetLesson = await LessonService.getLessonById(itemId);
-    if (targetLesson) {
-      filtered.splice(destinationIndex, 0, targetLesson);
-    }
-
-    for (let i = 0; i < filtered.length; i++) {
-      await supabase
-        .from('lessons')
-        .update({ order_index: i, section_id: destinationSectionId })
-        .eq('id', filtered[i].id);
-    }
-
-    // Re-index source section if different
-    if (sourceSectionId !== destinationSectionId) {
-      const srcLessons = await LessonService.getLessonsBySection(sourceSectionId);
-      for (let i = 0; i < srcLessons.length; i++) {
-        await supabase
-          .from('lessons')
-          .update({ order_index: i })
-          .eq('id', srcLessons[i].id);
-      }
+    if (error) {
+      console.error('RPC admin_move_lesson failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
   /**
-   * Reorder items inside a section
+   * Reorder items inside a section (RPC-only atomic execution)
    */
   static async reorderItems(
     sectionId: string,
     orderedItemIds: string[],
     courseId: string
   ): Promise<void> {
-    try {
-      const { error: rpcErr } = await supabase.rpc('admin_reorder_section_lessons', {
-        p_course_id: courseId,
-        p_section_id: sectionId,
-        p_lesson_ids: orderedItemIds,
-      });
+    const { error } = await supabase.rpc('admin_reorder_section_lessons', {
+      p_course_id: courseId,
+      p_section_id: sectionId,
+      p_lesson_ids: orderedItemIds,
+    });
 
-      if (!rpcErr) return;
-      console.warn('RPC admin_reorder_section_lessons failed, using direct update:', rpcErr.message);
-    } catch {
-      // Fallback
-    }
-
-    for (let index = 0; index < orderedItemIds.length; index++) {
-      const itemId = orderedItemIds[index];
-      await supabase
-        .from('lessons')
-        .update({ order_index: index, section_id: sectionId, updated_at: new Date().toISOString() })
-        .eq('id', itemId)
-        .eq('course_id', courseId);
+    if (error) {
+      console.error('RPC admin_reorder_section_lessons failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
@@ -429,54 +413,30 @@ export class CurriculumService {
   }
 
   /**
-   * Delete item (soft delete or hard delete)
+   * Delete item (soft delete via RPC)
    */
-  static async deleteItem(itemId: string, softDelete = true): Promise<void> {
-    if (softDelete) {
-      try {
-        const { error: rpcErr } = await supabase.rpc('admin_soft_delete_lessons', {
-          p_lesson_ids: [itemId],
-        });
-        if (!rpcErr) return;
-      } catch {
-        // Fallback
-      }
+  static async deleteItem(itemId: string): Promise<void> {
+    const { error } = await supabase.rpc('admin_soft_delete_lessons', {
+      p_lesson_ids: [itemId],
+    });
 
-      const { error } = await supabase
-        .from('lessons')
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', itemId);
-
-      if (error) {
-        // If column doesn't exist, hard delete as fallback
-        await LessonService.deleteLesson(itemId);
-      }
-    } else {
-      await LessonService.deleteLesson(itemId);
+    if (error) {
+      console.error('RPC admin_soft_delete_lessons failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
   /**
-   * Restore soft-deleted item
+   * Restore soft-deleted item via RPC
    */
   static async restoreItem(itemId: string): Promise<void> {
-    try {
-      const { error: rpcErr } = await supabase.rpc('admin_restore_lessons', {
-        p_lesson_ids: [itemId],
-      });
-      if (!rpcErr) return;
-    } catch {
-      // Fallback
-    }
-
-    const { error } = await supabase
-      .from('lessons')
-      .update({ deleted_at: null })
-      .eq('id', itemId);
+    const { error } = await supabase.rpc('admin_restore_lessons', {
+      p_lesson_ids: [itemId],
+    });
 
     if (error) {
-      console.error('Error restoring lesson:', error);
-      throw error;
+      console.error('RPC admin_restore_lessons failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
@@ -492,63 +452,39 @@ export class CurriculumService {
 
     if (error) {
       console.error('Error in bulkPublish:', error);
-      throw error;
+      throw mapCurriculumError(error);
     }
   }
 
   /**
-   * Bulk move items to target section
+   * Bulk move items to target section (Uses RPC per item or reorder)
    */
   static async bulkMove(itemIds: string[], destinationSectionId: string, courseId: string): Promise<void> {
     if (itemIds.length === 0) return;
 
-    // Get current lessons in destination section to calculate next order_index
+    // Get current lessons in destination section to calculate position
     const destLessons = await LessonService.getLessonsBySection(destinationSectionId);
-    let startOrder = destLessons.length;
+    let startIdx = destLessons.length;
 
     for (const itemId of itemIds) {
-      await supabase
-        .from('lessons')
-        .update({
-          section_id: destinationSectionId,
-          order_index: startOrder,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', itemId)
-        .eq('course_id', courseId);
-
-      startOrder++;
+      await this.moveItem(itemId, '', destinationSectionId, startIdx, courseId);
+      startIdx++;
     }
   }
 
   /**
-   * Bulk delete items
+   * Bulk delete items via soft delete RPC
    */
-  static async bulkDelete(itemIds: string[], softDelete = true): Promise<void> {
+  static async bulkDelete(itemIds: string[]): Promise<void> {
     if (itemIds.length === 0) return;
-    if (softDelete) {
-      try {
-        const { error: rpcErr } = await supabase.rpc('admin_soft_delete_lessons', {
-          p_lesson_ids: itemIds,
-        });
-        if (!rpcErr) return;
-      } catch {
-        // Fallback
-      }
 
-      const { error } = await supabase
-        .from('lessons')
-        .update({ deleted_at: new Date().toISOString() })
-        .in('id', itemIds);
+    const { error } = await supabase.rpc('admin_soft_delete_lessons', {
+      p_lesson_ids: itemIds,
+    });
 
-      if (error) {
-        // Hard delete fallback
-        const { error: hardErr } = await supabase.from('lessons').delete().in('id', itemIds);
-        if (hardErr) throw hardErr;
-      }
-    } else {
-      const { error } = await supabase.from('lessons').delete().in('id', itemIds);
-      if (error) throw error;
+    if (error) {
+      console.error('RPC admin_soft_delete_lessons failed in bulkDelete:', error);
+      throw mapCurriculumError(error);
     }
   }
 }
