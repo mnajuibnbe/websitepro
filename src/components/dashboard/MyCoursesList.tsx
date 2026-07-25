@@ -24,8 +24,8 @@ export function MyCoursesList() {
           if (user) {
             const coursesWithProgress = await Promise.all(data.map(async (course) => {
                const [lessonsCountRes, progressRes] = await Promise.all([
-                 supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', course.id),
-                 supabase.from('user_progress').select('lesson_id').eq('course_id', course.id).eq('user_id', user.id)
+                 supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', course.id).eq('is_published', true),
+                 supabase.from('lesson_progress').select('lesson_id').eq('course_id', course.id).eq('user_id', user.id).eq('is_completed', true)
                ]);
                
                const totalLessons = lessonsCountRes.count || 0;
@@ -71,7 +71,7 @@ export function MyCoursesList() {
           <div 
             key={course.id} 
             className="bg-white border border-primary-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 group cursor-pointer"
-            onClick={() => navigate(`/lesson?courseId=${course.id}`)}
+            onClick={() => navigate(`/learn/${course.id}`)}
           >
             <div className="flex h-32">
               <div className="w-1/3 relative overflow-hidden">

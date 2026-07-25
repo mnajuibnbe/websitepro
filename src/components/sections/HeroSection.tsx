@@ -31,7 +31,7 @@ export function HeroSection() {
               <Button variant="primary" className="w-full sm:w-auto text-lg h-14" onClick={() => navigate('/courses')}>
                 استكشفي الكورسات
               </Button>
-              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => navigate('/lesson')}>
+              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => navigate('/courses')}>
                 شاهدي درسًا مجانيًا
               </Button>
             </div>

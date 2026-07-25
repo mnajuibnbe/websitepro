@@ -201,7 +201,7 @@ export function MyCourses() {
                           </div>
                           <Button 
                             variant={progress === 100 ? 'secondary' : 'primary'} 
-                            onClick={() => navigate(`/lesson?courseId=${course.id}`)}
+                            onClick={() => navigate(`/learn/${course.id}`)}
                             className="px-6"
                           >
                             {progress === 100 ? 'مراجعة الكورس' : 'متابعة التعلم'}

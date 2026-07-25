@@ -8,6 +8,8 @@ import { CourseDetail } from './pages/CourseDetail';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { Dashboard } from './pages/Dashboard';
 import { LessonPlayer } from './pages/LessonPlayer';
+import { CourseLearnResolver } from './pages/CourseLearnResolver';
+import { LegacyLessonRedirector } from './pages/LegacyLessonRedirector';
 import { QuizPage } from './pages/Quiz';
 import { CertificatePage } from './pages/CertificatePage';
 import { LoginPage } from './pages/LoginPage';
@@ -62,7 +64,9 @@ function AppContent() {
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
       <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
-      <Route path="/lesson" element={<RequireAuth><LessonPlayer /></RequireAuth>} />
+      <Route path="/learn/:courseId" element={<RequireAuth><CourseLearnResolver /></RequireAuth>} />
+      <Route path="/learn/:courseId/lesson/:lessonId" element={<RequireAuth><LessonPlayer /></RequireAuth>} />
+      <Route path="/lesson" element={<RequireAuth><LegacyLessonRedirector /></RequireAuth>} />
       <Route path="/quiz" element={<RequireAuth><QuizPage /></RequireAuth>} />
       <Route path="/certificate" element={<RequireAuth><CertificatePage /></RequireAuth>} />
 

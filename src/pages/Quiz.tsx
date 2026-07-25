@@ -93,21 +93,21 @@ export function QuizPage() {
   };
 
   const handleContinue = () => {
-    navigate('/lesson');
+    navigate('/my-courses');
   };
 
   return (
     <div className="min-h-screen bg-primary-50 flex flex-col">
       {/* Focused Header */}
       <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
-        <Link to="/lesson" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
+        <Link to="/my-courses" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
           <ArrowRight className="w-5 h-5 group-hover:-translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />
           <span className="font-bold text-sm hidden sm:block">الخروج من الاختبار</span>
         </Link>
         <div className="font-bold text-primary-900 text-sm md:text-base">
           دبلومة العناية بالبشرة والشعر
         </div>
-        <button onClick={() => navigate('/lesson')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
+        <button onClick={() => navigate('/my-courses')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
           <X className="w-5 h-5" />
         </button>
       </header>

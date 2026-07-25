@@ -27,8 +27,8 @@ export function ContinueLearning() {
           
           if (user) {
              const [lessonsCountRes, progressRes] = await Promise.all([
-               supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', data.id),
-               supabase.from('user_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', user.id)
+               supabase.from('lessons').select('id', { count: 'exact', head: true }).eq('course_id', data.id).eq('is_published', true),
+               supabase.from('lesson_progress').select('lesson_id').eq('course_id', data.id).eq('user_id', user.id).eq('is_completed', true)
              ]);
              
              const totalLessons = lessonsCountRes.count || 0;
@@ -96,7 +96,7 @@ export function ContinueLearning() {
         {/* CTA */}
         <div className="w-full md:w-auto flex-shrink-0">
           <button 
-            onClick={() => navigate(`/lesson?courseId=${course.id}`)}
+            onClick={() => navigate(`/learn/${course.id}`)}
             className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent-600 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-md shadow-accent-600/20 hover:bg-accent-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
             <PlayCircle className="w-6 h-6" />

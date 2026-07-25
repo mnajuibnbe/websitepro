@@ -154,7 +154,7 @@ export function EnrollmentCard() {
 
   const handleButtonClick = () => {
     if (enrollmentStatus === 'active') {
-      navigate(`/lesson?courseId=${courseId}`);
+      navigate(`/learn/${courseId}`);
     } else if (enrollmentStatus === 'none') {
       handleEnroll();
     }
