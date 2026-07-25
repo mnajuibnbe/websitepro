@@ -41,6 +41,7 @@ import { supabase } from '../../lib/supabase';
 import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { LessonService } from '../../services/lesson.service';
+import { CurriculumBuilder } from '../../components/admin/curriculum/CurriculumBuilder';
 
 type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 
@@ -579,6 +580,9 @@ export function AdminCourseBuilder() {
             <>
               {/* TAB 1: CURRICULUM */}
               {activeTab === 'curriculum' && (
+                <CurriculumBuilder courseId={courseId!} />
+              )}
+              {false && (
                 <div className="space-y-6">
                   {/* Header Bar */}
                   <div className="flex items-center justify-between gap-4">

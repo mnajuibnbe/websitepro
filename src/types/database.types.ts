@@ -44,6 +44,7 @@ export interface CourseSection {
   description: string | null;
   order_index: number;
   is_published: boolean;
+  deleted_at?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -77,8 +78,37 @@ export interface Lesson {
   pdf_watermark?: boolean;
   open_in_new_tab?: boolean;
   embed_code?: string | null;
+  deleted_at?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface CurriculumItemViewModel {
+  id: string;
+  courseId: string;
+  sectionId: string;
+  title: string;
+  itemType: 'video' | 'article' | 'pdf' | 'audio' | 'embed' | 'external_link' | 'live' | 'quiz' | 'assignment' | string;
+  orderIndex: number;
+  duration?: string | null;
+  estimatedMinutes?: number | null;
+  isPublished: boolean;
+  isPreview: boolean;
+  sourceTable: 'lessons' | 'quizzes' | 'assignments' | string;
+  sourceId: string;
+  deletedAt?: string | null;
+}
+
+export interface CurriculumSectionViewModel {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  orderIndex: number;
+  isPublished: boolean;
+  isCollapsed?: boolean;
+  deletedAt?: string | null;
+  items: CurriculumItemViewModel[];
 }
 
 export interface LessonProgress {
