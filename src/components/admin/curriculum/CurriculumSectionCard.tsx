@@ -20,7 +20,6 @@ import { CurriculumSectionViewModel } from '../../../types/database.types';
 import { CurriculumItemRow } from './CurriculumItemRow';
 
 interface CurriculumSectionCardProps {
-  key?: React.Key;
   section: CurriculumSectionViewModel;
   courseId: string;
   selectedItemIds: string[];
@@ -36,7 +35,7 @@ interface CurriculumSectionCardProps {
   isOverlay?: boolean;
 }
 
-export function CurriculumSectionCard({
+export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
   section,
   courseId,
   selectedItemIds,
@@ -50,7 +49,7 @@ export function CurriculumSectionCard({
   onTogglePublishItem,
   onMoveItemToPosition,
   isOverlay = false,
-}: CurriculumSectionCardProps) {
+}) => {
   const [isCollapsed, setIsCollapsed] = useState(section.isCollapsed || false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(section.title);

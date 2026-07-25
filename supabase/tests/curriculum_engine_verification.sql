@@ -25,7 +25,9 @@ WHERE pg_namespace.nspname = 'public'
     'admin_soft_delete_lessons',
     'admin_restore_lessons',
     'admin_soft_delete_section',
-    'admin_restore_section'
+    'admin_restore_section',
+    'admin_duplicate_section',
+    'admin_bulk_move_lessons'
   );
 
 -- 3. Check EXECUTE permissions on RPC functions (Ensure no PUBLIC or anon permissions)
@@ -42,7 +44,9 @@ WHERE routine_schema = 'public'
     'admin_soft_delete_lessons',
     'admin_restore_lessons',
     'admin_soft_delete_section',
-    'admin_restore_section'
+    'admin_restore_section',
+    'admin_duplicate_section',
+    'admin_bulk_move_lessons'
   );
 
 -- 4. Check for duplicate order_index within the same section (lessons)

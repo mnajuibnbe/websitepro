@@ -363,3 +363,205 @@ GRANT EXECUTE ON FUNCTION public.admin_soft_delete_lessons(UUID[]) TO authentica
 GRANT EXECUTE ON FUNCTION public.admin_restore_lessons(UUID[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_soft_delete_section(UUID, UUID, UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_restore_section(UUID, UUID, BOOLEAN) TO authenticated;
+
+-- 9. RPC: Duplicate Section
+CREATE OR REPLACE FUNCTION public.admin_duplicate_section(
+    p_course_id UUID,
+    p_section_id UUID
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_orig_section RECORD;
+    v_new_section_id UUID;
+    v_target_order INTEGER;
+    v_lesson RECORD;
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
+        IF NOT public.is_admin() THEN
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
+        END IF;
+    END IF;
+
+    -- Fetch original section
+    SELECT * INTO v_orig_section
+    FROM public.course_sections
+    WHERE id = p_section_id AND course_id = p_course_id AND deleted_at IS NULL;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Section not found or deleted.';
+    END IF;
+
+    v_target_order := v_orig_section.order_index + 1;
+
+    -- Shift order_index of subsequent sections
+    UPDATE public.course_sections
+    SET order_index = order_index + 1
+    WHERE course_id = p_course_id AND order_index >= v_target_order AND deleted_at IS NULL;
+
+    -- Create new duplicate section
+    INSERT INTO public.course_sections (
+        course_id,
+        title,
+        description,
+        order_index,
+        is_published,
+        created_at,
+        updated_at
+    ) VALUES (
+        p_course_id,
+        v_orig_section.title || ' (نسخة)',
+        v_orig_section.description,
+        v_target_order,
+        v_orig_section.is_published,
+        NOW(),
+        NOW()
+    )
+    RETURNING id INTO v_new_section_id;
+
+    -- Duplicate active lessons
+    FOR v_lesson IN
+        SELECT * FROM public.lessons
+        WHERE section_id = p_section_id AND course_id = p_course_id AND deleted_at IS NULL
+        ORDER BY order_index ASC
+    LOOP
+        INSERT INTO public.lessons (
+            course_id,
+            section_id,
+            title,
+            description,
+            lesson_type,
+            content,
+            video_url,
+            duration,
+            estimated_minutes,
+            order_index,
+            is_published,
+            is_preview,
+            created_at,
+            updated_at
+        ) VALUES (
+            p_course_id,
+            v_new_section_id,
+            v_lesson.title,
+            v_lesson.description,
+            v_lesson.lesson_type,
+            v_lesson.content,
+            v_lesson.video_url,
+            v_lesson.duration,
+            v_lesson.estimated_minutes,
+            v_lesson.order_index,
+            v_lesson.is_published,
+            v_lesson.is_preview,
+            NOW(),
+            NOW()
+        );
+    END LOOP;
+
+    RETURN v_new_section_id;
+END;
+$$;
+
+-- 10. RPC: Bulk Move Lessons
+CREATE OR REPLACE FUNCTION public.admin_bulk_move_lessons(
+    p_course_id UUID,
+    p_lesson_ids UUID[],
+    p_destination_section_id UUID,
+    p_destination_index INTEGER DEFAULT 0
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_found_count INTEGER;
+    v_idx INTEGER;
+    v_les_id UUID;
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'is_admin') THEN
+        IF NOT public.is_admin() THEN
+            RAISE EXCEPTION 'Access denied. Admin privileges required.';
+        END IF;
+    END IF;
+
+    IF p_course_id IS NULL OR p_destination_section_id IS NULL THEN
+        RAISE EXCEPTION 'Course ID and Destination Section ID are required.';
+    END IF;
+
+    IF p_lesson_ids IS NULL OR array_length(p_lesson_ids, 1) = 0 THEN
+        RETURN;
+    END IF;
+
+    -- Check duplicates in p_lesson_ids
+    IF (SELECT COUNT(DISTINCT elem) FROM unnest(p_lesson_ids) AS elem) <> array_length(p_lesson_ids, 1) THEN
+        RAISE EXCEPTION 'Duplicate lesson IDs in bulk move array.';
+    END IF;
+
+    -- Verify destination section belongs to course
+    IF NOT EXISTS (
+        SELECT 1 FROM public.course_sections 
+        WHERE id = p_destination_section_id AND course_id = p_course_id AND deleted_at IS NULL
+    ) THEN
+        RAISE EXCEPTION 'Destination section does not belong to specified course.';
+    END IF;
+
+    -- Verify all lessons belong to course and are not soft-deleted
+    SELECT COUNT(*) INTO v_found_count
+    FROM public.lessons
+    WHERE id = ANY(p_lesson_ids)
+      AND course_id = p_course_id
+      AND deleted_at IS NULL;
+
+    IF v_found_count <> array_length(p_lesson_ids, 1) THEN
+        RAISE EXCEPTION 'One or more lessons do not belong to specified course or are deleted.';
+    END IF;
+
+    -- Move lessons to target section
+    UPDATE public.lessons
+    SET section_id = p_destination_section_id,
+        updated_at = NOW()
+    WHERE id = ANY(p_lesson_ids) AND course_id = p_course_id;
+
+    -- Re-index destination section lessons
+    FOR v_idx IN 1..array_length(p_lesson_ids, 1) LOOP
+        v_les_id := p_lesson_ids[v_idx];
+        UPDATE public.lessons
+        SET order_index = p_destination_index + v_idx - 1
+        WHERE id = v_les_id AND course_id = p_course_id;
+    END LOOP;
+
+    -- Normalize order_index in destination section sequentially
+    WITH dest_ordered AS (
+        SELECT id, ROW_NUMBER() OVER (ORDER BY order_index ASC, updated_at DESC) - 1 AS new_order
+        FROM public.lessons
+        WHERE section_id = p_destination_section_id AND course_id = p_course_id AND deleted_at IS NULL
+    )
+    UPDATE public.lessons l
+    SET order_index = d.new_order
+    FROM dest_ordered d
+    WHERE l.id = d.id;
+
+    -- Normalize order_index across all sections in course
+    WITH all_ordered AS (
+        SELECT id, ROW_NUMBER() OVER (PARTITION BY section_id ORDER BY order_index ASC) - 1 AS new_order
+        FROM public.lessons
+        WHERE course_id = p_course_id AND deleted_at IS NULL
+    )
+    UPDATE public.lessons l
+    SET order_index = a.new_order
+    FROM all_ordered a
+    WHERE l.id = a.id;
+END;
+$$;
+
+-- Security Hardening for new RPCs
+REVOKE ALL ON FUNCTION public.admin_duplicate_section(UUID, UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.admin_bulk_move_lessons(UUID, UUID[], UUID, INTEGER) FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.admin_duplicate_section(UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_bulk_move_lessons(UUID, UUID[], UUID, INTEGER) TO authenticated;
+

@@ -200,10 +200,9 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       const oldIndex = sections.findIndex((s) => s.id === activeIdStr);
       const newIndex = sections.findIndex((s) => s.id === overIdStr);
 
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        const reorderedSections = (
-          arrayMove(sections, oldIndex, newIndex) as CurriculumSectionViewModel[]
-        ).map((s, idx) => ({
+      if (oldIndex >= 0 && newIndex >= 0 && oldIndex !== newIndex) {
+        const movedSections: CurriculumSectionViewModel[] = arrayMove(sections, oldIndex, newIndex);
+        const reorderedSections = movedSections.map((s, idx) => ({
           ...s,
           orderIndex: idx,
         }));
@@ -229,19 +228,17 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
     const sourceSec = findSectionByItemId(activeIdStr);
     if (!sourceSec) return;
 
-    const currentItem = sourceSec.items.find((it) => it.id === activeIdStr);
-    if (!currentItem) return;
-
     const itemsInSec = sourceSec.items;
     const oldIndex = itemsInSec.findIndex((it) => it.id === activeIdStr);
     let newIndex = itemsInSec.findIndex((it) => it.id === overIdStr);
 
     if (newIndex === -1) {
-      newIndex = itemsInSec.length - 1;
+      newIndex = itemsInSec.length > 0 ? itemsInSec.length - 1 : 0;
     }
 
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const reorderedItems = arrayMove(itemsInSec, oldIndex, newIndex).map((it, idx) => ({
+    if (oldIndex >= 0 && newIndex >= 0 && oldIndex !== newIndex) {
+      const movedItems: CurriculumItemViewModel[] = arrayMove(itemsInSec, oldIndex, newIndex);
+      const reorderedItems = movedItems.map((it, idx) => ({
         ...it,
         orderIndex: idx,
       }));
@@ -300,16 +297,16 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
   // Duplicate Section
   const handleDuplicateSection = async (sectionId: string) => {
     try {
-      const duplicated = await CurriculumService.duplicateSection(sectionId);
+      const duplicated = await CurriculumService.duplicateSection(courseId, sectionId);
       setSections((prev) => {
         const idx = prev.findIndex((s) => s.id === sectionId);
         const copy = [...prev];
         copy.splice(idx + 1, 0, duplicated);
         return copy;
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error duplicating section:', err);
-      setError('تعذر تكرار القسم.');
+      setError(err?.message || 'تعذر تكرار القسم.');
     }
   };
 
@@ -369,7 +366,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
   const handleTogglePublishItem = async (itemId: string, currentStatus: boolean) => {
     try {
-      await CurriculumService.bulkPublish([itemId], !currentStatus);
+      await CurriculumService.bulkPublish(courseId, [itemId], !currentStatus);
       setSections((prev) =>
         prev.map((sec) => ({
           ...sec,
@@ -484,7 +481,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
   // Bulk Actions
   const handleBulkPublish = async (isPublished: boolean) => {
     try {
-      await CurriculumService.bulkPublish(selectedItemIds, isPublished);
+      await CurriculumService.bulkPublish(courseId, selectedItemIds, isPublished);
       setSections((prev) =>
         prev.map((sec) => ({
           ...sec,
@@ -494,9 +491,9 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         }))
       );
       setSelectedItemIds([]);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error bulk publishing:', err);
-      setError('تعذر تحديث حالة العناصر المحددة.');
+      setError(err?.message || 'تعذر تحديث حالة العناصر المحددة.');
     }
   };
 
@@ -533,13 +530,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
   const handleBulkMove = async () => {
     if (!targetBulkSectionId) return;
     try {
-      await CurriculumService.bulkMove(selectedItemIds, targetBulkSectionId, courseId);
+      await CurriculumService.bulkMove(courseId, selectedItemIds, targetBulkSectionId);
       setShowBulkMoveDialog(false);
       setSelectedItemIds([]);
       await loadCurriculum();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error bulk moving items:', err);
-      setError('تعذر نقل العناصر المحددة.');
+      setError(err?.message || 'تعذر نقل العناصر المحددة.');
     }
   };
 

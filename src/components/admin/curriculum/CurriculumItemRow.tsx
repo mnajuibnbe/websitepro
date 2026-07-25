@@ -27,7 +27,6 @@ import {
 import { CurriculumItemViewModel } from '../../../types/database.types';
 
 interface CurriculumItemRowProps {
-  key?: React.Key;
   item: CurriculumItemViewModel;
   courseId: string;
   index: number;
@@ -40,7 +39,7 @@ interface CurriculumItemRowProps {
   isOverlay?: boolean;
 }
 
-export function CurriculumItemRow({
+export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
   item,
   courseId,
   index,
@@ -51,7 +50,7 @@ export function CurriculumItemRow({
   onTogglePublish,
   onMoveToPosition,
   isOverlay = false,
-}: CurriculumItemRowProps) {
+}) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const {

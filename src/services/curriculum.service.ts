@@ -7,14 +7,44 @@ import {
 } from '../types/database.types';
 import { LessonService } from './lesson.service';
 
+export interface UpdateSectionInput {
+  title?: string;
+  description?: string | null;
+  isPublished?: boolean;
+}
+
+interface SupabaseLikeError {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+}
+
+function isSupabaseLikeError(value: unknown): value is SupabaseLikeError {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    ('code' in value || 'message' in value || 'details' in value)
+  );
+}
+
 /**
  * Maps Supabase / PostgreSQL errors into clean Arabic messages
  */
-export function mapCurriculumError(error: any): Error {
+export function mapCurriculumError(error: unknown): Error {
   if (!error) return new Error('حدث خطأ غير متوقع أثناء معالجة المنهج.');
 
-  const msg = typeof error === 'string' ? error : error.message || error.details || '';
-  const code = error.code || '';
+  let msg = '';
+  let code = '';
+
+  if (typeof error === 'string') {
+    msg = error;
+  } else if (isSupabaseLikeError(error)) {
+    msg = error.message || error.details || '';
+    code = error.code || '';
+  } else if (error instanceof Error) {
+    msg = error.message;
+  }
 
   // Function not found (42883 or PGRST202 or missing RPC)
   if (
@@ -38,6 +68,11 @@ export function mapCurriculumError(error: any): Error {
     msg.includes('Destination section does not belong')
   ) {
     return new Error('لا يمكن تنفيذ العملية: العناصر المحددة لا تنتمي لنفس الدورة التدريبية.');
+  }
+
+  // Deleted item / section error
+  if (msg.includes('Section is deleted') || msg.includes('Lesson is deleted') || msg.includes('not found or deleted')) {
+    return new Error('فشلت العملية: القسم أو الدرس محذوف أو غير موجود.');
   }
 
   // Duplicate or constraint violation
@@ -206,20 +241,16 @@ export class CurriculumService {
   }
 
   /**
-   * Update section fields
+   * Update section fields safely without modifying id, course_id, or order_index
    */
-  static async updateSection(sectionId: string, data: Partial<CourseSection>): Promise<CourseSection> {
-    const payload: Record<string, any> = {
-      title: data.title?.trim(),
-      description: data.description?.trim() || null,
-      is_published: data.is_published,
-      order_index: data.order_index,
+  static async updateSection(sectionId: string, data: UpdateSectionInput): Promise<CourseSection> {
+    const payload: { title?: string; description?: string | null; is_published?: boolean; updated_at: string } = {
       updated_at: new Date().toISOString(),
     };
 
-    Object.keys(payload).forEach((k) => {
-      if (payload[k] === undefined) delete payload[k];
-    });
+    if (data.title !== undefined) payload.title = data.title.trim();
+    if (data.description !== undefined) payload.description = data.description?.trim() || null;
+    if (data.isPublished !== undefined) payload.is_published = data.isPublished;
 
     const { data: updated, error } = await supabase
       .from('course_sections')
@@ -273,77 +304,26 @@ export class CurriculumService {
   }
 
   /**
-   * Duplicate section and lessons
+   * Duplicate section and lessons atomically via RPC
    */
-  static async duplicateSection(sectionId: string): Promise<CurriculumSectionViewModel> {
-    // 1. Fetch original section
-    const { data: original, error: secErr } = await supabase
-      .from('course_sections')
-      .select('*')
-      .eq('id', sectionId)
-      .single();
+  static async duplicateSection(courseId: string, sectionId: string): Promise<CurriculumSectionViewModel> {
+    const { data: newSecId, error } = await supabase.rpc('admin_duplicate_section', {
+      p_course_id: courseId,
+      p_section_id: sectionId,
+    });
 
-    if (secErr || !original) throw new Error('القسم المطلوب غير موجود.');
-
-    const origSec = original as CourseSection;
-
-    // 2. Insert new duplicate section
-    const existingCurriculum = await this.getCurriculum(origSec.course_id);
-    const targetOrder = origSec.order_index + 1;
-
-    const newSecPayload = {
-      course_id: origSec.course_id,
-      title: `${origSec.title} (نسخة)`,
-      description: origSec.description,
-      order_index: targetOrder,
-      is_published: origSec.is_published,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data: createdSec, error: createSecErr } = await supabase
-      .from('course_sections')
-      .insert(newSecPayload)
-      .select()
-      .single();
-
-    if (createSecErr || !createdSec) throw mapCurriculumError(createSecErr);
-    const newSec = createdSec as CourseSection;
-
-    // 3. Duplicate active lessons in section
-    const originalLessons = await LessonService.getLessonsBySection(sectionId);
-    const duplicatedItems: CurriculumItemViewModel[] = [];
-
-    for (const lesson of originalLessons) {
-      const copyPayload: Partial<Lesson> = {
-        ...lesson,
-        id: undefined,
-        section_id: newSec.id,
-        title: lesson.title,
-        created_at: undefined,
-        updated_at: undefined,
-      };
-
-      const newLesson = await LessonService.createLesson(copyPayload);
-      duplicatedItems.push(this.mapLessonToViewModel(newLesson));
+    if (error) {
+      console.error('RPC admin_duplicate_section failed:', error);
+      throw mapCurriculumError(error);
     }
 
-    // 4. Reorder sections atomically
-    const allSecIds = existingCurriculum.map((s) => s.id);
-    const origIdx = allSecIds.indexOf(sectionId);
-    if (origIdx !== -1) {
-      allSecIds.splice(origIdx + 1, 0, newSec.id);
-      await this.reorderSections(origSec.course_id, allSecIds);
+    const fullCurriculum = await this.getCurriculum(courseId);
+    const createdViewModel = fullCurriculum.find((s) => s.id === newSecId);
+    if (!createdViewModel) {
+      throw new Error('تعذر تحميل بيانات القسم المكرر.');
     }
 
-    return {
-      id: newSec.id,
-      courseId: newSec.course_id,
-      title: newSec.title,
-      description: newSec.description,
-      orderIndex: targetOrder,
-      isPublished: newSec.is_published,
-      items: duplicatedItems,
-    };
+    return createdViewModel;
   }
 
   /**
@@ -366,7 +346,6 @@ export class CurriculumService {
    */
   static async moveItem(
     itemId: string,
-    sourceSectionId: string,
     destinationSectionId: string,
     destinationIndex: number,
     courseId: string
@@ -441,14 +420,16 @@ export class CurriculumService {
   }
 
   /**
-   * Bulk publish/unpublish items
+   * Bulk publish/unpublish active items belonging to specified course
    */
-  static async bulkPublish(itemIds: string[], isPublished: boolean): Promise<void> {
+  static async bulkPublish(courseId: string, itemIds: string[], isPublished: boolean): Promise<void> {
     if (itemIds.length === 0) return;
     const { error } = await supabase
       .from('lessons')
       .update({ is_published: isPublished, updated_at: new Date().toISOString() })
-      .in('id', itemIds);
+      .eq('course_id', courseId)
+      .in('id', itemIds)
+      .is('deleted_at', null);
 
     if (error) {
       console.error('Error in bulkPublish:', error);
@@ -457,18 +438,26 @@ export class CurriculumService {
   }
 
   /**
-   * Bulk move items to target section (Uses RPC per item or reorder)
+   * Bulk move items to target section atomically via RPC
    */
-  static async bulkMove(itemIds: string[], destinationSectionId: string, courseId: string): Promise<void> {
+  static async bulkMove(
+    courseId: string,
+    itemIds: string[],
+    destinationSectionId: string,
+    destinationIndex = 0
+  ): Promise<void> {
     if (itemIds.length === 0) return;
 
-    // Get current lessons in destination section to calculate position
-    const destLessons = await LessonService.getLessonsBySection(destinationSectionId);
-    let startIdx = destLessons.length;
+    const { error } = await supabase.rpc('admin_bulk_move_lessons', {
+      p_course_id: courseId,
+      p_lesson_ids: itemIds,
+      p_destination_section_id: destinationSectionId,
+      p_destination_index: destinationIndex,
+    });
 
-    for (const itemId of itemIds) {
-      await this.moveItem(itemId, '', destinationSectionId, startIdx, courseId);
-      startIdx++;
+    if (error) {
+      console.error('RPC admin_bulk_move_lessons failed:', error);
+      throw mapCurriculumError(error);
     }
   }
 
