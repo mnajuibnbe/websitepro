@@ -280,7 +280,7 @@ export function AdminCourseBuilder() {
         lesson_type: newLessonType,
         type: newLessonType,
         video_url: newLessonUrl.trim() || null,
-        duration: newLessonDuration.trim() || null,
+        duration: typeof newLessonDuration === 'string' ? newLessonDuration.trim() || null : typeof newLessonDuration === 'number' ? String(newLessonDuration) : null,
         is_preview: newLessonPreview,
         is_published: true,
         order_index: nextOrder,

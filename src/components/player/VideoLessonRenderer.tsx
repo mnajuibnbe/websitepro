@@ -1,10 +1,26 @@
 import React from 'react';
-import { VideoOff, AlertCircle } from 'lucide-react';
+import { VideoOff } from 'lucide-react';
 
 interface VideoLessonRendererProps {
   videoUrl: string | null;
   title: string;
 }
+
+const getGoogleDrivePreviewUrl = (
+  url: string | null | undefined
+): string | null => {
+  if (typeof url !== 'string' || !url.trim()) {
+    return null;
+  }
+
+  const match = url
+    .trim()
+    .match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
+
+  return match?.[1]
+    ? `https://drive.google.com/file/d/${match[1]}/preview`
+    : null;
+};
 
 function getEmbedUrl(url: string | null): { type: 'embed' | 'direct' | 'none'; src: string } {
   if (!url || !url.trim()) return { type: 'none', src: '' };
@@ -31,11 +47,9 @@ function getEmbedUrl(url: string | null): { type: 'embed' | 'direct' | 'none'; s
 
   // Direct MP4 or video files
   if (cleanUrl.match(/\.(mp4|webm|ogg|m3u8)(\?.*)?$/i) || cleanUrl.startsWith('http')) {
-    // If it's a standard URL, check if it's embeddable or direct
     if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm')) {
       return { type: 'direct', src: cleanUrl };
     }
-    // Fallback embed for generic URL
     return { type: 'embed', src: cleanUrl };
   }
 
@@ -43,6 +57,22 @@ function getEmbedUrl(url: string | null): { type: 'embed' | 'direct' | 'none'; s
 }
 
 export function VideoLessonRenderer({ videoUrl, title }: VideoLessonRendererProps) {
+  const googleDrivePreviewUrl = getGoogleDrivePreviewUrl(videoUrl);
+
+  if (googleDrivePreviewUrl) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden bg-black rounded-2xl shadow-lg border border-primary-900">
+        <iframe
+          src={googleDrivePreviewUrl}
+          title={title || 'Lesson video'}
+          className="absolute inset-0 h-full w-full border-0"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+
   const { type, src } = getEmbedUrl(videoUrl);
 
   if (type === 'none' || !src) {

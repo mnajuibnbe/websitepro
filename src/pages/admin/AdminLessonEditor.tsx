@@ -275,7 +275,7 @@ export function AdminLessonEditor() {
         description: description.trim() || null,
         lesson_type: lessonType,
         type: lessonType === 'article' || lessonType === 'pdf' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
-        duration: duration.trim() || (estimatedMinutes ? `${estimatedMinutes} دقيقة` : null),
+        duration: (typeof duration === 'string' ? duration.trim() : typeof duration === 'number' ? String(duration) : '') || (estimatedMinutes ? `${estimatedMinutes} دقيقة` : null),
         estimated_minutes: estimatedMinutes,
         thumbnail: thumbnail.trim() || null,
         video_url: videoUrl.trim() || null,
