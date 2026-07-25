@@ -19,6 +19,17 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 
+// Helper to sanitize slug
+export function sanitizeSlug(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\u0621-\u064A\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export function AdminCourseCreate() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -81,25 +92,26 @@ export function AdminCourseCreate() {
     loadInstructors();
   }, []);
 
-  // Helper to generate Arabic/English slug from title
+  // Helper to generate slug from title
   const generateSlug = () => {
     if (!title.trim()) return;
-    const cleanSlug = title
-      .trim()
-      .toLowerCase()
-      .replace(/[^\w\u0621-\u064A\s-]/g, '')
-      .replace(/\s+/g, '-');
+    const cleanSlug = sanitizeSlug(title);
     setSlug(cleanSlug);
+    if (errors.slug) setErrors((prev) => ({ ...prev, slug: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent double click
 
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
       newErrors.title = 'عنوان الكورس مطلوب';
     }
+
+    const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       addToast('error', 'يرجى استكمال الحقول المطلوبة بشكل صحيح.');
@@ -110,15 +122,31 @@ export function AdminCourseCreate() {
     setIsSubmitting(true);
 
     try {
+      // Check duplicate slug if slug provided
+      if (cleanSlug) {
+        const { data: existingCourse } = await supabase
+          .from('courses')
+          .select('id')
+          .eq('slug', cleanSlug)
+          .maybeSingle();
+
+        if (existingCourse) {
+          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
+          addToast('error', 'رابط الكورس المخصص مستخدم بالفعل، يرجى تغيير الرابط.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const finalInstructorId = instructorId || user?.id || null;
       const parsedPrice = parseFloat(price) || 0;
 
-      // Attempt calling RPC admin_create_course
+      // Call RPC admin_create_course strictly - NO FALLBACK to direct insert
       const { data: rpcCourseId, error: rpcError } = await supabase.rpc(
         'admin_create_course',
         {
           p_title: title.trim(),
-          p_slug: slug.trim() || null,
+          p_slug: cleanSlug || null,
           p_short_description: shortDescription.trim() || null,
           p_description: description.trim() || null,
           p_category: category.trim() || null,
@@ -132,43 +160,31 @@ export function AdminCourseCreate() {
         }
       );
 
-      let createdCourseId = rpcCourseId;
-
       if (rpcError) {
-        console.warn('RPC admin_create_course error, falling back to direct table insert:', rpcError);
-        // Fallback to direct insert if RPC fails
-        const { data: directData, error: directError } = await supabase
-          .from('courses')
-          .insert({
-            title: title.trim(),
-            slug: slug.trim() || null,
-            short_description: shortDescription.trim() || null,
-            description: description.trim() || null,
-            category: category.trim() || null,
-            level: level,
-            language: language.trim() || 'العربية',
-            price: parsedPrice,
-            instructor_id: finalInstructorId,
-            thumbnail: thumbnail.trim() || null,
-            cover_image: coverImage.trim() || null,
-            status: 'draft',
-            visibility: 'public',
-          })
-          .select('id')
-          .single();
+        console.error('RPC admin_create_course error:', rpcError);
+        let errorMsg = 'تعذر إنشاء الكورس عبر إجراء النظام (RPC).';
+        if (rpcError.message?.includes('duplicate key') || rpcError.message?.includes('courses_slug_key')) {
+          errorMsg = 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى تغيير الرابط.';
+          setErrors({ slug: errorMsg });
+        }
+        addToast('error', errorMsg);
+        setIsSubmitting(false);
+        return;
+      }
 
-        if (directError) throw directError;
-        createdCourseId = directData.id;
+      if (!rpcCourseId) {
+        addToast('error', 'لم يقم النظام بإنشاء الكورس بنجاح.');
+        setIsSubmitting(false);
+        return;
       }
 
       addToast('success', 'تم إنشاء الكورس بنجاح!');
       setTimeout(() => {
-        navigate(`/admin/courses/${createdCourseId}/builder`);
-      }, 1000);
+        navigate(`/admin/courses/${rpcCourseId}/builder`);
+      }, 800);
     } catch (err: any) {
       console.error('Error creating course:', err);
-      addToast('error', err.message || 'حدث خطأ أثناء إرسال البيانات لمُنشئ الكورسات.');
-    } finally {
+      addToast('error', err.message || 'حدث خطأ غير متوقع أثناء إنشاء الكورس.');
       setIsSubmitting(false);
     }
   };

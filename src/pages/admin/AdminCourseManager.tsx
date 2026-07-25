@@ -152,9 +152,12 @@ export function AdminCourseManager() {
 
   // Filtered courses
   const filteredCourses = courses.filter((course) => {
+    const term = searchTerm.toLowerCase().trim();
     const matchesSearch =
-      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.category && course.category.toLowerCase().includes(searchTerm.toLowerCase()));
+      !term ||
+      course.title.toLowerCase().includes(term) ||
+      (course.slug && course.slug.toLowerCase().includes(term)) ||
+      (course.category && course.category.toLowerCase().includes(term));
 
     const matchesStatus =
       statusFilter === 'all' ? true : course.status === statusFilter;
@@ -168,14 +171,25 @@ export function AdminCourseManager() {
   // Quick Status Toggle Handler
   const handleUpdateStatus = async (courseId: string, newStatus: 'published' | 'draft' | 'archived') => {
     try {
+      const currentCourse = courses.find((c) => c.id === courseId);
       const updates: any = {
         status: newStatus,
         updated_at: new Date().toISOString(),
       };
+
       if (newStatus === 'published') {
-        updates.published_at = new Date().toISOString();
+        if (!currentCourse?.published_at) {
+          updates.published_at = new Date().toISOString();
+        }
+        if (currentCourse?.visibility === 'private') {
+          addToast('info', 'الكورس منشور ولكنه محدد كـ "خاص" (Private)، ولن يظهر في التصفح العام.');
+        }
       } else if (newStatus === 'archived') {
         updates.archived_at = new Date().toISOString();
+      }
+
+      if (currentCourse?.status === 'archived' && newStatus !== 'archived') {
+        updates.archived_at = null;
       }
 
       const { error } = await supabase
@@ -213,7 +227,18 @@ export function AdminCourseManager() {
         .delete()
         .eq('id', selectedCourseForDelete.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database deletion error:', error);
+        if (error.code === '23503' || error.message?.includes('foreign key constraint')) {
+          addToast(
+            'error',
+            'تعذر حذف الكورس مباشرة لوجود أقسام أو دروس أو بيانات مرتبطة به. يُنصح بأرشفة الكورس بدلاً من حذفه.'
+          );
+          setSelectedCourseForDelete(null);
+          return;
+        }
+        throw error;
+      }
 
       setCourses((prev) => prev.filter((c) => c.id !== selectedCourseForDelete.id));
       addToast('success', 'تم حذف الكورس بنجاح');

@@ -25,11 +25,22 @@ import {
   PlayCircle,
   Clock,
   BookOpen,
+  GripVertical,
+  Copy,
+  FileCode,
+  Volume2,
+  ExternalLink,
+  Code,
+  Radio,
+  ClipboardCheck,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
+import { LessonService } from '../../services/lesson.service';
 
 type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 
@@ -156,7 +167,7 @@ export function AdminCourseBuilder() {
 
     try {
       setIsSaving(true);
-      const nextOrder = sections.length > 0 ? Math.max(...sections.map((s) => s.order_index)) + 1 : 1;
+      const nextOrder = sections.length > 0 ? Math.max(...sections.map((s) => s.order_index)) + 1 : 0;
 
       const { data, error } = await supabase
         .from('course_sections')
@@ -225,7 +236,33 @@ export function AdminCourseBuilder() {
     }
   };
 
-  // Lesson CRUD
+  // Lesson CRUD & Helpers
+  const getLessonTypeIcon = (type?: string) => {
+    switch (type) {
+      case 'video':
+        return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+      case 'article':
+      case 'text':
+        return <FileText className="w-4 h-4 text-emerald-600 flex-shrink-0" />;
+      case 'pdf':
+        return <FileCode className="w-4 h-4 text-red-600 flex-shrink-0" />;
+      case 'audio':
+        return <Volume2 className="w-4 h-4 text-purple-600 flex-shrink-0" />;
+      case 'external_link':
+        return <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />;
+      case 'embed':
+        return <Code className="w-4 h-4 text-indigo-600 flex-shrink-0" />;
+      case 'live':
+        return <Radio className="w-4 h-4 text-rose-600 flex-shrink-0" />;
+      case 'quiz':
+        return <HelpCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+      case 'assignment':
+        return <ClipboardCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />;
+      default:
+        return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+    }
+  };
+
   const handleAddLesson = async (e: React.FormEvent, sectionId: string) => {
     e.preventDefault();
     if (!courseId || !newLessonTitle.trim()) return;
@@ -233,27 +270,22 @@ export function AdminCourseBuilder() {
     try {
       setIsSaving(true);
       const sectionLessons = lessons.filter((l) => l.section_id === sectionId);
-      const nextOrder = sectionLessons.length > 0 ? Math.max(...sectionLessons.map((l) => l.order_index)) + 1 : 1;
+      const nextOrder = sectionLessons.length > 0 ? Math.max(...sectionLessons.map((l) => l.order_index)) + 1 : 0;
 
-      const { data, error } = await supabase
-        .from('lessons')
-        .insert({
-          course_id: courseId,
-          section_id: sectionId,
-          title: newLessonTitle.trim(),
-          type: newLessonType,
-          video_url: newLessonUrl.trim() || null,
-          duration: newLessonDuration.trim() || null,
-          is_preview: newLessonPreview,
-          is_published: true,
-          order_index: nextOrder,
-        })
-        .select()
-        .single();
+      const createdLesson = await LessonService.createLesson({
+        course_id: courseId,
+        section_id: sectionId,
+        title: newLessonTitle.trim(),
+        lesson_type: newLessonType,
+        type: newLessonType,
+        video_url: newLessonUrl.trim() || null,
+        duration: newLessonDuration.trim() || null,
+        is_preview: newLessonPreview,
+        is_published: true,
+        order_index: nextOrder,
+      });
 
-      if (error) throw error;
-
-      setLessons((prev) => [...prev, data]);
+      setLessons((prev) => [...prev, createdLesson]);
       setNewLessonTitle('');
       setNewLessonUrl('');
       setNewLessonDuration('');
@@ -268,13 +300,30 @@ export function AdminCourseBuilder() {
     }
   };
 
-  const handleDeleteLesson = async (lessonId: string) => {
+  const handleDuplicateLesson = async (lessonId: string) => {
+    try {
+      setIsSaving(true);
+      const duplicated = await LessonService.duplicateLesson(lessonId);
+      if (courseId) {
+        const freshLessons = await LessonService.getLessonsByCourse(courseId);
+        setLessons(freshLessons);
+      } else {
+        setLessons((prev) => [...prev, duplicated]);
+      }
+      addToast('success', 'تم تكرار الدرس بنجاح');
+    } catch (err: any) {
+      console.error('Error duplicating lesson:', err);
+      addToast('error', 'تعذر تكرار الدرس.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteLesson = async (lessonId: string, sectionId?: string | null) => {
     if (!window.confirm('هل أنت تأكد من رغبتك في حذف هذا الدرس؟')) return;
 
     try {
-      const { error } = await supabase.from('lessons').delete().eq('id', lessonId);
-      if (error) throw error;
-
+      await LessonService.deleteLesson(lessonId, sectionId || undefined);
       setLessons((prev) => prev.filter((l) => l.id !== lessonId));
       addToast('success', 'تم حذف الدرس بنجاح');
     } catch (err: any) {
@@ -283,17 +332,66 @@ export function AdminCourseBuilder() {
     }
   };
 
+  const handleMoveLessonOrder = async (sectionId: string, lessonId: string, direction: 'up' | 'down') => {
+    const sectionLessons = lessons
+      .filter((l) => l.section_id === sectionId)
+      .sort((a, b) => a.order_index - b.order_index);
+
+    const index = sectionLessons.findIndex((l) => l.id === lessonId);
+    if (index === -1) return;
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === sectionLessons.length - 1) return;
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const reordered = [...sectionLessons];
+    const [moved] = reordered.splice(index, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    const orderedIds = reordered.map((l) => l.id);
+
+    // Optimistic UI update
+    setLessons((prev) => {
+      const otherLessons = prev.filter((l) => l.section_id !== sectionId);
+      const updatedSectionLessons = reordered.map((l, idx) => ({ ...l, order_index: idx }));
+      return [...otherLessons, ...updatedSectionLessons];
+    });
+
+    try {
+      await LessonService.reorderLessons(sectionId, orderedIds);
+      addToast('success', 'تم تحديث ترتيب الدرس');
+    } catch (err: any) {
+      console.error('Error reordering lessons:', err);
+      addToast('error', 'تعذر إعادة ترتيب الدرس.');
+      // Refresh from server
+      if (courseId) {
+        const fresh = await LessonService.getLessonsByCourse(courseId);
+        setLessons(fresh);
+      }
+    }
+  };
+
   // Quick Status Toggle
   const handleTogglePublish = async () => {
     if (!course) return;
-    const newStatus = course.status === 'published' ? 'draft' : 'published';
+    const newStatus: 'published' | 'draft' | 'archived' = course.status === 'published' ? 'draft' : 'published';
 
     try {
       const updates: any = {
         status: newStatus,
         updated_at: new Date().toISOString(),
       };
-      if (newStatus === 'published') updates.published_at = new Date().toISOString();
+      if (newStatus === 'published') {
+        if (!course.published_at) {
+          updates.published_at = new Date().toISOString();
+        }
+        if (course.visibility === 'private') {
+          addToast('info', 'الكورس منشور ولكنه محدد كـ "خاص" (Private)، ولن يظهر في التصفح العام.');
+        }
+      }
+
+      if ((course.status as string) === 'archived') {
+        updates.archived_at = null;
+      }
 
       const { error } = await supabase.from('courses').update(updates).eq('id', course.id);
       if (error) throw error;
@@ -646,41 +744,95 @@ export function AdminCourseBuilder() {
                                 sectionLessons.map((lesson, lIndex) => (
                                   <div
                                     key={lesson.id}
-                                    className="p-3.5 bg-primary-50/50 hover:bg-primary-50 rounded-xl border border-primary-200/80 flex items-center justify-between gap-3 transition-colors"
+                                    className="p-3.5 bg-white hover:bg-primary-50/80 rounded-xl border border-primary-200/80 flex items-center justify-between gap-3 transition-colors shadow-2xs"
                                   >
                                     <div className="flex items-center gap-3 min-w-0">
-                                      {lesson.type === 'video' ? (
-                                        <PlayCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                                      ) : lesson.type === 'quiz' ? (
-                                        <HelpCircle className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-                                      ) : (
-                                        <FileText className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                                      )}
+                                      <div className="text-primary-300 hover:text-primary-600 cursor-grab flex-shrink-0">
+                                        <GripVertical className="w-4 h-4" />
+                                      </div>
+
+                                      {getLessonTypeIcon(lesson.lesson_type || lesson.type)}
 
                                       <div className="min-w-0">
-                                        <h5 className="font-bold text-primary-900 text-sm truncate">
-                                          {lIndex + 1}. {lesson.title}
-                                        </h5>
-                                        <div className="flex items-center gap-3 text-[11px] text-primary-500 mt-0.5">
-                                          <span>النوع: {lesson.type === 'video' ? 'فيديو' : lesson.type === 'quiz' ? 'اختبار' : 'نص / مقال'}</span>
-                                          {lesson.duration && (
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <h5 className="font-bold text-primary-900 text-sm truncate">
+                                            {lIndex + 1}. {lesson.title}
+                                          </h5>
+                                        </div>
+
+                                        <div className="flex items-center gap-2.5 text-[11px] text-primary-500 mt-0.5 flex-wrap">
+                                          <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
+                                            {lesson.lesson_type || lesson.type || 'فيديو'}
+                                          </span>
+
+                                          {(lesson.duration || lesson.estimated_minutes) && (
                                             <span className="flex items-center gap-1">
                                               <Clock className="w-3 h-3 text-primary-400" />
-                                              {lesson.duration}
+                                              {lesson.duration || `${lesson.estimated_minutes} دقيقة`}
                                             </span>
                                           )}
+
                                           {lesson.is_preview && (
-                                            <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
+                                            <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
                                               معاينة مجانية
                                             </span>
                                           )}
+
+                                          <span
+                                            className={`px-1.5 py-0.2 rounded font-bold text-[10px] ${
+                                              lesson.is_published
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : 'bg-amber-100 text-amber-800'
+                                            }`}
+                                          >
+                                            {lesson.is_published ? 'منشور' : 'مسودة'}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2">
+                                    {/* Action buttons */}
+                                    <div className="flex items-center gap-1">
                                       <button
-                                        onClick={() => handleDeleteLesson(lesson.id)}
+                                        type="button"
+                                        onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'up')}
+                                        disabled={lIndex === 0}
+                                        className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
+                                        title="تحريك لأعلى"
+                                      >
+                                        <ArrowUp className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'down')}
+                                        disabled={lIndex === sectionLessons.length - 1}
+                                        className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
+                                        title="تحريك لأسفل"
+                                      >
+                                        <ArrowDown className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      <Link
+                                        to={`/admin/courses/${courseId}/lessons/${lesson.id}/edit`}
+                                        className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+                                        title="تعديل الدرس بالكامل"
+                                      >
+                                        <Edit2 className="w-4 h-4" />
+                                      </Link>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDuplicateLesson(lesson.id)}
+                                        className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
+                                        title="تكرار الدرس"
+                                      >
+                                        <Copy className="w-4 h-4" />
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteLesson(lesson.id, section.id)}
                                         className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
                                         title="حذف الدرس"
                                       >
@@ -691,14 +843,14 @@ export function AdminCourseBuilder() {
                                 ))
                               )}
 
-                              {/* Add Lesson Form or Button */}
+                              {/* Add Lesson Controls */}
                               {isAddLessonOpen === section.id ? (
                                 <form
                                   onSubmit={(e) => handleAddLesson(e, section.id)}
                                   className="mt-4 p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3"
                                 >
                                   <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-xs text-amber-900">إضافة درس جديد للقسم</h5>
+                                    <h5 className="font-bold text-xs text-amber-900">إضافة درس جديد سريع للقسم</h5>
                                     <button
                                       type="button"
                                       onClick={() => setIsAddLessonOpen(null)}
@@ -732,7 +884,9 @@ export function AdminCourseBuilder() {
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-bold"
                                       >
                                         <option value="video">فيديو (Video)</option>
-                                        <option value="text">مقال / نص (Text)</option>
+                                        <option value="article">مقال / نص (Article)</option>
+                                        <option value="pdf">ملف PDF</option>
+                                        <option value="audio">صوتيات (Audio)</option>
                                         <option value="quiz">اختبار (Quiz)</option>
                                       </select>
                                     </div>
@@ -780,39 +934,58 @@ export function AdminCourseBuilder() {
                                     </label>
                                   </div>
 
-                                  <div className="flex items-center justify-end gap-2 pt-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => setIsAddLessonOpen(null)}
-                                      className="px-3 py-1.5 bg-white text-primary-700 border border-primary-200 rounded-lg text-xs font-bold"
+                                  <div className="flex items-center justify-between pt-2 border-t border-amber-200/60">
+                                    <Link
+                                      to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
+                                      className="text-xs text-amber-800 font-bold hover:underline"
                                     >
-                                      إلغاء
-                                    </button>
-                                    <button
-                                      type="submit"
-                                      disabled={isSaving}
-                                      className="px-4 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 flex items-center gap-1"
-                                    >
-                                      {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                      <span>حفظ الدرس</span>
-                                    </button>
+                                      فتح محرر الدروس المتقدم بالكامل ←
+                                    </Link>
+
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => setIsAddLessonOpen(null)}
+                                        className="px-3 py-1.5 bg-white text-primary-700 border border-primary-200 rounded-lg text-xs font-bold"
+                                      >
+                                        إلغاء
+                                      </button>
+                                      <button
+                                        type="submit"
+                                        disabled={isSaving}
+                                        className="px-4 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 flex items-center gap-1"
+                                      >
+                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        <span>حفظ الدرس</span>
+                                      </button>
+                                    </div>
                                   </div>
                                 </form>
                               ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setIsAddLessonOpen(section.id);
-                                    setNewLessonTitle('');
-                                    setNewLessonUrl('');
-                                    setNewLessonDuration('');
-                                    setNewLessonPreview(false);
-                                  }}
-                                  className="w-full py-2.5 border border-dashed border-amber-300 bg-amber-50/40 hover:bg-amber-50 text-amber-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 mt-2"
-                                >
-                                  <Plus className="w-4 h-4 text-amber-600" />
-                                  <span>إضافة درس إلى هذا القسم</span>
-                                </button>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsAddLessonOpen(section.id);
+                                      setNewLessonTitle('');
+                                      setNewLessonUrl('');
+                                      setNewLessonDuration('');
+                                      setNewLessonPreview(false);
+                                    }}
+                                    className="flex-1 py-2.5 border border-dashed border-primary-300 bg-primary-50/50 hover:bg-primary-50 text-primary-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                                  >
+                                    <Plus className="w-4 h-4 text-primary-600" />
+                                    <span>إضافة درس سريع</span>
+                                  </button>
+
+                                  <Link
+                                    to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
+                                    className="py-2.5 px-4 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5 text-amber-600" />
+                                    <span>المحرر المتقدم</span>
+                                  </Link>
+                                </div>
                               )}
                             </div>
                           </div>

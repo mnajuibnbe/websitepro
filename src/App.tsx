@@ -28,6 +28,7 @@ import { AdminCourseManager } from './pages/admin/AdminCourseManager';
 import { AdminCourseCreate } from './pages/admin/AdminCourseCreate';
 import { AdminCourseEdit } from './pages/admin/AdminCourseEdit';
 import { AdminCourseBuilder } from './pages/admin/AdminCourseBuilder';
+import { AdminLessonEditor } from './pages/admin/AdminLessonEditor';
 import { CourseEditor } from './pages/admin/CourseEditor';
 import { UpdatePassword } from './pages/UpdatePassword';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -79,6 +80,8 @@ function AppContent() {
       <Route path="/admin/courses/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/admin/courses/:courseId/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseEdit /></RequireAuth>} />
       <Route path="/admin/courses/:courseId/builder" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseBuilder /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/lessons/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminLessonEditor /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/lessons/:lessonId/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminLessonEditor /></RequireAuth>} />
       <Route path="/admin/courses/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/admin/users" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminUserManagement /></RequireAuth>} />
 

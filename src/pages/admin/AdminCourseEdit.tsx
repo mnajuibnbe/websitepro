@@ -19,6 +19,8 @@ import { supabase } from '../../lib/supabase';
 import { Course } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 
+import { sanitizeSlug } from './AdminCourseCreate';
+
 export function AdminCourseEdit() {
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
@@ -27,6 +29,9 @@ export function AdminCourseEdit() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Initial course data for comparison
+  const [originalCourse, setOriginalCourse] = useState<Course | null>(null);
 
   // Form Fields
   const [title, setTitle] = useState('');
@@ -93,6 +98,8 @@ export function AdminCourseEdit() {
         return;
       }
 
+      setOriginalCourse(course);
+
       // Populate form
       setTitle(course.title || '');
       setSlug(course.slug || '');
@@ -122,23 +129,22 @@ export function AdminCourseEdit() {
 
   const generateSlug = () => {
     if (!title.trim()) return;
-    const cleanSlug = title
-      .trim()
-      .toLowerCase()
-      .replace(/[^\w\u0621-\u064A\s-]/g, '')
-      .replace(/\s+/g, '-');
+    const cleanSlug = sanitizeSlug(title);
     setSlug(cleanSlug);
+    if (errors.slug) setErrors((prev) => ({ ...prev, slug: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!courseId) return;
+    if (!courseId || isSubmitting) return;
 
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
       newErrors.title = 'عنوان الكورس مطلوب';
     }
+
+    const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -151,16 +157,16 @@ export function AdminCourseEdit() {
 
     try {
       // Check slug uniqueness if provided
-      if (slug.trim()) {
+      if (cleanSlug) {
         const { data: existingCourse } = await supabase
           .from('courses')
           .select('id')
-          .eq('slug', slug.trim())
+          .eq('slug', cleanSlug)
           .neq('id', courseId)
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'رابط الكورس (Slug) مستخدم بالفعل في كورس آخر' });
+          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
           addToast('error', 'رابط الكورس مستخدم بالفعل، يرجى كتابة رابط فريد.');
           setIsSubmitting(false);
           return;
@@ -171,7 +177,7 @@ export function AdminCourseEdit() {
 
       const updates: Partial<Course> = {
         title: title.trim(),
-        slug: slug.trim() || null,
+        slug: cleanSlug || null,
         short_description: shortDescription.trim() || null,
         description: description.trim() || null,
         category: category.trim() || null,
@@ -187,9 +193,18 @@ export function AdminCourseEdit() {
       };
 
       if (status === 'published') {
-        updates.published_at = new Date().toISOString();
+        if (!originalCourse?.published_at) {
+          updates.published_at = new Date().toISOString();
+        }
+        if (visibility === 'private') {
+          addToast('info', 'الكورس منشور ولكنه محدد كـ "خاص" (Private)، ولن يظهر في التصفح العام.');
+        }
       } else if (status === 'archived') {
         updates.archived_at = new Date().toISOString();
+      }
+
+      if (originalCourse?.status === 'archived' && status !== 'archived') {
+        updates.archived_at = null;
       }
 
       const { error } = await supabase
@@ -197,9 +212,18 @@ export function AdminCourseEdit() {
         .update(updates)
         .eq('id', courseId);
 
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes('duplicate key') || error.message?.includes('courses_slug_key')) {
+          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
+          addToast('error', 'رابط الكورس المخصص مستخدم بالفعل، يرجى تغيير الرابط.');
+          setIsSubmitting(false);
+          return;
+        }
+        throw error;
+      }
 
       addToast('success', 'تم حفظ التعديلات بنجاح!');
+      loadCourse();
     } catch (err: any) {
       console.error('Error updating course:', err);
       addToast('error', err.message || 'تعذر حفظ التعديلات.');

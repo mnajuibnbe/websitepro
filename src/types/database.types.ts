@@ -53,16 +53,32 @@ export interface Lesson {
   course_id: string;
   section_id: string | null;
   title: string;
-  description: string | null;
-  content: string | null;
-  video_url: string | null;
-  type: 'video' | 'text' | 'quiz';
-  duration: string | null;
+  slug?: string | null;
+  description?: string | null;
+  content?: string | null;
+  video_url?: string | null;
+  content_url?: string | null;
+  type?: 'video' | 'text' | 'quiz' | string;
+  lesson_type?: 'video' | 'article' | 'pdf' | 'audio' | 'embed' | 'external_link' | 'live' | 'quiz' | 'assignment' | string;
+  duration?: string | null;
+  estimated_minutes?: number | null;
+  thumbnail?: string | null;
+  attachments?: any[] | null;
   order_index: number;
   is_published: boolean;
   is_preview: boolean;
-  created_at: string;
-  updated_at: string;
+  completion_rule?: 'manual' | 'watch90' | 'read_end' | 'pass_quiz' | 'upload_assignment' | string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  transcript?: string | null;
+  captions_url?: string | null;
+  notes?: string | null;
+  pdf_allow_download?: boolean;
+  pdf_watermark?: boolean;
+  open_in_new_tab?: boolean;
+  embed_code?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface LessonProgress {
