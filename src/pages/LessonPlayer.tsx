@@ -10,7 +10,7 @@ import { CourseLearningHeader } from '../components/player/CourseLearningHeader'
 import { CourseSidebar } from '../components/player/CourseSidebar';
 import { VideoLessonRenderer } from '../components/player/VideoLessonRenderer';
 import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
-import { QuizLessonPlaceholder } from '../components/player/QuizLessonPlaceholder';
+import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { LessonDetails } from '../components/player/LessonDetails';
 
@@ -462,7 +462,33 @@ export function LessonPlayer() {
             ) : currentLesson.type === 'text' ? (
               <TextLessonRenderer content={currentLesson.content} title={currentLesson.title} />
             ) : currentLesson.type === 'quiz' ? (
-              <QuizLessonPlaceholder title={currentLesson.title} />
+              <QuizLessonRenderer
+                lessonId={currentLesson.id}
+                courseId={course.id}
+                quizTitle={currentLesson.title}
+                onQuizCompleted={() => {
+                  if (!user || !courseId) return;
+                  setProgressRows((prev) => {
+                    const existing = prev.find((p) => p.lesson_id === currentLesson.id);
+                    if (existing?.is_completed) return prev;
+                    const now = new Date().toISOString();
+                    return [
+                      ...prev.filter((p) => p.lesson_id !== currentLesson.id),
+                      {
+                        id: existing?.id || `temp-${Date.now()}`,
+                        user_id: user.id,
+                        course_id: courseId,
+                        lesson_id: currentLesson.id,
+                        is_completed: true,
+                        completed_at: now,
+                        last_accessed_at: now,
+                        created_at: now,
+                        updated_at: now,
+                      },
+                    ];
+                  });
+                }}
+              />
             ) : (
               <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="rtl">
                 <h3 className="text-xl font-bold text-primary-900 mb-2">نوع الدرس غير مدعوم</h3>
