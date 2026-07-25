@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import { Loader2 } from 'lucide-react';
 
-export interface ButtonProps {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'danger';
   isLoading?: boolean;
   icon?: React.ReactNode;
@@ -10,6 +10,7 @@ export interface ButtonProps {
   disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
+  form?: string;
 }
 
 export function Button({

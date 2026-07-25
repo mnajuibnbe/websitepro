@@ -1,10 +1,32 @@
 export interface Course {
   id: string;
   title: string;
+  slug: string | null;
+  short_description: string | null;
   description: string | null;
   price: number | string | null;
+  duration: string | null;
+  category: string | null;
   thumbnail: string | null;
+  cover_image: string | null;
+  trailer_video: string | null;
+  status: 'draft' | 'published' | 'archived' | string;
+  instructor_id: string | null;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'all_levels' | string | null;
+  language: string | null;
+  visibility: 'public' | 'private' | 'unlisted' | string | null;
+  is_featured: boolean | null;
+  certificate_enabled: boolean | null;
+  sequential_learning: boolean | null;
+  drip_enabled: boolean | null;
+  discussion_enabled: boolean | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_keywords: string | null;
+  published_at: string | null;
+  archived_at: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Enrollment {
