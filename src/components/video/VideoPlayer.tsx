@@ -29,6 +29,9 @@ export interface VideoPlayerProps {
 }
 
 class VideoPlayerErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  declare props: Readonly<{ children: ReactNode }>;
+  declare state: Readonly<{ hasError: boolean }>;
+
   constructor(props: { children: ReactNode }) {
     super(props);
     this.state = { hasError: false };
