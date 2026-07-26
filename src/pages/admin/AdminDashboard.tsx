@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { CheckCircle, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { formatCourseAmount } from '../../lib/pricing';
 
 interface PendingEnrollment {
   id: string;
@@ -20,6 +21,7 @@ interface PendingEnrollment {
     id: string;
     title: string;
   } | null;
+  order?: { id: string; amount: string; currency: 'EGP' | 'USD' } | null;
 }
 
 export function AdminDashboard() {
@@ -82,7 +84,11 @@ export function AdminDashboard() {
         // Supabase typings can sometimes return an array for relations if it thinks it's one-to-many,
         // but since users/courses are foreign keys on enrollments (many-to-one), they should be objects.
         // We cast as any to handle potential TS mismatches if the generated types differ, but the runtime shape is correct.
-        setPendingEnrollments(data as any as PendingEnrollment[]);
+        const pending = data as any as PendingEnrollment[];
+        const { data: orders } = await supabase.from('course_orders').select('id,user_id,course_id,amount,currency,created_at').eq('enrollment_status', 'pending').order('created_at', { ascending: false });
+        const keyed = new Map<string, any>();
+        (orders || []).forEach(order => { const key = `${order.user_id}:${order.course_id}`; if (!keyed.has(key)) keyed.set(key, order); });
+        setPendingEnrollments(pending.map(item => ({ ...item, order: keyed.get(`${item.user_id}:${item.course_id}`) || null })));
       }
     } catch (e) {
       console.error('Exception during fetch:', e);
@@ -105,6 +111,8 @@ export function AdminDashboard() {
         .maybeSingle();
 
       if (!error && updatedEnrollment?.status === status) {
+        const enrollment = pendingEnrollments.find(item => item.id === id);
+        if (enrollment?.order) await supabase.from('course_orders').update({ enrollment_status: status, updated_at: new Date().toISOString() }).eq('id', enrollment.order.id);
         setPendingEnrollments(prev => prev.filter(e => e.id !== id));
         setToastMessage(status === 'active' ? 'Order' : 'Order');
         setShowToast(true);
@@ -213,6 +221,7 @@ export function AdminDashboard() {
                               <span className={`font-bold ${!enrollment.courses ? 'text-danger-600' : 'text-primary-900'}`}>
                                 {courseTitle}
                               </span>
+                              {enrollment.order && <div className="text-xs text-primary-500 mt-1">Original order: {formatCourseAmount(String(enrollment.order.amount), enrollment.order.currency)}</div>}
                             </td>
                             <td className="py-4 px-6 text-sm text-primary-500 font-medium" dir="ltr" style={{textAlign: 'right'}}>
                               {date}

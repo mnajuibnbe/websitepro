@@ -41,7 +41,8 @@ export function AdminCourseEdit() {
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
   const [language, setLanguage] = useState('Arabic');
-  const [price, setPrice] = useState('0');
+  const [priceEgp, setPriceEgp] = useState('');
+  const [priceUsd, setPriceUsd] = useState('');
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
   const [thumbnail, setThumbnail] = useState('');
@@ -108,7 +109,8 @@ export function AdminCourseEdit() {
       setCategory(course.category || 'Learn More');
       setLevel((course.level as any) || 'all_levels');
       setLanguage(course.language || 'Arabic');
-      setPrice(course.price ? String(course.price) : '0');
+      setPriceEgp(course.price_egp == null ? '' : String(course.price_egp));
+      setPriceUsd(course.price_usd == null ? '' : String(course.price_usd));
       setStatus((course.status as any) || 'draft');
       setVisibility((course.visibility as any) || 'public');
       setThumbnail(course.thumbnail || '');
@@ -145,6 +147,9 @@ export function AdminCourseEdit() {
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
+    if (!/^\d+(\.\d{1,2})?$/.test(priceEgp)) newErrors.priceEgp = 'Egypt Price is required and cannot be negative.';
+    if (!/^\d+(\.\d{1,2})?$/.test(priceUsd)) newErrors.priceUsd = 'International Price is required and cannot be negative.';
+    if (!newErrors.priceEgp && !newErrors.priceUsd && ((Number(priceEgp) === 0) !== (Number(priceUsd) === 0))) newErrors.priceUsd = 'A free course must have both prices set to zero.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -173,8 +178,6 @@ export function AdminCourseEdit() {
         }
       }
 
-      const parsedPrice = parseFloat(price) || 0;
-
       const updates: Partial<Course> = {
         title: title.trim(),
         slug: cleanSlug || null,
@@ -183,7 +186,8 @@ export function AdminCourseEdit() {
         category: category.trim() || null,
         level: level,
         language: language.trim() || 'Arabic',
-        price: parsedPrice,
+        price_egp: priceEgp,
+        price_usd: priceUsd,
         status: status,
         visibility: visibility,
         thumbnail: thumbnail.trim() || null,
@@ -458,18 +462,15 @@ export function AdminCourseEdit() {
                     </select>
                   </div>
 
-                  {/* Price */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Price (Learn More.Learn More)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
-                    />
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Egypt Price (EGP) *</label>
+                    <input type="number" min="0" step="0.01" required value={priceEgp} onChange={(e) => setPriceEgp(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                    {errors.priceEgp && <p className="text-xs text-danger-600 mt-1">{errors.priceEgp}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">International Price (USD) *</label>
+                    <input type="number" min="0" step="0.01" required value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                    {errors.priceUsd && <p className="text-xs text-danger-600 mt-1">{errors.priceUsd}</p>}
                   </div>
 
                   {/* Language */}

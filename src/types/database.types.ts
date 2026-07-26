@@ -5,6 +5,8 @@ export interface Course {
   short_description: string | null;
   description: string | null;
   price: number | string | null;
+  price_egp: number | string | null;
+  price_usd: number | string | null;
   duration: string | null;
   category: string | null;
   thumbnail: string | null;
@@ -36,6 +38,12 @@ export interface Enrollment {
   course_id: string;
   status: 'active' | 'pending' | 'cancelled' | string;
   enrolled_at: string;
+}
+
+export interface CourseOrder {
+  id: string; course_id: string; user_id: string; amount: string; currency: 'EGP' | 'USD';
+  pricing_region: 'egypt' | 'international'; pricing_source: string;
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'; enrollment_status: 'pending' | 'active' | 'cancelled'; created_at: string;
 }
 
 export interface CourseSection {

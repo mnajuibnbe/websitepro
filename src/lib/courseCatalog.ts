@@ -1,4 +1,5 @@
 import type { Course } from '../types/database.types';
+import { DEFAULT_PRICING_CONTEXT, resolveCoursePrice, type PricingContext } from './pricing';
 
 export type CourseSort = 'newest' | 'price-asc' | 'price-desc';
 export type PriceFilter = 'all' | 'free' | 'paid';
@@ -22,7 +23,10 @@ export const EMPTY_CATALOG_FILTERS: CourseCatalogFilters = {
   durations: [],
 };
 
-const numericPrice = (course: Course) => Number(course.price || 0);
+const numericPrice = (course: Course, context: PricingContext) => {
+  const amount = resolveCoursePrice(course, context).amount;
+  return amount === null ? Number.POSITIVE_INFINITY : Number(amount);
+};
 const durationHours = (course: Course) => {
   const parsed = Number.parseFloat(course.duration || '');
   return Number.isFinite(parsed) ? parsed : null;
@@ -41,7 +45,7 @@ function categoryMatches(courseCategory: string | null, selectedCategory: string
   return legacyTerm ? courseCategory.includes(legacyTerm) : false;
 }
 
-export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFilters): Course[] {
+export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFilters, context: PricingContext = DEFAULT_PRICING_CONTEXT): Course[] {
   const search = filters.search.trim().toLocaleLowerCase();
 
   return courses
@@ -54,7 +58,7 @@ export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFi
       if (filters.categories.length && !filters.categories.some(category => categoryMatches(course.category, category))) return false;
       if (filters.levels.length && !filters.levels.includes(course.level || '')) return false;
 
-      const price = numericPrice(course);
+      const price = numericPrice(course, context);
       if (filters.price === 'free' && price !== 0) return false;
       if (filters.price === 'paid' && price <= 0) return false;
 
@@ -68,8 +72,8 @@ export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFi
       return true;
     })
     .sort((a, b) => {
-      if (filters.sort === 'price-asc') return numericPrice(a) - numericPrice(b);
-      if (filters.sort === 'price-desc') return numericPrice(b) - numericPrice(a);
+      if (filters.sort === 'price-asc') return numericPrice(a, context) - numericPrice(b, context);
+      if (filters.sort === 'price-desc') return numericPrice(b, context) - numericPrice(a, context);
       return new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime();
     });
 }

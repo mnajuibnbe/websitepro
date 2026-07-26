@@ -27,6 +27,7 @@ import { Permission } from '../../types/auth';
 import { supabase } from '../../lib/supabase';
 import { Course } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
+import { formatCourseAmount } from '../../lib/pricing';
 
 interface CourseListItem extends Course {
   sections_count: number;
@@ -460,7 +461,7 @@ export function AdminCourseManager() {
 
                           {/* Price */}
                           <td className="py-4 px-4 font-bold text-primary-900">
-                            {course.price ? `${course.price} Learn More.Learn More` : <span className="text-emerald-600 font-bold">Free</span>}
+                            <div className="space-y-1 text-xs"><div>Egypt: {course.price_egp == null ? 'Unavailable' : Number(course.price_egp) === 0 ? 'Free' : formatCourseAmount(String(course.price_egp), 'EGP')}</div><div>International: {course.price_usd == null ? 'Unavailable' : Number(course.price_usd) === 0 ? 'Free' : formatCourseAmount(String(course.price_usd), 'USD')}</div></div>
                           </td>
 
                           {/* Stats */}
