@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { PricingProvider } from './contexts/PricingContext';
 
 import { Home } from './pages/Home';
 import { CoursesListing } from './pages/CoursesListing';
@@ -96,7 +97,7 @@ export default function App() {
   return (
     <HashRouter>
       <AuthProvider>
-        <AppContent />
+        <PricingProvider><AppContent /></PricingProvider>
       </AuthProvider>
     </HashRouter>
   );

@@ -3,6 +3,8 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import videoRoutes from './src/server/routes/video.routes.js';
 import { validateServerEnvironment } from './src/server/config/environment.js';
+import pricingRoutes from './src/server/routes/pricing.routes.js';
+import checkoutRoutes from './src/server/routes/checkout.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +19,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // API Routes
 app.use('/api/video', videoRoutes);
+app.use('/api/pricing', pricingRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 // Setup Vite middleware for development or static serving for production
 async function setupVite() {

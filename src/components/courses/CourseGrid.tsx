@@ -8,6 +8,8 @@ import { Button } from '../ui/Button';
 import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
 import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS, filterAndSortCourses } from '../../lib/courseCatalog';
 import type { Course } from '../../types/database.types';
+import { usePricingContext } from '../../contexts/PricingContext';
+import { resolveCoursePrice } from '../../lib/pricing';
 
 interface CourseGridProps {
   filters: CourseCatalogFilters;
@@ -18,6 +20,7 @@ interface CourseGridProps {
 export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: CourseGridProps) {
   const pageSize = 9;
   const navigate = useNavigate();
+  const pricingContext = usePricingContext();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +30,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     fetchCourses();
   }, []);
 
-  const visibleCourses = filterAndSortCourses(courses, filters);
+  const visibleCourses = filterAndSortCourses(courses, filters, pricingContext);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -126,7 +129,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
             description={course.description || course.short_description || ''}
             duration={course.duration || 'TBD'}
             lessonsCount={0}
-            price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
+            price={resolveCoursePrice(course, pricingContext).formatted}
             imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
             ctaText="Course"
             onEnroll={() => navigate(`/course/${course.id}`)}

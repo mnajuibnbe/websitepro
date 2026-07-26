@@ -98,3 +98,8 @@ lessons, and progress loader. That set the page-level access state back to
 - Continue recording `last_accessed_at` for the selected lesson and preserve the
   full authorization/data-loading path for initial loads, refreshes, user
   changes, and course changes.
+## 2026-07-26 — Secure dual-country pricing
+
+- Inspected the legacy `courses.price` flow: public cards/detail parsed it in the browser, Checkout was hard-coded/mock-only, enrollment was inserted directly by the browser, and no repository order schema/payment adapter/country resolver existed.
+- Added nullable `NUMERIC(12,2)` EGP/USD fields without changing the legacy field, protected order snapshots, Admin RPC/form support, a single typed resolver, and server checkout validation.
+- Public queries remain limited by existing published-course RLS. New order RLS permits owners/Admin to read, Admin status decisions to update, and has no browser create/delete policy.

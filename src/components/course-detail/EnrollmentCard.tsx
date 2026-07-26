@@ -1,4 +1,6 @@
 import { useAuth } from '../../contexts/AuthContext';
+import { usePricingContext } from '../../contexts/PricingContext';
+import { resolveCoursePrice } from '../../lib/pricing';
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -8,6 +10,7 @@ import { isValidUUID } from '../../lib/uuid';
 
 export function EnrollmentCard() {
   const { user } = useAuth();
+  const pricingContext = usePricingContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState<string | null>(null);
@@ -199,8 +202,7 @@ export function EnrollmentCard() {
       <div className="p-6 md:p-8 flex flex-col gap-6">
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold text-primary-900">${price}</span>
-          {price > 0 && <span className="text-lg text-primary-400 line-through">${Math.round(price * 1.2)}</span>}
+          <span className="text-4xl font-bold text-primary-900">{price.formatted}</span>
         </div>
 
         {/* Enrollment Information List */}
@@ -237,7 +239,7 @@ export function EnrollmentCard() {
             variant="primary"
             className="w-full h-14 text-lg"
             onClick={handleButtonClick}
-            disabled={isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
+            disabled={!price.available || isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
           >
             {renderButtonContent()}
           </Button>
@@ -257,14 +259,13 @@ export function EnrollmentCard() {
     {/* Mobile Sticky Bottom Bar */}
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-primary-200 p-4 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)] z-50 flex items-center justify-between gap-4">
       <div className="flex flex-col">
-        {price > 0 && <span className="text-sm text-primary-500 line-through font-medium leading-none mb-1">${Math.round(price * 1.2)}</span>}
-        <span className="text-2xl font-bold text-primary-900 leading-none">${price}</span>
+        <span className="text-2xl font-bold text-primary-900 leading-none">{price.formatted}</span>
       </div>
       <Button
         variant="primary"
         className="flex-grow h-12 text-lg font-bold"
         onClick={handleButtonClick}
-        disabled={isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
+        disabled={!price.available || isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
       >
         {renderButtonContent()}
       </Button>

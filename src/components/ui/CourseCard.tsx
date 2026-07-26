@@ -10,7 +10,7 @@ interface CourseCardProps {
   description: string;
   duration: string;
   lessonsCount: number;
-  price: number | string;
+  price: string;
   imageUrl?: string;
   ctaText?: string;
   onEnroll?: () => void;
@@ -62,7 +62,7 @@ export function CourseCard({
         {/* Footer (Price & CTA) */}
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-primary-100">
           <div className="text-xl font-bold text-primary-900">
-            {typeof price === 'number' ? `$${price}` : price}
+            {price}
           </div>
           <Button variant="primary" onClick={onEnroll}>
             {ctaText}

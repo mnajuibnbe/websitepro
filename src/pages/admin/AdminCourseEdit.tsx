@@ -145,6 +145,9 @@ export function AdminCourseEdit() {
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
+    if (!/^\d+(\.\d{1,2})?$/.test(priceEgp)) newErrors.priceEgp = 'Egypt Price is required and cannot be negative.';
+    if (!/^\d+(\.\d{1,2})?$/.test(priceUsd)) newErrors.priceUsd = 'International Price is required and cannot be negative.';
+    if (!newErrors.priceEgp && !newErrors.priceUsd && ((Number(priceEgp) === 0) !== (Number(priceUsd) === 0))) newErrors.priceUsd = 'A free course must have both prices set to zero.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -172,8 +175,6 @@ export function AdminCourseEdit() {
           return;
         }
       }
-
-      const parsedPrice = parseFloat(price) || 0;
 
       const updates: Partial<Course> = {
         title: title.trim(),
@@ -458,7 +459,6 @@ export function AdminCourseEdit() {
                     </select>
                   </div>
 
-                  {/* Price */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">Price (SAR)</label>
                     <input

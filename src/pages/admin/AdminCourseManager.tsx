@@ -27,6 +27,7 @@ import { Permission } from '../../types/auth';
 import { supabase } from '../../lib/supabase';
 import { Course } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
+import { formatCourseAmount } from '../../lib/pricing';
 
 interface CourseListItem extends Course {
   sections_count: number;

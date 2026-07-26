@@ -80,7 +80,8 @@ export function AdminCourseBuilder() {
   const [seoKeywords, setSeoKeywords] = useState('');
 
   // Pricing Form Fields
-  const [price, setPrice] = useState('0');
+  const [priceEgp, setPriceEgp] = useState('');
+  const [priceUsd, setPriceUsd] = useState('');
   const [dripEnabled, setDripEnabled] = useState(false);
   const [sequentialLearning, setSequentialLearning] = useState(false);
   const [certificateEnabled, setCertificateEnabled] = useState(true);
@@ -122,7 +123,8 @@ export function AdminCourseBuilder() {
       setSeoTitle(courseData.seo_title || '');
       setSeoDescription(courseData.seo_description || '');
       setSeoKeywords(courseData.seo_keywords || '');
-      setPrice(courseData.price ? String(courseData.price) : '0');
+      setPriceEgp(courseData.price_egp == null ? '' : String(courseData.price_egp));
+      setPriceUsd(courseData.price_usd == null ? '' : String(courseData.price_usd));
       setDripEnabled(Boolean(courseData.drip_enabled));
       setSequentialLearning(Boolean(courseData.sequential_learning));
       setCertificateEnabled(
@@ -421,9 +423,14 @@ export function AdminCourseBuilder() {
           seo_keywords: seoKeywords.trim() || null,
         };
       } else if (tabName === 'pricing') {
+        if (!/^\d+(\.\d{1,2})?$/.test(priceEgp) || !/^\d+(\.\d{1,2})?$/.test(priceUsd) || ((Number(priceEgp) === 0) !== (Number(priceUsd) === 0))) {
+          addToast('error', 'Enter both non-negative regional prices; free courses require both prices to be zero.');
+          return;
+        }
         updates = {
           ...updates,
-          price: parseFloat(price) || 0,
+          price_egp: priceEgp,
+          price_usd: priceUsd,
           drip_enabled: dripEnabled,
           sequential_learning: sequentialLearning,
           certificate_enabled: certificateEnabled,
