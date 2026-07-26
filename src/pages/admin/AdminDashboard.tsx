@@ -95,18 +95,21 @@ export function AdminDashboard() {
     try {
       setActionLoadingId(id);
       setErrorMsg(null);
-      const { error } = await supabase
+      const { data: updatedEnrollment, error } = await supabase
         .from('enrollments')
         .update({ status: 'active' })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('status', 'pending')
+        .select('id, status')
+        .maybeSingle();
         
-      if (!error) {
+      if (!error && updatedEnrollment?.status === 'active') {
         setPendingEnrollments(prev => prev.filter(e => e.id !== id));
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       } else {
         setErrorMsg('فشل في اعتماد الطلب، يرجى المحاولة مرة أخرى.');
-        console.error('Update error:', error);
+        console.error('Enrollment approval did not update a pending row:', error || { id });
       }
     } catch (e) {
       console.error(e);
@@ -216,7 +219,7 @@ export function AdminDashboard() {
                               <button
                                 onClick={() => handleApprove(enrollment.id)}
                                 disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-success-600 hover:bg-success-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 title={(!enrollment.users || !enrollment.courses) ? "لا يمكن الاعتماد لعدم اكتمال البيانات" : "اعتماد الطلب"}
                               >
                                 {actionLoadingId === enrollment.id ? (

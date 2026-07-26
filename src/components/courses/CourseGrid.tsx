@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
+import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
 
 export function CourseGrid() {
+  const pageSize = 9;
   const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchCourses();
@@ -23,11 +26,12 @@ export function CourseGrid() {
       const { data, error: dbError } = await supabase
         .from('courses')
         .select('*')
-        .eq('status', 'active')
+        .eq('status', PUBLIC_COURSE_STATUS)
         .order('created_at', { ascending: false });
 
       if (dbError) throw dbError;
       setCourses(data || []);
+      setCurrentPage(1);
     } catch (err) {
       setError('حدث خطأ أثناء تحميل الكورسات. يرجى المحاولة لاحقاً.');
       console.error('Error fetching courses:', err);
@@ -90,7 +94,7 @@ export function CourseGrid() {
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
-        {courses.map(course => (
+        {courses.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(course => (
           <CourseCard 
             key={course.id}
             title={course.title}
@@ -107,7 +111,14 @@ export function CourseGrid() {
       </div>
 
       {/* Pagination */}
-      <Pagination />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(courses.length / pageSize)}
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
     </div>
   );
 }
