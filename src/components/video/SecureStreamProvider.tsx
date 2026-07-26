@@ -35,12 +35,30 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         });
         
         if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || 'Failed to get streaming token');
+          let errorMessage = `Failed to get streaming token (${response.status})`;
+          try {
+            const errData = await response.json();
+            if (errData && errData.error) {
+              errorMessage = errData.error;
+            }
+          } catch (jsonErr) {
+            console.warn('[DevLog] Token response was not JSON:', response.status);
+          }
+          throw new Error(errorMessage);
         }
         
-        const data = await response.json();
-        console.log(`[DevLog] Token received: ${data.token.substring(0, 10)}...`);
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonErr) {
+          throw new Error('Received invalid response format from server.');
+        }
+
+        if (!data || !data.token) {
+          throw new Error('Streaming token was not provided by server.');
+        }
+
+        console.log(`[DevLog] Token received successfully`);
         
         if (isMounted) {
           // Construct stream URL
