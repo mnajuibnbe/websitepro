@@ -388,7 +388,7 @@ export function AdminCourseBuilder() {
           updates.published_at = new Date().toISOString();
         }
         if (course.visibility === 'private') {
-          addToast('info', 'Course "Learn More" (Private)Learn More.');
+          addToast('info', 'This course is private and will not appear in the public catalog.');
         }
       }
 
@@ -486,7 +486,7 @@ export function AdminCourseBuilder() {
                             : 'bg-amber-100 text-amber-800 border-amber-200'
                         }`}
                       >
-                        {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Learn More' : 'Draft'}
+                        {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Archived' : 'Draft'}
                       </span>
                     )}
                   </div>
@@ -539,7 +539,7 @@ export function AdminCourseBuilder() {
               {[
                 { id: 'curriculum', label: 'Curriculum (Curriculum)', icon: BookOpen },
                 { id: 'settings', label: 'Settings', icon: Settings },
-                { id: 'pricing', label: 'Learn More', icon: DollarSign },
+                { id: 'pricing', label: 'Pricing', icon: DollarSign },
                 { id: 'seo', label: 'Search (SEO)', icon: Globe },
                 { id: 'publish', label: 'Publish (Publish)', icon: CheckCircle },
               ].map((tab) => {
@@ -635,7 +635,7 @@ export function AdminCourseBuilder() {
                           type="text"
                           value={newSectionTitle}
                           onChange={(e) => setNewSectionTitle(e.target.value)}
-                          placeholder="Learn More: Learn More - Learn More"
+                          placeholder="Example: Section 1 - Skin Care Foundations"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                           autoFocus
                         />
@@ -773,7 +773,7 @@ export function AdminCourseBuilder() {
 
                                         <div className="flex items-center gap-2.5 text-[11px] text-primary-500 mt-0.5 flex-wrap">
                                           <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
-                                            {lesson.lesson_type || lesson.type || 'Learn More'}
+                                            {lesson.lesson_type || lesson.type || 'Lesson'}
                                           </span>
 
                                           {(lesson.duration || lesson.estimated_minutes) && (
@@ -809,7 +809,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'up')}
                                         disabled={lIndex === 0}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="Learn More"
+                                        title="Move lesson up"
                                       >
                                         <ArrowUp className="w-3.5 h-3.5" />
                                       </button>
@@ -819,7 +819,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'down')}
                                         disabled={lIndex === sectionLessons.length - 1}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="Learn More"
+                                        title="Move lesson down"
                                       >
                                         <ArrowDown className="w-3.5 h-3.5" />
                                       </button>
@@ -894,10 +894,10 @@ export function AdminCourseBuilder() {
                                         onChange={(e) => setNewLessonType(e.target.value as any)}
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-bold"
                                       >
-                                        <option value="video">Learn More (Video)</option>
-                                        <option value="article">Learn More / Learn More (Article)</option>
-                                        <option value="pdf">Learn More PDF</option>
-                                        <option value="audio">Learn More (Audio)</option>
+                                        <option value="video">Video Lesson</option>
+                                        <option value="article">Article</option>
+                                        <option value="pdf">PDF Document</option>
+                                        <option value="audio">Audio Lesson</option>
                                         <option value="quiz">Quiz (Quiz)</option>
                                       </select>
                                     </div>
@@ -920,7 +920,7 @@ export function AdminCourseBuilder() {
 
                                     <div>
                                       <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        Duration (Learn More: 12 Minute)
+                                        Duration (Example: 12 minutes)
                                       </label>
                                       <input
                                         type="text"
@@ -1024,7 +1024,7 @@ export function AdminCourseBuilder() {
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
                       <span className="text-xs text-primary-500 font-bold block mb-1">Level</span>
                       <span className="font-bold text-primary-900">
-                        {course?.category || 'Learn More'} | {course?.level || 'Learn More'}
+                        {course?.category || 'Uncategorized'} | {course?.level || 'All Levels'}
                       </span>
                     </div>
 
@@ -1038,7 +1038,7 @@ export function AdminCourseBuilder() {
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
                       <span className="text-xs text-primary-500 font-bold block mb-1">Lessons</span>
                       <span className="font-bold text-primary-900">
-                        {sections.length} Learn More | {lessons.length} Lesson
+                        {sections.length} Sections | {lessons.length} Lessons
                       </span>
                     </div>
                   </div>
@@ -1062,7 +1062,7 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-amber-600" />
-                    <span>Learn More</span>
+                    <span>Pricing</span>
                   </h2>
 
                   <div className="space-y-6 max-w-xl">
@@ -1135,7 +1135,7 @@ export function AdminCourseBuilder() {
 
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">Learn More SEO (SEO Title)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">SEO Title</label>
                       <input
                         type="text"
                         value={seoTitle}
@@ -1146,7 +1146,7 @@ export function AdminCourseBuilder() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">Learn More SEO (Meta Description)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Meta Description</label>
                       <textarea
                         rows={3}
                         value={seoDescription}
@@ -1157,12 +1157,12 @@ export function AdminCourseBuilder() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">Learn More (Keywords)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">SEO Keywords</label>
                       <input
                         type="text"
                         value={seoKeywords}
                         onChange={(e) => setSeoKeywords(e.target.value)}
-                        placeholder="Learn More..."
+                        placeholder="Enter keywords separated by commas..."
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm font-medium"
                       />
                     </div>
@@ -1196,7 +1196,7 @@ export function AdminCourseBuilder() {
 
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
                       <span className="font-bold text-sm text-primary-900">
-                        Learn More ({sections.length} Learn More)
+                        Publish ({sections.length} Sections)
                       </span>
                       {sections.length > 0 ? (
                         <CheckCircle className="w-5 h-5 text-emerald-600" />

@@ -42,7 +42,7 @@ export function AdminCourseCreate() {
   const [slug, setSlug] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Learn More');
+  const [category, setCategory] = useState('Skin Care');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
   const [language, setLanguage] = useState('Arabic');
   const [priceEgp, setPriceEgp] = useState('');
@@ -82,7 +82,7 @@ export function AdminCourseCreate() {
         if (!error && data) {
           const list = data.map((p) => ({
             id: p.id,
-            name: p.full_name || 'Learn More',
+            name: p.full_name || 'Instructor',
           }));
           setInstructors(list);
         }
@@ -243,7 +243,7 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <Tag className="w-5 h-5 text-amber-600" />
-                <span>Learn More</span>
+                <span>Basic Information</span>
               </h2>
 
               <div className="space-y-6">
@@ -259,7 +259,7 @@ export function AdminCourseCreate() {
                       setTitle(e.target.value);
                       if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                     }}
-                    placeholder="Learn More: Learn More"
+                    placeholder="Example: Professional Skin Care Diploma"
                     className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium ${
                       errors.title ? 'border-danger-400 bg-danger-50/50' : 'border-primary-200'
                     }`}
@@ -303,13 +303,13 @@ export function AdminCourseCreate() {
                 {/* Short Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Description (Learn More)
+                    Short Description
                   </label>
                   <input
                     type="text"
                     value={shortDescription}
                     onChange={(e) => setShortDescription(e.target.value)}
-                    placeholder="Learn More"
+                    placeholder="Summarize the course for catalog cards"
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm"
                   />
                 </div>
@@ -340,12 +340,12 @@ export function AdminCourseCreate() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Category</label>
                   <input
                     type="text"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    placeholder="Learn More..."
+                    placeholder="Skin care, hair care, or professional practice..."
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   />
                 </div>
@@ -358,7 +358,7 @@ export function AdminCourseCreate() {
                     onChange={(e) => setLevel(e.target.value as any)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                   >
-                    <option value="all_levels">Learn More</option>
+                    <option value="all_levels">All Levels</option>
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
@@ -367,7 +367,7 @@ export function AdminCourseCreate() {
 
                 {/* Language */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Course Language</label>
                   <input
                     type="text"
                     value={language}
@@ -391,14 +391,14 @@ export function AdminCourseCreate() {
                 {/* Instructor */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Learn More / Instructor
+                    Assigned Instructor
                   </label>
                   <select
                     value={instructorId}
                     onChange={(e) => setInstructorId(e.target.value)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   >
-                    <option value="">-- Course (Learn More) --</option>
+                    <option value="">-- Select an instructor (or use default) --</option>
                     {instructors.map((ins) => (
                       <option key={ins.id} value={ins.id}>
                         {ins.name}
@@ -413,7 +413,7 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-amber-600" />
-                <span>Learn More</span>
+                <span>Images and Media</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -432,7 +432,7 @@ export function AdminCourseCreate() {
                   />
                   {thumbnail && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={thumbnail} alt="Learn More" className="w-full h-full object-cover" />
+                      <img src={thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -452,7 +452,7 @@ export function AdminCourseCreate() {
                   />
                   {coverImage && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={coverImage} alt="Learn More" className="w-full h-full object-cover" />
+                      <img src={coverImage} alt="Cover image preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
