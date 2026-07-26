@@ -5,9 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
+import { usePricingContext } from '../../contexts/PricingContext';
+import { resolveCoursePrice } from '../../lib/pricing';
 
 export function FeaturedCourses() {
   const navigate = useNavigate();
+  const pricingContext = usePricingContext();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +89,7 @@ export function FeaturedCourses() {
               description={course.description}
               duration="TBD"
               lessonsCount={0}
-              price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
+              price={resolveCoursePrice(course, pricingContext).formatted}
               imageUrl={course.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
               ctaText="View Course"
               onEnroll={() => navigate(`/course/${course.id}`)}
