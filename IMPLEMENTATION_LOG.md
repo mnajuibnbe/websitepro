@@ -59,3 +59,23 @@ media/HEAD probes to be aborted and restarted.
   than the full user object.
 - Preserve token refresh handling and all authentication and authorization
   checks.
+
+## 2026-07-26 — Google Drive media 403 and hanging stream
+
+### Proven root cause
+
+Production logs showed that Drive metadata succeeded, but the subsequent
+`files.get({ alt: 'media' })` call returned HTTP 403. The controller had already
+sent `206` headers before awaiting that upstream call, so it could not return the
+real failure and the Vercel invocation remained open until its five-minute
+timeout. Express also handled media `HEAD` probes through the GET handler, which
+started and immediately aborted unnecessary full Drive downloads.
+
+### Fix
+
+- Added a metadata-only HEAD endpoint.
+- Await the Google Drive media response before committing 200/206 headers.
+- Abort only when the response closes before completion, rather than on the
+  request object's normal close event.
+- Preserve all Range calculations, seeking headers, JWT checks, and access
+  authorization.
