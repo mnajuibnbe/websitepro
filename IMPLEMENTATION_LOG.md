@@ -64,3 +64,11 @@ The browser build additionally requires `VITE_SUPABASE_ANON_KEY`.
 - Restored the established latest-three Home rule after proving `is_featured` has no Admin control.
 - Replaced fake static pagination with working data-driven pagination that is hidden for a single page.
 - Added a narrowly scoped admin pending-to-active enrollment policy and made the approval UI verify that RLS actually updated a row.
+
+### Catalogue controls and request denial follow-up
+
+- Connected the previously static search, category, level, price, duration, sort, result-count, applied-filter, clear, mobile-filter and pagination controls to real Supabase course rows.
+- Added focused catalogue filtering/sorting tests, including production legacy category aliases.
+- Added Admin denial using the schema-supported `cancelled` terminal state, verified returned mutations, denied-student messaging, and a least-privilege pending-decision policy.
+- Completed mobile parity for catalogue actions with an accessible filter toggle/panel, visible live count, shared search/sort state, and close action; kept Admin approve/deny actions together in the responsive table.
+- Added optional Admin-managed Home ordering with positive numeric priorities; unranked courses retain newest-published order, and the same query order is used on mobile and desktop.

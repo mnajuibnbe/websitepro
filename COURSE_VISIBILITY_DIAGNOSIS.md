@@ -14,7 +14,7 @@ A course managed by an administrator can be absent from Home, the public catalog
 
 `FeaturedCourses.tsx` queried `status = 'active'`. Admin create/edit/builder and the shared type publish courses with `status = 'published'`; `active` is an enrollment status, not a course publication status. A first repair incorrectly required `is_featured=true`, although no Admin workflow sets that field, which kept the entire section empty. Finally, Supabase errors were originally swallowed and rendered as no section.
 
-**Repair:** query the newest three `published` rows, let RLS enforce public/enrolled visibility, and show a retryable error. This matches the pre-existing latest-three Home rule without requiring an unmanageable flag.
+**Repair:** query the newest three `published` rows by default, let RLS enforce public/enrolled visibility, and show a retryable error. An optional positive `home_order` set in Admin takes precedence (lower number first); blank values retain newest-published ordering. Mobile and desktop render the same ordered result array.
 
 ### Public Courses — proven in code; deployed RLS requires runtime verification
 
@@ -23,6 +23,8 @@ A course managed by an administrator can be absent from Home, the public catalog
 **Repair:** query `published`. Add an additive, least-privilege policy allowing anon/authenticated SELECT only when `status = 'published'` and visibility is public (null legacy visibility is treated as public).
 
 The supplied screenshots also show courses configured as `private` and `unlisted` in Admin. Those rows are intentionally absent from the anonymous and unenrolled catalogue after RLS is applied; set visibility to `public` in the existing Admin editor when catalogue display is desired. This is configuration, not a reason to weaken RLS.
+
+The catalogue controls were also proven to be presentation-only: the search input, sort select, category shortcuts, sidebar checkboxes, result count, and applied-filter chips had no shared state and `CourseGrid` always rendered the unfiltered query. They now operate on the retrieved Supabase rows, reset pagination, report the actual result count, and show a distinct no-match state. Category matching accepts the legacy labels visible in production (for example `البشرة`) without changing stored data.
 
 ### Dashboard / My Courses — mixed: UI causes proven; deployed RLS/data require runtime verification
 
@@ -39,7 +41,7 @@ All student queries correctly bind `enrollments.user_id` to the authenticated `a
 
 ### Admin pending approval — proven in code and screenshot
 
-The approval button used nonexistent theme colors (`success-600`/`success-700`), producing white text on a transparent background. More importantly, no tracked enrollment UPDATE policy authorized the operation, and the UI treated a zero-row RLS update as success because it checked only `error`. The button now uses existing accent colors, the mutation requires and verifies a returned `pending -> active` row, and an additive policy permits only that transition for an authenticated `app_metadata.role = admin` user.
+The approval button used nonexistent theme colors (`success-600`/`success-700`), producing white text on a transparent background. More importantly, no tracked enrollment UPDATE policy authorized the operation, and the UI treated a zero-row RLS update as success because it checked only `error`. The buttons now use existing theme colors, the mutation requires and verifies a returned row, and an additive policy permits an authenticated `app_metadata.role = admin` user to decide a pending request as `active` (approve) or the schema-supported `cancelled` (deny). A denied student sees the existing request as rejected and receives no course access.
 
 ## Affected data flow and files
 

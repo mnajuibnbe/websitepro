@@ -17,12 +17,14 @@ export function FeaturedCourses() {
       try {
         setIsLoading(true);
         setError(null);
-        // Home shows the latest published courses. Public/private visibility is
-        // enforced by course RLS, including for signed-in visitors.
+        // Explicit Admin order wins; courses without an order remain newest-first.
+        // The same returned array is rendered on mobile and desktop.
         const { data, error } = await supabase
           .from('courses')
           .select('*')
           .eq('status', PUBLIC_COURSE_STATUS)
+          .order('home_order', { ascending: true, nullsFirst: false })
+          .order('published_at', { ascending: false, nullsFirst: false })
           .order('created_at', { ascending: false })
           .limit(3);
 
