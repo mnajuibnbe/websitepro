@@ -86,29 +86,29 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
 
   const getItemTypeLabel = (type: string) => {
     switch (type) {
-      case 'video': return 'فيديو';
-      case 'article': return 'مقال';
+      case 'video': return 'Curriculum Item';
+      case 'article': return 'Curriculum Item';
       case 'pdf': return 'PDF';
-      case 'audio': return 'صوتي';
-      case 'external_link': return 'رابط خارجي';
-      case 'embed': return 'تضمين';
-      case 'live': return 'بث مباشر';
-      case 'quiz': return 'اختبار';
-      case 'assignment': return 'واجب';
-      default: return 'درس';
+      case 'audio': return 'Curriculum Item';
+      case 'external_link': return 'Link';
+      case 'embed': return 'Curriculum Item';
+      case 'live': return 'Curriculum Item';
+      case 'quiz': return 'Quiz';
+      case 'assignment': return 'Curriculum Item';
+      default: return 'Lesson';
     }
   };
 
   if (isOverlay) {
     return (
-      <div className="p-3.5 bg-white border-2 border-amber-500 rounded-xl shadow-xl flex items-center justify-between gap-3 text-right cursor-grabbing scale-102">
+      <div className="p-3.5 bg-white border-2 border-amber-500 rounded-xl shadow-xl flex items-center justify-between gap-3 text-left cursor-grabbing scale-102">
         <div className="flex items-center gap-3">
           <GripVertical className="w-4 h-4 text-amber-600" />
           {getItemTypeIcon(item.itemType)}
           <span className="font-bold text-primary-900 text-sm">{item.title}</span>
         </div>
         <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md">
-          جاري السحب...
+          Loading...
         </span>
       </div>
     );
@@ -118,13 +118,13 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 sm:gap-3 text-right ${
+      className={`group p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 sm:gap-3 text-left ${
         isSelected
           ? 'bg-amber-50/80 border-amber-400 ring-1 ring-amber-400/30'
           : 'bg-white hover:bg-primary-50/80 border-primary-200/80 hover:border-primary-300'
       }`}
     >
-      {/* Right side: Checkbox + Drag handle + Icon + Details */}
+      {/* Right side: Checkbox + Drag handle + Icon + Curriculum Item */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         {/* Checkbox */}
         {onToggleSelect && (
@@ -132,7 +132,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => onToggleSelect(item.id)}
             className="text-primary-400 hover:text-amber-600 transition-colors flex-shrink-0 p-0.5"
-            title="تحديد العنصر"
+            title="Curriculum Item"
           >
             {isSelected ? (
               <CheckSquare className="w-4 h-4 text-amber-600" />
@@ -147,7 +147,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           {...attributes}
           {...listeners}
           className="p-1 text-primary-300 group-hover:text-primary-600 cursor-grab active:cursor-grabbing rounded-lg hover:bg-primary-100 transition-colors flex-shrink-0"
-          title="سحب لإعادة الترتيب"
+          title="Sort"
         >
           <GripVertical className="w-4 h-4" />
         </div>
@@ -177,7 +177,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
 
             {item.isPreview && (
               <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
-                معاينة مجانية
+                Free
               </span>
             )}
 
@@ -188,7 +188,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                   : 'bg-amber-100 text-amber-800'
               }`}
             >
-              {item.isPublished ? 'منشور' : 'مسودة'}
+              {item.isPublished ? 'Published' : 'Draft'}
             </span>
           </div>
         </div>
@@ -199,7 +199,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
         <Link
           to={`/admin/courses/${courseId}/lessons/${item.id}/edit`}
           className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-          title="تعديل الدرس بالكامل"
+          title="Edit"
         >
           <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </Link>
@@ -209,7 +209,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => onDuplicate(item.id)}
             className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-            title="تكرار العنصر"
+            title="Curriculum Item"
           >
             <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
@@ -220,7 +220,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => onDelete(item.id)}
             className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-            title="حذف العنصر"
+            title="Delete"
           >
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
@@ -232,7 +232,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => setShowMenu((prev) => !prev)}
             className="p-1.5 text-primary-400 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
-            title="خيارات إضافية"
+            title="Curriculum Item"
           >
             <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
@@ -249,10 +249,10 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                     onTogglePublish(item.id, item.isPublished);
                     setShowMenu(false);
                   }}
-                  className="w-full text-right px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
                 >
                   <Eye className="w-3.5 h-3.5 text-primary-500" />
-                  <span>{item.isPublished ? 'تحويل لمسودة' : 'نشر العنصر'}</span>
+                  <span>{item.isPublished ? 'Draft' : 'Publish'}</span>
                 </button>
               )}
 
@@ -264,10 +264,10 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                       onMoveToPosition(item.id, 'top');
                       setShowMenu(false);
                     }}
-                    className="w-full text-right px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
                   >
                     <ArrowUp className="w-3.5 h-3.5 text-primary-500" />
-                    <span>نقل إلى الأعلى</span>
+                    <span>Curriculum Item</span>
                   </button>
 
                   <button
@@ -276,10 +276,10 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                       onMoveToPosition(item.id, 'bottom');
                       setShowMenu(false);
                     }}
-                    className="w-full text-right px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
                   >
                     <ArrowDown className="w-3.5 h-3.5 text-primary-500" />
-                    <span>نقل إلى الأسفل</span>
+                    <span>Curriculum Item</span>
                   </button>
                 </>
               )}

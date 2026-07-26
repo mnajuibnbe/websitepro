@@ -3,30 +3,10 @@ import { Microscope, Layers, Clock, Award } from 'lucide-react';
 
 export function WhyChooseUs() {
   const features = [
-    {
-      id: 1,
-      title: 'أساس علمي',
-      description: 'تعلم قائم على فهم المكونات والمبادئ العلمية، وليس حفظ أسماء المنتجات.',
-      icon: Microscope,
-    },
-    {
-      id: 2,
-      title: 'تطبيق عملي',
-      description: 'أمثلة ودراسات حالة تساعدك على تقييم المنتجات واتخاذ قرارات عملية.',
-      icon: Layers,
-    },
-    {
-      id: 3,
-      title: 'تعلم مرن',
-      description: 'شاهدي الدروس وراجعي المحتوى في الوقت المناسب لكِ ومن أي جهاز.',
-      icon: Clock,
-    },
-    {
-      id: 4,
-      title: 'إنجاز منظم',
-      description: 'تقدم واضح، اختبارات، وشهادة إتمام عند استيفاء متطلبات البرنامج.',
-      icon: Award,
-    },
+    { id: 1, title: 'Scientific Foundation', description: 'Understand ingredients and scientific principles instead of memorizing product names.', icon: Microscope },
+    { id: 2, title: 'Practical Application', description: 'Use examples and case studies to evaluate products and make informed decisions.', icon: Layers },
+    { id: 3, title: 'Flexible Learning', description: 'Study at your own pace, revisit lessons, and learn from any device.', icon: Clock },
+    { id: 4, title: 'Structured Achievement', description: 'Track your progress, complete assessments, and earn a verified certificate.', icon: Award },
   ];
 
   return (
@@ -34,15 +14,15 @@ export function WhyChooseUs() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900">
-            لماذا تختار Tutiba؟
+            Why Learn with Tutiba?
           </h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <div 
+              <div
                 key={feature.id}
                 className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-primary-100 flex flex-col h-full hover:shadow-md transition-shadow duration-200"
               >

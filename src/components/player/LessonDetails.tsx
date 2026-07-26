@@ -9,7 +9,7 @@ interface LessonDetailsProps {
 
 export function LessonDetails({ lesson, section }: LessonDetailsProps) {
   return (
-    <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-right mt-6" dir="rtl">
+    <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-left mt-6" dir="ltr">
       {/* Meta tags */}
       <div className="flex flex-wrap items-center gap-2 mb-3 text-xs font-semibold">
         {section && (
@@ -21,12 +21,12 @@ export function LessonDetails({ lesson, section }: LessonDetailsProps) {
           {lesson.type === 'video' ? (
             <>
               <MonitorPlay className="w-3.5 h-3.5" />
-              <span>درس فيديو</span>
+              <span>Lesson</span>
             </>
           ) : (
             <>
               <FileText className="w-3.5 h-3.5" />
-              <span>درس نصي</span>
+              <span>Lesson</span>
             </>
           )}
         </span>

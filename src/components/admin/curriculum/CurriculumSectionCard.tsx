@@ -88,12 +88,12 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
 
   if (isOverlay) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-amber-500 p-5 shadow-2xl flex items-center justify-between text-right cursor-grabbing">
+      <div className="bg-white rounded-2xl border-2 border-amber-500 p-5 shadow-2xl flex items-center justify-between text-left cursor-grabbing">
         <div className="flex items-center gap-3">
           <GripVertical className="w-5 h-5 text-amber-600" />
           <h4 className="font-bold text-primary-900 text-base">{section.title}</h4>
           <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg">
-            {section.items.length} عنصر
+            {section.items.length} items
           </span>
         </div>
       </div>
@@ -104,7 +104,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
     <div
       ref={setSectionRef}
       style={sectionStyle}
-      className="bg-white rounded-2xl border border-primary-200/90 shadow-2xs overflow-hidden transition-all text-right hover:border-primary-300"
+      className="bg-white rounded-2xl border border-primary-200/90 shadow-2xs overflow-hidden transition-all text-left hover:border-primary-300"
     >
       {/* Section Header */}
       <div className="p-4 sm:p-5 bg-primary-50/50 border-b border-primary-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -115,7 +115,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             {...attributes}
             {...listeners}
             className="p-1.5 text-primary-400 hover:text-amber-600 cursor-grab active:cursor-grabbing rounded-xl hover:bg-primary-100/80 transition-colors flex-shrink-0 mt-0.5 sm:mt-0"
-            title="سحب إعادة ترتيب القسم"
+            title="Section"
           >
             <GripVertical className="w-5 h-5" />
           </div>
@@ -128,14 +128,14 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 className="w-full text-sm font-bold p-2 bg-white border border-primary-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
-                placeholder="عنوان القسم..."
+                placeholder="Section..."
               />
               <input
                 type="text"
                 value={editDesc}
                 onChange={(e) => setEditDesc(e.target.value)}
                 className="w-full text-xs p-2 bg-white border border-primary-200 rounded-xl outline-none"
-                placeholder="وصف مختصر للقسم (اختياري)..."
+                placeholder="Section (Section)..."
               />
               <div className="flex items-center gap-2 pt-1">
                 <button
@@ -144,7 +144,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                   className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg flex items-center gap-1"
                 >
                   <Check className="w-3.5 h-3.5" />
-                  حفظ
+                  Save
                 </button>
                 <button
                   type="button"
@@ -152,7 +152,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                   className="px-3 py-1 bg-primary-200 hover:bg-primary-300 text-primary-800 font-bold text-xs rounded-lg flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
-                  إلغاء
+                  Cancel
                 </button>
               </div>
             </div>
@@ -163,7 +163,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                   {section.title}
                 </h4>
                 <span className="text-xs font-bold text-primary-500 bg-white border border-primary-200 px-2.5 py-0.5 rounded-md">
-                  {section.items.length} عنصر
+                  {section.items.length} items
                 </span>
               </div>
               {section.description && (
@@ -180,11 +180,11 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
           <div className="flex items-center gap-2 text-xs text-primary-600 font-medium">
             <span className="flex items-center gap-1 bg-white border border-primary-200 px-2 py-1 rounded-lg">
               <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-              {section.items.length} دروس
+              {section.items.length} Lessons
             </span>
             <span className="flex items-center gap-1 bg-white border border-primary-200 px-2 py-1 rounded-lg">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              {publishedCount} منشور
+              {publishedCount} Published
             </span>
           </div>
 
@@ -195,14 +195,14 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1 shadow-2xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>إضافة عنصر</span>
+              <span>Add</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsEditing(true)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title="تعديل اسم القسم"
+              title="Edit"
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -211,7 +211,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => onDuplicateSection(section.id)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title="تكرار القسم"
+              title="Section"
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -220,7 +220,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => onDeleteSection(section.id)}
               className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-xl transition-colors"
-              title="حذف القسم"
+              title="Delete"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -229,7 +229,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => setIsCollapsed((prev) => !prev)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title={isCollapsed ? 'توسيع القسم' : 'طي القسم'}
+              title={isCollapsed ? 'Section' : 'Section'}
             >
               {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
             </button>
@@ -248,14 +248,14 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             >
               <Layers className="w-6 h-6 text-primary-400" />
               <p className="text-xs font-bold text-primary-600">
-                هذا القسم فارغ حاليًا. اسحب إليه عنصرًا أو انقر على &quot;إضافة عنصر&quot;.
+                Section. Section &quot;Add&quot;.
               </p>
               <button
                 type="button"
                 onClick={() => onAddItem(section.id, section.title)}
                 className="mt-1 text-xs text-amber-700 hover:text-amber-800 font-bold underline"
               >
-                إضافة درس الآن
+                Add
               </button>
             </div>
           ) : (

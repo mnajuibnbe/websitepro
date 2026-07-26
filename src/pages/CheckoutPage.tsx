@@ -11,25 +11,25 @@ export function CheckoutPage() {
   return (
     <div className="min-h-screen bg-primary-50 flex flex-col">
       <MarketingNavbar />
-      
+
       <main className="flex-grow pt-24 md:pt-32 pb-24">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
-          
+
           <div className="mb-8 lg:mb-12">
             <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-4">
-              <Link to="/courses" className="hover:text-accent-600 transition-colors">الكورسات</Link>
+              <Link to="/courses" className="hover:text-accent-600 transition-colors">Courses</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-              <Link to="/course" className="hover:text-accent-600 transition-colors">دبلومة العناية بالبشرة</Link>
+              <Link to="/course" className="hover:text-accent-600 transition-colors">Course Details</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-              <span className="text-primary-900 font-bold">إتمام الدفع</span>
+              <span className="text-primary-900 font-bold">Payment</span>
             </nav>
             <h1 className="text-3xl md:text-4xl font-bold text-primary-900">
-              إتمام الدفع
+              Payment
             </h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            
+
             {/* Main Form (8 columns) */}
             <div className="lg:col-span-8 order-2 lg:order-1">
               <AccountDetails />
@@ -40,9 +40,9 @@ export function CheckoutPage() {
             <div className="lg:col-span-4 order-1 lg:order-2">
               <OrderSummary />
             </div>
-            
+
           </div>
-          
+
         </div>
       </main>
 

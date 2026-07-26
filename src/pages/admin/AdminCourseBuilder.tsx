@@ -101,7 +101,7 @@ export function AdminCourseBuilder() {
   };
 
   // Fetch Course, Sections, Lessons
-  const fetchCourseDetails = useCallback(async () => {
+  const fetchCourseCurriculum = useCallback(async () => {
     if (!courseId) return;
 
     try {
@@ -150,7 +150,7 @@ export function AdminCourseBuilder() {
       setLessons(lessonsData || []);
     } catch (err: any) {
       console.error('Error loading course builder details:', err);
-      setErrorMessage(err.message || 'حدث خطأ أثناء تحميل بيانات Course Builder.');
+      setErrorMessage(err.message || 'Error Course Builder.');
     } finally {
       setIsLoading(false);
     }
@@ -158,8 +158,8 @@ export function AdminCourseBuilder() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchCourseDetails();
-  }, [fetchCourseDetails]);
+    fetchCourseCurriculum();
+  }, [fetchCourseCurriculum]);
 
   // Section CRUD
   const handleAddSection = async (e: React.FormEvent) => {
@@ -186,10 +186,10 @@ export function AdminCourseBuilder() {
       setSections((prev) => [...prev, data]);
       setNewSectionTitle('');
       setIsAddSectionOpen(false);
-      addToast('success', 'تم إضافة القسم بنجاح');
+      addToast('success', 'Add');
     } catch (err: any) {
       console.error('Error adding section:', err);
-      addToast('error', err.message || 'تعذر إضافة القسم.');
+      addToast('error', err.message || 'Add.');
     } finally {
       setIsSaving(false);
     }
@@ -210,15 +210,15 @@ export function AdminCourseBuilder() {
         prev.map((s) => (s.id === sectionId ? { ...s, title: editingSectionTitle.trim() } : s))
       );
       setEditingSectionId(null);
-      addToast('success', 'تم تحديث عنوان القسم');
+      addToast('success', 'Update');
     } catch (err: any) {
       console.error('Error updating section:', err);
-      addToast('error', 'تعذر تحديث القسم.');
+      addToast('error', 'Update.');
     }
   };
 
   const handleDeleteSection = async (sectionId: string) => {
-    if (!window.confirm('هل أنت تأكد من رغبتك في حذف هذا القسم وجميع الدروس التابعة له؟')) return;
+    if (!window.confirm('Delete')) return;
 
     try {
       // Delete lessons in section first
@@ -230,10 +230,10 @@ export function AdminCourseBuilder() {
 
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
       setLessons((prev) => prev.filter((l) => l.section_id !== sectionId));
-      addToast('success', 'تم حذف القسم بنجاح');
+      addToast('success', 'Delete');
     } catch (err: any) {
       console.error('Error deleting section:', err);
-      addToast('error', 'تعذر حذف القسم.');
+      addToast('error', 'Delete.');
     }
   };
 
@@ -292,10 +292,10 @@ export function AdminCourseBuilder() {
       setNewLessonDuration('');
       setNewLessonPreview(false);
       setIsAddLessonOpen(null);
-      addToast('success', 'تم إضافة الدرس بنجاح');
+      addToast('success', 'Add');
     } catch (err: any) {
       console.error('Error adding lesson:', err);
-      addToast('error', err.message || 'تعذر إضافة الدرس.');
+      addToast('error', err.message || 'Add.');
     } finally {
       setIsSaving(false);
     }
@@ -311,25 +311,25 @@ export function AdminCourseBuilder() {
       } else {
         setLessons((prev) => [...prev, duplicated]);
       }
-      addToast('success', 'تم تكرار الدرس بنجاح');
+      addToast('success', 'Lesson');
     } catch (err: any) {
       console.error('Error duplicating lesson:', err);
-      addToast('error', 'تعذر تكرار الدرس.');
+      addToast('error', 'Lesson.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteLesson = async (lessonId: string, sectionId?: string | null) => {
-    if (!window.confirm('هل أنت تأكد من رغبتك في حذف هذا الدرس؟')) return;
+    if (!window.confirm('Delete')) return;
 
     try {
       await LessonService.deleteLesson(lessonId, sectionId || undefined);
       setLessons((prev) => prev.filter((l) => l.id !== lessonId));
-      addToast('success', 'تم حذف الدرس بنجاح');
+      addToast('success', 'Delete');
     } catch (err: any) {
       console.error('Error deleting lesson:', err);
-      addToast('error', 'تعذر حذف الدرس.');
+      addToast('error', 'Delete.');
     }
   };
 
@@ -359,10 +359,10 @@ export function AdminCourseBuilder() {
 
     try {
       await LessonService.reorderLessons(sectionId, orderedIds);
-      addToast('success', 'تم تحديث ترتيب الدرس');
+      addToast('success', 'Update');
     } catch (err: any) {
       console.error('Error reordering lessons:', err);
-      addToast('error', 'تعذر إعادة ترتيب الدرس.');
+      addToast('error', 'Lesson.');
       // Refresh from server
       if (courseId) {
         const fresh = await LessonService.getLessonsByCourse(courseId);
@@ -386,7 +386,7 @@ export function AdminCourseBuilder() {
           updates.published_at = new Date().toISOString();
         }
         if (course.visibility === 'private') {
-          addToast('info', 'الكورس منشور ولكنه محدد كـ "خاص" (Private)، ولن يظهر في التصفح العام.');
+          addToast('info', 'Course "Curriculum" (Private)Curriculum.');
         }
       }
 
@@ -398,10 +398,10 @@ export function AdminCourseBuilder() {
       if (error) throw error;
 
       setCourse((prev) => (prev ? { ...prev, ...updates } : null));
-      addToast('success', newStatus === 'published' ? 'تم نشر الكورس بنجاح!' : 'تم تحويل الكورس إلى مسودة');
+      addToast('success', newStatus === 'published' ? 'Course!' : 'Course');
     } catch (err: any) {
       console.error('Error toggling status:', err);
-      addToast('error', 'تعذر تغيير حالة النشر.');
+      addToast('error', 'Publish.');
     }
   };
 
@@ -434,17 +434,17 @@ export function AdminCourseBuilder() {
       if (error) throw error;
 
       setCourse((prev) => (prev ? { ...prev, ...updates } : null));
-      addToast('success', 'تم حفظ الإعدادات بنجاح');
+      addToast('success', 'Settings');
     } catch (err: any) {
       console.error('Error saving settings:', err);
-      addToast('error', 'تعذر حفظ الإعدادات.');
+      addToast('error', 'Settings.');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main className="lg:pr-72 pt-6 pb-24 transition-all duration-300">
@@ -458,7 +458,7 @@ export function AdminCourseBuilder() {
                   type="button"
                   onClick={() => navigate('/admin/courses')}
                   className="p-2 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
-                  title="العودة لجميع الكورسات"
+                  title="Courses"
                 >
                   <ArrowRight className="w-5 h-5" />
                 </button>
@@ -479,13 +479,13 @@ export function AdminCourseBuilder() {
                             : 'bg-amber-100 text-amber-800 border-amber-200'
                         }`}
                       >
-                        {course.status === 'published' ? 'منشور' : course.status === 'archived' ? 'مؤرشف' : 'مسودة'}
+                        {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Archived' : 'Draft'}
                       </span>
                     )}
                   </div>
 
                   <h1 className="text-xl sm:text-2xl font-bold text-primary-900 leading-tight">
-                    {course?.title || 'جاري تحميل الكورس...'}
+                    {course?.title || 'Course...'}
                   </h1>
                 </div>
               </div>
@@ -499,7 +499,7 @@ export function AdminCourseBuilder() {
                     className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
                   >
                     <Eye className="w-4 h-4 text-primary-600" />
-                    <span>معاينة الكورس</span>
+                    <span>Course</span>
                   </Link>
                 )}
 
@@ -509,7 +509,7 @@ export function AdminCourseBuilder() {
                   className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
                 >
                   <Settings className="w-4 h-4 text-primary-600" />
-                  <span>بيانات الكورس</span>
+                  <span>Course</span>
                 </button>
 
                 <Button
@@ -522,7 +522,7 @@ export function AdminCourseBuilder() {
                   }`}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>{course?.status === 'published' ? 'تحويل لمسودة' : 'نشر الكورس'}</span>
+                  <span>{course?.status === 'published' ? 'Draft' : 'Course'}</span>
                 </Button>
               </div>
             </div>
@@ -530,11 +530,11 @@ export function AdminCourseBuilder() {
             {/* Navigation Tabs Bar */}
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
-                { id: 'curriculum', label: 'المنهج والدروس (Curriculum)', icon: BookOpen },
-                { id: 'settings', label: 'الإعدادات العامة', icon: Settings },
-                { id: 'pricing', label: 'التسعير والشروط', icon: DollarSign },
-                { id: 'seo', label: 'محركات البحث (SEO)', icon: Globe },
-                { id: 'publish', label: 'مركز النشر (Publish)', icon: CheckCircle },
+                { id: 'curriculum', label: 'Curriculum (Curriculum)', icon: BookOpen },
+                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'pricing', label: 'Curriculum', icon: DollarSign },
+                { id: 'seo', label: 'Search (SEO)', icon: Globe },
+                { id: 'publish', label: 'Publish (Publish)', icon: CheckCircle },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -560,20 +560,20 @@ export function AdminCourseBuilder() {
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
               <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-              <p className="text-primary-700 font-bold text-sm">جاري تحميل Course Builder...</p>
+              <p className="text-primary-700 font-bold text-sm">Processing... Course Builder...</p>
             </div>
           ) : errorMessage ? (
-            <div className="bg-white border border-danger-200 rounded-2xl p-6 text-right shadow-xs">
+            <div className="bg-white border border-danger-200 rounded-2xl p-6 text-left shadow-xs">
               <div className="flex items-center gap-3 text-danger-600 mb-2">
                 <AlertCircle className="w-5 h-5" />
-                <h3 className="font-bold text-base">خطأ في التحميل</h3>
+                <h3 className="font-bold text-base">Error</h3>
               </div>
               <p className="text-primary-700 text-sm mb-4">{errorMessage}</p>
               <button
-                onClick={fetchCourseDetails}
+                onClick={fetchCourseCurriculum}
                 className="bg-primary-900 text-white font-bold text-xs py-2 px-4 rounded-xl hover:bg-primary-800"
               >
-                إعادة المحاولة
+                Retry
               </button>
             </div>
           ) : (
@@ -587,9 +587,9 @@ export function AdminCourseBuilder() {
                   {/* Header Bar */}
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-bold text-primary-900">هيكل المنهج والأقسام</h2>
+                      <h2 className="text-xl font-bold text-primary-900">Curriculum</h2>
                       <p className="text-primary-600 text-xs mt-0.5">
-                        قم بإضافة الأقسام والدروس وترتيبها لتقديم تجربة تعليمية متميزة.
+                        Add.
                       </p>
                     </div>
 
@@ -598,7 +598,7 @@ export function AdminCourseBuilder() {
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>إضافة قسم جديد</span>
+                      <span>Add</span>
                     </Button>
                   </div>
 
@@ -611,7 +611,7 @@ export function AdminCourseBuilder() {
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-amber-900 text-base flex items-center gap-2">
                           <Layers className="w-5 h-5 text-amber-600" />
-                          <span>إضافة قسم منهج جديد</span>
+                          <span>Add</span>
                         </h4>
                         <button
                           type="button"
@@ -623,12 +623,12 @@ export function AdminCourseBuilder() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-1.5">عنوان القسم</label>
+                        <label className="block text-xs font-bold text-primary-900 mb-1.5">Section</label>
                         <input
                           type="text"
                           value={newSectionTitle}
                           onChange={(e) => setNewSectionTitle(e.target.value)}
-                          placeholder="مثال: الفصل الأول - المقدمة والأدوات الأساسية"
+                          placeholder="Curriculum: Curriculum - Curriculum"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                           autoFocus
                         />
@@ -640,7 +640,7 @@ export function AdminCourseBuilder() {
                           onClick={() => setIsAddSectionOpen(false)}
                           className="px-4 py-2 bg-white text-primary-700 border border-primary-200 rounded-xl text-xs font-bold hover:bg-primary-50"
                         >
-                          إلغاء
+                          Cancel
                         </button>
                         <button
                           type="submit"
@@ -648,7 +648,7 @@ export function AdminCourseBuilder() {
                           className="px-5 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 flex items-center gap-1.5"
                         >
                           {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                          <span>حفظ القسم</span>
+                          <span>Save</span>
                         </button>
                       </div>
                     </form>
@@ -658,16 +658,16 @@ export function AdminCourseBuilder() {
                   {sections.length === 0 ? (
                     <div className="bg-white border border-dashed border-primary-300 rounded-2xl p-12 text-center">
                       <Layers className="w-12 h-12 text-primary-300 mx-auto mb-3" />
-                      <h3 className="text-base font-bold text-primary-900 mb-1">لا توجد أقسام في المنهج بعد</h3>
+                      <h3 className="text-base font-bold text-primary-900 mb-1">No items are available yet.</h3>
                       <p className="text-primary-500 text-xs mb-4">
-                        ابدأ بإضافة أول قسم لتنظيم الدروس بداخله.
+                        Add.
                       </p>
                       <Button
                         onClick={() => setIsAddSectionOpen(true)}
                         className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-xl text-xs"
                       >
                         <Plus className="w-4 h-4 ml-1 inline" />
-                        <span>إضافة أول قسم</span>
+                        <span>Add</span>
                       </Button>
                     </div>
                   ) : (
@@ -694,13 +694,13 @@ export function AdminCourseBuilder() {
                                     onClick={() => handleUpdateSectionTitle(section.id)}
                                     className="p-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold"
                                   >
-                                    حفظ
+                                    Save
                                   </button>
                                   <button
                                     onClick={() => setEditingSectionId(null)}
                                     className="p-1.5 bg-primary-200 text-primary-800 rounded-lg text-xs font-bold"
                                   >
-                                    إلغاء
+                                    Cancel
                                   </button>
                                 </div>
                               ) : (
@@ -712,7 +712,7 @@ export function AdminCourseBuilder() {
                                     {section.title}
                                   </h3>
                                   <span className="text-xs text-primary-500 font-medium bg-primary-100 px-2 py-0.5 rounded-md">
-                                    {sectionLessons.length} دروس
+                                    {sectionLessons.length} Lessons
                                   </span>
                                 </div>
                               )}
@@ -724,14 +724,14 @@ export function AdminCourseBuilder() {
                                     setEditingSectionTitle(section.title);
                                   }}
                                   className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                  title="تعديل اسم القسم"
+                                  title="Edit"
                                 >
                                   <Edit2 className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSection(section.id)}
                                   className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-                                  title="حذف القسم"
+                                  title="Delete"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -742,7 +742,7 @@ export function AdminCourseBuilder() {
                             <div className="p-4 sm:p-5 space-y-3">
                               {sectionLessons.length === 0 ? (
                                 <p className="text-center py-6 text-xs text-primary-400 font-medium">
-                                  لا توجد دروس في هذا القسم بعد.
+                                  No items are available yet..
                                 </p>
                               ) : (
                                 sectionLessons.map((lesson, lIndex) => (
@@ -766,19 +766,19 @@ export function AdminCourseBuilder() {
 
                                         <div className="flex items-center gap-2.5 text-[11px] text-primary-500 mt-0.5 flex-wrap">
                                           <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
-                                            {lesson.lesson_type || lesson.type || 'فيديو'}
+                                            {lesson.lesson_type || lesson.type || 'Lesson'}
                                           </span>
 
                                           {(lesson.duration || lesson.estimated_minutes) && (
                                             <span className="flex items-center gap-1">
                                               <Clock className="w-3 h-3 text-primary-400" />
-                                              {lesson.duration || `${lesson.estimated_minutes} دقيقة`}
+                                              {lesson.duration || `${lesson.estimated_minutes} Minute`}
                                             </span>
                                           )}
 
                                           {lesson.is_preview && (
                                             <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
-                                              معاينة مجانية
+                                              Free
                                             </span>
                                           )}
 
@@ -789,7 +789,7 @@ export function AdminCourseBuilder() {
                                                 : 'bg-amber-100 text-amber-800'
                                             }`}
                                           >
-                                            {lesson.is_published ? 'منشور' : 'مسودة'}
+                                            {lesson.is_published ? 'Published' : 'Draft'}
                                           </span>
                                         </div>
                                       </div>
@@ -802,7 +802,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'up')}
                                         disabled={lIndex === 0}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="تحريك لأعلى"
+                                        title="Curriculum"
                                       >
                                         <ArrowUp className="w-3.5 h-3.5" />
                                       </button>
@@ -812,7 +812,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'down')}
                                         disabled={lIndex === sectionLessons.length - 1}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="تحريك لأسفل"
+                                        title="Curriculum"
                                       >
                                         <ArrowDown className="w-3.5 h-3.5" />
                                       </button>
@@ -820,7 +820,7 @@ export function AdminCourseBuilder() {
                                       <Link
                                         to={`/admin/courses/${courseId}/lessons/${lesson.id}/edit`}
                                         className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-                                        title="تعديل الدرس بالكامل"
+                                        title="Edit"
                                       >
                                         <Edit2 className="w-4 h-4" />
                                       </Link>
@@ -829,7 +829,7 @@ export function AdminCourseBuilder() {
                                         type="button"
                                         onClick={() => handleDuplicateLesson(lesson.id)}
                                         className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                        title="تكرار الدرس"
+                                        title="Lesson"
                                       >
                                         <Copy className="w-4 h-4" />
                                       </button>
@@ -838,7 +838,7 @@ export function AdminCourseBuilder() {
                                         type="button"
                                         onClick={() => handleDeleteLesson(lesson.id, section.id)}
                                         className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-                                        title="حذف الدرس"
+                                        title="Delete"
                                       >
                                         <Trash2 className="w-4 h-4" />
                                       </button>
@@ -854,7 +854,7 @@ export function AdminCourseBuilder() {
                                   className="mt-4 p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3"
                                 >
                                   <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-xs text-amber-900">إضافة درس جديد سريع للقسم</h5>
+                                    <h5 className="font-bold text-xs text-amber-900">Add</h5>
                                     <button
                                       type="button"
                                       onClick={() => setIsAddLessonOpen(null)}
@@ -867,38 +867,38 @@ export function AdminCourseBuilder() {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
                                       <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        عنوان الدرس *
+                                        Lesson *
                                       </label>
                                       <input
                                         type="text"
                                         value={newLessonTitle}
                                         onChange={(e) => setNewLessonTitle(e.target.value)}
-                                        placeholder="اسم الدرس"
+                                        placeholder="Lesson"
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-medium"
                                       />
                                     </div>
 
                                     <div>
                                       <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        نوع المحتوى
+                                        Content
                                       </label>
                                       <select
                                         value={newLessonType}
                                         onChange={(e) => setNewLessonType(e.target.value as any)}
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-bold"
                                       >
-                                        <option value="video">فيديو (Video)</option>
-                                        <option value="article">مقال / نص (Article)</option>
-                                        <option value="pdf">ملف PDF</option>
-                                        <option value="audio">صوتيات (Audio)</option>
-                                        <option value="quiz">اختبار (Quiz)</option>
+                                        <option value="video">Video</option>
+                                        <option value="article">Article</option>
+                                        <option value="pdf">PDF Document</option>
+                                        <option value="audio">Audio</option>
+                                        <option value="quiz">Quiz (Quiz)</option>
                                       </select>
                                     </div>
 
                                     {newLessonType === 'video' && (
                                       <div>
                                         <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                          رابط الفيديو (Video URL)
+                                          Link (Video URL)
                                         </label>
                                         <input
                                           type="text"
@@ -913,13 +913,13 @@ export function AdminCourseBuilder() {
 
                                     <div>
                                       <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        المدة التقديرية (مثال: 12 دقيقة)
+                                        Duration (Curriculum: 12 Minute)
                                       </label>
                                       <input
                                         type="text"
                                         value={newLessonDuration}
                                         onChange={(e) => setNewLessonDuration(e.target.value)}
-                                        placeholder="12 دقيقة"
+                                        placeholder="12 Minute"
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs"
                                       />
                                     </div>
@@ -934,7 +934,7 @@ export function AdminCourseBuilder() {
                                       className="rounded border-primary-300 text-amber-600 focus:ring-amber-500"
                                     />
                                     <label htmlFor={`preview-${section.id}`} className="text-xs font-bold text-primary-800">
-                                      السماح بالمعاينة المجانية لهذا الدرس قبل الشراء
+                                      Lesson
                                     </label>
                                   </div>
 
@@ -943,7 +943,7 @@ export function AdminCourseBuilder() {
                                       to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
                                       className="text-xs text-amber-800 font-bold hover:underline"
                                     >
-                                      فتح محرر الدروس المتقدم بالكامل ←
+                                      Lessons ←
                                     </Link>
 
                                     <div className="flex items-center gap-2">
@@ -952,7 +952,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => setIsAddLessonOpen(null)}
                                         className="px-3 py-1.5 bg-white text-primary-700 border border-primary-200 rounded-lg text-xs font-bold"
                                       >
-                                        إلغاء
+                                        Cancel
                                       </button>
                                       <button
                                         type="submit"
@@ -960,7 +960,7 @@ export function AdminCourseBuilder() {
                                         className="px-4 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 flex items-center gap-1"
                                       >
                                         {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                        <span>حفظ الدرس</span>
+                                        <span>Save</span>
                                       </button>
                                     </div>
                                   </div>
@@ -979,7 +979,7 @@ export function AdminCourseBuilder() {
                                     className="flex-1 py-2.5 border border-dashed border-primary-300 bg-primary-50/50 hover:bg-primary-50 text-primary-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
                                   >
                                     <Plus className="w-4 h-4 text-primary-600" />
-                                    <span>إضافة درس سريع</span>
+                                    <span>Add</span>
                                   </button>
 
                                   <Link
@@ -987,7 +987,7 @@ export function AdminCourseBuilder() {
                                     className="py-2.5 px-4 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
                                   >
                                     <Edit2 className="w-3.5 h-3.5 text-amber-600" />
-                                    <span>المحرر المتقدم</span>
+                                    <span>Advanced</span>
                                   </Link>
                                 </div>
                               )}
@@ -1005,46 +1005,46 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Settings className="w-5 h-5 text-amber-600" />
-                    <span>ملخص إعدادات الكورس</span>
+                    <span>Course</span>
                   </h2>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-                      <span className="text-xs text-primary-500 font-bold block mb-1">اسم الكورس</span>
+                      <span className="text-xs text-primary-500 font-bold block mb-1">Course</span>
                       <span className="font-bold text-primary-900">{course?.title}</span>
                     </div>
 
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-                      <span className="text-xs text-primary-500 font-bold block mb-1">التصنيف والمستوى</span>
+                      <span className="text-xs text-primary-500 font-bold block mb-1">Level</span>
                       <span className="font-bold text-primary-900">
-                        {course?.category || 'غير محدد'} | {course?.level || 'جميع المستويات'}
+                        {course?.category || 'Uncategorized'} | {course?.level || 'Curriculum'}
                       </span>
                     </div>
 
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-                      <span className="text-xs text-primary-500 font-bold block mb-1">حالة النشر والظهور</span>
+                      <span className="text-xs text-primary-500 font-bold block mb-1">Publish</span>
                       <span className="font-bold text-primary-900">
                         {course?.status} - {course?.visibility}
                       </span>
                     </div>
 
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-                      <span className="text-xs text-primary-500 font-bold block mb-1">عدد الأقسام والدروس</span>
+                      <span className="text-xs text-primary-500 font-bold block mb-1">Lessons</span>
                       <span className="font-bold text-primary-900">
-                        {sections.length} قسم | {lessons.length} درس
+                        {sections.length} sections | {lessons.length} Lesson
                       </span>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-primary-100 flex items-center justify-between">
                     <p className="text-xs text-primary-500">
-                      لتعديل النصوص الكاملة أو الصور، انتقل لصفحة التعديل الشاملة.
+                      Edit.
                     </p>
                     <button
                       onClick={() => navigate(`/admin/courses/${courseId}/edit`)}
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-colors"
                     >
-                      تعديل البيانات الأساسية بالكامل
+                      Edit
                     </button>
                   </div>
                 </div>
@@ -1055,13 +1055,13 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-amber-600" />
-                    <span>التسعير وخيارات الوصول</span>
+                    <span>Curriculum</span>
                   </h2>
 
                   <div className="space-y-6 max-w-xl">
                     <div>
                       <label className="block text-sm font-bold text-primary-900 mb-2">
-                        سعر الكورس (ر.س)
+                        Course (SAR)
                       </label>
                       <input
                         type="number"
@@ -1082,7 +1082,7 @@ export function AdminCourseBuilder() {
                           className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
-                          تفعيل إصدار شهادة إتمام للطلاب عند إنهاء المنهج
+                          Your verified certificate is ready.
                         </span>
                       </label>
 
@@ -1094,7 +1094,7 @@ export function AdminCourseBuilder() {
                           className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
-                          إلزام الطالب بالتسلسل الترتيبي للدروس (لا يفتح الدرس القادم إلا بعد إكمال الحالي)
+                          Sort (Lesson)
                         </span>
                       </label>
 
@@ -1106,7 +1106,7 @@ export function AdminCourseBuilder() {
                           className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
-                          تفعيل التقطير الجدولي للدروس (Drip Content)
+                          Lessons (Drip Content)
                         </span>
                       </label>
                     </div>
@@ -1117,7 +1117,7 @@ export function AdminCourseBuilder() {
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      <span>حفظ إعدادات التسعير</span>
+                      <span>Save</span>
                     </Button>
                   </div>
                 </div>
@@ -1128,39 +1128,39 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-amber-600" />
-                    <span>تهيئة محركات البحث (SEO)</span>
+                    <span>Search (SEO)</span>
                   </h2>
 
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">عنوان SEO (SEO Title)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Curriculum SEO (SEO Title)</label>
                       <input
                         type="text"
                         value={seoTitle}
                         onChange={(e) => setSeoTitle(e.target.value)}
-                        placeholder={course?.title || 'عنوان الكورس في محركات البحث'}
+                        placeholder={course?.title || 'Course'}
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm font-medium"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">وصف SEO (Meta Description)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Curriculum SEO (Meta Description)</label>
                       <textarea
                         rows={3}
                         value={seoDescription}
                         onChange={(e) => setSeoDescription(e.target.value)}
-                        placeholder="وصف مختصر يظهر في نتائج البحث جوجل..."
+                        placeholder="Search..."
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm leading-relaxed"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">الكلمات المفتاحية (Keywords)</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Curriculum (Keywords)</label>
                       <input
                         type="text"
                         value={seoKeywords}
                         onChange={(e) => setSeoKeywords(e.target.value)}
-                        placeholder="عناية بالبشرة، كورس تجميل، دبلومة البشرة..."
+                        placeholder="Enter details..."
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm font-medium"
                       />
                     </div>
@@ -1171,7 +1171,7 @@ export function AdminCourseBuilder() {
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      <span>حفظ بيانات SEO</span>
+                      <span>Save SEO</span>
                     </Button>
                   </div>
                 </div>
@@ -1182,19 +1182,19 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-amber-600" />
-                    <span>مركز فحص وجاهزية النشر</span>
+                    <span>Publish</span>
                   </h2>
 
                   {/* Checklist */}
                   <div className="space-y-3">
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary-900">عنوان الكورس والتصنيف</span>
+                      <span className="font-bold text-sm text-primary-900">Course</span>
                       <CheckCircle className="w-5 h-5 text-emerald-600" />
                     </div>
 
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
                       <span className="font-bold text-sm text-primary-900">
-                        وجود أقسام منهج ({sections.length} أقسام)
+                        Curriculum ({sections.length} Curriculum)
                       </span>
                       {sections.length > 0 ? (
                         <CheckCircle className="w-5 h-5 text-emerald-600" />
@@ -1205,7 +1205,7 @@ export function AdminCourseBuilder() {
 
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
                       <span className="font-bold text-sm text-primary-900">
-                        وجود دروس متخصصة ({lessons.length} دروس)
+                        Lessons ({lessons.length} Lessons)
                       </span>
                       {lessons.length > 0 ? (
                         <CheckCircle className="w-5 h-5 text-emerald-600" />
@@ -1225,7 +1225,7 @@ export function AdminCourseBuilder() {
                       }`}
                     >
                       <CheckCircle className="w-5 h-5" />
-                      <span>{course?.status === 'published' ? 'تحويل الكورس إلى مسودة' : 'نشر الكورس للجمهور الآن'}</span>
+                      <span>{course?.status === 'published' ? 'Course' : 'Course'}</span>
                     </Button>
                   </div>
                 </div>

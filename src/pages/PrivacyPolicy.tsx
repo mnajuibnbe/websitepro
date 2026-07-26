@@ -12,9 +12,9 @@ export function PrivacyPolicy() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
-      
+
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-12">
@@ -23,48 +23,48 @@ export function PrivacyPolicy() {
                 <Shield className="w-8 h-8 text-accent-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">سياسة الخصوصية</h1>
-                <p className="text-primary-600">آخر تحديث: 23 يوليو 2026</p>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">Privacy Policy</h1>
+                <p className="text-primary-600">Update: 23 Privacy Information 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. مقدمة</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Privacy Information</h2>
                 <p className="leading-relaxed">
-                  نحن في منصة توتيبا (Tutiba) نولي أهمية قصوى لخصوصية بياناتك. تشرح سياسة الخصوصية هذه كيف نقوم بجمع، واستخدام، وحماية معلوماتك الشخصية عند استخدامك لمنصتنا التعليمية المتخصصة في الكوسميسوتيكال.
+                  Privacy Information (Tutiba) Privacy Information. Privacy Policy.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. المعلومات التي نجمعها</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Privacy Information</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li><strong>معلومات الحساب:</strong> الاسم، البريد الإلكتروني، وكلمة المرور المشفرة.</li>
-                  <li><strong>بيانات الدفع:</strong> لا نقوم بتخزين بيانات بطاقات الائتمان مباشرة، بل نتعامل مع مزودي خدمات دفع موثوقين ومسجلين.</li>
-                  <li><strong>بيانات التعلم:</strong> تقدمك في الكورسات، نتائج الاختبارات، والشهادات الصادرة.</li>
+                  <li><strong>Account:</strong> Email Address.</li>
+                  <li><strong>Payment:</strong> Privacy Information.</li>
+                  <li><strong>Privacy Information:</strong> Review the quiz information and continue when you are ready.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. كيف نستخدم معلوماتك</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Privacy Information</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>تقديم المحتوى التعليمي وإصدار الشهادات المعتمدة.</li>
-                  <li>تحسين تجربة المستخدم وتطوير محتوى المنصة.</li>
-                  <li>التواصل معك بخصوص التحديثات الهامة أو الدعم الفني.</li>
+                  <li>Certificates.</li>
+                  <li>User.</li>
+                  <li>Update.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. أمن البيانات</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Privacy Information</h2>
                 <p className="leading-relaxed">
-                  نستخدم بروتوكولات التشفير القياسية (SSL/TLS) لحماية نقل البيانات. يتم تخزين بياناتك في خوادم سحابية مؤمنة بأحدث تقنيات الحماية القياسية المعتمدة.
+                  Privacy Information (SSL/TLS) Privacy Information. Privacy Information.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. حقوقك</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Privacy Information</h2>
                 <p className="leading-relaxed">
-                  يحق لك الوصول إلى بياناتك الشخصية، أو طلب تعديلها، أو حذفها في أي وقت عبر إعدادات حسابك أو بالتواصل مع فريق الدعم الفني الخاص بنا.
+                  Delete.
                 </p>
               </section>
             </div>
@@ -78,7 +78,7 @@ export function PrivacyPolicy() {
                 className="inline-flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors font-bold"
               >
                 <ArrowRight className="w-5 h-5" />
-                العودة للصفحة الرئيسية
+                Home
               </Link>
             </div>
           </div>

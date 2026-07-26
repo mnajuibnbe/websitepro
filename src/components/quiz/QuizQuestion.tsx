@@ -52,11 +52,11 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-sm font-bold text-primary-500 mb-2">
-          <span>السؤال {currentIndex + 1} من {totalQuestions}</span>
+          <span>Question {currentIndex + 1} Details {totalQuestions}</span>
           <span>{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-accent-500 rounded-full transition-all duration-500 ease-out motion-reduce:transition-none"
             style={{ width: `${progressPercentage}%` }}
           ></div>
@@ -72,7 +72,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
           {questionData.options.map((option, index) => {
             const isSelected = selectedIndex === index;
             let optionStyles = 'border-primary-200 bg-white hover:border-accent-400 hover:bg-accent-50';
-            
+
             if (isChecked) {
               if (index === questionData.correctIndex) {
                 optionStyles = 'border-success-500 bg-success-50 ring-1 ring-success-500';
@@ -86,8 +86,8 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
             }
 
             return (
-              <label 
-                key={index} 
+              <label
+                key={index}
                 className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${optionStyles} ${isChecked ? 'pointer-events-none' : ''}`}
               >
                 <div className={`relative flex items-center justify-center w-6 h-6 rounded-full border-2 flex-shrink-0 transition-colors ${
@@ -98,10 +98,10 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
                   {isChecked && index === questionData.correctIndex && <CheckCircle2 className="w-4 h-4 text-white absolute" />}
                   {isChecked && isSelected && index !== questionData.correctIndex && <XCircle className="w-4 h-4 text-white absolute" />}
                   {!isChecked && isSelected && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                  <input 
-                    type="radio" 
-                    name="quiz-option" 
-                    className="sr-only" 
+                  <input
+                    type="radio"
+                    name="quiz-option"
+                    className="sr-only"
                     checked={isSelected}
                     onChange={() => setSelectedIndex(index)}
                     disabled={isChecked}
@@ -118,15 +118,15 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
         {/* Feedback Section */}
         {isChecked && (
           <div className="space-y-4">
-            <AIExplanation 
-              isCorrect={isCorrect} 
+            <AIExplanation
+              isCorrect={isCorrect}
               briefExplanation={questionData.explanation}
               scientificExplanation={questionData.aiExplanation?.scientific}
               practicalExample={questionData.aiExplanation?.practical}
             />
-            
+
             {questionData.memoryCoach && (
-              <MemoryCoach 
+              <MemoryCoach
                 type={questionData.memoryCoach.type}
                 content={questionData.memoryCoach.content}
               />
@@ -144,22 +144,22 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
       {/* Action Buttons */}
       <div className="fixed sm:static bottom-0 left-0 right-0 p-4 sm:p-0 bg-white sm:bg-transparent border-t border-primary-200 sm:pt-6 flex justify-end z-20 shadow-[0_-8px_16px_rgba(0,0,0,0.05)] sm:shadow-none">
         {!isChecked ? (
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             className="h-14 sm:h-12 w-full sm:w-auto px-8 font-bold text-lg sm:text-base"
             onClick={handleCheck}
             disabled={selectedIndex === null}
           >
-            تحقق من الإجابة
+            Answer
           </Button>
         ) : (
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             className="h-14 sm:h-12 w-full sm:w-auto px-8 font-bold text-lg sm:text-base"
             onClick={handleNext}
             icon={<ArrowLeft className="w-5 h-5" />} // Points left in RTL
           >
-            {currentIndex === totalQuestions - 1 ? 'إنهاء الاختبار' : 'السؤال التالي'}
+            {currentIndex === totalQuestions - 1 ? 'Quiz' : 'Next'}
           </Button>
         )}
       </div>

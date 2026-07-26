@@ -16,7 +16,7 @@ export function ToastContainer({ toasts, onDismiss }: ToastProps) {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-5 left-5 z-50 flex flex-col gap-3 max-w-sm w-full" dir="rtl">
+    <div className="fixed bottom-5 left-5 z-50 flex flex-col gap-3 max-w-sm w-full" dir="ltr">
       {toasts.map((toast) => (
         <div
           key={toast.id}

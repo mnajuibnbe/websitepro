@@ -48,7 +48,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       setCourses(data || []);
       setCurrentPage(1);
     } catch (err) {
-      setError('حدث خطأ أثناء تحميل الكورسات. يرجى المحاولة لاحقاً.');
+      setError('Courses. Please.');
       console.error('Error fetching courses:', err);
     } finally {
       setIsLoading(false);
@@ -59,7 +59,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <Loader2 className="w-12 h-12 text-accent-600 animate-spin mb-4" />
-        <p className="text-primary-600 font-medium">جاري تحميل الكورسات...</p>
+        <p className="text-primary-600 font-medium">Courses...</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
           <p className="font-bold mb-4">{error}</p>
           <Button variant="primary" onClick={fetchCourses} className="mx-auto flex items-center gap-2">
             <RefreshCw className="w-4 h-4" />
-            إعادة المحاولة
+            Retry
           </Button>
         </div>
       </div>
@@ -82,8 +82,8 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
-          <p className="font-bold mb-2">لا توجد كورسات</p>
-          <p>لم يتم العثور على أي كورسات متاحة حالياً.</p>
+          <p className="font-bold mb-2">No items found</p>
+          <p>Course Information.</p>
         </div>
       </div>
     );
@@ -91,44 +91,44 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
 
   const appliedFilters = [
     ...filters.categories.map(value => ({ label: value, clear: () => onFiltersChange({ ...filters, categories: filters.categories.filter(item => item !== value) }) })),
-    ...filters.levels.map(value => ({ label: ({ beginner: 'مبتدئ', intermediate: 'متوسط', advanced: 'متقدم' } as Record<string, string>)[value] || value, clear: () => onFiltersChange({ ...filters, levels: filters.levels.filter(item => item !== value) }) })),
-    ...(filters.price === 'all' ? [] : [{ label: filters.price === 'free' ? 'مجاني' : 'مدفوع', clear: () => onFiltersChange({ ...filters, price: 'all' }) }]),
-    ...filters.durations.map(value => ({ label: ({ short: 'أقل من 5 ساعات', medium: '5 - 20 ساعة', long: 'أكثر من 20 ساعة' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
-    ...(filters.search ? [{ label: `بحث: ${filters.search}`, clear: () => onFiltersChange({ ...filters, search: '' }) }] : []),
+    ...filters.levels.map(value => ({ label: ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' } as Record<string, string>)[value] || value, clear: () => onFiltersChange({ ...filters, levels: filters.levels.filter(item => item !== value) }) })),
+    ...(filters.price === 'all' ? [] : [{ label: filters.price === 'free' ? 'Free' : 'Paid', clear: () => onFiltersChange({ ...filters, price: 'all' }) }]),
+    ...filters.durations.map(value => ({ label: ({ short: 'Course Information 5 Course Information', medium: '5 - 20 Hour', long: 'Course Information 20 Hour' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
+    ...(filters.search ? [{ label: `Search: ${filters.search}`, clear: () => onFiltersChange({ ...filters, search: '' }) }] : []),
   ];
 
   return (
     <div className="flex-grow">
       {appliedFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          <span className="text-sm font-bold text-primary-900 ml-2">الفلاتر المُطبقة:</span>
+          <span className="text-sm font-bold text-primary-900 ml-2">Course Information:</span>
           {appliedFilters.map(item => (
             <button type="button" key={item.label} onClick={item.clear} className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
               {item.label}<X className="w-4 h-4 text-primary-400" />
             </button>
           ))}
-          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">مسح الكل</button>
+          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">Course Information</button>
         </div>
       )}
 
       {visibleCourses.length === 0 ? (
-        <div className="py-20 text-center text-primary-600 font-bold">لا توجد كورسات تطابق البحث أو الفلاتر المحددة.</div>
+        <div className="py-20 text-center text-primary-600 font-bold">No items are available yet..</div>
       ) : (
         <>
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
         {visibleCourses.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(course => (
-          <CourseCard 
+          <CourseCard
             key={course.id}
             title={course.title}
-            category="Course" 
+            category="Course"
             description={course.description || course.short_description || ''}
             duration={course.duration || 'TBD'}
             lessonsCount={0}
             price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
             imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
-            ctaText="استعرضي الكورس"
+            ctaText="Course"
             onEnroll={() => navigate(`/course/${course.id}`)}
           />
         ))}

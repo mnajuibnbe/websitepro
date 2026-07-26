@@ -19,26 +19,26 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const currentPath = location.pathname;
   const { hasPermission } = useAuthorization();
   const isAdmin = hasPermission(Permission.ADMIN_ACCESS);
-  
+
   const navItems = [
-    { icon: Home, label: 'لوحة التحكم', href: '/dashboard' },
-    { icon: BookOpen, label: 'كورساتي', href: '/my-courses' },
-    { icon: Award, label: 'الشهادات', href: '/certificate' },
-    { icon: Settings, label: 'الإعدادات', href: '/profile' },
+    { icon: Home, label: 'Dashboard', href: '/dashboard' },
+    { icon: BookOpen, label: 'My Courses', href: '/my-courses' },
+    { icon: Award, label: 'Certificates', href: '/certificate' },
+    { icon: Settings, label: 'Settings', href: '/profile' },
   ];
 
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-primary-900/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`fixed lg:sticky top-0 right-0 h-screen w-72 bg-white border-l border-primary-200 flex flex-col z-50 transition-transform duration-300 transform ${
           isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         }`}
@@ -52,7 +52,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             </div>
             <span className="font-bold text-xl tracking-tight text-primary-900 uppercase">Tutiba</span>
           </Link>
-          <button 
+          <button
             className="lg:hidden text-primary-500 hover:text-primary-900"
             onClick={() => setIsOpen(false)}
           >
@@ -66,12 +66,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             const Icon = item.icon;
             const isActive = currentPath === item.href;
             return (
-              <Link 
-                key={index} 
+              <Link
+                key={index}
                 to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-                  isActive 
-                    ? 'bg-accent-50 text-accent-700' 
+                  isActive
+                    ? 'bg-accent-50 text-accent-700'
                     : 'text-primary-600 hover:bg-primary-50 hover:text-primary-900'
                 }`}
               >
@@ -87,12 +87,12 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           {isAdmin && (
             <Link to="/admin" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
               <Settings className="w-5 h-5" />
-              <span>لوحة الإدارة</span>
+              <span>Admin Dashboard</span>
             </Link>
           )}
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
-            <span>تسجيل الخروج</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

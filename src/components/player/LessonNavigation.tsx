@@ -24,7 +24,7 @@ export function LessonNavigation({
   const isQuiz = currentLessonType === 'quiz';
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-primary-200 mt-6" dir="rtl">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-primary-200 mt-6" dir="ltr">
       {/* Right side in RTL: Previous Lesson */}
       <button
         onClick={() => prevLesson && onNavigate(prevLesson)}
@@ -36,7 +36,7 @@ export function LessonNavigation({
         }`}
       >
         <ChevronRight className="w-4 h-4" />
-        <span>الدرس السابق</span>
+        <span>Previous</span>
       </button>
 
       {/* Center: Completion Status / Action */}
@@ -45,12 +45,12 @@ export function LessonNavigation({
           {isCurrentCompleted ? (
             <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
               <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
-              <span>تم اجتياز الاختبار (مكتمل)</span>
+              <span>Quiz (Completed)</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 font-bold text-sm min-h-[48px]">
               <HelpCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-              <span>يتطلب إكمال هذا الدرس اجتياز الاختبار</span>
+              <span>Review the quiz information and continue when you are ready.</span>
             </div>
           )}
         </div>
@@ -58,7 +58,7 @@ export function LessonNavigation({
         <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
           <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
             <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
-            <span>تم إكمال هذا الدرس</span>
+            <span>Lesson</span>
           </div>
 
           {nextLesson && (
@@ -66,7 +66,7 @@ export function LessonNavigation({
               onClick={() => onNavigate(nextLesson)}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm transition-all shadow-xs min-h-[48px]"
             >
-              <span>الانتقال إلى الدرس التالي</span>
+              <span>Next</span>
               <ChevronLeft className="w-4 h-4" />
             </button>
           )}
@@ -84,10 +84,10 @@ export function LessonNavigation({
           )}
           <span>
             {isCompleting
-              ? 'جاري الحفظ...'
+              ? 'Save...'
               : nextLesson
-              ? 'إكمال الدرس والمتابعة'
-              : 'إكمال الدرس'}
+              ? 'Lesson'
+              : 'Lesson'}
           </span>
         </button>
       )}
@@ -102,7 +102,7 @@ export function LessonNavigation({
             : 'bg-primary-50 border border-primary-100 text-primary-300 cursor-not-allowed opacity-60'
         }`}
       >
-        <span>الدرس التالي</span>
+        <span>Next</span>
         <ChevronLeft className="w-4 h-4" />
       </button>
     </div>

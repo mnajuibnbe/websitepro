@@ -40,7 +40,7 @@ export function AdminCourseEdit() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
-  const [language, setLanguage] = useState('العربية');
+  const [language, setLanguage] = useState('Arabic');
   const [price, setPrice] = useState('0');
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
@@ -69,7 +69,7 @@ export function AdminCourseEdit() {
   // Load course data
   const loadCourse = useCallback(async () => {
     if (!courseId) {
-      setErrorMessage('معرّف الكورس غير صالح.');
+      setErrorMessage('Course.');
       setIsLoading(false);
       return;
     }
@@ -81,7 +81,7 @@ export function AdminCourseEdit() {
       // Load instructors
       const { data: profData } = await supabase.from('profiles').select('id, full_name');
       if (profData) {
-        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'مدرب' })));
+        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Course Information' })));
       }
 
       // Fetch course
@@ -93,7 +93,7 @@ export function AdminCourseEdit() {
 
       if (error) throw error;
       if (!course) {
-        setErrorMessage('لم يتم العثور على الكورس المطلوب.');
+        setErrorMessage('The requested information could not be loaded. Please try again.');
         setIsLoading(false);
         return;
       }
@@ -105,9 +105,9 @@ export function AdminCourseEdit() {
       setSlug(course.slug || '');
       setShortDescription(course.short_description || '');
       setDescription(course.description || '');
-      setCategory(course.category || 'العناية بالبشرة');
+      setCategory(course.category || 'Course Information');
       setLevel((course.level as any) || 'all_levels');
-      setLanguage(course.language || 'العربية');
+      setLanguage(course.language || 'Arabic');
       setPrice(course.price ? String(course.price) : '0');
       setStatus((course.status as any) || 'draft');
       setVisibility((course.visibility as any) || 'public');
@@ -116,7 +116,7 @@ export function AdminCourseEdit() {
       setInstructorId(course.instructor_id || '');
     } catch (err: any) {
       console.error('Error fetching course details:', err);
-      setErrorMessage(err.message || 'حدث خطأ أثناء تحميل بيانات الكورس.');
+      setErrorMessage(err.message || 'The requested information could not be loaded. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -141,14 +141,14 @@ export function AdminCourseEdit() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'عنوان الكورس مطلوب';
+      newErrors.title = 'Course';
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'يرجى تصحيح الأخطاء قبل الحفظ.');
+      addToast('error', 'Save.');
       return;
     }
 
@@ -166,8 +166,8 @@ export function AdminCourseEdit() {
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
-          addToast('error', 'رابط الكورس مستخدم بالفعل، يرجى كتابة رابط فريد.');
+          setErrors({ slug: 'Course (Slug) Please review the information and try again.' });
+          addToast('error', 'Please review the information and try again.');
           setIsSubmitting(false);
           return;
         }
@@ -182,7 +182,7 @@ export function AdminCourseEdit() {
         description: description.trim() || null,
         category: category.trim() || null,
         level: level,
-        language: language.trim() || 'العربية',
+        language: language.trim() || 'Arabic',
         price: parsedPrice,
         status: status,
         visibility: visibility,
@@ -197,7 +197,7 @@ export function AdminCourseEdit() {
           updates.published_at = new Date().toISOString();
         }
         if (visibility === 'private') {
-          addToast('info', 'الكورس منشور ولكنه محدد كـ "خاص" (Private)، ولن يظهر في التصفح العام.');
+          addToast('info', 'Course "Course Information" (Private)Course Information.');
         }
       } else if (status === 'archived') {
         updates.archived_at = new Date().toISOString();
@@ -214,26 +214,26 @@ export function AdminCourseEdit() {
 
       if (error) {
         if (error.message?.includes('duplicate key') || error.message?.includes('courses_slug_key')) {
-          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
-          addToast('error', 'رابط الكورس المخصص مستخدم بالفعل، يرجى تغيير الرابط.');
+          setErrors({ slug: 'Course (Slug) Please review the information and try again.' });
+          addToast('error', 'Please review the information and try again.');
           setIsSubmitting(false);
           return;
         }
         throw error;
       }
 
-      addToast('success', 'تم حفظ التعديلات بنجاح!');
+      addToast('success', 'Save!');
       loadCourse();
     } catch (err: any) {
       console.error('Error updating course:', err);
-      addToast('error', err.message || 'تعذر حفظ التعديلات.');
+      addToast('error', err.message || 'Save.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
@@ -245,14 +245,14 @@ export function AdminCourseEdit() {
                 type="button"
                 onClick={() => navigate('/admin/courses')}
                 className="p-2 bg-white rounded-xl border border-primary-200 text-primary-600 hover:text-primary-900 transition-colors"
-                title="العودة لقائمة الكورسات"
+                title="Courses"
               >
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">تعديل بيانات الكورس</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Course</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
-                  تحديث البيانات الأساسية، التصنيف، السعر وحالة النشر.
+                  Update.
                 </p>
               </div>
             </div>
@@ -264,7 +264,7 @@ export function AdminCourseEdit() {
                 className="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-colors"
               >
                 <Sparkle className="w-4 h-4 text-amber-600" />
-                <span>فتح Course Builder</span>
+                <span>Course Information Course Builder</span>
               </button>
 
               <Button
@@ -276,12 +276,12 @@ export function AdminCourseEdit() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>جاري الحفظ...</span>
+                    <span>Save...</span>
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    <span>حفظ التغييرات</span>
+                    <span>Save</span>
                   </>
                 )}
               </Button>
@@ -292,14 +292,14 @@ export function AdminCourseEdit() {
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
               <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-              <p className="text-primary-700 font-bold text-sm">جاري جلب بيانات الكورس...</p>
+              <p className="text-primary-700 font-bold text-sm">Course...</p>
             </div>
           ) : errorMessage ? (
             /* Error State */
-            <div className="bg-white border border-danger-200 rounded-2xl p-6 md:p-8 text-right shadow-xs">
+            <div className="bg-white border border-danger-200 rounded-2xl p-6 md:p-8 text-left shadow-xs">
               <div className="flex items-center gap-3 text-danger-600 mb-3">
                 <AlertCircle className="w-6 h-6 flex-shrink-0" />
-                <h3 className="font-bold text-lg">خطأ في جلب الكورس</h3>
+                <h3 className="font-bold text-lg">Course</h3>
               </div>
               <p className="text-primary-700 text-sm mb-6">{errorMessage}</p>
               <button
@@ -307,7 +307,7 @@ export function AdminCourseEdit() {
                 className="inline-flex items-center gap-2 bg-primary-900 text-white font-bold text-sm py-2.5 px-6 rounded-xl hover:bg-primary-800 transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>إعادة المحاولة</span>
+                <span>Retry</span>
               </button>
             </div>
           ) : (
@@ -317,14 +317,14 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-amber-600" />
-                  <span>المعلومات الأساسية</span>
+                  <span>Course Information</span>
                 </h2>
 
                 <div className="space-y-6">
                   {/* Title */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">
-                      عنوان الكورس <span className="text-danger-500">*</span>
+                      Course <span className="text-danger-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -346,7 +346,7 @@ export function AdminCourseEdit() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-sm font-bold text-primary-900">
-                        رابط الكورس المخصص (Slug)
+                        Course (Slug)
                       </label>
                       <button
                         type="button"
@@ -354,7 +354,7 @@ export function AdminCourseEdit() {
                         className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>توليد من العنوان</span>
+                        <span>Title</span>
                       </button>
                     </div>
                     <input
@@ -374,7 +374,7 @@ export function AdminCourseEdit() {
 
                   {/* Short Description */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">الوصف المختصر</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Description</label>
                     <input
                       type="text"
                       value={shortDescription}
@@ -385,7 +385,7 @@ export function AdminCourseEdit() {
 
                   {/* Description */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">الوصف الشامل</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Description</label>
                     <textarea
                       rows={5}
                       value={description}
@@ -400,41 +400,41 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Globe className="w-5 h-5 text-amber-600" />
-                  <span>حالة النشر والتصنيف</span>
+                  <span>Publish</span>
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Status */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">حالة الكورس</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course</label>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="draft">مسودة (Draft)</option>
-                      <option value="published">منشور (Published)</option>
-                      <option value="archived">مؤرشف (Archived)</option>
+                      <option value="draft">Draft (Draft)</option>
+                      <option value="published">Published (Published)</option>
+                      <option value="archived">Archived</option>
                     </select>
                   </div>
 
                   {/* Visibility */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">مستوى الظهور</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
                     <select
                       value={visibility}
                       onChange={(e) => setVisibility(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="public">عام (مدرج بكافة الأقسام)</option>
-                      <option value="unlisted">غير مدرج (متاح عبر الرابط المباشر فقط)</option>
-                      <option value="private">خاص (مغلق للمسجلين فقط)</option>
+                      <option value="public">Course Information (Course Information)</option>
+                      <option value="unlisted">Course Information (Link)</option>
+                      <option value="private">Course Information (Course Information)</option>
                     </select>
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">التصنيف</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
                     <input
                       type="text"
                       value={category}
@@ -445,22 +445,22 @@ export function AdminCourseEdit() {
 
                   {/* Level */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">المستوى</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Level</label>
                     <select
                       value={level}
                       onChange={(e) => setLevel(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="all_levels">جميع المستويات</option>
-                      <option value="beginner">مبتدئ</option>
-                      <option value="intermediate">متوسط</option>
-                      <option value="advanced">متقدم</option>
+                      <option value="all_levels">Course Information</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
                     </select>
                   </div>
 
                   {/* Price */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">السعر (ر.س)</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Price (SAR)</label>
                     <input
                       type="number"
                       min="0"
@@ -474,7 +474,7 @@ export function AdminCourseEdit() {
 
                   {/* Language */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">اللغة</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Language</label>
                     <input
                       type="text"
                       value={language}
@@ -485,13 +485,13 @@ export function AdminCourseEdit() {
 
                   {/* Instructor */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-primary-900 mb-2">المُدرّس المسند</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
                     <select
                       value={instructorId}
                       onChange={(e) => setInstructorId(e.target.value)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                     >
-                      <option value="">-- اختار مدرّس --</option>
+                      <option value="">-- Select --</option>
                       {instructors.map((ins) => (
                         <option key={ins.id} value={ins.id}>
                           {ins.name}
@@ -506,13 +506,13 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-amber-600" />
-                  <span>الصور والوسائط</span>
+                  <span>Course Information</span>
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Thumbnail */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">رابط الصورة المصغرة</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Image</label>
                     <input
                       type="url"
                       value={thumbnail}
@@ -522,14 +522,14 @@ export function AdminCourseEdit() {
                     />
                     {thumbnail && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={thumbnail} alt="معاينة" className="w-full h-full object-cover" />
+                        <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
 
                   {/* Cover */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">رابط صورة الغلاف</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Link</label>
                     <input
                       type="url"
                       value={coverImage}
@@ -539,7 +539,7 @@ export function AdminCourseEdit() {
                     />
                     {coverImage && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={coverImage} alt="معاينة" className="w-full h-full object-cover" />
+                        <img src={coverImage} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -553,7 +553,7 @@ export function AdminCourseEdit() {
                   onClick={() => navigate('/admin/courses')}
                   className="bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl text-sm transition-colors"
                 >
-                  إلغاء
+                  Cancel
                 </button>
 
                 <Button
@@ -564,12 +564,12 @@ export function AdminCourseEdit() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>جاري حفظ التعديلات...</span>
+                      <span>Save...</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-5 h-5" />
-                      <span>حفظ التغييرات</span>
+                      <span>Save</span>
                     </>
                   )}
                 </Button>

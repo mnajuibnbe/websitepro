@@ -12,10 +12,10 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
       <div className="w-24 h-24 bg-success-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
         <Trophy className="w-12 h-12 text-success-600" />
       </div>
-      
-      <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">مبارك لك! <br className="sm:hidden" />لقد أتممت الكورس بنجاح</h1>
+
+      <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">Congratulations! <br className="sm:hidden" />Course</h1>
       <p className="text-lg text-primary-600 mb-10 leading-relaxed">
-        رحلة رائعة مليئة بالمعرفة. لقد أثبتي جدارتك والتزامك بتطوير مهاراتك العلمية والعملية.
+        Details. Details.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
@@ -24,30 +24,30 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
             <PlayCircle className="w-6 h-6 text-accent-600" />
             <span className="text-3xl font-bold text-primary-900">42</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">درساً مكتملاً</span>
+          <span className="text-sm font-medium text-primary-500">Completed</span>
         </div>
         <div className="bg-primary-50 p-6 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-6 h-6 text-success-600" />
             <span className="text-3xl font-bold text-primary-900">5</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">اختبارات مجتازة</span>
+          <span className="text-sm font-medium text-primary-500">Quiz</span>
         </div>
         <div className="bg-primary-50 p-6 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-6 h-6 text-info-600" />
             <span className="text-3xl font-bold text-primary-900">45</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">ساعة تعلم</span>
+          <span className="text-sm font-medium text-primary-500">Hour</span>
         </div>
       </div>
 
-      <Button 
-        variant="primary" 
+      <Button
+        variant="primary"
         className="w-full sm:w-auto h-14 px-12 text-lg font-bold"
         onClick={onNext}
       >
-        إصدار الشهادة
+        Certificate
       </Button>
     </div>
   );

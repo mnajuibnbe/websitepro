@@ -6,18 +6,18 @@ export function Achievements() {
   return (
     <div className="bg-white border border-primary-200 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-primary-900">الإنجازات</h3>
-        <Link to="/certificate" className="text-sm font-bold text-accent-600 hover:text-accent-700">عرض الشهادات</Link>
+        <h3 className="text-lg font-bold text-primary-900">Achievements</h3>
+        <Link to="/certificate" className="text-sm font-bold text-accent-600 hover:text-accent-700">Certificates</Link>
       </div>
-      
+
       <div className="space-y-4">
         <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-l from-primary-50 to-white border border-primary-100">
           <div className="w-12 h-12 rounded-full bg-warning-100 flex items-center justify-center text-warning-600 flex-shrink-0">
             <Award className="w-6 h-6" />
           </div>
           <div>
-            <h4 className="font-bold text-primary-900 text-sm mb-1">شهادة أساسيات العناية</h4>
-            <p className="text-xs text-primary-500 font-medium">مكتملة بتاريخ 15 مايو 2026</p>
+            <h4 className="font-bold text-primary-900 text-sm mb-1">Skin Care Foundations Certificate</h4>
+            <p className="text-xs text-primary-500 font-medium">Completed 15 Details 2026</p>
           </div>
         </div>
 
@@ -26,8 +26,8 @@ export function Achievements() {
             <Trophy className="w-6 h-6" />
           </div>
           <div>
-            <h4 className="font-bold text-primary-900 text-sm mb-1">خبير الكوسميسوتيكال</h4>
-            <p className="text-xs text-primary-500 font-medium">أكملي الدبلومة الشاملة لفتح الوسام</p>
+            <h4 className="font-bold text-primary-900 text-sm mb-1">Cosmeceutical Specialist Badge</h4>
+            <p className="text-xs text-primary-500 font-medium">Complete the comprehensive diploma to unlock this badge.</p>
           </div>
         </div>
       </div>

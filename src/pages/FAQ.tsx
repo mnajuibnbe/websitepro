@@ -10,35 +10,35 @@ export function FAQ() {
 
   const faqs = [
     {
-      q: "لمن موجهة كورسات المنصة؟",
-      a: "كورساتنا مصممة خصيصاً للصيادلة، أطباء الجلدية، والممارسين الصحيين المهتمين بمجال الكوسميسوتيكال والعناية العلاجية بالبشرة والشعر."
+      q: "Help Information",
+      a: "Help Information."
     },
     {
-      q: "هل الشهادات معتمدة؟",
-      a: "نعم، نقدم شهادات إتمام موثقة برقم تعريفي فريد يمكن التحقق منه عبر منصتنا، وتعتبر إضافة قيمة لسيرتك الذاتية المهنية."
+      q: "Certificates",
+      a: "Add."
     },
     {
-      q: "كيف يمكنني الدفع؟",
-      a: "ندعم وسائل الدفع الإلكتروني المختلفة بما في ذلك البطاقات الائتمانية، مدى، وبوابات الدفع المحلية المعتمدة."
+      q: "Payment",
+      a: "Payment."
     },
     {
-      q: "هل يمكنني الوصول للكورسات في أي وقت؟",
-      a: "بمجرد اشتراكك في الكورس، يمكنك الوصول للمحتوى في أي وقت ومن أي جهاز، وتستمر صلاحية الوصول حسب خطة الاشتراك الموضحة في تفاصيل الكورس."
+      q: "Help Information",
+      a: "The requested information could not be loaded. Please try again."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
-      
+
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <HelpCircle className="w-8 h-8 text-accent-600" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-900 mb-4">الأسئلة الشائعة</h1>
-            <p className="text-xl text-primary-600">إجابات على استفساراتكم حول منصة توتيبا</p>
+            <h1 className="text-4xl font-bold text-primary-900 mb-4">Frequently Asked Questions</h1>
+            <p className="text-xl text-primary-600">Help Information</p>
           </div>
 
           <div className="space-y-4">

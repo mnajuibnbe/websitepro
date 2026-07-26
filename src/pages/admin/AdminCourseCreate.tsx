@@ -42,9 +42,9 @@ export function AdminCourseCreate() {
   const [slug, setSlug] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('العناية بالبشرة');
+  const [category, setCategory] = useState('Skin Care');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
-  const [language, setLanguage] = useState('العربية');
+  const [language, setLanguage] = useState('Arabic');
   const [price, setPrice] = useState('0');
   const [thumbnail, setThumbnail] = useState('');
   const [coverImage, setCoverImage] = useState('');
@@ -81,7 +81,7 @@ export function AdminCourseCreate() {
         if (!error && data) {
           const list = data.map((p) => ({
             id: p.id,
-            name: p.full_name || 'مدرب',
+            name: p.full_name || 'Instructor',
           }));
           setInstructors(list);
         }
@@ -107,14 +107,14 @@ export function AdminCourseCreate() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'عنوان الكورس مطلوب';
+      newErrors.title = 'Course';
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'يرجى استكمال الحقول المطلوبة بشكل صحيح.');
+      addToast('error', 'Please review the information and try again.');
       return;
     }
 
@@ -131,8 +131,8 @@ export function AdminCourseCreate() {
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى اختيار رابط آخر.' });
-          addToast('error', 'رابط الكورس المخصص مستخدم بالفعل، يرجى تغيير الرابط.');
+          setErrors({ slug: 'Course URL Slug Please review the information and try again.' });
+          addToast('error', 'Please review the information and try again.');
           setIsSubmitting(false);
           return;
         }
@@ -151,7 +151,7 @@ export function AdminCourseCreate() {
           p_description: description.trim() || null,
           p_category: category.trim() || null,
           p_level: level,
-          p_language: language.trim() || 'العربية',
+          p_language: language.trim() || 'Arabic',
           p_price: parsedPrice,
           p_instructor_id: finalInstructorId,
           p_thumbnail: thumbnail.trim() || null,
@@ -162,9 +162,9 @@ export function AdminCourseCreate() {
 
       if (rpcError) {
         console.error('RPC admin_create_course error:', rpcError);
-        let errorMsg = 'تعذر إنشاء الكورس عبر إجراء النظام (RPC).';
+        let errorMsg = 'Unable to complete this action. Please try again. (RPC).';
         if (rpcError.message?.includes('duplicate key') || rpcError.message?.includes('courses_slug_key')) {
-          errorMsg = 'رابط الكورس المخصص (Slug) مستخدم بالفعل، يرجى تغيير الرابط.';
+          errorMsg = 'Course URL Slug Link.';
           setErrors({ slug: errorMsg });
         }
         addToast('error', errorMsg);
@@ -173,24 +173,24 @@ export function AdminCourseCreate() {
       }
 
       if (!rpcCourseId) {
-        addToast('error', 'لم يقم النظام بإنشاء الكورس بنجاح.');
+        addToast('error', 'The requested information could not be loaded. Please try again.');
         setIsSubmitting(false);
         return;
       }
 
-      addToast('success', 'تم إنشاء الكورس بنجاح!');
+      addToast('success', 'Course!');
       setTimeout(() => {
         navigate(`/admin/courses/${rpcCourseId}/builder`);
       }, 800);
     } catch (err: any) {
       console.error('Error creating course:', err);
-      addToast('error', err.message || 'حدث خطأ غير متوقع أثناء إنشاء الكورس.');
+      addToast('error', err.message || 'The requested information could not be loaded. Please try again.');
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
@@ -202,14 +202,14 @@ export function AdminCourseCreate() {
                 type="button"
                 onClick={() => navigate('/admin/courses')}
                 className="p-2 bg-white rounded-xl border border-primary-200 text-primary-600 hover:text-primary-900 transition-colors"
-                title="العودة لقائمة الكورسات"
+                title="Courses"
               >
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">إنشاء كورس جديد</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
-                  قم بإدخال تفاصيل الكورس الأساسية للبدء في إضافة المنهج والدروس.
+                  The requested information could not be loaded. Please try again.
                 </p>
               </div>
             </div>
@@ -223,12 +223,12 @@ export function AdminCourseCreate() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>جاري الإنشاء...</span>
+                  <span>Create...</span>
                 </>
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  <span>حفظ ومتابعة البناء</span>
+                  <span>Save</span>
                 </>
               )}
             </Button>
@@ -239,14 +239,14 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <Tag className="w-5 h-5 text-amber-600" />
-                <span>المعلومات الأساسية</span>
+                <span>Basic Information</span>
               </h2>
 
               <div className="space-y-6">
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    عنوان الكورس <span className="text-danger-500">*</span>
+                    Course Title <span className="text-danger-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -255,7 +255,7 @@ export function AdminCourseCreate() {
                       setTitle(e.target.value);
                       if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                     }}
-                    placeholder="مثال: دبلومة العناية بالبشرة وتحديد نوع البشرة"
+                    placeholder="Example: Professional Skin Care Diploma"
                     className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium ${
                       errors.title ? 'border-danger-400 bg-danger-50/50' : 'border-primary-200'
                     }`}
@@ -272,7 +272,7 @@ export function AdminCourseCreate() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-bold text-primary-900">
-                      رابط الكورس المخصص (Slug)
+                      Course URL Slug
                     </label>
                     <button
                       type="button"
@@ -280,7 +280,7 @@ export function AdminCourseCreate() {
                       className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>توليد تلقائي من العنوان</span>
+                      <span>Generate from Title</span>
                     </button>
                   </div>
                   <input
@@ -292,20 +292,20 @@ export function AdminCourseCreate() {
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-left transition-all text-sm font-mono"
                   />
                   <p className="text-[11px] text-primary-500 mt-1">
-                    يستخدم لرابط الصفحة المباشر: /course/{slug || 'course-id'}
+                    Public URL: /course/{slug || 'course-id'}
                   </p>
                 </div>
 
                 {/* Short Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    الوصف المختصر (سريع للبطاقات)
+                    Short Description
                   </label>
                   <input
                     type="text"
                     value={shortDescription}
                     onChange={(e) => setShortDescription(e.target.value)}
-                    placeholder="دورة مكثفة لتشخيص البشرة العادية والمتخصصة وإعداد بروتوكولات العناية"
+                    placeholder="Summarize the course for catalog cards"
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm"
                   />
                 </div>
@@ -313,13 +313,13 @@ export function AdminCourseCreate() {
                 {/* Full Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    الوصف الشامل للكورس
+                    Description
                   </label>
                   <textarea
                     rows={5}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="اكتب نظرة عامة وتفاصيل المخرجات التعليمية والمستهدفين من هذا الكورس..."
+                    placeholder="Describe the course, its learning outcomes, and its intended audience..."
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed resize-y"
                   />
                 </div>
@@ -330,45 +330,45 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-amber-600" />
-                <span>التصنيف والتسعير واللغة</span>
+                <span>Classification, Pricing, and Language</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">التصنيف</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Category</label>
                   <input
                     type="text"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    placeholder="العناية بالبشرة، التجميل، أسلوب الحياة..."
+                    placeholder="Skin care, hair care, or professional practice"
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   />
                 </div>
 
                 {/* Level */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">المستوى</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Level</label>
                   <select
                     value={level}
                     onChange={(e) => setLevel(e.target.value as any)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                   >
-                    <option value="all_levels">جميع المستويات</option>
-                    <option value="beginner">مبتدئ</option>
-                    <option value="intermediate">متوسط</option>
-                    <option value="advanced">متقدم</option>
+                    <option value="all_levels">All Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
                   </select>
                 </div>
 
                 {/* Language */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">لغة الشرح</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Course Language</label>
                   <input
                     type="text"
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    placeholder="العربية"
+                    placeholder="Arabic"
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   />
                 </div>
@@ -376,7 +376,7 @@ export function AdminCourseCreate() {
                 {/* Price */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    السعر (بالريال السعودي - 0 للمجاني)
+                    Price (SAR; enter 0 for free)
                   </label>
                   <div className="relative">
                     <input
@@ -390,7 +390,7 @@ export function AdminCourseCreate() {
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     />
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-primary-500 font-bold">
-                      ر.س
+                      SAR
                     </span>
                   </div>
                 </div>
@@ -398,14 +398,14 @@ export function AdminCourseCreate() {
                 {/* Instructor */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    المُدرّس / المحاضر المسند
+                    Assigned Instructor
                   </label>
                   <select
                     value={instructorId}
                     onChange={(e) => setInstructorId(e.target.value)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   >
-                    <option value="">-- اختار مدرّس الكورس (أو افتراضي) --</option>
+                    <option value="">-- Select an instructor (or use default) --</option>
                     {instructors.map((ins) => (
                       <option key={ins.id} value={ins.id}>
                         {ins.name}
@@ -420,14 +420,14 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-amber-600" />
-                <span>الصور والوسائط</span>
+                <span>Images and Media</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thumbnail */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    رابط الصورة المصغرة (Thumbnail URL)
+                    Image (Thumbnail URL)
                   </label>
                   <input
                     type="url"
@@ -439,7 +439,7 @@ export function AdminCourseCreate() {
                   />
                   {thumbnail && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={thumbnail} alt="معاينة" className="w-full h-full object-cover" />
+                      <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -447,7 +447,7 @@ export function AdminCourseCreate() {
                 {/* Cover Image */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    رابط صورة الغلاف (Cover Image URL)
+                    Link (Cover Image URL)
                   </label>
                   <input
                     type="url"
@@ -459,7 +459,7 @@ export function AdminCourseCreate() {
                   />
                   {coverImage && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={coverImage} alt="معاينة" className="w-full h-full object-cover" />
+                      <img src={coverImage} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -473,7 +473,7 @@ export function AdminCourseCreate() {
                 onClick={() => navigate('/admin/courses')}
                 className="bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl text-sm transition-colors"
               >
-                إلغاء
+                Cancel
               </button>
 
               <Button
@@ -484,12 +484,12 @@ export function AdminCourseCreate() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>جاري الحفظ والإنشاء...</span>
+                    <span>Save...</span>
                   </>
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    <span>إنشاء الكورس والذهاب إلى Builder</span>
+                    <span>Course Builder</span>
                   </>
                 )}
               </Button>

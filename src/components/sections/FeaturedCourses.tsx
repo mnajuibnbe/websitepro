@@ -32,12 +32,12 @@ export function FeaturedCourses() {
         setCourses(data || []);
       } catch (err) {
         console.error("Error fetching featured courses", err);
-        setError('تعذر تحميل الكورسات المميزة. يرجى المحاولة مرة أخرى.');
+        setError('Unable to load featured courses. Please try again.');
       } finally {
         setIsLoading(false);
       }
     }
-    
+
     fetchFeaturedCourses();
   }, []);
 
@@ -54,7 +54,7 @@ export function FeaturedCourses() {
       <section className="py-16 md:py-24 bg-white flex flex-col gap-4 justify-center items-center">
         <p className="text-danger-600 font-bold">{error}</p>
         <Button variant="secondary" onClick={() => window.location.reload()} className="flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" /> إعادة المحاولة
+          <RefreshCw className="w-4 h-4" /> Retry
         </Button>
       </section>
     );
@@ -65,21 +65,21 @@ export function FeaturedCourses() {
   return (
     <section className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            البرامج التعليمية المميزة
+            Featured Courses
           </h2>
           <p className="text-lg text-primary-600">
-            اختاري البرنامج الذي يناسب هدفك المهني ومستوى خبرتك.
+            Choose a course that matches your professional goals and start learning today.
           </p>
         </div>
-        
+
         {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {courses.map(course => (
-            <CourseCard 
+            <CourseCard
               key={course.id}
               title={course.title}
               category="Course"
@@ -88,16 +88,16 @@ export function FeaturedCourses() {
               lessonsCount={0}
               price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
               imageUrl={course.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
-              ctaText="استعرضي الكورس"
+              ctaText="View Course"
               onEnroll={() => navigate(`/course/${course.id}`)}
             />
           ))}
         </div>
-        
+
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
-            عرض جميع الكورسات
+            Courses
           </Button>
         </div>
       </div>

@@ -12,17 +12,17 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
-  
+
   const navItems = [
-    { icon: BarChart3, label: 'لوحة القيادة', href: '/admin' },
-    { icon: BookOpen, label: 'إدارة الكورسات', href: '/admin/courses' },
-    { icon: Users, label: 'إدارة الطلاب', href: '/admin/users' },
+    { icon: BarChart3, label: 'Overview', href: '/admin' },
+    { icon: BookOpen, label: 'Courses', href: '/admin/courses' },
+    { icon: Users, label: 'Manage', href: '/admin/users' },
   ];
 
   return (
     <>
       {/* Mobile Toggle */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-xl shadow-sm border border-primary-200 text-primary-600"
       >
@@ -37,7 +37,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
-            <span>توتيبا - الإدارة</span>
+            <span>Details - Manage</span>
           </div>
         </div>
 
@@ -47,12 +47,12 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             const Icon = item.icon;
             const isActive = currentPath === item.href || (item.href === '/admin/courses' && currentPath === '/admin/courses/edit');
             return (
-              <Link 
-                key={index} 
+              <Link
+                key={index}
                 to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-                  isActive 
-                    ? 'bg-accent-50 text-accent-700' 
+                  isActive
+                    ? 'bg-accent-50 text-accent-700'
                     : 'text-primary-600 hover:bg-primary-50 hover:text-primary-900'
                 }`}
               >
@@ -67,18 +67,18 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         <div className="p-4 border-t border-primary-100">
           <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
             <Home className="w-5 h-5" />
-            <span>لوحة الطالب</span>
+            <span>Administration</span>
           </Link>
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
-            <span>تسجيل الخروج</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-primary-900/20 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
