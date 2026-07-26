@@ -98,13 +98,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) {
       if (error.message.includes('Invalid login credentials')) {
-        throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        throw new Error('Incorrect email address or password.');
       }
       throw error;
     }
-    
+
     if (!data.session) {
-      throw new Error('تعذر إنشاء الجلسة بنجاح، يرجى المحاولة لاحقاً');
+      throw new Error('Unable to complete this action. Please try again.');
     }
   };
 
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
 
     const requiresEmailConfirmation = !data.session;
-    
+
     return {
       user: data.user ? mapSupabaseUserToLocalUser(data.user) : null,
       session: data.session,

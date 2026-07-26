@@ -53,7 +53,7 @@ export function CourseLearnResolver() {
 
         if (enrollmentError) {
           console.error('Error verifying enrollment:', enrollmentError);
-          setErrorMessage('حدث خطأ أثناء التحقق من اشتراكك في الكورس.');
+          setErrorMessage('Build practical skills with structured, expert-led course content..');
           setState('error');
           return;
         }
@@ -107,7 +107,7 @@ export function CourseLearnResolver() {
 
         if (lessonsRes.error) {
           console.error('Error fetching lessons:', lessonsRes.error);
-          setErrorMessage('حدث خطأ أثناء جلب دروس الكورس.');
+          setErrorMessage('Build practical skills with structured, expert-led course content..');
           setState('error');
           return;
         }
@@ -161,7 +161,7 @@ export function CourseLearnResolver() {
         navigate(`/learn/${cleanCourseId}/lesson/${targetLesson.id}`, { replace: true });
       } catch (err: any) {
         console.error('Unexpected error in CourseLearnResolver:', err);
-        setErrorMessage(err.message || 'حدث خطأ غير متوقع.');
+        setErrorMessage(err.message || 'Error.');
         setState('error');
       }
     }
@@ -173,27 +173,27 @@ export function CourseLearnResolver() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4">
         <Loader2 className="w-12 h-12 text-accent-600 animate-spin mb-4" />
-        <p className="text-primary-700 font-bold text-lg">جاري تحديد موضع المتابعة...</p>
+        <p className="text-primary-700 font-bold text-lg">Processing......</p>
       </div>
     );
   }
 
   if (state === 'invalid_course_id') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">معرف كورس غير صحيح</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Learn More</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            الرابط المطلوب لا يحتوي على معرف كورس صحيح.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            الانتقال إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -202,14 +202,14 @@ export function CourseLearnResolver() {
 
   if (state === 'not_enrolled') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">أنت غير مسجل في هذا الكورس</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Build practical skills with structured, expert-led course content.</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            يتطلب الوصول لمحتوى هذا الكورس وجود اشتراك نشط.
+            Build practical skills with structured, expert-led course content..
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
@@ -217,14 +217,14 @@ export function CourseLearnResolver() {
                 onClick={() => navigate(`/course/${courseId}`)}
                 className="w-full bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
               >
-                عرض تفاصيل الكورس للتسجيل
+                Course
               </button>
             )}
             <button
               onClick={() => navigate('/my-courses')}
               className="w-full bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              العودة لكورساتي
+              My Courses
             </button>
           </div>
         </div>
@@ -234,20 +234,20 @@ export function CourseLearnResolver() {
 
   if (state === 'pending_enrollment') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-accent-50 text-accent-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Clock className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">اشتراكك قيد المراجعة</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Pending Approval</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            طلب اشتراكك في هذا الكورس قيد المراجعة حالياً وسيتم تفعيل الوصول فور الموافقة.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -256,17 +256,17 @@ export function CourseLearnResolver() {
 
   if (state === 'no_lessons') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">لا توجد دروس حالياً</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            لم يتم إضافة دروس منشورة في هذا الكورس بعد.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -274,15 +274,15 @@ export function CourseLearnResolver() {
   }
 
   return (
-    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
       <div className="bg-danger-50 text-danger-700 p-8 rounded-2xl border border-danger-200 text-center max-w-md w-full">
-        <h2 className="font-bold text-xl mb-2">حدث خطأ</h2>
-        <p className="mb-6">{errorMessage || 'تعذر الوصول لهذا الكورس.'}</p>
+        <h2 className="font-bold text-xl mb-2">Error</h2>
+        <p className="mb-6">{errorMessage || 'Course.'}</p>
         <button
           onClick={() => navigate('/my-courses')}
           className="w-full bg-danger-600 hover:bg-danger-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
         >
-          العودة لكورساتي
+          My Courses
         </button>
       </div>
     </div>

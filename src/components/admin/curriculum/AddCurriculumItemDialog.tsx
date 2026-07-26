@@ -36,8 +36,8 @@ export function AddCurriculumItemDialog({
   const itemOptions = [
     {
       id: 'video',
-      label: 'درس فيديو',
-      description: 'فيديو رفع مباشر أو رابط YouTube / Vimeo / HLS',
+      label: 'Lesson',
+      description: 'Link YouTube / Vimeo / HLS',
       icon: Video,
       color: 'bg-amber-50 text-amber-600 border-amber-200',
       type: 'video',
@@ -45,8 +45,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'article',
-      label: 'درس مقال / نص',
-      description: 'محتوى نصي غني مع تنسيقات HTML و Markdown',
+      label: 'Lesson / Learn More',
+      description: 'Content HTML Learn More Markdown',
       icon: FileText,
       color: 'bg-emerald-50 text-emerald-600 border-emerald-200',
       type: 'article',
@@ -54,8 +54,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'pdf',
-      label: 'ملف PDF',
-      description: 'ملف مستند قابل للقراءة والتحميل مع حماية العلامة المائية',
+      label: 'Learn More PDF',
+      description: 'Learn More',
       icon: FileCode,
       color: 'bg-red-50 text-red-600 border-red-200',
       type: 'pdf',
@@ -63,8 +63,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'audio',
-      label: 'صوتيات / بودكاست',
-      description: 'ملف صوتي MP3 مع مشغل استماع مخصص',
+      label: 'Learn More / Learn More',
+      description: 'Learn More MP3 Learn More',
       icon: Volume2,
       color: 'bg-purple-50 text-purple-600 border-purple-200',
       type: 'audio',
@@ -72,8 +72,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'embed',
-      label: 'محتوى مضمّن (Embed)',
-      description: 'تضمين كود iFrame أو نموذج خارجي',
+      label: 'Content (Embed)',
+      description: 'Learn More iFrame Learn More',
       icon: Code,
       color: 'bg-indigo-50 text-indigo-600 border-indigo-200',
       type: 'embed',
@@ -81,8 +81,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'external_link',
-      label: 'رابط خارجي',
-      description: 'رابط لموقع خارجي أو مستودع كود',
+      label: 'Link',
+      description: 'Link',
       icon: ExternalLink,
       color: 'bg-blue-50 text-blue-600 border-blue-200',
       type: 'external_link',
@@ -90,8 +90,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'live',
-      label: 'لقاء مباشر (Live)',
-      description: 'جلسة بث مباشر عبر Zoom أو Google Meet',
+      label: 'Learn More (Live)',
+      description: 'Learn More Zoom Learn More Google Meet',
       icon: Radio,
       color: 'bg-rose-50 text-rose-600 border-rose-200',
       type: 'live',
@@ -99,23 +99,23 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'quiz',
-      label: 'اختبار تقييمي (Quiz)',
-      description: 'مُنشئ الاختبارات التفاعلية والأسئلة الشاملة',
+      label: 'Quiz (Quiz)',
+      description: 'Quiz',
       icon: HelpCircle,
       color: 'bg-amber-50 text-amber-400 border-amber-200 opacity-70',
       type: 'quiz',
       disabled: true,
-      badge: 'قريبًا',
+      badge: 'Learn More',
     },
     {
       id: 'assignment',
-      label: 'واجب / تكليف (Assignment)',
-      description: 'واجبات مرفوعة ومراجعة من المحاضر',
+      label: 'Learn More / Learn More (Assignment)',
+      description: 'Instructor',
       icon: ClipboardCheck,
       color: 'bg-teal-50 text-teal-400 border-teal-200 opacity-70',
       type: 'assignment',
       disabled: true,
-      badge: 'قريبًا',
+      badge: 'Learn More',
     },
   ];
 
@@ -126,7 +126,7 @@ export function AddCurriculumItemDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs rtl" dir="rtl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
       <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-2xl w-full p-6 space-y-6 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-primary-100 pb-4">
@@ -134,15 +134,15 @@ export function AddCurriculumItemDialog({
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>إضافة عنصر إلى المنهج</span>
+                <span>Add</span>
               </span>
               {sectionTitle && (
                 <span className="text-xs text-primary-500 font-medium">
-                  القسم: <strong className="text-primary-800">{sectionTitle}</strong>
+                  Section: <strong className="text-primary-800">{sectionTitle}</strong>
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-bold text-primary-900">اختر نوع العنصر المراد إضافته</h3>
+            <h3 className="text-lg font-bold text-primary-900">Select</h3>
           </div>
 
           <button
@@ -163,7 +163,7 @@ export function AddCurriculumItemDialog({
                 type="button"
                 disabled={opt.disabled}
                 onClick={() => handleSelectOption(opt)}
-                className={`p-4 rounded-2xl border text-right transition-all flex items-start gap-3.5 relative ${
+                className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3.5 relative ${
                   opt.disabled
                     ? 'bg-primary-50/50 border-primary-200/80 cursor-not-allowed opacity-60'
                     : 'bg-white hover:bg-amber-50/40 hover:border-amber-300 border-primary-200 hover:shadow-2xs cursor-pointer group'
@@ -200,7 +200,7 @@ export function AddCurriculumItemDialog({
             onClick={onClose}
             className="px-5 py-2.5 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold text-xs rounded-xl transition-colors"
           >
-            إلغاء
+            Cancel
           </button>
         </div>
       </div>

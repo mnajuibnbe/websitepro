@@ -7,16 +7,16 @@ export function VideoPlayer() {
   return (
     <div className="relative w-full aspect-video bg-primary-900 rounded-2xl overflow-hidden shadow-lg group flex flex-col">
       {/* Video Placeholder */}
-      <img 
-        src="https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=1200&auto=format&fit=crop" 
-        alt="Video Thumbnail" 
+      <img
+        src="https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=1200&auto=format&fit=crop"
+        alt="Video Thumbnail"
         className="w-full h-full object-cover opacity-60"
       />
-      
+
       {/* Play/Pause Center Button (Visible when paused) */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-primary-900/40">
-          <button 
+          <button
             onClick={() => setIsPlaying(true)}
             className="w-20 h-20 bg-accent-600/90 text-white rounded-full flex items-center justify-center hover:bg-accent-500 hover:scale-110 transition-all shadow-xl backdrop-blur-sm"
           >
@@ -27,7 +27,7 @@ export function VideoPlayer() {
 
       {/* Controls Bar (Visible on hover or when playing) */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary-900/90 to-transparent p-4 md:p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        
+
         {/* Progress Bar */}
         <div className="flex items-center gap-3 mb-4">
           <span className="text-white text-xs font-medium w-10 text-center">12:34</span>
@@ -41,7 +41,7 @@ export function VideoPlayer() {
         {/* Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center sm:gap-2">
-            <button 
+            <button
               onClick={() => setIsPlaying(!isPlaying)}
               className="text-white hover:text-accent-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
@@ -62,7 +62,7 @@ export function VideoPlayer() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center sm:gap-2">
             <button className="text-white text-sm font-bold hover:text-accent-400 transition-colors border border-white/30 px-2 py-1 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
               1.25x

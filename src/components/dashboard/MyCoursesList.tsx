@@ -65,7 +65,7 @@ export function MyCoursesList() {
     );
   }
 
-  if (error) return <div className="p-6 text-danger-600 flex gap-2"><AlertCircle /> تعذر تحميل كورساتك.</div>;
+  if (error) return <div className="p-6 text-danger-600 flex gap-2"><AlertCircle /> Unable to complete this action.</div>;
 
   if (courses.length === 0) {
     return null;
@@ -74,14 +74,14 @@ export function MyCoursesList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-primary-900">كورساتي الأخرى</h3>
-        <Link to="/courses" className="text-lg font-bold text-accent-600 hover:text-accent-700">عرض الكل</Link>
+        <h3 className="text-xl font-bold text-primary-900">My Courses</h3>
+        <Link to="/courses" className="text-lg font-bold text-accent-600 hover:text-accent-700">View All</Link>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {courses.map(course => (
-          <div 
-            key={course.id} 
+          <div
+            key={course.id}
             className="bg-white border border-primary-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 group cursor-pointer"
             onClick={() => navigate(`/learn/${course.id}`)}
           >
@@ -98,7 +98,7 @@ export function MyCoursesList() {
                 <h4 className="font-bold text-primary-900 line-clamp-2 mb-3 leading-snug">{course.title}</h4>
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1.5">
-                    <span className="text-primary-500">التقدم</span>
+                    <span className="text-primary-500">Learn More</span>
                     <span className="text-primary-900">{course.progress}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-primary-100 rounded-full overflow-hidden">

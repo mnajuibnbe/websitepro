@@ -26,8 +26,8 @@ export function QuizLessonPlaceholder({
   }
 
   return (
-    <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-10 shadow-sm text-right" dir="rtl">
-      <h2 className="text-2xl font-bold text-primary-900 mb-3">{title || 'اختبار الدرس'}</h2>
+    <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-10 shadow-sm text-left" dir="ltr">
+      <h2 className="text-2xl font-bold text-primary-900 mb-3">{title || 'Lesson'}</h2>
     </div>
   );
 }

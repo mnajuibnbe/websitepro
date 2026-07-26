@@ -31,11 +31,14 @@ const durationHours = (course: Course) => {
 function categoryMatches(courseCategory: string | null, selectedCategory: string): boolean {
   if (!courseCategory) return false;
   if (courseCategory === selectedCategory) return true;
-  if (selectedCategory === 'العناية بالبشرة') return courseCategory.includes('بشرة');
-  if (selectedCategory === 'العناية بالشعر') return courseCategory.includes('شعر');
-  if (selectedCategory === 'برامج الدبلومة') return courseCategory.includes('دبلوم');
-  if (selectedCategory === 'كورسات متخصصة') return courseCategory.includes('متخصص');
-  return false;
+  const legacyCategoryTerms: Record<string, string> = {
+    'Skin Care': '\u0628\u0634\u0631\u0629',
+    'Hair Care': '\u0634\u0639\u0631',
+    'Diploma Programs': '\u062f\u0628\u0644\u0648\u0645',
+    'Specialized Courses': '\u0645\u062a\u062e\u0635\u0635',
+  };
+  const legacyTerm = legacyCategoryTerms[selectedCategory];
+  return legacyTerm ? courseCategory.includes(legacyTerm) : false;
 }
 
 export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFilters): Course[] {

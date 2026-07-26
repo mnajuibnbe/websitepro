@@ -68,8 +68,8 @@ export function AdminUserManagement() {
 
       const mappedStudents: StudentData[] = (usersData || []).map((user: any) => ({
         id: user.id,
-        name: user.full_name || 'طالب غير معروف',
-        email: user.email || 'غير متوفر',
+        name: user.full_name || 'Learn More',
+        email: user.email || 'Learn More',
         joined: new Date(user.created_at).toLocaleDateString('ar-EG'),
         courses: activeCounts[user.id] || 0,
       }));
@@ -92,35 +92,35 @@ export function AdminUserManagement() {
   });
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      
+
       <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-8">إدارة الطلاب</h1>
-          
+          <h1 className="text-3xl font-bold text-primary-900 mb-8">Manage</h1>
+
           <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-primary-200 flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
-                <input 
-                  type="text" 
-                  placeholder="ابحث بالاسم أو البريد..." 
+                <input
+                  type="text"
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-4 pr-10 py-2 bg-primary-50 border border-primary-200 rounded-lg focus:ring-2 focus:ring-accent-500 transition-colors"
                 />
               </div>
             </div>
-            
+
             <div className="overflow-x-auto">
-              <table className="w-full text-right">
+              <table className="w-full text-left">
                 <thead className="bg-primary-50 text-primary-600 font-medium border-b border-primary-200">
                   <tr>
-                    <th className="py-4 px-6 text-sm">الاسم</th>
-                    <th className="py-4 px-6 text-sm">البريد الإلكتروني</th>
-                    <th className="py-4 px-6 text-sm">تاريخ الانضمام</th>
-                    <th className="py-4 px-6 text-sm">عدد الكورسات النشطة</th>
+                    <th className="py-4 px-6 text-sm">Learn More</th>
+                    <th className="py-4 px-6 text-sm">Email Address</th>
+                    <th className="py-4 px-6 text-sm">Learn More</th>
+                    <th className="py-4 px-6 text-sm">Courses</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-primary-100">
@@ -137,9 +137,9 @@ export function AdminUserManagement() {
                       <td colSpan={4} className="py-12 text-center">
                         <div className="flex flex-col items-center justify-center text-danger-600">
                           <AlertCircle className="w-10 h-10 mb-4" />
-                          <p className="mb-4 font-medium">حدث خطأ أثناء تحميل البيانات</p>
+                          <p className="mb-4 font-medium">Error</p>
                           <Button variant="primary" onClick={fetchStudents}>
-                            إعادة المحاولة
+                            Retry
                           </Button>
                         </div>
                       </td>
@@ -147,7 +147,7 @@ export function AdminUserManagement() {
                   ) : filteredStudents.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="py-12 text-center text-primary-500">
-                        لا توجد بيانات مطابقة للبحث
+                        Search
                       </td>
                     </tr>
                   ) : (

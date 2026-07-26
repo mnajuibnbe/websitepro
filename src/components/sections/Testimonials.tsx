@@ -5,23 +5,23 @@ export function Testimonials() {
   const testimonials = [
     {
       id: 1,
-      quote: "أخيراً وجدت محتوى عربي يشرح الكوسميسوتيكال بعمق علمي. الدورة غيرت طريقتي في قراءة مكونات المنتجات تماماً وبنيت ثقتي في تقديم الاستشارات.",
-      name: "د. سارة أحمد",
-      profession: "صيدلانية",
+      quote: "Content. Build practical skills with structured, expert-led course content..",
+      name: "Learn More. Learn More",
+      profession: "Learn More",
       rating: 5
     },
     {
       id: 2,
-      quote: "المعلومات منظمة جداً والتطبيق العملي بعد كل درس ساعدني كثيراً في تقديم استشارات أفضل لعملائي في عيادتي الخاصة.",
-      name: "د. نورة محمد",
-      profession: "طبيبة أمراض جلدية",
+      quote: "Lesson.",
+      name: "Learn More. Learn More",
+      profession: "Learn More",
       rating: 5
     },
     {
       id: 3,
-      quote: "كورس الدبلومة الشامل كان استثماراً ممتازاً في مستقبلي المهني. أوصي به بشدة لأي شخص يعمل في مجال العناية بالبشرة والشعر.",
-      name: "د. هند عبدالله",
-      profession: "صيدلانية تجميلية",
+      quote: "Learn More. Learn More.",
+      name: "Learn More. Learn More",
+      profession: "Learn More",
       rating: 5
     }
   ];
@@ -31,17 +31,17 @@ export function Testimonials() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            ماذا يقول الطلاب
+            Students
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            تجارب حقيقية من مهنيين صحيين طوروا مهاراتهم عبر منصة Tutiba.
+            Learn More Tutiba.
           </p>
         </div>
-        
+
         {/* Mobile Horizontal Scroll / Desktop Grid */}
         <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 lg:gap-8 snap-x snap-mandatory hide-scrollbar">
           {testimonials.map((testimonial) => (
-            <div 
+            <div
               key={testimonial.id}
               className="flex-none w-[85%] sm:w-[70%] md:w-auto snap-center bg-primary-50 p-8 lg:p-10 rounded-2xl border border-primary-100 flex flex-col h-full"
             >

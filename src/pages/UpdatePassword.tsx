@@ -22,7 +22,7 @@ export function UpdatePassword() {
       try {
         // 1. Check existing session first
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session) {
           if (isMounted) {
             setHasSession(true);
@@ -50,7 +50,7 @@ export function UpdatePassword() {
             setError(null);
           } else {
             setHasSession(false);
-            setError('رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب رابط جديد.');
+            setError('Password. Link.');
           }
           setIsVerifyingSession(false);
         }, 3000);
@@ -62,7 +62,7 @@ export function UpdatePassword() {
       } catch (err: any) {
         if (isMounted) {
           setHasSession(false);
-          setError('حدث خطأ أثناء التحقق من الجلسة.');
+          setError('Error.');
           setIsVerifyingSession(false);
         }
       }
@@ -85,12 +85,12 @@ export function UpdatePassword() {
     setSuccess(false);
 
     if (password !== confirmPassword) {
-      setError('كلمتا المرور غير متطابقتين.');
+      setError('Learn More.');
       return;
     }
 
     if (password.length < 6) {
-      setError('كلمة المرور يجب أن تتكون من 6 أحرف على الأقل.');
+      setError('Password 6 Learn More.');
       return;
     }
 
@@ -100,7 +100,7 @@ export function UpdatePassword() {
       // Verify session exists right before calling updateUser
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('جلسة المصادقة غير متوفرة. يرجى استخدام رابط استعادة جديد.');
+        throw new Error('Learn More. Link.');
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -116,7 +116,7 @@ export function UpdatePassword() {
         navigate('/login');
       }, 3000);
     } catch (err: any) {
-      setError(err.message || 'حدث خطأ أثناء تحديث كلمة المرور.');
+      setError(err.message || 'Password.');
     } finally {
       setIsLoading(false);
     }
@@ -124,11 +124,11 @@ export function UpdatePassword() {
 
   if (isVerifyingSession) {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 font-sans" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 font-sans" dir="ltr">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-primary-200 text-center max-w-md w-full">
           <Loader2 className="w-10 h-10 text-accent-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-primary-900 mb-2">جاري التحقق من صلاحية الرابط...</h3>
-          <p className="text-sm text-primary-600">يرجى الانتظار لحظات لتأكيد الجلسة وتفعيل إمكانية التحديث.</p>
+          <h3 className="text-lg font-bold text-primary-900 mb-2">Processing......</h3>
+          <p className="text-sm text-primary-600">Please review the information and try again..</p>
         </div>
       </div>
     );
@@ -136,27 +136,27 @@ export function UpdatePassword() {
 
   if (!hasSession && !success) {
     return (
-      <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 font-sans" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 font-sans" dir="ltr">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8 text-center">
           <div className="w-12 h-12 bg-danger-100 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-primary-900 mb-2">جلسة المصادقة غير متوفرة</h2>
+          <h2 className="text-xl font-bold text-primary-900 mb-2">Learn More</h2>
           <p className="text-primary-600 text-sm mb-6">
-            {error || 'رابط إعادة تعيين كلمة المرور غير صالح أو انتهت صلاحيته.'}
+            {error || 'Password.'}
           </p>
           <div className="space-y-3">
             <button
               onClick={() => navigate('/forgot-password')}
               className="w-full py-3 px-4 bg-accent-600 hover:bg-accent-700 text-white font-bold rounded-xl transition-colors text-sm"
             >
-              طلب رابط جديد لإعادة التعيين
+              Link
             </button>
             <button
               onClick={() => navigate('/login')}
               className="w-full py-3 px-4 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold rounded-xl transition-colors text-sm"
             >
-              العودة لتسجيل الدخول
+              Sign In
             </button>
           </div>
         </div>
@@ -165,16 +165,16 @@ export function UpdatePassword() {
   }
 
   return (
-    <div className="min-h-screen bg-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans" dir="ltr">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center text-accent-600">
           <Lock className="w-12 h-12" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-primary-900">
-          تحديث كلمة المرور
+          Password
         </h2>
         <p className="mt-2 text-center text-sm text-primary-600">
-          الرجاء إدخال كلمة المرور الجديدة
+          Password
         </p>
       </div>
 
@@ -185,15 +185,15 @@ export function UpdatePassword() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-success-100 mb-4">
                 <CheckCircle2 className="h-6 w-6 text-success-600" />
               </div>
-              <h3 className="text-lg font-bold text-primary-900 mb-2">تم تحديث كلمة المرور بنجاح</h3>
+              <h3 className="text-lg font-bold text-primary-900 mb-2">Password</h3>
               <p className="text-sm text-primary-500 mb-6">
-                جاري توجيهك إلى صفحة تسجيل الدخول...
+                Sign In...
               </p>
               <button
                 onClick={() => navigate('/login')}
                 className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-accent-600 hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 transition-colors"
               >
-                الذهاب لتسجيل الدخول
+                Sign In
               </button>
             </div>
           ) : (
@@ -206,7 +206,7 @@ export function UpdatePassword() {
 
               <div>
                 <label className="block text-sm font-bold text-primary-700 mb-1">
-                  كلمة المرور الجديدة
+                  Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -232,7 +232,7 @@ export function UpdatePassword() {
 
               <div>
                 <label className="block text-sm font-bold text-primary-700 mb-1">
-                  تأكيد كلمة المرور
+                  Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -258,24 +258,24 @@ export function UpdatePassword() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>جاري التحديث...</span>
+                      <span>Update...</span>
                     </>
                   ) : (
-                    'تحديث كلمة المرور'
+                    'Password'
                   )}
                 </button>
               </div>
             </form>
           )}
         </div>
-        
+
         <div className="mt-6 text-center">
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
-            <span>العودة لتسجيل الدخول</span>
+            <span>Sign In</span>
           </button>
         </div>
       </div>

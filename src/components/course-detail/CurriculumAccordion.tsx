@@ -11,35 +11,35 @@ export function CurriculumAccordion() {
   const curriculum = [
     {
       id: 1,
-      title: 'مقدمة في علم الكوسميسوتيكال',
-      duration: '3 دروس • 45 دقيقة',
+      title: 'Learn More',
+      duration: '3 Lessons • 45 Minute',
       lessons: [
-        { id: 101, title: 'ما هو الكوسميسوتيكال؟', duration: '15 دقيقة', type: 'video', isPreview: true },
-        { id: 102, title: 'الفرق بين المنتجات التجميلية والعلاجية', duration: '20 دقيقة', type: 'video', isPreview: false },
-        { id: 103, title: 'كيف تقرأ ملصق المكونات (INCI)', duration: '10 دقائق', type: 'document', isPreview: false },
+        { id: 101, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: true },
+        { id: 102, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 103, title: 'Learn More (INCI)', duration: '10 Learn More', type: 'document', isPreview: false },
       ]
     },
     {
       id: 2,
-      title: 'تشريح وفسيولوجيا البشرة',
-      duration: '4 دروس • 60 دقيقة',
+      title: 'Learn More',
+      duration: '4 Lessons • 60 Minute',
       lessons: [
-        { id: 201, title: 'طبقات الجلد ووظائفها', duration: '18 دقيقة', type: 'video', isPreview: false },
-        { id: 202, title: 'حاجز البشرة (Skin Barrier)', duration: '15 دقيقة', type: 'video', isPreview: false },
-        { id: 203, title: 'أنواع البشرة وكيفية تحديدها علمياً', duration: '20 دقيقة', type: 'video', isPreview: false },
-        { id: 204, title: 'اختبار القسم الأول', duration: '7 أسئلة', type: 'quiz', isPreview: false },
+        { id: 201, title: 'Learn More', duration: '18 Minute', type: 'video', isPreview: false },
+        { id: 202, title: 'Learn More (Skin Barrier)', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 203, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 204, title: 'Section', duration: '7 Learn More', type: 'quiz', isPreview: false },
       ]
     },
     {
       id: 3,
-      title: 'المرطبات والمواد الحافظة',
-      duration: '5 دروس • 85 دقيقة',
+      title: 'Learn More',
+      duration: '5 Lessons • 85 Minute',
       lessons: [
-        { id: 301, title: 'آلية عمل المرطبات (Humectants, Emollients, Occlusives)', duration: '25 دقيقة', type: 'video', isPreview: false },
-        { id: 302, title: 'حمض الهيالورونيك والجليسرين', duration: '20 دقيقة', type: 'video', isPreview: false },
-        { id: 303, title: 'السيراميد والأحماض الدهنية', duration: '15 دقيقة', type: 'video', isPreview: false },
-        { id: 304, title: 'المواد الحافظة ودورها في المنتجات', duration: '15 دقيقة', type: 'video', isPreview: false },
-        { id: 305, title: 'حالة عملية: تحليل كريم مرطب شهير', duration: '10 دقائق', type: 'video', isPreview: false },
+        { id: 301, title: 'Learn More (Humectants, Emollients, Occlusives)', duration: '25 Minute', type: 'video', isPreview: false },
+        { id: 302, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 303, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 304, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 305, title: 'Learn More: Learn More', duration: '10 Learn More', type: 'video', isPreview: false },
       ]
     }
   ];
@@ -49,9 +49,9 @@ export function CurriculumAccordion() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-2">
-            منهج الكورس
+            Course
           </h2>
-          <p className="text-primary-600 font-medium">12 قسم • 45 درس • 80 ساعة تعليمية</p>
+          <p className="text-primary-600 font-medium">12 Learn More • 45 Lesson • 80 Hour</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export function CurriculumAccordion() {
               </div>
             </button>
 
-            <div 
+            <div
               className={`overflow-hidden transition-all duration-300 ${openSection === section.id ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
               <div className="p-2 md:p-4 bg-white">
@@ -83,13 +83,13 @@ export function CurriculumAccordion() {
                       </div>
                       <span className="font-medium text-primary-800 leading-snug">{lesson.title}</span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-11 sm:pl-0">
                       <span className="text-sm text-primary-500 font-medium">{lesson.duration}</span>
                       {lesson.isPreview ? (
                         <button className="flex items-center gap-1.5 text-accent-600 hover:text-accent-700 font-bold text-sm bg-accent-50 px-3 py-1.5 rounded-full transition-colors">
                           <PlayCircle className="w-4 h-4" />
-                          <span>معاينة</span>
+                          <span>Learn More</span>
                         </button>
                       ) : (
                         <div className="flex items-center justify-center w-8 h-8 text-primary-400">

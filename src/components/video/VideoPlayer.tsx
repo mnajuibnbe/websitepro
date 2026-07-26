@@ -5,7 +5,7 @@ import { AlertCircle } from 'lucide-react';
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 
-// WORKAROUND: Vidstack has a bug where it attempts to `JSON.stringify()` DOM Events 
+// WORKAROUND: Vidstack has a bug where it attempts to `JSON.stringify()` DOM Events
 // (like media 'error' events) which contain circular references (target -> FiberNode -> stateNode).
 // This causes a fatal "Converting circular structure to JSON" TypeError.
 // By providing a `toJSON` method on Event, we prevent the circular reference crash.
@@ -50,8 +50,8 @@ class VideoPlayerErrorBoundary extends Component<{ children: ReactNode }, { hasE
       return (
         <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 border border-red-900/30 rounded-2xl">
           <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-xl font-bold text-red-400 mb-2">تعذر تشغيل الفيديو</h3>
-          <p className="text-red-200 text-center max-w-md">حدث خطأ أثناء محاولة تحميل أو تشغيل مشغل الفيديو. قد يكون الرابط غير صالح.</p>
+          <h3 className="text-xl font-bold text-red-400 mb-2">Unable to complete this action</h3>
+          <p className="text-red-200 text-center max-w-md">Error. Link.</p>
         </div>
       );
     }

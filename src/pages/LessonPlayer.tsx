@@ -108,7 +108,7 @@ export function LessonPlayer() {
 
         if (enrollmentError) {
           console.error('Error verifying enrollment:', enrollmentError);
-          setErrorMessage('حدث خطأ أثناء التحقق من اشتراكك في الكورس.');
+          setErrorMessage('Build practical skills with structured, expert-led course content..');
           setAccessState('error');
           return;
         }
@@ -162,7 +162,7 @@ export function LessonPlayer() {
 
         if (lessonsRes.error) {
           console.error('Error fetching lessons:', lessonsRes.error);
-          setErrorMessage('حدث خطأ أثناء تحميل دروس الكورس.');
+          setErrorMessage('Build practical skills with structured, expert-led course content..');
           setAccessState('error');
           return;
         }
@@ -223,7 +223,7 @@ export function LessonPlayer() {
         }
       } catch (err: any) {
         console.error('Unexpected error in LessonPlayer:', err);
-        setErrorMessage(err.message || 'حدث خطأ غير متوقع.');
+        setErrorMessage(err.message || 'Error.');
         setAccessState('error');
       }
     }
@@ -332,27 +332,27 @@ export function LessonPlayer() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4">
         <Loader2 className="w-12 h-12 text-accent-600 animate-spin mb-4" />
-        <p className="text-primary-700 font-bold text-lg">جاري تحميل مساحة التعلم...</p>
+        <p className="text-primary-700 font-bold text-lg">Processing......</p>
       </div>
     );
   }
 
   if (accessState === 'invalid_params') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">رابط الدرس غير صحيح</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Lesson</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            الرابط المطلوب لا يحتوي على معرفات صحيحة للكورس أو الدرس.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            الانتقال إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -361,14 +361,14 @@ export function LessonPlayer() {
 
   if (accessState === 'not_enrolled') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">أنت غير مسجل في هذا الكورس</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Build practical skills with structured, expert-led course content.</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            عذراً، يتطلب عرض دروس هذا الكورس وجود اشتراك نشط.
+            Build practical skills with structured, expert-led course content..
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
@@ -376,14 +376,14 @@ export function LessonPlayer() {
                 onClick={() => navigate(`/course/${courseId}`)}
                 className="w-full bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
               >
-                عرض تفاصيل الكورس للتسجيل
+                Course
               </button>
             )}
             <button
               onClick={() => navigate('/my-courses')}
               className="w-full bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              العودة لكورساتي
+              My Courses
             </button>
           </div>
         </div>
@@ -393,20 +393,20 @@ export function LessonPlayer() {
 
   if (accessState === 'pending_enrollment') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-accent-50 text-accent-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Clock className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">اشتراكك قيد المراجعة</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Pending Approval</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            طلب اشتراكك في هذا الكورس قيد المراجعة حالياً وسيتم تفعيل الوصول فور الموافقة.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -415,24 +415,24 @@ export function LessonPlayer() {
 
   if (accessState === 'course_not_found' || accessState === 'lesson_not_found') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <div className="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">
-            {accessState === 'course_not_found' ? 'الكورس غير موجود' : 'الدرس غير موجود'}
+            {accessState === 'course_not_found' ? 'Course' : 'Lesson'}
           </h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             {accessState === 'course_not_found'
-              ? 'لم نتمكن من العثور على بيانات هذا الكورس في النظام.'
-              : 'الدرس المطلوبة غير موجود أو غير منشور حالياً.'}
+              ? 'Build practical skills with structured, expert-led course content..'
+              : 'Published.'}
           </p>
           <button
             onClick={() => navigate(courseId ? `/learn/${courseId}` : '/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة لمتابعة الكورس
+            Course
           </button>
         </div>
       </div>
@@ -441,17 +441,17 @@ export function LessonPlayer() {
 
   if (accessState === 'no_lessons') {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">لا توجد دروس حالياً</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            لم يتم إضافة دروس منشورة في هذا الكورس بعد.
+            Build practical skills with structured, expert-led course content..
           </p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة إلى كورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -460,15 +460,15 @@ export function LessonPlayer() {
 
   if (accessState === 'error' || !currentLesson || !course) {
     return (
-      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-right" dir="rtl">
+      <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-danger-50 text-danger-700 p-8 rounded-2xl border border-danger-200 text-center max-w-md w-full">
-          <h2 className="font-bold text-xl mb-2">حدث خطأ</h2>
-          <p className="mb-6">{errorMessage || 'تعذر تحميل بيانات الدرس.'}</p>
+          <h2 className="font-bold text-xl mb-2">Error</h2>
+          <p className="mb-6">{errorMessage || 'Lesson.'}</p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-danger-600 hover:bg-danger-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            العودة لكورساتي
+            My Courses
           </button>
         </div>
       </div>
@@ -476,7 +476,7 @@ export function LessonPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-primary-50 flex flex-col" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex flex-col" dir="ltr">
       {/* Learning Header */}
       <CourseLearningHeader
         courseTitle={course.title}
@@ -525,9 +525,9 @@ export function LessonPlayer() {
                 }}
               />
             ) : (
-              <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="rtl">
-                <h3 className="text-xl font-bold text-primary-900 mb-2">نوع الدرس غير مدعوم</h3>
-                <p className="text-primary-500 text-sm">محتوى هذا الدرس ينتمي لنوع غير معرف حالياً.</p>
+              <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="ltr">
+                <h3 className="text-xl font-bold text-primary-900 mb-2">Lesson</h3>
+                <p className="text-primary-500 text-sm">Content.</p>
               </div>
             )}
 
@@ -566,7 +566,7 @@ export function LessonPlayer() {
         <div className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/60 backdrop-blur-xs transition-opacity">
           <div className="w-full max-w-sm bg-white h-full flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-300">
             <div className="p-4 border-b border-primary-200 flex items-center justify-between bg-primary-50">
-              <h2 className="font-bold text-primary-900 text-base">منهاج الكورس</h2>
+              <h2 className="font-bold text-primary-900 text-base">Course</h2>
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="p-2 text-primary-500 hover:text-primary-900 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"

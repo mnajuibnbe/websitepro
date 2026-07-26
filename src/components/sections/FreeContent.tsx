@@ -7,29 +7,29 @@ export function FreeContent() {
   const contents = [
     {
       id: 1,
-      type: 'مقال',
-      title: 'الفرق بين الريتينول والريتينال وكيفية الاختيار',
+      type: 'Learn More',
+      title: 'Learn More',
       icon: FileText,
       image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600&auto=format&fit=crop',
-      cta: 'اقرئي المقال',
+      cta: 'Learn More',
       isProminent: false
     },
     {
       id: 2,
-      type: 'درس مجاني',
-      title: 'مقدمة في الكوسميسوتيكال وفهم التركيبات',
+      type: 'Lesson',
+      title: 'Learn More',
       icon: PlayCircle,
       image: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=600&auto=format&fit=crop',
-      cta: 'افتحي الدرس المجاني',
+      cta: 'Lesson',
       isProminent: true
     },
     {
       id: 3,
-      type: 'فيديو قصير',
-      title: 'كيف نقرأ ملصقات المكونات (INCI)؟',
+      type: 'Learn More',
+      title: 'Learn More (INCI)Learn More',
       icon: Play,
       image: 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=600&auto=format&fit=crop',
-      cta: 'شاهدي الفيديو',
+      cta: 'Learn More',
       isProminent: false
     }
   ];
@@ -39,10 +39,10 @@ export function FreeContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            ابدئي التعلم مجانًا
+            Start
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            استكشفي الموارد المجانية للتعرف على جودة المحتوى وبناء أساس علمي في العناية بالبشرة.
+            Content.
           </p>
         </div>
 
@@ -51,11 +51,11 @@ export function FreeContent() {
             const Icon = item.icon;
             const isProminent = item.isProminent;
             return (
-              <div 
+              <div
                 key={item.id}
                 className={`bg-white rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col group ${
-                  isProminent 
-                    ? 'border-accent-500 shadow-lg md:scale-105 z-10' 
+                  isProminent
+                    ? 'border-accent-500 shadow-lg md:scale-105 z-10'
                     : 'border-primary-200 shadow-sm hover:shadow-md'
                 }`}
               >
@@ -66,7 +66,7 @@ export function FreeContent() {
                       {item.type}
                     </Badge>
                   </div>
-                  {item.type !== 'مقال' && (
+                  {item.type !== 'Learn More' && (
                     <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center z-10">
                       <div className={`rounded-full bg-white/95 flex items-center justify-center backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform duration-300 ${isProminent ? 'w-16 h-16 text-accent-600' : 'w-12 h-12 text-primary-900'}`}>
                         <Icon className={`${isProminent ? 'w-8 h-8' : 'w-6 h-6'} ms-1`} />
@@ -74,7 +74,7 @@ export function FreeContent() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className={`p-6 md:p-8 flex flex-col flex-grow ${isProminent ? 'bg-accent-50/30' : ''}`}>
                   <h3 className={`font-bold text-primary-900 mb-6 flex-grow leading-snug ${isProminent ? 'text-2xl' : 'text-xl'}`}>
                     {item.title}
@@ -90,7 +90,7 @@ export function FreeContent() {
 
         <div className="flex justify-center mt-12 md:mt-16">
           <Button variant="secondary" className="px-8 text-lg h-12">
-            استكشفي الموارد المجانية
+            Free
           </Button>
         </div>
       </div>
