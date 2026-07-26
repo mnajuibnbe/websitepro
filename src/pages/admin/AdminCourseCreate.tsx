@@ -42,10 +42,11 @@ export function AdminCourseCreate() {
   const [slug, setSlug] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Skin Care');
+  const [category, setCategory] = useState('Learn More');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
   const [language, setLanguage] = useState('Arabic');
-  const [price, setPrice] = useState('0');
+  const [priceEgp, setPriceEgp] = useState('');
+  const [priceUsd, setPriceUsd] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [coverImage, setCoverImage] = useState('');
   const [instructorId, setInstructorId] = useState('');
@@ -81,7 +82,7 @@ export function AdminCourseCreate() {
         if (!error && data) {
           const list = data.map((p) => ({
             id: p.id,
-            name: p.full_name || 'Instructor',
+            name: p.full_name || 'Learn More',
           }));
           setInstructors(list);
         }
@@ -117,7 +118,7 @@ export function AdminCourseCreate() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'Please review the information and try again.');
+      addToast('error', 'Please review the information and try again..');
       return;
     }
 
@@ -134,8 +135,8 @@ export function AdminCourseCreate() {
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'Course URL Slug Please review the information and try again.' });
-          addToast('error', 'Please review the information and try again.');
+          setErrors({ slug: 'Course (Slug) Please review the information and try again..' });
+          addToast('error', 'Please review the information and try again..');
           setIsSubmitting(false);
           return;
         }
@@ -154,7 +155,8 @@ export function AdminCourseCreate() {
           p_category: category.trim() || null,
           p_level: level,
           p_language: language.trim() || 'Arabic',
-          p_price: parsedPrice,
+          p_price_egp: priceEgp,
+          p_price_usd: priceUsd,
           p_instructor_id: finalInstructorId,
           p_thumbnail: thumbnail.trim() || null,
           p_cover_image: coverImage.trim() || null,
@@ -166,7 +168,7 @@ export function AdminCourseCreate() {
         console.error('RPC admin_create_course error:', rpcError);
         let errorMsg = 'Unable to complete this action. Please try again. (RPC).';
         if (rpcError.message?.includes('duplicate key') || rpcError.message?.includes('courses_slug_key')) {
-          errorMsg = 'Course URL Slug Link.';
+          errorMsg = 'Course (Slug) Link.';
           setErrors({ slug: errorMsg });
         }
         addToast('error', errorMsg);
@@ -175,7 +177,7 @@ export function AdminCourseCreate() {
       }
 
       if (!rpcCourseId) {
-        addToast('error', 'The requested information could not be loaded. Please try again.');
+        addToast('error', 'Build practical skills with structured, expert-led course content..');
         setIsSubmitting(false);
         return;
       }
@@ -186,7 +188,7 @@ export function AdminCourseCreate() {
       }, 800);
     } catch (err: any) {
       console.error('Error creating course:', err);
-      addToast('error', err.message || 'The requested information could not be loaded. Please try again.');
+      addToast('error', err.message || 'Build practical skills with structured, expert-led course content..');
       setIsSubmitting(false);
     }
   };
@@ -211,7 +213,7 @@ export function AdminCourseCreate() {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
-                  The requested information could not be loaded. Please try again.
+                  Build practical skills with structured, expert-led course content..
                 </p>
               </div>
             </div>
@@ -241,14 +243,14 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <Tag className="w-5 h-5 text-amber-600" />
-                <span>Basic Information</span>
+                <span>Learn More</span>
               </h2>
 
               <div className="space-y-6">
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Course Title <span className="text-danger-500">*</span>
+                    Course <span className="text-danger-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -257,7 +259,7 @@ export function AdminCourseCreate() {
                       setTitle(e.target.value);
                       if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                     }}
-                    placeholder="Example: Professional Skin Care Diploma"
+                    placeholder="Learn More: Learn More"
                     className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium ${
                       errors.title ? 'border-danger-400 bg-danger-50/50' : 'border-primary-200'
                     }`}
@@ -274,7 +276,7 @@ export function AdminCourseCreate() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-bold text-primary-900">
-                      Course URL Slug
+                      Course (Slug)
                     </label>
                     <button
                       type="button"
@@ -282,7 +284,7 @@ export function AdminCourseCreate() {
                       className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>Generate from Title</span>
+                      <span>Title</span>
                     </button>
                   </div>
                   <input
@@ -294,20 +296,20 @@ export function AdminCourseCreate() {
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-left transition-all text-sm font-mono"
                   />
                   <p className="text-[11px] text-primary-500 mt-1">
-                    Public URL: /course/{slug || 'course-id'}
+                    Link: /course/{slug || 'course-id'}
                   </p>
                 </div>
 
                 {/* Short Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Short Description
+                    Description (Learn More)
                   </label>
                   <input
                     type="text"
                     value={shortDescription}
                     onChange={(e) => setShortDescription(e.target.value)}
-                    placeholder="Summarize the course for catalog cards"
+                    placeholder="Learn More"
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm"
                   />
                 </div>
@@ -321,7 +323,7 @@ export function AdminCourseCreate() {
                     rows={5}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the course, its learning outcomes, and its intended audience..."
+                    placeholder="Build practical skills with structured, expert-led course content...."
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed resize-y"
                   />
                 </div>
@@ -332,18 +334,18 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-amber-600" />
-                <span>Classification, Pricing, and Language</span>
+                <span>Language</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">Category</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
                   <input
                     type="text"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    placeholder="Skin care, hair care, or professional practice"
+                    placeholder="Learn More..."
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   />
                 </div>
@@ -356,7 +358,7 @@ export function AdminCourseCreate() {
                     onChange={(e) => setLevel(e.target.value as any)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                   >
-                    <option value="all_levels">All Levels</option>
+                    <option value="all_levels">Learn More</option>
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
@@ -365,7 +367,7 @@ export function AdminCourseCreate() {
 
                 {/* Language */}
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">Course Language</label>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
                   <input
                     type="text"
                     value={language}
@@ -376,37 +378,27 @@ export function AdminCourseCreate() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Price (SAR; enter 0 for free)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="299"
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
-                    />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-primary-500 font-bold">
-                      SAR
-                    </span>
-                  </div>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">Egypt Price (EGP) *</label>
+                  <input type="number" min="0" step="0.01" required value={priceEgp} onChange={(e) => setPriceEgp(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                  {errors.priceEgp && <p className="text-xs text-danger-600 mt-1">{errors.priceEgp}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-primary-900 mb-2">International Price (USD) *</label>
+                  <input type="number" min="0" step="0.01" required value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                  {errors.priceUsd && <p className="text-xs text-danger-600 mt-1">{errors.priceUsd}</p>}
                 </div>
 
                 {/* Instructor */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Assigned Instructor
+                    Learn More / Instructor
                   </label>
                   <select
                     value={instructorId}
                     onChange={(e) => setInstructorId(e.target.value)}
                     className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
                   >
-                    <option value="">-- Select an instructor (or use default) --</option>
+                    <option value="">-- Course (Learn More) --</option>
                     {instructors.map((ins) => (
                       <option key={ins.id} value={ins.id}>
                         {ins.name}
@@ -421,7 +413,7 @@ export function AdminCourseCreate() {
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-amber-600" />
-                <span>Images and Media</span>
+                <span>Learn More</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -440,7 +432,7 @@ export function AdminCourseCreate() {
                   />
                   {thumbnail && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={thumbnail} alt="Learn More" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -460,7 +452,7 @@ export function AdminCourseCreate() {
                   />
                   {coverImage && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={coverImage} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={coverImage} alt="Learn More" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>

@@ -41,7 +41,8 @@ export function AdminCourseEdit() {
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
   const [language, setLanguage] = useState('Arabic');
-  const [price, setPrice] = useState('0');
+  const [priceEgp, setPriceEgp] = useState('');
+  const [priceUsd, setPriceUsd] = useState('');
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
   const [thumbnail, setThumbnail] = useState('');
@@ -81,7 +82,7 @@ export function AdminCourseEdit() {
       // Load instructors
       const { data: profData } = await supabase.from('profiles').select('id, full_name');
       if (profData) {
-        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Course Information' })));
+        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Learn More' })));
       }
 
       // Fetch course
@@ -93,7 +94,7 @@ export function AdminCourseEdit() {
 
       if (error) throw error;
       if (!course) {
-        setErrorMessage('The requested information could not be loaded. Please try again.');
+        setErrorMessage('Build practical skills with structured, expert-led course content..');
         setIsLoading(false);
         return;
       }
@@ -105,10 +106,11 @@ export function AdminCourseEdit() {
       setSlug(course.slug || '');
       setShortDescription(course.short_description || '');
       setDescription(course.description || '');
-      setCategory(course.category || 'Course Information');
+      setCategory(course.category || 'Learn More');
       setLevel((course.level as any) || 'all_levels');
       setLanguage(course.language || 'Arabic');
-      setPrice(course.price ? String(course.price) : '0');
+      setPriceEgp(course.price_egp == null ? '' : String(course.price_egp));
+      setPriceUsd(course.price_usd == null ? '' : String(course.price_usd));
       setStatus((course.status as any) || 'draft');
       setVisibility((course.visibility as any) || 'public');
       setThumbnail(course.thumbnail || '');
@@ -116,7 +118,7 @@ export function AdminCourseEdit() {
       setInstructorId(course.instructor_id || '');
     } catch (err: any) {
       console.error('Error fetching course details:', err);
-      setErrorMessage(err.message || 'The requested information could not be loaded. Please try again.');
+      setErrorMessage(err.message || 'Build practical skills with structured, expert-led course content..');
     } finally {
       setIsLoading(false);
     }
@@ -169,8 +171,8 @@ export function AdminCourseEdit() {
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'Course (Slug) Please review the information and try again.' });
-          addToast('error', 'Please review the information and try again.');
+          setErrors({ slug: 'Course (Slug) Please review the information and try again..' });
+          addToast('error', 'Please review the information and try again..');
           setIsSubmitting(false);
           return;
         }
@@ -184,7 +186,8 @@ export function AdminCourseEdit() {
         category: category.trim() || null,
         level: level,
         language: language.trim() || 'Arabic',
-        price: parsedPrice,
+        price_egp: priceEgp,
+        price_usd: priceUsd,
         status: status,
         visibility: visibility,
         thumbnail: thumbnail.trim() || null,
@@ -198,7 +201,7 @@ export function AdminCourseEdit() {
           updates.published_at = new Date().toISOString();
         }
         if (visibility === 'private') {
-          addToast('info', 'Course "Course Information" (Private)Course Information.');
+          addToast('info', 'Course "Learn More" (Private)Learn More.');
         }
       } else if (status === 'archived') {
         updates.archived_at = new Date().toISOString();
@@ -215,8 +218,8 @@ export function AdminCourseEdit() {
 
       if (error) {
         if (error.message?.includes('duplicate key') || error.message?.includes('courses_slug_key')) {
-          setErrors({ slug: 'Course (Slug) Please review the information and try again.' });
-          addToast('error', 'Please review the information and try again.');
+          setErrors({ slug: 'Course (Slug) Please review the information and try again..' });
+          addToast('error', 'Please review the information and try again..');
           setIsSubmitting(false);
           return;
         }
@@ -265,7 +268,7 @@ export function AdminCourseEdit() {
                 className="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-colors"
               >
                 <Sparkle className="w-4 h-4 text-amber-600" />
-                <span>Course Information Course Builder</span>
+                <span>Learn More Course Builder</span>
               </button>
 
               <Button
@@ -318,7 +321,7 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-amber-600" />
-                  <span>Course Information</span>
+                  <span>Learn More</span>
                 </h2>
 
                 <div className="space-y-6">
@@ -415,27 +418,27 @@ export function AdminCourseEdit() {
                     >
                       <option value="draft">Draft (Draft)</option>
                       <option value="published">Published (Published)</option>
-                      <option value="archived">Archived</option>
+                      <option value="archived">Learn More (Archived)</option>
                     </select>
                   </div>
 
                   {/* Visibility */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
                     <select
                       value={visibility}
                       onChange={(e) => setVisibility(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="public">Course Information (Course Information)</option>
-                      <option value="unlisted">Course Information (Link)</option>
-                      <option value="private">Course Information (Course Information)</option>
+                      <option value="public">Learn More (Learn More)</option>
+                      <option value="unlisted">Learn More (Link)</option>
+                      <option value="private">Learn More (Learn More)</option>
                     </select>
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
                     <input
                       type="text"
                       value={category}
@@ -452,7 +455,7 @@ export function AdminCourseEdit() {
                       onChange={(e) => setLevel(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="all_levels">Course Information</option>
+                      <option value="all_levels">Learn More</option>
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
@@ -460,16 +463,14 @@ export function AdminCourseEdit() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Price (SAR)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
-                    />
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Egypt Price (EGP) *</label>
+                    <input type="number" min="0" step="0.01" required value={priceEgp} onChange={(e) => setPriceEgp(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                    {errors.priceEgp && <p className="text-xs text-danger-600 mt-1">{errors.priceEgp}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">International Price (USD) *</label>
+                    <input type="number" min="0" step="0.01" required value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} dir="ltr" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl" />
+                    {errors.priceUsd && <p className="text-xs text-danger-600 mt-1">{errors.priceUsd}</p>}
                   </div>
 
                   {/* Language */}
@@ -485,7 +486,7 @@ export function AdminCourseEdit() {
 
                   {/* Instructor */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Information</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
                     <select
                       value={instructorId}
                       onChange={(e) => setInstructorId(e.target.value)}
@@ -506,7 +507,7 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-amber-600" />
-                  <span>Course Information</span>
+                  <span>Learn More</span>
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -522,7 +523,7 @@ export function AdminCourseEdit() {
                     />
                     {thumbnail && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={thumbnail} alt="Learn More" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -539,7 +540,7 @@ export function AdminCourseEdit() {
                     />
                     {coverImage && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={coverImage} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={coverImage} alt="Learn More" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>

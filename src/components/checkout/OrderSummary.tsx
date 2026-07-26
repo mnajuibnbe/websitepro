@@ -1,28 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
-import { usePricingContext } from '../../contexts/PricingContext';
-import { resolveCoursePrice } from '../../lib/pricing';
-import type { Course } from '../../types/database.types';
+import { Input } from '../ui/Input';
+import { Tag, ShieldCheck, Loader2 } from 'lucide-react';
 
 export function OrderSummary() {
-  const [params] = useSearchParams();
-  const courseId = params.get('courseId');
-  const { token } = useAuth();
-  const context = usePricingContext();
   const navigate = useNavigate();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!courseId) { setError('Select a course before checkout.'); return; }
-    supabase.from('courses').select('*').eq('id', courseId).eq('status', 'published').single()
-      .then(({ data, error }) => error ? setError('Course is unavailable.') : setCourse(data));
-  }, [courseId]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePayment = () => {
+    setIsProcessing(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsProcessing(false);
+      navigate('/dashboard');
+    }, 1500);
+  };
 
   return (
     <div className="bg-white border border-primary-200 rounded-2xl shadow-lg overflow-hidden lg:sticky lg:top-28">
