@@ -388,7 +388,7 @@ export function AdminCourseBuilder() {
           updates.published_at = new Date().toISOString();
         }
         if (course.visibility === 'private') {
-          addToast('info', 'Course "Learn More" (Private)Learn More.');
+          addToast('info', 'This course is private and will not appear in the public catalog.');
         }
       }
 
@@ -486,7 +486,7 @@ export function AdminCourseBuilder() {
                             : 'bg-amber-100 text-amber-800 border-amber-200'
                         }`}
                       >
-                        {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Learn More' : 'Draft'}
+                        {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Archived' : 'Draft'}
                       </span>
                     )}
                   </div>
@@ -539,7 +539,7 @@ export function AdminCourseBuilder() {
               {[
                 { id: 'curriculum', label: 'Curriculum (Curriculum)', icon: BookOpen },
                 { id: 'settings', label: 'Settings', icon: Settings },
-                { id: 'pricing', label: 'Learn More', icon: DollarSign },
+                { id: 'pricing', label: 'Pricing', icon: DollarSign },
                 { id: 'seo', label: 'Search (SEO)', icon: Globe },
                 { id: 'publish', label: 'Publish (Publish)', icon: CheckCircle },
               ].map((tab) => {
@@ -635,7 +635,7 @@ export function AdminCourseBuilder() {
                           type="text"
                           value={newSectionTitle}
                           onChange={(e) => setNewSectionTitle(e.target.value)}
-                          placeholder="Learn More: Learn More - Learn More"
+                          placeholder="Example: Section 1 - Skin Care Foundations"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                           autoFocus
                         />
@@ -773,7 +773,7 @@ export function AdminCourseBuilder() {
 
                                         <div className="flex items-center gap-2.5 text-[11px] text-primary-500 mt-0.5 flex-wrap">
                                           <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
-                                            {lesson.lesson_type || lesson.type || 'Learn More'}
+                                            {lesson.lesson_type || lesson.type || 'Lesson'}
                                           </span>
 
                                           {(lesson.duration || lesson.estimated_minutes) && (
@@ -809,7 +809,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'up')}
                                         disabled={lIndex === 0}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="Learn More"
+                                        title="Move lesson up"
                                       >
                                         <ArrowUp className="w-3.5 h-3.5" />
                                       </button>
