@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import videoRoutes from './src/server/routes/video.routes';
+import videoRoutes from './src/server/routes/video.routes.js';
+import { validateServerEnvironment } from './src/server/config/environment.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -41,6 +42,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 async function startServer() {
+  validateServerEnvironment();
   await setupVite();
 
   const server = app.listen(PORT, () => {

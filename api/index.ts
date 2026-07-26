@@ -1,5 +1,13 @@
 import express, { Request, Response, NextFunction } from 'express';
-import videoRoutes from '../src/server/routes/video.routes';
+import videoRoutes from '../src/server/routes/video.routes.js';
+import { getMissingServerEnvironmentVariables } from '../src/server/config/environment.js';
+
+const missingEnvironmentVariables = getMissingServerEnvironmentVariables();
+if (missingEnvironmentVariables.length > 0) {
+  console.error('[ServerConfig] Missing required environment variables', {
+    missing: missingEnvironmentVariables,
+  });
+}
 
 const app = express();
 app.use(express.json());
