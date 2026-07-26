@@ -29,6 +29,7 @@ export function LessonPlayer() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
+  const userId = user?.id;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [sections, setSections] = useState<CourseSection[]>([]);
@@ -54,8 +55,42 @@ export function LessonPlayer() {
       const cleanLessonId = lessonId.trim();
 
       if (authLoading) return;
-      if (!user) {
+      if (!userId) {
         setAccessState('not_enrolled');
+        return;
+      }
+
+      // Lesson-to-lesson navigation within an already authorized course should
+      // not tear down the entire workspace and repeat every course query.
+      if (course?.id === cleanCourseId && lessons.length > 0) {
+        const target = lessons.find((lesson) => lesson.id === cleanLessonId);
+        if (!target) {
+          setAccessState('lesson_not_found');
+          return;
+        }
+
+        setCurrentLesson(target);
+        setAccessState('allowed');
+        setIsMobileSidebarOpen(false);
+
+        const existingProgress = progressRows.find((progress) => progress.lesson_id === target.id);
+        const { error: accessError } = await supabase
+          .from('lesson_progress')
+          .upsert(
+            {
+              user_id: userId,
+              course_id: cleanCourseId,
+              lesson_id: target.id,
+              is_completed: existingProgress?.is_completed ?? false,
+              last_accessed_at: new Date().toISOString(),
+              completed_at: existingProgress?.completed_at || null,
+            },
+            { onConflict: 'user_id,lesson_id' }
+          );
+
+        if (accessError) {
+          console.error('Error updating lesson access time:', accessError);
+        }
         return;
       }
 
@@ -67,7 +102,7 @@ export function LessonPlayer() {
         const { data: enrollment, error: enrollmentError } = await supabase
           .from('enrollments')
           .select('id, status')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .eq('course_id', cleanCourseId)
           .maybeSingle();
 
@@ -122,7 +157,7 @@ export function LessonPlayer() {
             .from('lesson_progress')
             .select('*')
             .eq('course_id', cleanCourseId)
-            .eq('user_id', user.id),
+            .eq('user_id', userId),
         ]);
 
         if (lessonsRes.error) {
@@ -173,7 +208,7 @@ export function LessonPlayer() {
           .from('lesson_progress')
           .upsert(
             {
-              user_id: user.id,
+              user_id: userId,
               course_id: cleanCourseId,
               lesson_id: target.id,
               is_completed: existingProgress ? existingProgress.is_completed : false,
@@ -194,7 +229,7 @@ export function LessonPlayer() {
     }
 
     verifyAndLoadLessonData();
-  }, [courseId, lessonId, user, authLoading]);
+  }, [courseId, lessonId, userId, authLoading]);
 
   // Order lessons canonically (Section order ASC -> Lesson order ASC)
   const orderedLessons = useMemo(() => {

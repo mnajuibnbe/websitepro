@@ -1,10 +1,26 @@
 import { Request, Response } from 'express';
-import { generateStreamToken, verifyStreamToken } from '../services/token.service';
-import { getDriveClient } from '../config/google';
-import { getSupabaseAdmin } from '../config/supabase';
+import { randomUUID } from 'node:crypto';
+import { generateStreamToken, verifyStreamToken } from '../services/token.service.js';
+import { getDriveClient } from '../config/google.js';
+import { getSupabaseAdmin } from '../config/supabase.js';
+
+interface TokenControllerDependencies {
+  getSupabaseAdmin: typeof getSupabaseAdmin;
+  generateStreamToken: typeof generateStreamToken;
+  createCorrelationId: () => string;
+}
+
+const tokenControllerDependencies: TokenControllerDependencies = {
+  getSupabaseAdmin,
+  generateStreamToken,
+  createCorrelationId: randomUUID,
+};
 
 // Generate a signed streaming token for a video lesson
-export const generateToken = async (req: Request, res: Response): Promise<void> => {
+export const createGenerateToken = (dependencies: TokenControllerDependencies) => async (req: Request, res: Response): Promise<void> => {
+  const correlationId = dependencies.createCorrelationId();
+  res.setHeader('X-Correlation-ID', correlationId);
+
   try {
     const { lessonId } = req.body;
     
@@ -22,7 +38,7 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
     const token = authHeader.split(' ')[1];
     
     // 2. Setup Supabase Admin Client
-    const supabase = getSupabaseAdmin();
+    const supabase = dependencies.getSupabaseAdmin();
     
     // 3. Verify User JWT
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
@@ -33,33 +49,34 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // 4. Verify Enrollment (Authorization)
-    const { data: enrollment, error: enrollError } = await supabase
-      .from('enrollments')
-      .select('id, course_id')
-      .eq('user_id', userData.user.id)
-      .eq('status', 'active')
-      .limit(1)
+    // 4. Fetch the lesson and its owning course.
+    const { data: lessonData, error: lessonError } = await supabase
+      .from('lessons')
+      .select('video_url, course_id')
+      .eq('id', lessonId)
       .single();
 
-    // Since we don't have a direct mapping from lessonId -> courseId in the request easily,
-    // and lessons are shared across courses in this simplified model, we just ensure 
-    // the user has at least one active enrollment to view content.
-    // In a production app, we would verify: lesson -> chapter -> course -> enrollment
+    if (lessonError || !lessonData) {
+      res.status(404).json({ error: 'Lesson not found' });
+      return;
+    }
+
+    // 5. Authorize access to this lesson's course, not merely any course.
+    const { data: enrollment, error: enrollError } = await supabase
+      .from('enrollments')
+      .select('id')
+      .eq('user_id', userData.user.id)
+      .eq('course_id', lessonData.course_id)
+      .eq('status', 'active')
+      .maybeSingle();
+
     if (enrollError || !enrollment) {
-      console.warn('[VideoController] User not enrolled or enrollment inactive', userData.user.id);
+      console.warn('[VideoController] Course access denied', { correlationId, userId: userData.user.id });
       res.status(403).json({ error: 'Forbidden: You do not have access to this content.' });
       return;
     }
 
-    // 5. Fetch File ID for the Lesson from the database
-    const { data: lessonData, error: lessonError } = await supabase
-      .from('lessons')
-      .select('video_url') // We store Google Drive file ID in video_url
-      .eq('id', lessonId)
-      .single();
-
-    if (lessonError || !lessonData || !lessonData.video_url) {
+    if (!lessonData.video_url) {
       res.status(404).json({ error: 'Lesson video not found' });
       return;
     }
@@ -76,43 +93,81 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
 
     // 6. Generate Signed Streaming Token
     // We include only what is necessary: fileId for streaming.
-    const streamToken = generateStreamToken({ fileId });
+    const streamToken = dependencies.generateStreamToken({ fileId });
 
     res.status(200).json({ token: streamToken });
   } catch (error: any) {
-    console.error('[VideoController] Error generating token:', error.message, error.code, error.status, error.stack);
-    res.status(500).json({ 
-      error: error.message || 'Failed to generate token', 
-      originalError: error.message
+    console.error('[VideoController] Error generating token', {
+      correlationId,
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+    });
+    res.status(500).json({
+      error: 'Unable to authorize the video stream.',
+      correlationId,
     });
   }
 };
 
-export const streamVideo = async (req: Request, res: Response): Promise<void> => {
-  // 1. Extract Token from Query Params
+export const generateToken = createGenerateToken(tokenControllerDependencies);
+
+function readStreamFileId(req: Request, res: Response): string | null {
   const token = req.query.token as string;
   if (!token) {
-    console.warn('[StreamVideo] Missing token in request');
     res.status(401).json({ error: 'Missing streaming token' });
-    return;
+    return null;
   }
 
-  // 2. Verify Token
-  let fileId: string;
   try {
-    const decoded = verifyStreamToken(token);
-    fileId = decoded.fileId;
+    return verifyStreamToken(token).fileId;
   } catch (error: any) {
     console.warn('[StreamVideo] Token verification failed:', error.message);
     res.status(401).json({ error: 'Invalid or expired streaming token' });
-    return;
+    return null;
   }
+}
+
+export const inspectVideo = async (req: Request, res: Response): Promise<void> => {
+  const fileId = readStreamFileId(req, res);
+  if (!fileId) return;
+
+  try {
+    const metadataResponse = await getDriveClient().files.get({
+      fileId,
+      fields: 'size, mimeType',
+      supportsAllDrives: true,
+    });
+    const fileSize = parseInt(metadataResponse.data.size || '0', 10);
+    if (!Number.isFinite(fileSize) || fileSize <= 0) {
+      res.status(502).end();
+      return;
+    }
+
+    res.status(200).set({
+      'Content-Length': String(fileSize),
+      'Content-Type': metadataResponse.data.mimeType || 'video/mp4',
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'no-store',
+    }).end();
+  } catch (error: any) {
+    console.error('[StreamVideo] Metadata request failed:', error.message);
+    const statusCode = error.response?.status;
+    res.status(statusCode === 403 || statusCode === 404 || statusCode === 429 ? statusCode : 502).end();
+  }
+};
+
+export const streamVideo = async (req: Request, res: Response): Promise<void> => {
+  const fileId = readStreamFileId(req, res);
+  if (!fileId) return;
 
   // 3. Setup AbortController to handle client disconnects
   const abortController = new AbortController();
-  req.on('close', () => {
-    console.log(`[StreamVideo] Client connection closed. Aborting stream.`);
-    abortController.abort();
+  res.on('close', () => {
+    if (!res.writableEnded) {
+      console.log(`[StreamVideo] Client connection closed before completion. Aborting stream.`);
+      abortController.abort();
+    }
   });
 
   // 4. Fetch File Metadata & Stream
@@ -160,16 +215,6 @@ export const streamVideo = async (req: Request, res: Response): Promise<void> =>
 
       const chunksize = end - start + 1;
 
-      res.writeHead(206, {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': mimeType,
-        'Cache-Control': 'no-store', // Prevent caching
-      });
-
-      console.log(`[StreamVideo] Starting stream (206) for range: ${start}-${end}`);
-
       const streamResponse = await drive.files.get(
         {
           fileId,
@@ -182,6 +227,16 @@ export const streamVideo = async (req: Request, res: Response): Promise<void> =>
           signal: abortController.signal as any,
         }
       );
+
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': mimeType,
+        'Cache-Control': 'no-store',
+      });
+
+      console.log(`[StreamVideo] Starting stream (206) for range: ${start}-${end}`);
 
       streamResponse.data.on('end', () => {
         console.log(`[StreamVideo] Stream completed for range: ${start}-${end}`);
@@ -199,15 +254,6 @@ export const streamVideo = async (req: Request, res: Response): Promise<void> =>
       streamResponse.data.pipe(res);
     } else {
       // Handle Initial Request without Range (200)
-      res.writeHead(200, {
-        'Content-Length': fileSize,
-        'Content-Type': mimeType,
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'no-store',
-      });
-
-      console.log(`[StreamVideo] Starting full stream (200)`);
-
       const streamResponse = await drive.files.get(
         {
           fileId,
@@ -219,6 +265,15 @@ export const streamVideo = async (req: Request, res: Response): Promise<void> =>
           signal: abortController.signal as any,
         }
       );
+
+      res.writeHead(200, {
+        'Content-Length': fileSize,
+        'Content-Type': mimeType,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-store',
+      });
+
+      console.log(`[StreamVideo] Starting full stream (200)`);
 
       streamResponse.data.on('end', () => {
         console.log(`[StreamVideo] Full stream completed.`);

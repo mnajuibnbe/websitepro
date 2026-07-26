@@ -44,6 +44,24 @@ function mapSupabaseUserToLocalUser(supabaseUser: SupabaseUser): User {
   };
 }
 
+function updateLocalUser(previousUser: User | null, supabaseUser?: SupabaseUser): User | null {
+  if (!supabaseUser) return null;
+
+  const nextUser = mapSupabaseUserToLocalUser(supabaseUser);
+  if (
+    previousUser &&
+    previousUser.id === nextUser.id &&
+    previousUser.email === nextUser.email &&
+    previousUser.name === nextUser.name &&
+    previousUser.role === nextUser.role &&
+    previousUser.joinedAt === nextUser.joinedAt
+  ) {
+    return previousUser;
+  }
+
+  return nextUser;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -55,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user ? mapSupabaseUserToLocalUser(session.user) : null);
+      setUser((previousUser) => updateLocalUser(previousUser, session?.user));
       setIsLoading(false);
     }).catch((err) => {
       console.error('Session retrieval failed', err);
@@ -64,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setUser(session?.user ? mapSupabaseUserToLocalUser(session.user) : null);
+      setUser((previousUser) => updateLocalUser(previousUser, session?.user));
       setIsLoading(false);
     });
 

@@ -39,7 +39,9 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           try {
             const errData = await response.json();
             if (errData && errData.error) {
-              errorMessage = errData.error;
+              errorMessage = errData.correlationId
+                ? `${errData.error} (Reference: ${errData.correlationId})`
+                : errData.error;
             }
           } catch (jsonErr) {
             console.warn('[DevLog] Token response was not JSON:', response.status);
