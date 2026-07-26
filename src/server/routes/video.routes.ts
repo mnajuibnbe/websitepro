@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateToken, streamVideo } from '../controllers/video.controller';
+import { generateToken, streamVideo } from '../controllers/video.controller.js';
 
 const router = Router();
 
