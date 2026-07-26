@@ -94,7 +94,5 @@ export function OrderSummary() {
         </div>
       </div>
     </div>
-    </div>
-  );
   );
 }
