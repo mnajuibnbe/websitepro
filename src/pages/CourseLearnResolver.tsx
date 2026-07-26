@@ -18,7 +18,7 @@ type ResolverState =
 export function CourseLearnResolver() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   const [state, setState] = useState<ResolverState>('verifying');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

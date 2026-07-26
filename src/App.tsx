@@ -33,6 +33,7 @@ import { CourseEditor } from './pages/admin/CourseEditor';
 import { UpdatePassword } from './pages/UpdatePassword';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { AdminUserManagement } from './pages/admin/AdminUserManagement';
+import { VideoTestPage } from './pages/VideoTestPage';
 
 import { RequireAuth } from './components/auth/RequireAuth';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
@@ -75,6 +76,7 @@ function AppContent() {
       <Route path="/certificate" element={<RequireAuth><CertificatePage /></RequireAuth>} />
 
       {/* Admin Routes */}
+      <Route path="/test-video" element={<VideoTestPage />} />
       <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />
       <Route path="/admin/courses" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseManager /></RequireAuth>} />
       <Route path="/admin/courses/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />

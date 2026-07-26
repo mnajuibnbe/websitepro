@@ -1,81 +1,32 @@
 import React from 'react';
 import { VideoOff } from 'lucide-react';
+import { VideoProviderResolver } from '../video/VideoProviderResolver';
 
 interface VideoLessonRendererProps {
+  lessonId: string;
   videoUrl: string | null;
   title: string;
 }
 
-const getGoogleDrivePreviewUrl = (
-  url: string | null | undefined
-): string | null => {
-  if (typeof url !== 'string' || !url.trim()) {
-    return null;
-  }
-
-  const match = url
-    .trim()
-    .match(/drive\.google\.com\/file\/d\/([^/?#]+)/);
-
-  return match?.[1]
-    ? `https://drive.google.com/file/d/${match[1]}/preview`
-    : null;
-};
-
-function getEmbedUrl(url: string | null): { type: 'embed' | 'direct' | 'none'; src: string } {
-  if (!url || !url.trim()) return { type: 'none', src: '' };
-
+function detectProvider(url: string | null): string {
+  if (!url || !url.trim()) return 'none';
   const cleanUrl = url.trim();
 
-  // YouTube matchers
+  if (cleanUrl.match(/drive\.google\.com/)) return 'google_drive';
+  
   const ytMatch = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-  if (ytMatch && ytMatch[1]) {
-    return {
-      type: 'embed',
-      src: `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?rel=0&modestbranding=1&autoplay=0`
-    };
-  }
+  if (ytMatch) return 'youtube';
 
-  // Vimeo matchers
   const vimeoMatch = cleanUrl.match(/(?:vimeo\.com\/)(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/);
-  if (vimeoMatch && vimeoMatch[1]) {
-    return {
-      type: 'embed',
-      src: `https://player.vimeo.com/video/${vimeoMatch[1]}`
-    };
-  }
+  if (vimeoMatch) return 'vimeo';
 
-  // Direct MP4 or video files
-  if (cleanUrl.match(/\.(mp4|webm|ogg|m3u8)(\?.*)?$/i) || cleanUrl.startsWith('http')) {
-    if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm')) {
-      return { type: 'direct', src: cleanUrl };
-    }
-    return { type: 'embed', src: cleanUrl };
-  }
-
-  return { type: 'none', src: '' };
+  return 'mp4';
 }
 
-export function VideoLessonRenderer({ videoUrl, title }: VideoLessonRendererProps) {
-  const googleDrivePreviewUrl = getGoogleDrivePreviewUrl(videoUrl);
+export function VideoLessonRenderer({ lessonId, videoUrl, title }: VideoLessonRendererProps) {
+  const provider = detectProvider(videoUrl);
 
-  if (googleDrivePreviewUrl) {
-    return (
-      <div className="relative aspect-video w-full overflow-hidden bg-black rounded-2xl shadow-lg border border-primary-900">
-        <iframe
-          src={googleDrivePreviewUrl}
-          title={title || 'Lesson video'}
-          className="absolute inset-0 h-full w-full border-0"
-          allow="autoplay; fullscreen"
-          allowFullScreen
-        />
-      </div>
-    );
-  }
-
-  const { type, src } = getEmbedUrl(videoUrl);
-
-  if (type === 'none' || !src) {
+  if (provider === 'none' || !videoUrl) {
     return (
       <div className="relative w-full aspect-video bg-primary-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-6 text-center text-white border border-primary-800 shadow-md">
         <div className="w-16 h-16 bg-primary-900/80 rounded-full flex items-center justify-center text-primary-400 mb-3 border border-primary-800">
@@ -90,25 +41,11 @@ export function VideoLessonRenderer({ videoUrl, title }: VideoLessonRendererProp
   }
 
   return (
-    <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-primary-900">
-      {type === 'embed' ? (
-        <iframe
-          src={src}
-          title={title}
-          className="w-full h-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      ) : (
-        <video
-          src={src}
-          controls
-          className="w-full h-full object-contain"
-          controlsList="nodownload"
-        >
-          متصفحك لا يدعم تشغيل هذا الفيديو.
-        </video>
-      )}
-    </div>
+    <VideoProviderResolver
+      lessonId={lessonId}
+      videoUrl={videoUrl}
+      provider={provider}
+      title={title}
+    />
   );
 }

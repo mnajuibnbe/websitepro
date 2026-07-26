@@ -28,7 +28,7 @@ type AccessState =
 export function LessonPlayer() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [sections, setSections] = useState<CourseSection[]>([]);
@@ -458,7 +458,7 @@ export function LessonPlayer() {
           <main className="lg:col-span-8 flex flex-col">
             {/* Viewer Component */}
             {currentLesson.type === 'video' ? (
-              <VideoLessonRenderer videoUrl={currentLesson.video_url} title={currentLesson.title} />
+              <VideoLessonRenderer lessonId={currentLesson.id} videoUrl={currentLesson.video_url} title={currentLesson.title} />
             ) : currentLesson.type === 'text' ? (
               <TextLessonRenderer content={currentLesson.content} title={currentLesson.title} />
             ) : currentLesson.type === 'quiz' ? (
