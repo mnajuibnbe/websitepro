@@ -12,7 +12,7 @@ export function EnrollmentCard() {
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState<string | null>(null);
   const [courseDetails, setCourseDetails] = useState<any>(null);
-  const [enrollmentStatus, setEnrollmentStatus] = useState<'none' | 'pending' | 'active'>('none');
+  const [enrollmentStatus, setEnrollmentStatus] = useState<'none' | 'pending' | 'active' | 'cancelled'>('none');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -59,7 +59,7 @@ export function EnrollmentCard() {
             .single();
             
           if (enrollment) {
-            setEnrollmentStatus(enrollment.status as 'pending' | 'active');
+            setEnrollmentStatus(enrollment.status as 'pending' | 'active' | 'cancelled');
           }
         }
       } catch (err) {
@@ -94,7 +94,7 @@ export function EnrollmentCard() {
         
       if (existing) {
         setErrorState('already_enrolled');
-        setEnrollmentStatus(existing.status as 'pending' | 'active');
+        setEnrollmentStatus(existing.status as 'pending' | 'active' | 'cancelled');
         return;
       }
 
@@ -149,6 +149,7 @@ export function EnrollmentCard() {
     if (isEnrolling) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
     if (enrollmentStatus === 'active') return 'الذهاب للدرس (تم الاشتراك)';
     if (enrollmentStatus === 'pending') return 'الطلب قيد المراجعة';
+    if (enrollmentStatus === 'cancelled') return 'تم رفض الطلب';
     return 'سجلي الآن';
   };
 
@@ -236,7 +237,7 @@ export function EnrollmentCard() {
             variant="primary" 
             className="w-full h-14 text-lg"
             onClick={handleButtonClick}
-            disabled={isEnrolling || enrollmentStatus === 'pending'}
+            disabled={isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
           >
             {renderButtonContent()}
           </Button>
@@ -263,7 +264,7 @@ export function EnrollmentCard() {
         variant="primary" 
         className="flex-grow h-12 text-lg font-bold"
         onClick={handleButtonClick}
-        disabled={isEnrolling || enrollmentStatus === 'pending'}
+        disabled={isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
       >
         {renderButtonContent()}
       </Button>

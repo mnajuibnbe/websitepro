@@ -3,30 +3,36 @@ import { CourseCard } from '../ui/CourseCard';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
 
 export function FeaturedCourses() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchFeaturedCourses() {
       try {
         setIsLoading(true);
-        // Fetch top 3 active courses as featured
+        setError(null);
+        // Explicit Admin order wins; courses without an order remain newest-first.
+        // The same returned array is rendered on mobile and desktop.
         const { data, error } = await supabase
           .from('courses')
           .select('*')
-          .eq('status', 'active')
+          .eq('status', PUBLIC_COURSE_STATUS)
+          .order('home_order', { ascending: true, nullsFirst: false })
+          .order('published_at', { ascending: false, nullsFirst: false })
           .order('created_at', { ascending: false })
           .limit(3);
-        
-        if (!error && data) {
-          setCourses(data);
-        }
+
+        if (error) throw error;
+        setCourses(data || []);
       } catch (err) {
         console.error("Error fetching featured courses", err);
+        setError('تعذر تحميل الكورسات المميزة. يرجى المحاولة مرة أخرى.');
       } finally {
         setIsLoading(false);
       }
@@ -39,6 +45,17 @@ export function FeaturedCourses() {
     return (
       <section className="py-16 md:py-24 bg-white flex justify-center items-center">
         <Loader2 className="w-10 h-10 animate-spin text-accent-600" />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 md:py-24 bg-white flex flex-col gap-4 justify-center items-center">
+        <p className="text-danger-600 font-bold">{error}</p>
+        <Button variant="secondary" onClick={() => window.location.reload()} className="flex items-center gap-2">
+          <RefreshCw className="w-4 h-4" /> إعادة المحاولة
+        </Button>
       </section>
     );
   }
