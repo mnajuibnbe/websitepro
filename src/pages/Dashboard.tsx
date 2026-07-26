@@ -17,10 +17,12 @@ export function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasEnrollments, setHasEnrollments] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     async function checkEnrollments() {
       try {
+        setLoadError(false);
         if (user) {
           const { count, error } = await supabase
             .from('enrollments')
@@ -28,6 +30,7 @@ export function Dashboard() {
             .eq('user_id', user.id)
             .eq('status', 'active');
             
+          if (error) throw error;
           if (count && count > 0) {
             setHasEnrollments(true);
           } else {
@@ -38,12 +41,13 @@ export function Dashboard() {
         }
       } catch (err) {
         console.error(err);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
     }
     checkEnrollments();
-  }, []);
+  }, [user?.id, navigate]);
 
   return (
     <div className="min-h-screen bg-primary-50 flex font-sans rtl" dir="rtl">
@@ -96,6 +100,12 @@ export function Dashboard() {
             {isLoading ? (
                <div className="flex justify-center py-20">
                  <Loader2 className="w-8 h-8 animate-spin text-accent-600" />
+               </div>
+            ) : loadError ? (
+               <div className="bg-white rounded-2xl border border-danger-200 shadow-sm p-12 text-center">
+                 <h2 className="text-2xl font-bold text-danger-900 mb-3">تعذر تحميل كورساتك</h2>
+                 <p className="text-danger-600 mb-8">حدث خطأ أثناء التحقق من اشتراكاتك. يرجى تحديث الصفحة والمحاولة مرة أخرى.</p>
+                 <Button variant="primary" onClick={() => window.location.reload()}>إعادة المحاولة</Button>
                </div>
             ) : hasEnrollments === false ? (
                <div className="bg-white rounded-2xl border border-primary-200 shadow-sm p-12 flex flex-col items-center justify-center text-center">

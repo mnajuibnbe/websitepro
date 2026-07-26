@@ -12,21 +12,24 @@ export function ContinueLearning() {
   const [course, setCourse] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     async function loadLatestCourse() {
       try {
         setIsLoading(true);
+        setHasError(false);
         let activeCourseId: string | null = null;
 
         if (user) {
-          const { data: enrollmentData } = await supabase
+          const { data: enrollmentData, error: enrollmentError } = await supabase
             .from('enrollments')
             .select('course_id')
             .eq('user_id', user.id)
             .eq('status', 'active')
             .limit(1)
             .maybeSingle();
+          if (enrollmentError) throw enrollmentError;
 
           if (enrollmentData?.course_id) {
             activeCourseId = enrollmentData.course_id;
@@ -35,20 +38,12 @@ export function ContinueLearning() {
 
         let courseData = null;
         if (activeCourseId) {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from('courses')
             .select('*')
             .eq('id', activeCourseId)
             .maybeSingle();
-          courseData = data;
-        }
-
-        if (!courseData) {
-          const { data } = await supabase
-            .from('courses')
-            .select('*')
-            .limit(1)
-            .maybeSingle();
+          if (error) throw error;
           courseData = data;
         }
 
@@ -64,6 +59,7 @@ export function ContinueLearning() {
         }
       } catch (e) {
         console.error(e);
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
@@ -83,6 +79,8 @@ export function ContinueLearning() {
       </div>
     );
   }
+
+  if (hasError) return <div className="bg-white border border-danger-200 rounded-2xl p-8 text-danger-600 font-bold">تعذر تحميل الكورس الحالي.</div>;
 
   if (!course) {
     return null; // Or return a placeholder if no courses exist

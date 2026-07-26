@@ -40,3 +40,35 @@ The browser build additionally requires `VITE_SUPABASE_ANON_KEY`.
 - `npm run build`
 - API entry-point ESM bundle and syntax smoke check
 
+
+## 2026-07-26 — COURSE-VISIBILITY-FIX-001
+
+### Proven root causes
+
+- Home and Courses filtered course `status` by `active`, while admin publication writes `published`.
+- Home did not apply the existing `is_featured` field and swallowed query failures.
+- Dashboard treated enrollment-query failure as zero enrollment; its widgets swallowed errors and substituted arbitrary catalogue courses for missing active enrollment data.
+- No courses/enrollments SELECT policies were tracked in repository migrations; actual production RLS remains runtime evidence required.
+
+### Changes
+
+- Standardized public queries on `published`; Home additionally requires `is_featured=true`.
+- Added distinct query error states and removed enrollment-to-catalogue fallbacks.
+- Added least-privilege public published-course and own-enrollment SELECT policies without changing lesson authorization.
+- Added focused visibility predicate tests and full diagnosis/runtime test documentation.
+
+### Follow-up hardening
+
+- Added a separate enrolled-course SELECT policy so an active student can resolve published course metadata without making private/unlisted courses public.
+- Changed progress retrieval to propagate Supabase failures to the existing error states instead of silently displaying 0% progress.
+- Restored the established latest-three Home rule after proving `is_featured` has no Admin control.
+- Replaced fake static pagination with working data-driven pagination that is hidden for a single page.
+- Added a narrowly scoped admin pending-to-active enrollment policy and made the approval UI verify that RLS actually updated a row.
+
+### Catalogue controls and request denial follow-up
+
+- Connected the previously static search, category, level, price, duration, sort, result-count, applied-filter, clear, mobile-filter and pagination controls to real Supabase course rows.
+- Added focused catalogue filtering/sorting tests, including production legacy category aliases.
+- Added Admin denial using the schema-supported `cancelled` terminal state, verified returned mutations, denied-student messaging, and a least-privilege pending-decision policy.
+- Completed mobile parity for catalogue actions with an accessible filter toggle/panel, visible live count, shared search/sort state, and close action; kept Admin approve/deny actions together in the responsive table.
+- Added optional Admin-managed Home ordering with positive numeric priorities; unranked courses retain newest-published order, and the same query order is used on mobile and desktop.
