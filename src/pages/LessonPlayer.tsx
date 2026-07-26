@@ -60,6 +60,40 @@ export function LessonPlayer() {
         return;
       }
 
+      // Lesson-to-lesson navigation within an already authorized course should
+      // not tear down the entire workspace and repeat every course query.
+      if (course?.id === cleanCourseId && lessons.length > 0) {
+        const target = lessons.find((lesson) => lesson.id === cleanLessonId);
+        if (!target) {
+          setAccessState('lesson_not_found');
+          return;
+        }
+
+        setCurrentLesson(target);
+        setAccessState('allowed');
+        setIsMobileSidebarOpen(false);
+
+        const existingProgress = progressRows.find((progress) => progress.lesson_id === target.id);
+        const { error: accessError } = await supabase
+          .from('lesson_progress')
+          .upsert(
+            {
+              user_id: userId,
+              course_id: cleanCourseId,
+              lesson_id: target.id,
+              is_completed: existingProgress?.is_completed ?? false,
+              last_accessed_at: new Date().toISOString(),
+              completed_at: existingProgress?.completed_at || null,
+            },
+            { onConflict: 'user_id,lesson_id' }
+          );
+
+        if (accessError) {
+          console.error('Error updating lesson access time:', accessError);
+        }
+        return;
+      }
+
       try {
         setAccessState('verifying');
         setErrorMessage(null);

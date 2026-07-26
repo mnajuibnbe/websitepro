@@ -79,3 +79,22 @@ started and immediately aborted unnecessary full Drive downloads.
   request object's normal close event.
 - Preserve all Range calculations, seeking headers, JWT checks, and access
   authorization.
+
+## 2026-07-26 — In-course lesson navigation experience
+
+### Root cause
+
+Changing only the lesson route reran the complete enrollment, course, sections,
+lessons, and progress loader. That set the page-level access state back to
+`verifying`, unmounted the whole workspace, and displayed the full-screen
+"جاري تحميل مساحة التعلم" screen between adjacent lessons.
+
+### Fix
+
+- Reuse the already-authorized course and lesson collection when navigating
+  between lessons in the same course.
+- Switch the current lesson in place while keeping the header, sidebar, and
+  workspace mounted.
+- Continue recording `last_accessed_at` for the selected lesson and preserve the
+  full authorization/data-loading path for initial loads, refreshes, user
+  changes, and course changes.
