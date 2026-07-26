@@ -1,8 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { CourseCatalogFilters } from '../../lib/courseCatalog';
 
-export function CoursesHeader() {
+interface CoursesHeaderProps {
+  filters: CourseCatalogFilters;
+  onChange: (filters: CourseCatalogFilters) => void;
+}
+
+export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
   const categories = [
     'الكل',
     'برامج الدبلومة',
@@ -32,11 +38,22 @@ export function CoursesHeader() {
       {/* Category Shortcuts */}
       <div className="flex overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 gap-3">
         {categories.map((category, index) => {
-          const isActive = category === 'العناية بالبشرة';
+          const isFree = category === 'مجانية';
+          const isAll = category === 'الكل';
+          const isActive = isAll
+            ? filters.categories.length === 0 && filters.price === 'all'
+            : isFree
+              ? filters.price === 'free'
+              : filters.categories.length === 1 && filters.categories[0] === category;
           return (
             <button
               key={index}
               aria-pressed={isActive}
+              onClick={() => onChange({
+                ...filters,
+                categories: isAll || isFree ? [] : [category],
+                price: isFree ? 'free' : 'all',
+              })}
               className={`flex-none px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
                 isActive 
                   ? 'bg-accent-600 text-white shadow-sm ring-2 ring-accent-600 ring-offset-2' 
