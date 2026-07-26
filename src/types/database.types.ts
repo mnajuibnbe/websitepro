@@ -16,6 +16,7 @@ export interface Course {
   language: string | null;
   visibility: 'public' | 'private' | 'unlisted' | string | null;
   is_featured: boolean | null;
+  home_order: number | null;
   certificate_enabled: boolean | null;
   sequential_learning: boolean | null;
   drip_enabled: boolean | null;
@@ -262,4 +263,3 @@ export interface GetQuizAttemptResultPayload {
   submitted_at: string;
   questions: ResultQuestionPayload[];
 }
-

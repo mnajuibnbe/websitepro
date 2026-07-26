@@ -2,7 +2,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
-import { CheckCircle, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface PendingEnrollment {
@@ -31,6 +31,7 @@ export function AdminDashboard() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('تم اعتماد الطلب بنجاح');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,22 +92,26 @@ export function AdminDashboard() {
     }
   }
 
-  const handleApprove = async (id: string) => {
+  const handleDecision = async (id: string, status: 'active' | 'cancelled') => {
     try {
       setActionLoadingId(id);
       setErrorMsg(null);
-      const { error } = await supabase
+      const { data: updatedEnrollment, error } = await supabase
         .from('enrollments')
-        .update({ status: 'active' })
-        .eq('id', id);
+        .update({ status })
+        .eq('id', id)
+        .eq('status', 'pending')
+        .select('id, status')
+        .maybeSingle();
         
-      if (!error) {
+      if (!error && updatedEnrollment?.status === status) {
         setPendingEnrollments(prev => prev.filter(e => e.id !== id));
+        setToastMessage(status === 'active' ? 'تم اعتماد الطلب بنجاح' : 'تم رفض الطلب');
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       } else {
         setErrorMsg('فشل في اعتماد الطلب، يرجى المحاولة مرة أخرى.');
-        console.error('Update error:', error);
+        console.error('Enrollment decision did not update a pending row:', error || { id, status });
       }
     } catch (e) {
       console.error(e);
@@ -129,7 +134,7 @@ export function AdminDashboard() {
       {showToast && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <CheckCircle2 className="w-6 h-6 text-success-600" />
-          <p className="font-bold">تم اعتماد الطلب بنجاح</p>
+          <p className="font-bold">{toastMessage}</p>
         </div>
       )}
       
@@ -213,10 +218,11 @@ export function AdminDashboard() {
                               {date}
                             </td>
                             <td className="py-4 px-6 text-center">
+                              <div className="flex flex-nowrap items-center justify-center gap-2 min-w-max">
                               <button
-                                onClick={() => handleApprove(enrollment.id)}
+                                onClick={() => handleDecision(enrollment.id, 'active')}
                                 disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-success-600 hover:bg-success-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 title={(!enrollment.users || !enrollment.courses) ? "لا يمكن الاعتماد لعدم اكتمال البيانات" : "اعتماد الطلب"}
                               >
                                 {actionLoadingId === enrollment.id ? (
@@ -226,6 +232,16 @@ export function AdminDashboard() {
                                 )}
                                 اعتماد
                               </button>
+                              <button
+                                onClick={() => handleDecision(enrollment.id, 'cancelled')}
+                                disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
+                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-danger-500 hover:bg-red-600 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="رفض الطلب"
+                              >
+                                <XCircle className="w-4 h-4" />
+                                رفض
+                              </button>
+                              </div>
                             </td>
                           </tr>
                         );

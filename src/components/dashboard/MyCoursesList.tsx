@@ -1,7 +1,7 @@
 import { useAuth } from '../../contexts/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Play, Loader2 } from 'lucide-react';
+import { Play, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { fetchCoursesProgress } from '../../lib/courseProgress';
 
@@ -11,17 +11,20 @@ export function MyCoursesList() {
 
   const [courses, setCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadCourses() {
       try {
         setIsLoading(true);
+        setError(false);
         if (user) {
-          const { data: enrollmentsData } = await supabase
+          const { data: enrollmentsData, error: enrollmentsError } = await supabase
             .from('enrollments')
             .select('course_id')
             .eq('user_id', user.id)
             .eq('status', 'active');
+          if (enrollmentsError) throw enrollmentsError;
 
           let courseIds: string[] = [];
           if (enrollmentsData && enrollmentsData.length > 0) {
@@ -29,10 +32,11 @@ export function MyCoursesList() {
           }
 
           if (courseIds.length > 0) {
-            const [{ data: coursesData }, progressMap] = await Promise.all([
+            const [{ data: coursesData, error: coursesError }, progressMap] = await Promise.all([
               supabase.from('courses').select('*').in('id', courseIds).limit(4),
               fetchCoursesProgress(user.id, courseIds)
             ]);
+            if (coursesError) throw coursesError;
 
             if (coursesData) {
               const coursesWithProgress = coursesData.map((course) => {
@@ -41,21 +45,11 @@ export function MyCoursesList() {
               });
               setCourses(coursesWithProgress);
             }
-          } else {
-            const { data } = await supabase.from('courses').select('*').limit(4);
-            if (data) {
-              const progressMap = await fetchCoursesProgress(user.id, data.map(c => c.id));
-              setCourses(data.map(c => ({ ...c, progress: progressMap[c.id]?.percentage || 0 })));
-            }
-          }
-        } else {
-          const { data } = await supabase.from('courses').select('*').limit(4);
-          if (data) {
-            setCourses(data.map(c => ({ ...c, progress: 0 })));
-          }
+          } else setCourses([]);
         }
       } catch (e) {
         console.error(e);
+        setError(true);
       } finally {
         setIsLoading(false);
       }
@@ -70,6 +64,8 @@ export function MyCoursesList() {
       </div>
     );
   }
+
+  if (error) return <div className="p-6 text-danger-600 flex gap-2"><AlertCircle /> تعذر تحميل كورساتك.</div>;
 
   if (courses.length === 0) {
     return null;

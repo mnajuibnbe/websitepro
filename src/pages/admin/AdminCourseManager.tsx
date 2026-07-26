@@ -19,6 +19,7 @@ import {
   Sparkles,
   Filter,
   ExternalLink,
+  ListOrdered,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RequirePermission } from '../../components/auth/RequirePermission';
@@ -50,6 +51,7 @@ export function AdminCourseManager() {
   const [selectedCourseForDelete, setSelectedCourseForDelete] = useState<CourseListItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [homeOrderSavingId, setHomeOrderSavingId] = useState<string | null>(null);
 
   const addToast = (type: 'success' | 'error' | 'info', message: string) => {
     const id = Date.now().toString();
@@ -61,6 +63,34 @@ export function AdminCourseManager() {
 
   const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleHomeOrderChange = async (courseId: string, rawValue: string, currentOrder: number | null) => {
+    const homeOrder = rawValue === '' ? null : Number.parseInt(rawValue, 10);
+    if (homeOrder !== null && (!Number.isInteger(homeOrder) || homeOrder < 1)) {
+      addToast('error', 'ترتيب الرئيسية يجب أن يكون رقماً صحيحاً يبدأ من 1.');
+      return;
+    }
+    if (homeOrder === currentOrder) return;
+
+    try {
+      setHomeOrderSavingId(courseId);
+      const { data, error } = await supabase
+        .from('courses')
+        .update({ home_order: homeOrder, updated_at: new Date().toISOString() })
+        .eq('id', courseId)
+        .select('id, home_order')
+        .maybeSingle();
+
+      if (error || !data) throw error || new Error('Course order update returned no row');
+      setCourses((current) => current.map((course) => course.id === courseId ? { ...course, home_order: data.home_order } : course));
+      addToast('success', homeOrder === null ? 'تمت إعادة الكورس للترتيب التلقائي حسب الأحدث.' : 'تم تحديث ترتيب الكورس في الرئيسية.');
+    } catch (error) {
+      console.error('Error updating Home course order:', error);
+      addToast('error', 'تعذر تحديث ترتيب الكورس في الرئيسية.');
+    } finally {
+      setHomeOrderSavingId(null);
+    }
   };
 
   // Fetch Courses with aggregate counts
@@ -379,6 +409,7 @@ export function AdminCourseManager() {
                       <th className="py-4 px-4">الإحصائيات</th>
                       <th className="py-4 px-4">الحالة والظهور</th>
                       <th className="py-4 px-4">آخر تحديث</th>
+                      <th className="py-4 px-4 text-center">ترتيب الرئيسية</th>
                       <th className="py-4 px-5 text-center">الإجراءات والتحكم</th>
                     </tr>
                   </thead>
@@ -477,6 +508,25 @@ export function AdminCourseManager() {
                               month: 'short',
                               day: 'numeric',
                             })}
+                          </td>
+
+                          {/* Home order: lower numbers appear first; blank uses newest-first. */}
+                          <td className="py-4 px-4 text-center">
+                            <label className="inline-flex items-center gap-2" title="اتركيه فارغاً للترتيب التلقائي حسب الأحدث">
+                              <ListOrdered className="w-4 h-4 text-primary-400" />
+                              <input
+                                key={`${course.id}-${course.home_order ?? 'auto'}`}
+                                type="number"
+                                min="1"
+                                defaultValue={course.home_order ?? ''}
+                                onBlur={(event) => handleHomeOrderChange(course.id, event.target.value, course.home_order)}
+                                disabled={!isPublished || homeOrderSavingId === course.id}
+                                placeholder="تلقائي"
+                                className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                aria-label={`ترتيب ${course.title} في الصفحة الرئيسية`}
+                              />
+                              {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-amber-600" />}
+                            </label>
                           </td>
 
                           {/* Actions */}

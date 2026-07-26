@@ -5,16 +5,34 @@ import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
+import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
+import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS, filterAndSortCourses } from '../../lib/courseCatalog';
+import type { Course } from '../../types/database.types';
 
-export function CourseGrid() {
+interface CourseGridProps {
+  filters: CourseCatalogFilters;
+  onFiltersChange: (filters: CourseCatalogFilters) => void;
+  onResultCountChange: (count: number) => void;
+}
+
+export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: CourseGridProps) {
+  const pageSize = 9;
   const navigate = useNavigate();
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  const visibleCourses = filterAndSortCourses(courses, filters);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    onResultCountChange(visibleCourses.length);
+  }, [filters, courses, visibleCourses.length, onResultCountChange]);
 
   async function fetchCourses() {
     try {
@@ -23,11 +41,12 @@ export function CourseGrid() {
       const { data, error: dbError } = await supabase
         .from('courses')
         .select('*')
-        .eq('status', 'active')
+        .eq('status', PUBLIC_COURSE_STATUS)
         .order('created_at', { ascending: false });
 
       if (dbError) throw dbError;
       setCourses(data || []);
+      setCurrentPage(1);
     } catch (err) {
       setError('حدث خطأ أثناء تحميل الكورسات. يرجى المحاولة لاحقاً.');
       console.error('Error fetching courses:', err);
@@ -70,33 +89,42 @@ export function CourseGrid() {
     );
   }
 
+  const appliedFilters = [
+    ...filters.categories.map(value => ({ label: value, clear: () => onFiltersChange({ ...filters, categories: filters.categories.filter(item => item !== value) }) })),
+    ...filters.levels.map(value => ({ label: ({ beginner: 'مبتدئ', intermediate: 'متوسط', advanced: 'متقدم' } as Record<string, string>)[value] || value, clear: () => onFiltersChange({ ...filters, levels: filters.levels.filter(item => item !== value) }) })),
+    ...(filters.price === 'all' ? [] : [{ label: filters.price === 'free' ? 'مجاني' : 'مدفوع', clear: () => onFiltersChange({ ...filters, price: 'all' }) }]),
+    ...filters.durations.map(value => ({ label: ({ short: 'أقل من 5 ساعات', medium: '5 - 20 ساعة', long: 'أكثر من 20 ساعة' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
+    ...(filters.search ? [{ label: `بحث: ${filters.search}`, clear: () => onFiltersChange({ ...filters, search: '' }) }] : []),
+  ];
+
   return (
     <div className="flex-grow">
-      {/* Applied Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-8">
-        <span className="text-sm font-bold text-primary-900 ml-2">الفلاتر المُطبقة:</span>
-        <div className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 transition-colors cursor-pointer group">
-          <span>العناية بالبشرة</span>
-          <X className="w-4 h-4 text-primary-400 group-hover:text-danger-500" />
+      {appliedFilters.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+          <span className="text-sm font-bold text-primary-900 ml-2">الفلاتر المُطبقة:</span>
+          {appliedFilters.map(item => (
+            <button type="button" key={item.label} onClick={item.clear} className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
+              {item.label}<X className="w-4 h-4 text-primary-400" />
+            </button>
+          ))}
+          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">مسح الكل</button>
         </div>
-        <div className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100 transition-colors cursor-pointer group">
-          <span>مبتدئ</span>
-          <X className="w-4 h-4 text-primary-400 group-hover:text-danger-500" />
-        </div>
-        <button className="text-sm font-bold text-accent-600 hover:text-accent-700 mr-2 transition-colors">
-          مسح الكل
-        </button>
-      </div>
+      )}
+
+      {visibleCourses.length === 0 ? (
+        <div className="py-20 text-center text-primary-600 font-bold">لا توجد كورسات تطابق البحث أو الفلاتر المحددة.</div>
+      ) : (
+        <>
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
-        {courses.map(course => (
+        {visibleCourses.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(course => (
           <CourseCard 
             key={course.id}
             title={course.title}
             category="Course" 
-            description={course.description}
-            duration="TBD"
+            description={course.description || course.short_description || ''}
+            duration={course.duration || 'TBD'}
             lessonsCount={0}
             price={typeof course.price === 'number' ? course.price : parseFloat(course.price || '0')}
             imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
@@ -107,7 +135,16 @@ export function CourseGrid() {
       </div>
 
       {/* Pagination */}
-      <Pagination />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(visibleCourses.length / pageSize)}
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+        </>
+      )}
     </div>
   );
 }
