@@ -24,7 +24,7 @@ export function RegisterPage() {
       const result = await register(name.trim(), email.trim(), password);
 
       if (result.requiresEmailConfirmation) {
-        setSuccessMessage('Sign Up. Please review the information and try again..');
+        setSuccessMessage('Sign Up. Please review the information and try again.');
       } else {
         navigate('/dashboard');
       }
@@ -40,7 +40,7 @@ export function RegisterPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary-900 mb-2">Sign Up</h1>
-          <p className="text-primary-600">Learn More</p>
+          <p className="text-primary-600">Create your Tutiba account and start learning.</p>
         </div>
 
         {error && (
@@ -68,7 +68,7 @@ export function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                placeholder="Learn More"
+                placeholder="Enter details"
                 disabled={!!successMessage}
               />
             </div>
@@ -123,7 +123,7 @@ export function RegisterPage() {
         </form>
 
         <div className="mt-8 text-center text-primary-600">
-          Learn More{' '}
+          Details{' '}
           <Link to="/login"
             onClick={(e) => {
               e.preventDefault();

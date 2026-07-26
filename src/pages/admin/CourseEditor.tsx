@@ -36,30 +36,30 @@ export function CourseEditor() {
           <div className="space-y-8">
             {/* Basic Info */}
             <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-sm">
-              <h2 className="text-xl font-bold text-primary-900 mb-6">Learn More</h2>
+              <h2 className="text-xl font-bold text-primary-900 mb-6">Course Settings</h2>
 
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">Course</label>
-                  <input type="text" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 transition-colors" placeholder="Learn More: Learn More" />
+                  <input type="text" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 transition-colors" placeholder="Course Settings: Course Settings" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">Description</label>
-                  <textarea rows={4} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 transition-colors resize-none" placeholder="Learn More..."></textarea>
+                  <textarea rows={4} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 transition-colors resize-none" placeholder="Enter details..."></textarea>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Price (Learn More.Learn More)</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Price (SAR)</label>
                     <input type="number" className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 transition-colors" placeholder="0" dir="ltr" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Settings</label>
                     <div className="w-full h-[52px] border-2 border-dashed border-primary-300 rounded-xl flex items-center justify-center text-primary-500 bg-primary-50 hover:bg-primary-100 transition-colors cursor-pointer">
                       <div className="flex items-center gap-2">
                         <ImageIcon className="w-5 h-5" />
-                        <span className="text-sm font-medium">Learn More</span>
+                        <span className="text-sm font-medium">Course Settings</span>
                       </div>
                     </div>
                   </div>

@@ -24,29 +24,29 @@ export function PrivacyPolicy() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-primary-900 mb-2">Privacy Policy</h1>
-                <p className="text-primary-600">Update: 23 Learn More 2026</p>
+                <p className="text-primary-600">Update: 23 Privacy Information 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Privacy Information</h2>
                 <p className="leading-relaxed">
-                  Learn More (Tutiba) Learn More. Privacy Policy.
+                  Privacy Information (Tutiba) Privacy Information. Privacy Policy.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Privacy Information</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
                   <li><strong>Account:</strong> Email Address.</li>
-                  <li><strong>Payment:</strong> Learn More.</li>
-                  <li><strong>Learn More:</strong> Review the quiz information and continue when you are ready..</li>
+                  <li><strong>Payment:</strong> Privacy Information.</li>
+                  <li><strong>Privacy Information:</strong> Review the quiz information and continue when you are ready.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Privacy Information</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
                   <li>Certificates.</li>
                   <li>User.</li>
@@ -55,14 +55,14 @@ export function PrivacyPolicy() {
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Privacy Information</h2>
                 <p className="leading-relaxed">
-                  Learn More (SSL/TLS) Learn More. Learn More.
+                  Privacy Information (SSL/TLS) Privacy Information. Privacy Information.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Privacy Information</h2>
                 <p className="leading-relaxed">
                   Delete.
                 </p>

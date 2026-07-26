@@ -32,14 +32,14 @@ export interface Lesson {
 const MOCK_USERS: User[] = [
   {
     id: 'usr_1',
-    name: 'Learn More',
+    name: 'Instructor',
     email: 'student@example.com',
     role: 'student',
     joinedAt: '2026-07-01'
   },
   {
     id: 'usr_admin',
-    name: 'Learn More',
+    name: 'Instructor',
     email: 'admin@example.com',
     role: 'admin',
     joinedAt: '2026-01-01'
@@ -112,7 +112,7 @@ export async function getUserProfile(token: string): Promise<User | null> {
       if (!user) {
         user = {
           id: userId,
-          name: 'Learn More (Learn More Supabase)',
+          name: 'Details (Details Supabase)',
           email: 'user@example.com',
           role: 'student',
           joinedAt: new Date().toISOString()

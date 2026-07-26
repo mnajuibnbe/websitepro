@@ -19,7 +19,7 @@ export function CheckoutPage() {
             <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-4">
               <Link to="/courses" className="hover:text-accent-600 transition-colors">Courses</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-              <Link to="/course" className="hover:text-accent-600 transition-colors">Learn More</Link>
+              <Link to="/course" className="hover:text-accent-600 transition-colors">Course Details</Link>
               <ChevronLeft className="w-4 h-4 flex-shrink-0" />
               <span className="text-primary-900 font-bold">Payment</span>
             </nav>

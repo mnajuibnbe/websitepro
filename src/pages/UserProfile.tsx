@@ -21,10 +21,10 @@ export function UserProfile() {
           <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-10">
             <div className="flex items-center gap-6 mb-10 pb-8 border-b border-primary-100">
               <div className="w-24 h-24 bg-accent-100 rounded-full flex items-center justify-center text-accent-600 text-3xl font-bold">
-                {user?.name?.charAt(0) || 'Learn More'}
+                {user?.name?.charAt(0) || 'U'}
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">{user?.name || 'Learn More'}</h1>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">{user?.name || 'User'}</h1>
                 <p className="text-primary-600 flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   <span dir="ltr">{user?.email || 'user@example.com'}</span>
@@ -47,7 +47,7 @@ export function UserProfile() {
               <section>
                 <h2 className="text-xl font-bold text-primary-900 mb-6 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-accent-600" />
-                  Learn More
+                  Details
                 </h2>
                 <div className="bg-primary-50 p-6 rounded-2xl border border-primary-100 space-y-4">
                   <div className="flex items-center justify-between">

@@ -213,7 +213,7 @@ export function AdminCourseManager() {
           updates.published_at = new Date().toISOString();
         }
         if (currentCourse?.visibility === 'private') {
-          addToast('info', 'Course "Learn More" (Private)Learn More.');
+          addToast('info', 'Course "Course Management" (Private)Course Management.');
         }
       } else if (newStatus === 'archived') {
         updates.archived_at = new Date().toISOString();
@@ -331,10 +331,10 @@ export function AdminCourseManager() {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
               >
-                <option value="all">Learn More</option>
+                <option value="all">Course Management</option>
                 <option value="published">Published (Published)</option>
                 <option value="draft">Draft (Draft)</option>
-                <option value="archived">Learn More (Archived)</option>
+                <option value="archived">Archived</option>
               </select>
             </div>
 
@@ -346,7 +346,7 @@ export function AdminCourseManager() {
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
                 >
-                  <option value="all">Learn More</option>
+                  <option value="all">Course Management</option>
                   {categoriesList.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
@@ -407,11 +407,11 @@ export function AdminCourseManager() {
                     <tr>
                       <th className="py-4 px-5">Course</th>
                       <th className="py-4 px-4">Price</th>
-                      <th className="py-4 px-4">Learn More</th>
-                      <th className="py-4 px-4">Learn More</th>
+                      <th className="py-4 px-4">Course Management</th>
+                      <th className="py-4 px-4">Course Management</th>
                       <th className="py-4 px-4">Update</th>
                       <th className="py-4 px-4 text-center">Home</th>
-                      <th className="py-4 px-5 text-center">Learn More</th>
+                      <th className="py-4 px-5 text-center">Course Management</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100 text-sm">
@@ -441,7 +441,7 @@ export function AdminCourseManager() {
                                 </h4>
                                 <div className="flex items-center gap-2 mt-0.5">
                                   <span className="text-xs text-primary-500 font-medium">
-                                    {course.category || 'Learn More'}
+                                    {course.category || 'Uncategorized'}
                                   </span>
                                   {course.level && (
                                     <span className="text-[11px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-md font-semibold">
@@ -451,7 +451,7 @@ export function AdminCourseManager() {
                                         ? 'Intermediate'
                                         : course.level === 'advanced'
                                         ? 'Advanced'
-                                        : 'Learn More'}
+                                        : 'Course Management'}
                                     </span>
                                   )}
                                 </div>
@@ -461,23 +461,23 @@ export function AdminCourseManager() {
 
                           {/* Price */}
                           <td className="py-4 px-4 font-bold text-primary-900">
-                            <div className="space-y-1 text-xs"><div>Egypt: {course.price_egp == null ? 'Unavailable' : Number(course.price_egp) === 0 ? 'Free' : formatCourseAmount(String(course.price_egp), 'EGP')}</div><div>International: {course.price_usd == null ? 'Unavailable' : Number(course.price_usd) === 0 ? 'Free' : formatCourseAmount(String(course.price_usd), 'USD')}</div></div>
+                            {course.price ? `${course.price} SAR` : <span className="text-emerald-600 font-bold">Free</span>}
                           </td>
 
                           {/* Stats */}
                           <td className="py-4 px-4 text-xs text-primary-600 font-medium">
                             <div className="flex items-center gap-3">
-                              <span className="flex items-center gap-1" title="Learn More">
+                              <span className="flex items-center gap-1" title="Course Management">
                                 <Layers className="w-3.5 h-3.5 text-primary-400" />
-                                {course.sections_count} Learn More
+                                {course.sections_count} sections
                               </span>
                               <span className="flex items-center gap-1" title="Lessons">
                                 <FileText className="w-3.5 h-3.5 text-primary-400" />
                                 {course.lessons_count} Lesson
                               </span>
-                              <span className="flex items-center gap-1 text-amber-700 font-bold" title="Learn More">
+                              <span className="flex items-center gap-1 text-amber-700 font-bold" title="Course Management">
                                 <Users className="w-3.5 h-3.5 text-amber-600" />
-                                {course.enrolled_count} Learn More
+                                {course.enrolled_count} students
                               </span>
                             </div>
                           </td>
@@ -494,10 +494,10 @@ export function AdminCourseManager() {
                                     : 'bg-amber-100 text-amber-800 border border-amber-200'
                                 }`}
                               >
-                                {isPublished ? 'Published' : isArchived ? 'Learn More' : 'Draft'}
+                                {isPublished ? 'Published' : isArchived ? 'Archived' : 'Draft'}
                               </span>
                               <span className="text-[11px] text-primary-500 font-medium">
-                                Learn More: {course.visibility === 'private' ? 'Learn More' : course.visibility === 'unlisted' ? 'Learn More' : 'Learn More'}
+                                Course Management: {course.visibility === 'private' ? 'Course Management' : course.visibility === 'unlisted' ? 'Course Management' : 'Course Management'}
                               </span>
                             </div>
                           </td>
@@ -513,7 +513,7 @@ export function AdminCourseManager() {
 
                           {/* Home order: lower numbers appear first; blank uses newest-first. */}
                           <td className="py-4 px-4 text-center">
-                            <label className="inline-flex items-center gap-2" title="Learn More">
+                            <label className="inline-flex items-center gap-2" title="Course Management">
                               <ListOrdered className="w-4 h-4 text-primary-400" />
                               <input
                                 key={`${course.id}-${course.home_order ?? 'auto'}`}
@@ -522,9 +522,9 @@ export function AdminCourseManager() {
                                 defaultValue={course.home_order ?? ''}
                                 onBlur={(event) => handleHomeOrderChange(course.id, event.target.value, course.home_order)}
                                 disabled={!isPublished || homeOrderSavingId === course.id}
-                                placeholder="Learn More"
+                                placeholder="Enter details"
                                 className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                aria-label={`Learn More ${course.title} Home`}
+                                aria-label={`Course Management ${course.title} Home`}
                               />
                               {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-amber-600" />}
                             </label>
@@ -537,10 +537,10 @@ export function AdminCourseManager() {
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/builder`)}
                                 className="p-2 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"
-                                title="Learn More Course Builder"
+                                title="Course Management Course Builder"
                               >
                                 <Sparkles className="w-4 h-4 text-amber-600" />
-                                <span className="hidden xl:inline">Learn More</span>
+                                <span className="hidden xl:inline">Course Management</span>
                               </button>
 
                               {/* Edit Metadata */}
@@ -617,12 +617,12 @@ export function AdminCourseManager() {
                 <h3 className="text-xl font-bold text-primary-900 mb-2">Course</h3>
 
                 <p className="text-primary-700 text-sm leading-relaxed mb-4">
-                  Course <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span> Learn More{' '}
-                  <span className="font-bold text-amber-700">{selectedCourseForDelete.enrolled_count} Learn More</span>.
+                  Course <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span> Course Management{' '}
+                  <span className="font-bold text-amber-700">{selectedCourseForDelete.enrolled_count} Course Management</span>.
                 </p>
 
                 <p className="text-xs text-primary-500 leading-relaxed bg-primary-50 p-3 rounded-xl border border-primary-200 mb-6">
-                  Create, review, and manage your course catalog. Course "Learn More" Students.
+                  Create, review, and manage your course catalog. Course "Course Management" Students.
                 </p>
 
                 <div className="flex items-center gap-3">
@@ -653,7 +653,7 @@ export function AdminCourseManager() {
                 <h3 className="text-xl font-bold text-primary-900 mb-2">Course</h3>
 
                 <p className="text-primary-700 text-sm leading-relaxed mb-6">
-                  Build practical skills with structured, expert-led course content. <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span>Learn More.
+                  Build practical skills with structured, expert-led course content. <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span>Course Management.
                 </p>
 
                 <div className="flex items-center gap-3">

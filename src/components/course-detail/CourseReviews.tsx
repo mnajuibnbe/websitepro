@@ -5,27 +5,27 @@ export function CourseReviews() {
   const reviews = [
     {
       id: 1,
-      name: "Learn More. Learn More",
-      profession: "Learn More",
-      date: "Learn More",
+      name: "Course Review. Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review",
       rating: 5,
-      content: "Content. Build practical skills with structured, expert-led course content.."
+      content: "Content. The requested information could not be loaded. Please try again."
     },
     {
       id: 2,
-      name: "Learn More. Learn More",
-      profession: "Learn More",
-      date: "Learn More 3 Learn More",
+      name: "Course Review. Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review 3 Course Review",
       rating: 5,
       content: "Lesson. Course."
     },
     {
       id: 3,
-      name: "Learn More",
-      profession: "Learn More",
-      date: "Learn More",
+      name: "Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review",
       rating: 5,
-      content: "Learn More. Learn More. Build practical skills with structured, expert-led course content.."
+      content: "Course Review. Course Review. The requested information could not be loaded. Please try again."
     }
   ];
 
@@ -48,7 +48,7 @@ export function CourseReviews() {
               <Star className="w-5 h-5 fill-current" />
               <Star className="w-5 h-5 fill-current opacity-50" />
             </div>
-            <span className="text-sm text-primary-500 font-medium">120 Learn More</span>
+            <span className="text-sm text-primary-500 font-medium">120 Course Review</span>
           </div>
 
           {/* Rating Bars - Mockup */}

@@ -8,7 +8,7 @@ export function AccountDetails() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-bold text-primary-700 mb-2">Full Name</label>
-          <Input type="text" placeholder="Learn More: Learn More" className="w-full" />
+          <Input type="text" placeholder="Account Information: Account Information" className="w-full" />
         </div>
         <div>
           <label className="block text-sm font-bold text-primary-700 mb-2">Email Address</label>
@@ -16,7 +16,7 @@ export function AccountDetails() {
         </div>
       </div>
       <p className="text-sm text-primary-500 mt-4">
-        Build practical skills with structured, expert-led course content..
+        The requested information could not be loaded. Please try again.
       </p>
     </div>
   );

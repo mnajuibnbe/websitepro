@@ -109,7 +109,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setSections(data);
     } catch (err: any) {
       console.error('Failed loading curriculum:', err);
-      setError('Course. Please review the information and try again..');
+      setError('Course. Please review the information and try again.');
     } finally {
       setLoading(false);
     }
@@ -216,7 +216,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         } catch (err) {
           console.error('Failed to save section reorder:', err);
           setSections(snapshot);
-          setError('Save. Learn More.');
+          setError('Save. Curriculum.');
         } finally {
           setIsSavingOrder(false);
         }
@@ -256,7 +256,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       } catch (err) {
         console.error('Failed to save item reorder:', err);
         setSections(snapshot);
-        setError('Save. Learn More.');
+        setError('Save. Curriculum.');
       } finally {
         setIsSavingOrder(false);
       }
@@ -435,7 +435,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setUndoToast({
         show: true,
         itemIds: [itemId],
-        message: `Delete "${item?.title || 'Learn More'}" Success.`,
+        message: `Delete "${item?.title || 'Curriculum'}" Success.`,
         timeoutId: timeout,
       });
     } catch (err) {
@@ -518,7 +518,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setUndoToast({
         show: true,
         itemIds: ids,
-        message: `Delete ${ids.length} Learn More/Lessons.`,
+        message: `Delete ${ids.length} Curriculum/Lessons.`,
         timeoutId: timeout,
       });
     } catch (err) {
@@ -589,7 +589,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         {/* Action Controls & Stats */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="hidden sm:flex items-center gap-3 text-xs font-bold text-primary-700 border-l border-primary-200 pl-4 ml-1">
-            <span>{totalSections} Learn More</span>
+            <span>{totalSections} Curriculum</span>
             <span className="text-primary-300">•</span>
             <span>{totalItems} Lessons</span>
             <span className="text-primary-300">•</span>
@@ -600,20 +600,20 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             type="button"
             onClick={() => handleToggleExpandAll(true)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="Learn More"
+            title="Curriculum"
           >
             <Maximize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Learn More</span>
+            <span className="hidden sm:inline">Curriculum</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleToggleExpandAll(false)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="Learn More"
+            title="Curriculum"
           >
             <Minimize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Learn More</span>
+            <span className="hidden sm:inline">Curriculum</span>
           </button>
 
           <button
@@ -657,7 +657,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         <div className="sticky top-4 z-30 p-3 bg-primary-900 text-white rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-3 duration-200">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold bg-amber-500 text-primary-950 px-2.5 py-1 rounded-lg">
-              Learn More {selectedItemIds.length} Learn More
+              {selectedItemIds.length} items selected
             </span>
 
             <button
@@ -698,7 +698,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <MoveRight className="w-3.5 h-3.5" />
-              <span>Learn More</span>
+              <span>Curriculum</span>
             </button>
 
             <button
@@ -726,7 +726,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold text-xs rounded-xl flex items-center gap-1.5 flex-shrink-0 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Learn More</span>
+            <span>Curriculum</span>
           </button>
         </div>
       )}
@@ -740,7 +740,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <div className="max-w-md mx-auto space-y-1">
             <h3 className="font-bold text-base text-primary-900">No items are available yet.</h3>
             <p className="text-xs text-primary-500 leading-relaxed">
-              Build practical skills with structured, expert-led course content..
+              The requested information could not be loaded. Please try again.
             </p>
           </div>
           <button
@@ -823,7 +823,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   type="text"
                   value={newSectionTitle}
                   onChange={(e) => setNewSectionTitle(e.target.value)}
-                  placeholder="Learn More: Learn More - Learn More"
+                  placeholder="Curriculum: Curriculum - Curriculum"
                   className="w-full text-xs font-bold p-3 bg-primary-50/50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
                   autoFocus
                 />
@@ -831,7 +831,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
               <div>
                 <label className="block text-xs font-bold text-primary-800 mb-1">
-                  Section (Learn More)
+                  Section (Curriculum)
                 </label>
                 <textarea
                   rows={3}
@@ -883,7 +883,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             </div>
 
             <p className="text-xs text-primary-600 leading-relaxed">
-              Section <strong>&quot;{deleteSectionModal.section.title}&quot;</strong> Learn More{' '}
+              Section <strong>&quot;{deleteSectionModal.section.title}&quot;</strong> Curriculum{' '}
               <strong className="text-amber-800">{deleteSectionModal.section.items.length} Lessons</strong>.
               Select:
             </p>
@@ -951,7 +951,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <h3 className="text-base font-bold text-primary-900">
-              Learn More {selectedItemIds.length} Learn More
+              {selectedItemIds.length} items selected
             </h3>
 
             <div className="space-y-2">

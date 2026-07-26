@@ -3,11 +3,11 @@ import { Button } from '../ui/Button';
 
 export function LearningMethod() {
   const steps = [
-    { id: 1, number: '01', title: 'Learn More', description: 'Lessons.' },
-    { id: 2, number: '02', title: 'Learn More', description: 'Learn More.' },
-    { id: 3, number: '03', title: 'Learn More', description: 'Content.' },
-    { id: 4, number: '04', title: 'Learn More', description: 'Learn More.' },
-    { id: 5, number: '05', title: 'Learn More', description: 'Learn More.' },
+    { id: 1, number: '01', title: 'Learn', description: 'Follow structured, accessible scientific lessons.' },
+    { id: 2, number: '02', title: 'Apply', description: 'Work through practical cases from the market.' },
+    { id: 3, number: '03', title: 'Assess', description: 'Check your understanding with focused questions.' },
+    { id: 4, number: '04', title: 'Understand', description: 'Use detailed explanations to close knowledge gaps.' },
+    { id: 5, number: '05', title: 'Retain', description: 'Reinforce key concepts with memory tools.' },
   ];
 
   return (
@@ -15,10 +15,10 @@ export function LearningMethod() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            Learn More
+            How Learning Works
           </h2>
           <p className="text-lg text-primary-600">
-            Learn More.
+            A complete method designed to help you understand, retain, and apply what you learn.
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export function LearningMethod() {
 
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8">
-            Explore
+            Explore Our Learning Method
           </Button>
         </div>
       </div>

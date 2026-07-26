@@ -244,15 +244,15 @@ export function AdminLessonEditor() {
       newErrors.title = 'Lesson';
     }
     if (estimatedMinutes < 0) {
-      newErrors.estimatedMinutes = 'Duration 0 Learn More';
+      newErrors.estimatedMinutes = 'Duration 0 Lesson Settings';
     }
 
     // URL validation if type demands URL
     if (['video'].includes(lessonType) && videoUrl.trim() && !videoUrl.trim().startsWith('http')) {
-      newErrors.videoUrl = 'Please review the information and try again. http:// Learn More https://';
+      newErrors.videoUrl = 'Please review the information and try again. http:// Lesson Settings https://';
     }
     if (['pdf', 'audio', 'external_link'].includes(lessonType) && contentUrl.trim() && !contentUrl.trim().startsWith('http')) {
-      newErrors.contentUrl = 'Please review the information and try again. http:// Learn More https://';
+      newErrors.contentUrl = 'Please review the information and try again. http:// Lesson Settings https://';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -383,7 +383,7 @@ export function AdminLessonEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (isDirty && !window.confirm('Learn More')) return;
+                    if (isDirty && !window.confirm('Lesson Settings')) return;
                     navigate(`/admin/courses/${courseId}/builder`);
                   }}
                   className="p-2.5 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
@@ -417,7 +417,7 @@ export function AdminLessonEditor() {
 
                     {isDirty && (
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white animate-pulse">
-                        Learn More
+                        Lesson Settings
                       </span>
                     )}
                   </div>
@@ -443,7 +443,7 @@ export function AdminLessonEditor() {
                       title="Lesson"
                     >
                       <Copy className="w-4 h-4 text-primary-600" />
-                      <span className="hidden sm:inline">Learn More (Duplicate)</span>
+                      <span className="hidden sm:inline">Lesson Settings (Duplicate)</span>
                     </button>
 
                     <button
@@ -474,9 +474,9 @@ export function AdminLessonEditor() {
             {/* Navigation Tabs Bar */}
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
-                { id: 'general', label: 'Learn More (General)', icon: SettingsIcon },
+                { id: 'general', label: 'General', icon: SettingsIcon },
                 { id: 'content', label: 'Content (Content)', icon: FileText },
-                { id: 'access', label: 'Learn More (Access)', icon: Lock },
+                { id: 'access', label: 'Access', icon: Lock },
                 { id: 'settings', label: 'SettingsSEO (Settings)', icon: Globe },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -503,7 +503,7 @@ export function AdminLessonEditor() {
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
               <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-              <p className="text-primary-700 font-bold text-sm">Processing......</p>
+              <p className="text-primary-700 font-bold text-sm">Loading...</p>
             </div>
           ) : errorMessage ? (
             <div className="bg-white border border-danger-200 rounded-2xl p-6 text-left shadow-xs">
@@ -544,7 +544,7 @@ export function AdminLessonEditor() {
                           setIsDirty(true);
                           if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                         }}
-                        placeholder="Learn More: Learn More"
+                        placeholder="Lesson Settings: Lesson Settings"
                         className={`w-full px-4 py-2.5 bg-white border ${
                           errors.title ? 'border-danger-500' : 'border-primary-200'
                         } rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium`}
@@ -564,7 +564,7 @@ export function AdminLessonEditor() {
                           className="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span>Learn More</span>
+                          <span>Lesson Settings</span>
                         </button>
                       </div>
                       <input
@@ -608,15 +608,15 @@ export function AdminLessonEditor() {
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
-                          { id: 'video', label: 'Learn More (Video)', icon: Video, color: 'text-amber-600' },
-                          { id: 'article', label: 'Learn More / Learn More (Article)', icon: FileText, color: 'text-emerald-600' },
-                          { id: 'pdf', label: 'Learn More PDF', icon: FileCode, color: 'text-red-600' },
-                          { id: 'audio', label: 'Learn More (Audio)', icon: Volume2, color: 'text-purple-600' },
+                          { id: 'video', label: 'Video', icon: Video, color: 'text-amber-600' },
+                          { id: 'article', label: 'Article', icon: FileText, color: 'text-emerald-600' },
+                          { id: 'pdf', label: 'PDF Document', icon: FileCode, color: 'text-red-600' },
+                          { id: 'audio', label: 'Audio', icon: Volume2, color: 'text-purple-600' },
                           { id: 'external_link', label: 'Link', icon: ExternalLink, color: 'text-blue-600' },
-                          { id: 'embed', label: 'Learn More Embed', icon: Code, color: 'text-indigo-600' },
-                          { id: 'live', label: 'Learn More Live', icon: Radio, color: 'text-rose-600' },
+                          { id: 'embed', label: 'Embedded Content', icon: Code, color: 'text-indigo-600' },
+                          { id: 'live', label: 'Live Session', icon: Radio, color: 'text-rose-600' },
                           { id: 'quiz', label: 'Quiz Quiz', icon: HelpCircle, color: 'text-amber-600' },
-                          { id: 'assignment', label: 'Learn More Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
+                          { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
                         ].map((typeItem) => {
                           const Icon = typeItem.icon;
                           const isSelected = lessonType === typeItem.id;
@@ -645,7 +645,7 @@ export function AdminLessonEditor() {
                     {/* Estimated Duration */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Duration (Learn More)
+                        Duration (Lesson Settings)
                       </label>
                       <input
                         type="number"
@@ -704,7 +704,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     {getLessonTypeIcon(lessonType)}
-                    <span>Details - {lessonType.toUpperCase()}</span>
+                    <span>Lesson Settings - {lessonType.toUpperCase()}</span>
                   </h3>
 
                   {/* Video Content Fields */}
@@ -730,7 +730,7 @@ export function AdminLessonEditor() {
 
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Learn More (Transcript)
+                          Lesson Settings (Transcript)
                         </label>
                         <textarea
                           rows={4}
@@ -739,7 +739,7 @@ export function AdminLessonEditor() {
                             setTranscript(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="Learn MoreSEO..."
+                          placeholder="Lesson SettingsSEO..."
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                         />
                       </div>
@@ -764,7 +764,7 @@ export function AdminLessonEditor() {
 
                         <div>
                           <label className="block text-xs font-bold text-primary-900 mb-2">
-                            Learn More
+                            Lesson Settings
                           </label>
                           <input
                             type="text"
@@ -773,7 +773,7 @@ export function AdminLessonEditor() {
                               setNotes(e.target.value);
                               setIsDirty(true);
                             }}
-                            placeholder="Learn More..."
+                            placeholder="Enter details..."
                             className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                           />
                         </div>
@@ -795,7 +795,7 @@ export function AdminLessonEditor() {
                             setContent(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="Learn More (Learn More HTML Learn More Markdown)..."
+                          placeholder="Lesson Settings (Lesson Settings HTML Lesson Settings Markdown)..."
                           className="w-full p-4 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-mono leading-relaxed"
                         />
                       </div>
@@ -833,7 +833,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Learn More</span>
+                          <span>Lesson Settings</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary-900">
@@ -846,7 +846,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Learn More</span>
+                          <span>Lesson Settings</span>
                         </label>
                       </div>
                     </div>
@@ -914,7 +914,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Learn More (Embed HTML Code / iFrame)
+                          Lesson Settings (Embed HTML Code / iFrame)
                         </label>
                         <textarea
                           rows={6}
@@ -977,7 +977,7 @@ export function AdminLessonEditor() {
                             setContent(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="Learn More..."
+                          placeholder="Enter details..."
                           className="w-full p-4 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                         />
                       </div>
@@ -1023,7 +1023,7 @@ export function AdminLessonEditor() {
                       <div>
                         <h4 className="font-bold text-primary-900 text-sm">Free (Free Preview)</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          Build practical skills with structured, expert-led course content..
+                          The requested information could not be loaded. Please try again.
                         </p>
                       </div>
 
@@ -1055,10 +1055,10 @@ export function AdminLessonEditor() {
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold"
                       >
                         <option value="manual">Confirm</option>
-                        <option value="watch90">Learn More 90% Learn More</option>
+                        <option value="watch90">Lesson Settings 90% Lesson Settings</option>
                         <option value="read_end">Content</option>
                         <option value="pass_quiz">Lesson</option>
-                        <option value="upload_assignment">Learn More</option>
+                        <option value="upload_assignment">Lesson Settings</option>
                       </select>
                     </div>
                   </div>
@@ -1140,7 +1140,7 @@ export function AdminLessonEditor() {
               <h3 className="font-bold text-lg text-primary-900">Delete</h3>
             </div>
             <p className="text-primary-700 text-sm leading-relaxed">
-              Delete <strong className="text-primary-900">{title}</strong>Learn More.
+              Delete <strong className="text-primary-900">{title}</strong>Lesson Settings.
             </p>
             <div className="flex items-center justify-end gap-3 pt-3">
               <button

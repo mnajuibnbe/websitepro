@@ -15,7 +15,7 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
 
       <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">Congratulations! <br className="sm:hidden" />Course</h1>
       <p className="text-lg text-primary-600 mb-10 leading-relaxed">
-        Learn More. Learn More.
+        Details. Details.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">

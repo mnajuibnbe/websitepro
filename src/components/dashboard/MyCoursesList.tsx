@@ -98,7 +98,7 @@ export function MyCoursesList() {
                 <h4 className="font-bold text-primary-900 line-clamp-2 mb-3 leading-snug">{course.title}</h4>
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1.5">
-                    <span className="text-primary-500">Learn More</span>
+                    <span className="text-primary-500">Progress</span>
                     <span className="text-primary-900">{course.progress}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-primary-100 rounded-full overflow-hidden">

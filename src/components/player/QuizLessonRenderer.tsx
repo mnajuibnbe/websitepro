@@ -75,7 +75,7 @@ export function QuizLessonRenderer({
 
       if (quizError) {
         console.error('Error fetching quiz metadata:', quizError);
-        setErrorMessage('Review the quiz information and continue when you are ready..');
+        setErrorMessage('Review the quiz information and continue when you are ready.');
         setPhase('error');
         return;
       }
@@ -114,7 +114,7 @@ export function QuizLessonRenderer({
       }
     } catch (err: any) {
       console.error('Unexpected error loading quiz:', err);
-      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready..');
+      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready.');
       setPhase('error');
     }
   }, [user, lessonId]);
@@ -183,7 +183,7 @@ export function QuizLessonRenderer({
       setPhase('active');
     } catch (err: any) {
       console.error('Error starting quiz attempt:', err);
-      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready..');
+      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready.');
       setPhase('error');
     } finally {
       setIsActionLoading(false);
@@ -359,16 +359,16 @@ export function QuizLessonRenderer({
             </div>
 
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-200/60">
-              <span className="text-xs text-primary-500 font-medium block mb-1">Learn More</span>
+              <span className="text-xs text-primary-500 font-medium block mb-1">Quiz Information</span>
               <span className="text-lg font-bold text-primary-900">
-                {quizInfo.time_limit_minutes ? `${quizInfo.time_limit_minutes} Minute` : 'Learn More'}
+                {quizInfo.time_limit_minutes ? `${quizInfo.time_limit_minutes} minutes` : 'No time limit'}
               </span>
             </div>
 
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-200/60 col-span-2 sm:col-span-1">
-              <span className="text-xs text-primary-500 font-medium block mb-1">Learn More</span>
+              <span className="text-xs text-primary-500 font-medium block mb-1">Quiz Information</span>
               <span className="text-lg font-bold text-primary-900">
-                {quizInfo.max_attempts ? `${quizInfo.max_attempts} Learn More` : 'Learn More'}
+                {quizInfo.max_attempts ? `${quizInfo.max_attempts} attempts` : 'Unlimited'}
               </span>
             </div>
           </div>
@@ -382,7 +382,7 @@ export function QuizLessonRenderer({
             {isActionLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Processing......</span>
+                <span>Loading...</span>
               </>
             ) : (
               <>
@@ -405,7 +405,7 @@ export function QuizLessonRenderer({
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 w-fit mb-1.5">
               <HelpCircle className="w-3.5 h-3.5" />
-              <span>Learn More #{activeAttempt.attempt_number} {activeAttempt.max_attempts ? `Learn More ${activeAttempt.max_attempts}` : ''}</span>
+              <span>Quiz Information #{activeAttempt.attempt_number} {activeAttempt.max_attempts ? `Quiz Information ${activeAttempt.max_attempts}` : ''}</span>
             </div>
             <h2 className="text-xl font-bold text-primary-900">{activeAttempt.title}</h2>
           </div>
@@ -423,7 +423,7 @@ export function QuizLessonRenderer({
             >
               <Clock className="w-4 h-4 flex-shrink-0" />
               <span>
-                {isTimeExpired ? 'Learn More' : `Learn More: ${formatTimer(remainingSeconds)}`}
+                {isTimeExpired ? 'Quiz Information' : `Quiz Information: ${formatTimer(remainingSeconds)}`}
               </span>
             </div>
           )}
@@ -436,7 +436,7 @@ export function QuizLessonRenderer({
             <div>
               <p className="font-bold mb-1">Quiz!</p>
               <p className="text-xs text-danger-800 leading-relaxed">
-                Learn More. Learn More "Quiz" Save.
+                Quiz Information. Quiz Information "Quiz" Save.
               </p>
             </div>
           </div>
@@ -445,7 +445,7 @@ export function QuizLessonRenderer({
         {/* Progress Summary Header */}
         <div className="mb-8 bg-primary-50 p-4 rounded-xl border border-primary-200/80 flex items-center justify-between gap-4">
           <div className="text-xs font-bold text-primary-700">
-            Learn More: <span className="text-amber-700">{answeredQuestionsCount}</span> Learn More <span className="text-primary-900">{totalQuestionsCount}</span> Learn More
+            Quiz Information: <span className="text-amber-700">{answeredQuestionsCount}</span> Quiz Information <span className="text-primary-900">{totalQuestionsCount}</span> Quiz Information
           </div>
           <div className="w-32 sm:w-48 bg-primary-200 rounded-full h-2 overflow-hidden">
             <div
@@ -479,7 +479,7 @@ export function QuizLessonRenderer({
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-xs font-semibold text-primary-500 bg-primary-100 px-2.5 py-1 rounded-md">
-                      {question.points} {question.points === 1 ? 'Learn More' : 'Learn More'}
+                      {question.points} {question.points === 1 ? 'point' : 'points'}
                     </span>
                     {status === 'saving' && (
                       <span className="text-xs text-amber-600 flex items-center gap-1 font-medium">
@@ -546,7 +546,7 @@ export function QuizLessonRenderer({
             {phase === 'submitting' ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Processing......</span>
+                <span>Loading...</span>
               </>
             ) : (
               <>
@@ -568,13 +568,13 @@ export function QuizLessonRenderer({
               <h3 className="text-xl font-bold text-primary-900 mb-2">Quiz</h3>
 
               <p className="text-primary-600 text-sm leading-relaxed mb-4">
-                Answer <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> Learn More <span className="font-bold text-primary-900">{totalQuestionsCount}</span> Learn More.
+                Answer <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> Quiz Information <span className="font-bold text-primary-900">{totalQuestionsCount}</span> Quiz Information.
               </p>
 
               {answeredQuestionsCount < totalQuestionsCount && (
                 <div className="p-3 bg-warning-50 border border-warning-200 rounded-xl text-warning-800 text-xs mb-6 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-warning-600 flex-shrink-0 mt-0.5" />
-                  <span>Learn More: Answer.</span>
+                  <span>Quiz Information: Answer.</span>
                 </div>
               )}
 
@@ -631,7 +631,7 @@ export function QuizLessonRenderer({
 
           <p className="text-sm opacity-80 mb-6">
             {isPassed
-              ? 'Build practical skills with structured, expert-led course content..'
+              ? 'The requested information could not be loaded. Please try again.'
               : `Success ${resultData.pass_percentage}%. Retry.`}
           </p>
 
@@ -645,16 +645,16 @@ export function QuizLessonRenderer({
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
-              <span>Learn More: </span>
+              <span>Quiz Information: </span>
               <span>
-                {resultData.score_points} Learn More {resultData.total_points}
+                {resultData.score_points} of {resultData.total_points}
               </span>
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
-              <span>Learn More: </span>
+              <span>Quiz Information: </span>
               <span className={isPassed ? 'text-emerald-700' : 'text-danger-700'}>
-                {isPassed ? 'Learn More' : 'Learn More'}
+                {isPassed ? 'Quiz Information' : 'Quiz Information'}
               </span>
             </div>
           </div>
@@ -663,7 +663,7 @@ export function QuizLessonRenderer({
         {/* Detailed Questions Review */}
         <h3 className="text-lg font-bold text-primary-900 mb-6 flex items-center gap-2">
           <FileText className="w-5 h-5 text-amber-600" />
-          <span>Learn More:</span>
+          <span>Quiz Information:</span>
         </h3>
 
         <div className="space-y-8 mb-10">
@@ -701,7 +701,7 @@ export function QuizLessonRenderer({
                         : 'bg-danger-100 text-danger-800'
                     }`}
                   >
-                    {question.points_awarded || 0} / {question.points} Learn More
+                    {question.points_awarded || 0} / {question.points} points
                   </span>
                 </div>
 
@@ -731,7 +731,7 @@ export function QuizLessonRenderer({
                           <span className="leading-relaxed">{option.option_text}</span>
                           {isSelected && (
                             <span className="text-xs px-2 py-0.5 rounded-md bg-black/5 font-semibold">
-                              Learn More
+                              Quiz Information
                             </span>
                           )}
                         </div>
@@ -744,7 +744,7 @@ export function QuizLessonRenderer({
                 {/* Question Explanation Box */}
                 {question.explanation && (
                   <div className="mt-4 p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-amber-950 text-sm leading-relaxed">
-                    <span className="font-bold block mb-1 text-amber-900">Learn More:</span>
+                    <span className="font-bold block mb-1 text-amber-900">Quiz Information:</span>
                     <p className="text-amber-900/90 text-xs md:text-sm">{question.explanation}</p>
                   </div>
                 )}

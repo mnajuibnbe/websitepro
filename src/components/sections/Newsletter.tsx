@@ -24,7 +24,7 @@ export function Newsletter() {
               <div className="flex-grow">
                 <Input
                   type="email"
-                  placeholder="Learn More"
+                  placeholder="Enter details"
                   className="w-full h-14 text-lg bg-primary-50 border-primary-200 focus:bg-white"
                   required
                   aria-label="Email Address"

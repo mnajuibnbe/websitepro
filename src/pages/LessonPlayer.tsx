@@ -108,7 +108,7 @@ export function LessonPlayer() {
 
         if (enrollmentError) {
           console.error('Error verifying enrollment:', enrollmentError);
-          setErrorMessage('Build practical skills with structured, expert-led course content..');
+          setErrorMessage('The requested information could not be loaded. Please try again.');
           setAccessState('error');
           return;
         }
@@ -162,7 +162,7 @@ export function LessonPlayer() {
 
         if (lessonsRes.error) {
           console.error('Error fetching lessons:', lessonsRes.error);
-          setErrorMessage('Build practical skills with structured, expert-led course content..');
+          setErrorMessage('The requested information could not be loaded. Please try again.');
           setAccessState('error');
           return;
         }
@@ -332,7 +332,7 @@ export function LessonPlayer() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4">
         <Loader2 className="w-12 h-12 text-accent-600 animate-spin mb-4" />
-        <p className="text-primary-700 font-bold text-lg">Processing......</p>
+        <p className="text-primary-700 font-bold text-lg">Loading...</p>
       </div>
     );
   }
@@ -346,7 +346,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Lesson</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            Build practical skills with structured, expert-led course content..
+            The requested information could not be loaded. Please try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -368,7 +368,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Build practical skills with structured, expert-led course content.</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            Build practical skills with structured, expert-led course content..
+            The requested information could not be loaded. Please try again.
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
@@ -400,7 +400,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Pending Approval</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            Build practical skills with structured, expert-led course content..
+            The requested information could not be loaded. Please try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -425,7 +425,7 @@ export function LessonPlayer() {
           </h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             {accessState === 'course_not_found'
-              ? 'Build practical skills with structured, expert-led course content..'
+              ? 'The requested information could not be loaded. Please try again.'
               : 'Published.'}
           </p>
           <button
@@ -445,7 +445,7 @@ export function LessonPlayer() {
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            Build practical skills with structured, expert-led course content..
+            The requested information could not be loaded. Please try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}

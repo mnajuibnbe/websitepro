@@ -31,7 +31,7 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
       {/* Results Count & Sort */}
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-auto gap-4 md:gap-6">
         <span className="text-primary-600 font-medium whitespace-nowrap w-full sm:w-auto">
-          <strong className="text-primary-900 text-lg mx-1">{resultCount}</strong> Learn More
+          <strong className="text-primary-900 text-lg mx-1">{resultCount}</strong> Course Filter
         </span>
 
         {/* Mobile Filter Button */}
@@ -43,7 +43,7 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
           className="lg:hidden flex flex-1 sm:flex-none items-center justify-center gap-2 h-12 px-4 bg-white border border-primary-300 rounded-lg text-primary-900 font-bold hover:bg-primary-50 transition-colors shadow-sm sm:w-auto"
         >
           <Filter className="w-5 h-5" />
-          <span>{filtersOpen ? 'Learn More' : 'Learn More'}</span>
+          <span>{filtersOpen ? 'Course Filter' : 'Course Filter'}</span>
         </button>
 
         <div className="flex flex-1 items-center gap-3 sm:w-auto">
@@ -54,9 +54,9 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
               value={filters.sort}
               onChange={(event) => onChange({ ...filters, sort: event.target.value as CourseCatalogFilters['sort'] })}
             >
-              <option value="newest">Learn More</option>
-              <option value="price-asc">Price: Learn More</option>
-              <option value="price-desc">Price: Learn More</option>
+              <option value="newest">Course Filter</option>
+              <option value="price-asc">Price: Course Filter</option>
+              <option value="price-desc">Price: Course Filter</option>
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-500">
               <ChevronDown className="w-4 h-4" />

@@ -17,31 +17,31 @@ export function About() {
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-primary-900 mb-6">About Us</h1>
             <p className="text-xl text-primary-600 max-w-3xl mx-auto leading-relaxed">
-              Arabic (Cosmeceuticals) Learn More.
+              Arabic (Cosmeceuticals) About Tutiba.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
             <div className="bg-white rounded-3xl p-8 border border-primary-200 shadow-sm">
-              <h2 className="text-3xl font-bold text-primary-900 mb-6">Learn More</h2>
+              <h2 className="text-3xl font-bold text-primary-900 mb-6">About Tutiba</h2>
               <p className="text-lg text-primary-600 leading-relaxed">
                 Content.
               </p>
             </div>
             <div className="bg-white rounded-3xl p-8 border border-primary-200 shadow-sm">
-              <h2 className="text-3xl font-bold text-primary-900 mb-6">Learn More</h2>
+              <h2 className="text-3xl font-bold text-primary-900 mb-6">About Tutiba</h2>
               <p className="text-lg text-primary-600 leading-relaxed">
-                Learn More.
+                About Tutiba.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
             {[
-              { icon: BookOpen, title: "Learn More", desc: "Learn More" },
-              { icon: Users, title: "Learn More", desc: "Learn More" },
-              { icon: Award, title: "Learn More", desc: "Learn More" },
-              { icon: Info, title: "Learn More", desc: "Learn More" }
+              { icon: BookOpen, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Users, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Award, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Info, title: "About Tutiba", desc: "About Tutiba" }
             ].map((feature, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-primary-200 text-center">
                 <div className="w-16 h-16 mx-auto bg-accent-50 rounded-xl flex items-center justify-center mb-4">

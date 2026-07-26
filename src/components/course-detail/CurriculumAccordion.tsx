@@ -11,35 +11,35 @@ export function CurriculumAccordion() {
   const curriculum = [
     {
       id: 1,
-      title: 'Learn More',
+      title: 'Curriculum',
       duration: '3 Lessons • 45 Minute',
       lessons: [
-        { id: 101, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: true },
-        { id: 102, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
-        { id: 103, title: 'Learn More (INCI)', duration: '10 Learn More', type: 'document', isPreview: false },
+        { id: 101, title: 'Curriculum', duration: '15 Minute', type: 'video', isPreview: true },
+        { id: 102, title: 'Curriculum', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 103, title: 'Curriculum (INCI)', duration: '10 Curriculum', type: 'document', isPreview: false },
       ]
     },
     {
       id: 2,
-      title: 'Learn More',
+      title: 'Curriculum',
       duration: '4 Lessons • 60 Minute',
       lessons: [
-        { id: 201, title: 'Learn More', duration: '18 Minute', type: 'video', isPreview: false },
-        { id: 202, title: 'Learn More (Skin Barrier)', duration: '15 Minute', type: 'video', isPreview: false },
-        { id: 203, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
-        { id: 204, title: 'Section', duration: '7 Learn More', type: 'quiz', isPreview: false },
+        { id: 201, title: 'Curriculum', duration: '18 Minute', type: 'video', isPreview: false },
+        { id: 202, title: 'Curriculum (Skin Barrier)', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 203, title: 'Curriculum', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 204, title: 'Section', duration: '7 Curriculum', type: 'quiz', isPreview: false },
       ]
     },
     {
       id: 3,
-      title: 'Learn More',
+      title: 'Curriculum',
       duration: '5 Lessons • 85 Minute',
       lessons: [
-        { id: 301, title: 'Learn More (Humectants, Emollients, Occlusives)', duration: '25 Minute', type: 'video', isPreview: false },
-        { id: 302, title: 'Learn More', duration: '20 Minute', type: 'video', isPreview: false },
-        { id: 303, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: false },
-        { id: 304, title: 'Learn More', duration: '15 Minute', type: 'video', isPreview: false },
-        { id: 305, title: 'Learn More: Learn More', duration: '10 Learn More', type: 'video', isPreview: false },
+        { id: 301, title: 'Curriculum (Humectants, Emollients, Occlusives)', duration: '25 Minute', type: 'video', isPreview: false },
+        { id: 302, title: 'Curriculum', duration: '20 Minute', type: 'video', isPreview: false },
+        { id: 303, title: 'Curriculum', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 304, title: 'Curriculum', duration: '15 Minute', type: 'video', isPreview: false },
+        { id: 305, title: 'Curriculum: Curriculum', duration: '10 Curriculum', type: 'video', isPreview: false },
       ]
     }
   ];
@@ -51,7 +51,7 @@ export function CurriculumAccordion() {
           <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-2">
             Course
           </h2>
-          <p className="text-primary-600 font-medium">12 Learn More • 45 Lesson • 80 Hour</p>
+          <p className="text-primary-600 font-medium">12 Curriculum • 45 Lesson • 80 Hour</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export function CurriculumAccordion() {
                       {lesson.isPreview ? (
                         <button className="flex items-center gap-1.5 text-accent-600 hover:text-accent-700 font-bold text-sm bg-accent-50 px-3 py-1.5 rounded-full transition-colors">
                           <PlayCircle className="w-4 h-4" />
-                          <span>Learn More</span>
+                          <span>Curriculum</span>
                         </button>
                       ) : (
                         <div className="flex items-center justify-center w-8 h-8 text-primary-400">

@@ -13,14 +13,14 @@ export function InstructorSection() {
             <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-lg border border-primary-200">
               <img
                 src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=800&auto=format&fit=crop"
-                alt="Learn More. Learn More"
+                alt="Tutiba course instructor"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="absolute -bottom-6 -right-6 bg-white p-5 rounded-2xl shadow-md border border-primary-100 hidden md:block">
               <div className="flex flex-col gap-1 items-center justify-center text-center">
                 <span className="text-3xl font-bold text-accent-600">10+</span>
-                <span className="text-sm text-primary-600 font-semibold uppercase tracking-wider">Learn More</span>
+                <span className="text-sm text-primary-600 font-semibold uppercase tracking-wider">Years of Experience</span>
               </div>
             </div>
           </div>
@@ -31,29 +31,29 @@ export function InstructorSection() {
               Your Instructor
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-6">
-              Learn More. Learn More
+              Learn from an Experienced Cosmeceutical Educator
             </h2>
             <p className="text-lg text-primary-600 mb-8 leading-relaxed max-w-2xl">
-              Learn More. Learn More. Minute.
+              Gain practical, evidence-based guidance from an instructor experienced in translating scientific research into professional practice.
             </p>
 
             <ul className="space-y-4 mb-10 text-primary-800 font-medium">
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Learn More</span>
+                <span className="text-lg">Evidence-based course content</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Learn More</span>
+                <span className="text-lg">Practical case-based instruction</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Learn More</span>
+                <span className="text-lg">Clear guidance for professional practice</span>
               </li>
             </ul>
 
             <Button variant="secondary" className="px-8 text-lg h-12">
-              Instructor
+              Meet Your Instructor
             </Button>
           </div>
 

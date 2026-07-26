@@ -3,18 +3,18 @@ import { Check } from 'lucide-react';
 
 export function LearningOutcomes() {
   const outcomes = [
-    'Learn More.',
-    'Learn More.',
-    'Learn More.',
-    'Learn More (INCI) Learn More.',
-    'Learn More.',
+    'Learning Outcome.',
+    'Learning Outcome.',
+    'Learning Outcome.',
+    'Learning Outcome (INCI) Learning Outcome.',
+    'Learning Outcome.',
     'Minute.'
   ];
 
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Learn More
+        Learning Outcome
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         {outcomes.map((outcome, index) => (

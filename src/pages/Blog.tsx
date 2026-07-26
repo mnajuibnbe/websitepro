@@ -14,26 +14,26 @@ export function Blog() {
   const posts = [
     {
       id: '1',
-      title: 'Learn More',
-      excerpt: 'Learn More.',
-      date: '20 Learn More 2026',
-      author: 'Learn More. Learn More',
+      title: 'Article',
+      excerpt: 'Article.',
+      date: '20 Article 2026',
+      author: 'Article. Article',
       image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800'
     },
     {
       id: '2',
-      title: 'Learn More',
-      excerpt: 'Learn More (Humectants) Learn More (Emollients) Learn More.',
-      date: '15 Learn More 2026',
-      author: 'Learn More',
+      title: 'Article',
+      excerpt: 'Article (Humectants) Article (Emollients) Article.',
+      date: '15 Article 2026',
+      author: 'Article',
       image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800'
     },
     {
       id: '3',
-      title: 'Learn More: Learn More 2026',
-      excerpt: 'Learn More.',
-      date: '10 Learn More 2026',
-      author: 'Learn More. Learn More',
+      title: 'Article: Article 2026',
+      excerpt: 'Article.',
+      date: '10 Article 2026',
+      author: 'Article. Article',
       image: 'https://images.unsplash.com/photo-1571781526291-c477eb311dc6?auto=format&fit=crop&q=80&w=800'
     }
   ];
@@ -46,7 +46,7 @@ export function Blog() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-primary-900 mb-4">Blog</h1>
-            <p className="text-xl text-primary-600">Learn More</p>
+            <p className="text-xl text-primary-600">Article</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

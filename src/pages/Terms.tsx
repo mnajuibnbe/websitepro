@@ -23,23 +23,23 @@ export function Terms() {
                 <FileText className="w-8 h-8 text-accent-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">Learn More</h1>
-                <p className="text-primary-600">Update: 23 Learn More 2026</p>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms</h1>
+                <p className="text-primary-600">Update: 23 Terms 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Terms</h2>
                 <p className="leading-relaxed">
-                  Learn More (Tutiba)Learn More. Please review the information and try again..
+                  Terms (Tutiba)Terms. Please review the information and try again.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Learn More</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Terms</h2>
                 <p className="leading-relaxed">
-                  Learn More (Learn More PDFLearn More) Learn More. Learn More.
+                  Terms (PDF DocumentTerms) Terms. Terms.
                 </p>
               </section>
 
@@ -55,14 +55,14 @@ export function Terms() {
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Certificates</h2>
                 <p className="leading-relaxed">
-                  Review the quiz information and continue when you are ready..
+                  Review the quiz information and continue when you are ready.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancel</h2>
                 <p className="leading-relaxed">
-                  Learn More "Learn More". Learn More 14 Learn More 10% Course.
+                  Terms "Terms". Terms 14 Terms 10% Course.
                 </p>
               </section>
             </div>

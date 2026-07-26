@@ -14,7 +14,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const currentPath = location.pathname;
 
   const navItems = [
-    { icon: BarChart3, label: 'Learn More', href: '/admin' },
+    { icon: BarChart3, label: 'Overview', href: '/admin' },
     { icon: BookOpen, label: 'Courses', href: '/admin/courses' },
     { icon: Users, label: 'Manage', href: '/admin/users' },
   ];
@@ -37,7 +37,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
-            <span>Learn More - Manage</span>
+            <span>Details - Manage</span>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         <div className="p-4 border-t border-primary-100">
           <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
             <Home className="w-5 h-5" />
-            <span>Learn More</span>
+            <span>Administration</span>
           </Link>
           <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />

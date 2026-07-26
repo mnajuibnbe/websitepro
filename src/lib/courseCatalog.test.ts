@@ -15,7 +15,7 @@ const course = (overrides: Partial<Course>): Course => ({
 
 test('catalog search, category, level and price filters use actual course fields', () => {
   const courses = [
-    course({ title: 'Skin Diploma', category: '\u0627\u0644\u0628\u0634\u0631\u0629', level: 'beginner', price: 199, price_usd: 199 }),
+    course({ title: 'Skin Diploma', category: '\u0627\u0644\u0628\u0634\u0631\u0629', level: 'beginner', price: 199 }),
     course({ title: 'Free Hair', category: '\u0627\u0644\u0639\u0646\u0627\u064a\u0629 \u0628\u0627\u0644\u0634\u0639\u0631', level: 'advanced', price: 0 }),
   ];
   assert.deepEqual(filterAndSortCourses(courses, { ...EMPTY_CATALOG_FILTERS, search: 'skin' }).map(c => c.title), ['Skin Diploma']);

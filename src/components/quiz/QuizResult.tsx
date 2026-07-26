@@ -46,10 +46,10 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
         {isPassed ? 'Congratulations! Quiz' : 'Quiz'}
       </h1>
       <p className="text-lg text-primary-600 mb-8 leading-relaxed">
-        Learn More <strong className="text-primary-900">{score}</strong> Learn More <strong className="text-primary-900">{totalQuestions}</strong> Learn More.
+        Details <strong className="text-primary-900">{score}</strong> Details <strong className="text-primary-900">{totalQuestions}</strong> Details.
         {isPassed
-          ? ' Build practical skills with structured, expert-led course content..'
-          : ' Learn More.'}
+          ? ' The requested information could not be loaded. Please try again.'
+          : ' Details.'}
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -68,7 +68,7 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
               className="w-full sm:w-auto h-14 px-8 text-lg font-bold"
               onClick={onRetry}
             >
-              Learn More
+              Details
             </Button>
           </>
         ) : (

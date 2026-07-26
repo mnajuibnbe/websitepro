@@ -86,15 +86,15 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
 
   const getItemTypeLabel = (type: string) => {
     switch (type) {
-      case 'video': return 'Learn More';
-      case 'article': return 'Learn More';
+      case 'video': return 'Curriculum Item';
+      case 'article': return 'Curriculum Item';
       case 'pdf': return 'PDF';
-      case 'audio': return 'Learn More';
+      case 'audio': return 'Curriculum Item';
       case 'external_link': return 'Link';
-      case 'embed': return 'Learn More';
-      case 'live': return 'Learn More';
+      case 'embed': return 'Curriculum Item';
+      case 'live': return 'Curriculum Item';
       case 'quiz': return 'Quiz';
-      case 'assignment': return 'Learn More';
+      case 'assignment': return 'Curriculum Item';
       default: return 'Lesson';
     }
   };
@@ -108,7 +108,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <span className="font-bold text-primary-900 text-sm">{item.title}</span>
         </div>
         <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md">
-          Processing......
+          Loading...
         </span>
       </div>
     );
@@ -124,7 +124,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           : 'bg-white hover:bg-primary-50/80 border-primary-200/80 hover:border-primary-300'
       }`}
     >
-      {/* Right side: Checkbox + Drag handle + Icon + Details */}
+      {/* Right side: Checkbox + Drag handle + Icon + Curriculum Item */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         {/* Checkbox */}
         {onToggleSelect && (
@@ -132,7 +132,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => onToggleSelect(item.id)}
             className="text-primary-400 hover:text-amber-600 transition-colors flex-shrink-0 p-0.5"
-            title="Learn More"
+            title="Curriculum Item"
           >
             {isSelected ? (
               <CheckSquare className="w-4 h-4 text-amber-600" />
@@ -209,7 +209,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => onDuplicate(item.id)}
             className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-            title="Learn More"
+            title="Curriculum Item"
           >
             <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
@@ -232,7 +232,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             type="button"
             onClick={() => setShowMenu((prev) => !prev)}
             className="p-1.5 text-primary-400 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
-            title="Learn More"
+            title="Curriculum Item"
           >
             <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
@@ -267,7 +267,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                     className="w-full text-left px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
                   >
                     <ArrowUp className="w-3.5 h-3.5 text-primary-500" />
-                    <span>Learn More</span>
+                    <span>Curriculum Item</span>
                   </button>
 
                   <button
@@ -279,7 +279,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
                     className="w-full text-left px-3 py-2 hover:bg-primary-50 flex items-center gap-2"
                   >
                     <ArrowDown className="w-3.5 h-3.5 text-primary-500" />
-                    <span>Learn More</span>
+                    <span>Curriculum Item</span>
                   </button>
                 </>
               )}

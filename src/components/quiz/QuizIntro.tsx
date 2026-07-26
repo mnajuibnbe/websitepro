@@ -26,7 +26,7 @@ export function QuizIntro({ onStart, title, description, questionsCount, passMar
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         <div className="bg-primary-50 p-4 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <span className="text-3xl font-bold text-primary-900 mb-1">{questionsCount}</span>
-          <span className="text-sm font-medium text-primary-500">Learn More</span>
+          <span className="text-sm font-medium text-primary-500">Questions</span>
         </div>
         <div className="bg-primary-50 p-4 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <div className="flex items-center gap-1 mb-1">
@@ -40,7 +40,7 @@ export function QuizIntro({ onStart, title, description, questionsCount, passMar
             <AlertCircle className="w-5 h-5 text-info-500" />
             <span className="text-3xl font-bold text-primary-900">{attemptsLeft}</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">Learn More</span>
+          <span className="text-sm font-medium text-primary-500">Attempts Remaining</span>
         </div>
       </div>
 

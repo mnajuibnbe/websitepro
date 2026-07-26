@@ -72,9 +72,9 @@ export function CourseSidebar({
           />
         </div>
         <p className="text-xs text-primary-600 font-semibold mt-2.5 flex items-center justify-between">
-          <span>Learn More</span>
+          <span>Course Progress</span>
           <span>
-            {completedCount} Learn More {totalLessons} Lessons ({progressPercentage}%)
+            {completedCount} Details {totalLessons} Lessons ({progressPercentage}%)
           </span>
         </p>
       </div>
@@ -161,7 +161,7 @@ export function CourseSidebar({
                                 ) : (
                                   <FileText className="w-3.5 h-3.5 text-primary-400" />
                                 )}
-                                <span>{lesson.duration || (lesson.type === 'video' ? 'Learn More' : 'Content')}</span>
+                                <span>{lesson.duration || (lesson.type === 'video' ? 'Video lesson' : 'Content')}</span>
                               </div>
                             </div>
                           </button>

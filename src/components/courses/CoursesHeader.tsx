@@ -10,11 +10,11 @@ interface CoursesHeaderProps {
 
 export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
   const categories = [
-    'Learn More',
-    'Learn More',
-    'Learn More',
-    'Learn More',
-    'Learn More',
+    'Course Catalog',
+    'Course Catalog',
+    'Course Catalog',
+    'Course Catalog',
+    'Course Catalog',
     'Free'
   ];
 
@@ -29,17 +29,17 @@ export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
 
       {/* Header Content */}
       <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">
-        Explore Tutiba Learn More
+        Explore Tutiba Course Catalog
       </h1>
       <p className="text-lg text-primary-600 max-w-3xl mb-10 leading-relaxed">
-        Learn More.
+        Course Catalog.
       </p>
 
       {/* Category Shortcuts */}
       <div className="flex overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 gap-3">
         {categories.map((category, index) => {
           const isFree = category === 'Free';
-          const isAll = category === 'Learn More';
+          const isAll = category === 'Course Catalog';
           const isActive = isAll
             ? filters.categories.length === 0 && filters.price === 'all'
             : isFree

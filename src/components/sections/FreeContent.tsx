@@ -7,17 +7,17 @@ export function FreeContent() {
   const contents = [
     {
       id: 1,
-      type: 'Learn More',
-      title: 'Learn More',
+      type: 'Learning Resource',
+      title: 'Learning Resource',
       icon: FileText,
       image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600&auto=format&fit=crop',
-      cta: 'Learn More',
+      cta: 'Learning Resource',
       isProminent: false
     },
     {
       id: 2,
       type: 'Lesson',
-      title: 'Learn More',
+      title: 'Learning Resource',
       icon: PlayCircle,
       image: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=600&auto=format&fit=crop',
       cta: 'Lesson',
@@ -25,11 +25,11 @@ export function FreeContent() {
     },
     {
       id: 3,
-      type: 'Learn More',
-      title: 'Learn More (INCI)Learn More',
+      type: 'Learning Resource',
+      title: 'Learning Resource (INCI)Learning Resource',
       icon: Play,
       image: 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=600&auto=format&fit=crop',
-      cta: 'Learn More',
+      cta: 'Learning Resource',
       isProminent: false
     }
   ];
@@ -66,7 +66,7 @@ export function FreeContent() {
                       {item.type}
                     </Badge>
                   </div>
-                  {item.type !== 'Learn More' && (
+                  {item.type !== 'Learning Resource' && (
                     <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center z-10">
                       <div className={`rounded-full bg-white/95 flex items-center justify-center backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform duration-300 ${isProminent ? 'w-16 h-16 text-accent-600' : 'w-12 h-12 text-primary-900'}`}>
                         <Icon className={`${isProminent ? 'w-8 h-8' : 'w-6 h-6'} ms-1`} />

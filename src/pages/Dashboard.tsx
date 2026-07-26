@@ -85,7 +85,7 @@ export function Dashboard() {
             </button>
 
             <div className="w-10 h-10 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 font-bold border border-accent-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-              Learn More
+              Learning Information
             </div>
           </div>
         </header>
@@ -104,7 +104,7 @@ export function Dashboard() {
             ) : loadError ? (
                <div className="bg-white rounded-2xl border border-danger-200 shadow-sm p-12 text-center">
                  <h2 className="text-2xl font-bold text-danger-900 mb-3">Unable to complete this action</h2>
-                 <p className="text-danger-600 mb-8">Error. Please review the information and try again..</p>
+                 <p className="text-danger-600 mb-8">Error. Please review the information and try again.</p>
                  <Button variant="primary" onClick={() => window.location.reload()}>Retry</Button>
                </div>
             ) : hasEnrollments === false ? (
@@ -114,7 +114,7 @@ export function Dashboard() {
                  </div>
                  <h2 className="text-2xl font-bold text-primary-900 mb-3">Subscribe</h2>
                  <p className="text-primary-600 mb-8 max-w-md">
-                   Build practical skills with structured, expert-led course content..
+                   The requested information could not be loaded. Please try again.
                  </p>
                  <Button
                    variant="primary"

@@ -85,12 +85,12 @@ export function UpdatePassword() {
     setSuccess(false);
 
     if (password !== confirmPassword) {
-      setError('Learn More.');
+      setError('Details.');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password 6 Learn More.');
+      setError('Password 6 Details.');
       return;
     }
 
@@ -100,7 +100,7 @@ export function UpdatePassword() {
       // Verify session exists right before calling updateUser
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('Learn More. Link.');
+        throw new Error('Details. Link.');
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -127,8 +127,8 @@ export function UpdatePassword() {
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 font-sans" dir="ltr">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-primary-200 text-center max-w-md w-full">
           <Loader2 className="w-10 h-10 text-accent-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-primary-900 mb-2">Processing......</h3>
-          <p className="text-sm text-primary-600">Please review the information and try again..</p>
+          <h3 className="text-lg font-bold text-primary-900 mb-2">Loading...</h3>
+          <p className="text-sm text-primary-600">Please review the information and try again.</p>
         </div>
       </div>
     );
@@ -141,7 +141,7 @@ export function UpdatePassword() {
           <div className="w-12 h-12 bg-danger-100 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-primary-900 mb-2">Learn More</h2>
+          <h2 className="text-xl font-bold text-primary-900 mb-2">Password Updated</h2>
           <p className="text-primary-600 text-sm mb-6">
             {error || 'Password.'}
           </p>

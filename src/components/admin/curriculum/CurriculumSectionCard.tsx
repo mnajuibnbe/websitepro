@@ -93,7 +93,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
           <GripVertical className="w-5 h-5 text-amber-600" />
           <h4 className="font-bold text-primary-900 text-base">{section.title}</h4>
           <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg">
-            {section.items.length} Learn More
+            {section.items.length} items
           </span>
         </div>
       </div>
@@ -135,7 +135,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                 value={editDesc}
                 onChange={(e) => setEditDesc(e.target.value)}
                 className="w-full text-xs p-2 bg-white border border-primary-200 rounded-xl outline-none"
-                placeholder="Learn More (Learn More)..."
+                placeholder="Section (Section)..."
               />
               <div className="flex items-center gap-2 pt-1">
                 <button
@@ -163,7 +163,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                   {section.title}
                 </h4>
                 <span className="text-xs font-bold text-primary-500 bg-white border border-primary-200 px-2.5 py-0.5 rounded-md">
-                  {section.items.length} Learn More
+                  {section.items.length} items
                 </span>
               </div>
               {section.description && (
@@ -248,7 +248,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             >
               <Layers className="w-6 h-6 text-primary-400" />
               <p className="text-xs font-bold text-primary-600">
-                Section. Learn More &quot;Add&quot;.
+                Section. Section &quot;Add&quot;.
               </p>
               <button
                 type="button"

@@ -24,7 +24,7 @@ export function CourseCard({
   lessonsCount,
   price,
   imageUrl = 'https://placehold.co/600x338/E2E8F0/64748B?text=Course',
-  ctaText = 'Learn More',
+  ctaText = 'View Course',
   onEnroll
 }: CourseCardProps) {
   return (

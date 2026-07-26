@@ -53,7 +53,7 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('Could not find the function') ||
     (msg.includes('function') && msg.includes('does not exist'))
   ) {
-    return new Error('Manage (Migration) Learn More Supabase Learn More.');
+    return new Error('Manage (Migration) Details Supabase Details.');
   }
 
   // Permission denied / RLS
@@ -67,12 +67,12 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('does not belong to specified course') ||
     msg.includes('Destination section does not belong')
   ) {
-    return new Error('Learn More: Build practical skills with structured, expert-led course content..');
+    return new Error('Details: The requested information could not be loaded. Please try again.');
   }
 
   // Deleted item / section error
   if (msg.includes('Section is deleted') || msg.includes('Lesson is deleted') || msg.includes('not found or deleted')) {
-    return new Error('Learn More: Lesson.');
+    return new Error('Details: Lesson.');
   }
 
   // Duplicate or constraint violation
@@ -82,7 +82,7 @@ export function mapCurriculumError(error: unknown): Error {
 
   // Network error
   if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
-    return new Error('Unable to complete this action. Please review the information and try again..');
+    return new Error('Unable to complete this action. Please review the information and try again.');
   }
 
   return new Error(msg || 'Curriculum.');

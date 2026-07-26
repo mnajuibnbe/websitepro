@@ -13,7 +13,7 @@ export function WrongAnswersAction() {
         onClick={() => setIsSaved(true)}
         icon={isSaved ? <Check className="w-4 h-4" /> : <FolderX className="w-4 h-4" />}
       >
-        {isSaved ? 'Learn More' : 'Save'}
+        {isSaved ? 'Saved for Review' : 'Save to Incorrect Answers'}
       </Button>
     </div>
   );

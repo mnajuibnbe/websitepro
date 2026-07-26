@@ -68,8 +68,8 @@ export function AdminUserManagement() {
 
       const mappedStudents: StudentData[] = (usersData || []).map((user: any) => ({
         id: user.id,
-        name: user.full_name || 'Learn More',
-        email: user.email || 'Learn More',
+        name: user.full_name || 'User Information',
+        email: user.email || 'User Information',
         joined: new Date(user.created_at).toLocaleDateString('ar-EG'),
         courses: activeCounts[user.id] || 0,
       }));
@@ -117,9 +117,9 @@ export function AdminUserManagement() {
               <table className="w-full text-left">
                 <thead className="bg-primary-50 text-primary-600 font-medium border-b border-primary-200">
                   <tr>
-                    <th className="py-4 px-6 text-sm">Learn More</th>
+                    <th className="py-4 px-6 text-sm">User Information</th>
                     <th className="py-4 px-6 text-sm">Email Address</th>
-                    <th className="py-4 px-6 text-sm">Learn More</th>
+                    <th className="py-4 px-6 text-sm">User Information</th>
                     <th className="py-4 px-6 text-sm">Courses</th>
                   </tr>
                 </thead>

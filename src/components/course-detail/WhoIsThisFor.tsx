@@ -4,23 +4,23 @@ import { Stethoscope, Pill, GraduationCap, Sparkles } from 'lucide-react';
 export function WhoIsThisFor() {
   const audiences = [
     {
-      title: 'Learn More',
-      description: 'Learn More.',
+      title: 'Intended Audience',
+      description: 'Intended Audience.',
       icon: Stethoscope
     },
     {
-      title: 'Learn More',
-      description: 'Learn More.',
+      title: 'Intended Audience',
+      description: 'Intended Audience.',
       icon: Pill
     },
     {
-      title: 'Learn More',
-      description: 'Learn More.',
+      title: 'Intended Audience',
+      description: 'Intended Audience.',
       icon: GraduationCap
     },
     {
       title: 'Beginner',
-      description: 'Learn More.',
+      description: 'Intended Audience.',
       icon: Sparkles
     }
   ];

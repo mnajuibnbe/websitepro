@@ -8,58 +8,49 @@ import { QuizResult } from '../components/quiz/QuizResult';
 const mockQuestions: QuestionData[] = [
   {
     id: 1,
-    question: "Next (Humectants)Learn More",
-    options: ["Learn More", "Learn More", "Learn More", "Learn More"],
+    question: "Which ingredient is classified as a humectant?",
+    options: ["Hyaluronic acid", "Jojoba oil", "Shea butter", "Silicone"],
     correctIndex: 0,
-    explanation: "Learn More.",
+    explanation: "Hyaluronic acid attracts and retains water, while oils primarily act as emollients.",
     aiExplanation: {
-      scientific: "Learn More Humectants Learn More (Hydrophilic) Learn More (-OH) Learn More.",
-      practical: "Learn More The Ordinary Learn More (Damp skin)."
+      scientific: "Humectants are hydrophilic molecules that bind water and help increase hydration in the stratum corneum.",
+      practical: "Apply a hyaluronic acid serum to slightly damp skin, then follow with a moisturizer to reduce water loss."
     },
-    memoryCoach: {
-      type: "Link",
-      content: "Learn More (Learn More) Learn More."
-    }
+    memoryCoach: { type: "Memory Aid", content: "Think of hyaluronic acid as a sponge that attracts water to the skin's surface." }
   },
   {
     id: 2,
-    question: "Sort",
+    question: "What is the correct order of these epidermal layers from outermost to deepest?",
     options: [
-      "Learn More",
-      "Learn More",
-      "Learn More",
-      "Learn More"
+      "Basal, spinous, corneal",
+      "Corneal, spinous, basal",
+      "Spinous, corneal, basal",
+      "Corneal, basal, spinous"
     ],
     correctIndex: 1,
-    explanation: "Learn More.",
+    explanation: "The stratum corneum is the outermost layer, while the basal layer is the deepest of these layers.",
     aiExplanation: {
-      scientific: "Learn More (Learn More)Learn More.",
-      practical: "Learn More (AHA/BHA) Learn More."
+      scientific: "Keratinocytes originate in the basal layer and move upward through the spinous layers before forming the protective stratum corneum.",
+      practical: "Most cosmetic exfoliants act on the superficial stratum corneum rather than the deeper living layers."
     },
-    memoryCoach: {
-      type: "Learn More",
-      content: "Learn More (Learn More.Learn More.Learn More): Learn More (Learn More) -> Learn More (Learn More) -> Learn More (Learn More)."
-    }
+    memoryCoach: { type: "Mnemonic", content: "Remember the outside-in order: corneal, spinous, basal." }
   },
   {
     id: 3,
-    question: "Learn More (Preservatives) Learn More",
+    question: "When are antimicrobial preservatives generally required in a cosmetic formula?",
     options: [
-      "Learn More 100%",
-      "Learn More (Aqueous)",
-      "Learn More (Solid bars)",
-      "Learn More"
+      "In products made entirely from oils",
+      "In products that contain water",
+      "Only in solid cleansing bars",
+      "In every cosmetic product without exception"
     ],
     correctIndex: 1,
-    explanation: "Learn More.",
+    explanation: "Water-containing formulas can support microbial growth and therefore generally require an appropriate preservation system.",
     aiExplanation: {
-      scientific: "Learn More (Water Activity - Aw) Minute. Learn More.",
-      practical: "Learn More C Learn More 100% Learn More (Learn More)."
+      scientific: "Sufficient water activity can support bacteria, yeast, and mold. A suitable preservative system helps protect product safety and stability.",
+      practical: "A water-based face cream typically needs antimicrobial preservation, while a fully anhydrous oil may have different stability requirements."
     },
-    memoryCoach: {
-      type: "Learn More",
-      content: "Learn More (Learn More) Learn More (Learn More) Learn More. Learn More (Learn More)Learn More (Learn More)."
-    }
+    memoryCoach: { type: "Memory Aid", content: "Where there is available water, assess the need for microbial protection." }
   }
 ];
 
@@ -105,7 +96,7 @@ export function QuizPage() {
           <span className="font-bold text-sm hidden sm:block">Quiz</span>
         </Link>
         <div className="font-bold text-primary-900 text-sm md:text-base">
-          Learn More
+          Quiz Content
         </div>
         <button onClick={() => navigate('/my-courses')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
           <X className="w-5 h-5" />
@@ -118,8 +109,8 @@ export function QuizPage() {
 
           {quizState === 'intro' && (
             <QuizIntro
-              title="Section: Learn More"
-              description="Review the quiz information and continue when you are ready.. Learn More."
+              title="Section: Quiz Content"
+              description="Review the quiz information and continue when you are ready. Quiz Content."
               questionsCount={mockQuestions.length}
               passMark={80}
               attemptsLeft={3}

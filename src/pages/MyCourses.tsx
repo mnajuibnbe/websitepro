@@ -126,7 +126,7 @@ export function MyCourses() {
                 </div>
                 <h2 className="text-2xl font-bold text-danger-900 mb-3">Error</h2>
                 <p className="text-danger-600 mb-8 max-w-md">
-                  Build practical skills with structured, expert-led course content.. Please.
+                  The requested information could not be loaded. Please try again. Please.
                 </p>
                 <Button
                   variant="primary"
@@ -141,9 +141,9 @@ export function MyCourses() {
                 <div className="w-24 h-24 bg-warning-50 rounded-full flex items-center justify-center mb-6">
                   <BookOpen className="w-12 h-12 text-warning-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-warning-900 mb-3">Learn More</h2>
+                <h2 className="text-2xl font-bold text-warning-900 mb-3">Course Information</h2>
                 <p className="text-warning-600 mb-8 max-w-md">
-                  Learn More. Please review the information and try again..
+                  Course Information. Please review the information and try again.
                 </p>
                 <Button
                   variant="primary"
@@ -160,7 +160,7 @@ export function MyCourses() {
                 </div>
                 <h2 className="text-2xl font-bold text-primary-900 mb-3">No items found</h2>
                 <p className="text-primary-600 mb-8 max-w-md">
-                  Learn More.
+                  Course Information.
                 </p>
                 <Button
                   variant="primary"
@@ -197,7 +197,7 @@ export function MyCourses() {
                         <div className="mb-6 mt-auto">
                           <div className="flex justify-between text-sm mb-2">
                             <span className="font-medium text-primary-700">
-                              {totalLessons > 0 ? `${completedLessons} Learn More ${totalLessons} Completed` : 'Learn More'}
+                              {totalLessons > 0 ? `${completedLessons} Course Information ${totalLessons} Completed` : 'Course Information'}
                             </span>
                             <span className="font-bold text-accent-600" dir="ltr">{progress}%</span>
                           </div>
@@ -211,7 +211,7 @@ export function MyCourses() {
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center gap-2 text-sm text-primary-500">
                             <Clock className="w-4 h-4" />
-                            <span>Learn More</span>
+                            <span>Course Information</span>
                           </div>
                           <Button
                             variant={progress === 100 ? 'secondary' : 'primary'}

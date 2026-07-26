@@ -118,7 +118,7 @@ export function AdminDashboard() {
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       } else {
-        setErrorMsg('Please review the information and try again..');
+        setErrorMsg('Please review the information and try again.');
         console.error('Enrollment decision did not update a pending row:', error || { id, status });
       }
     } catch (e) {
@@ -151,7 +151,7 @@ export function AdminDashboard() {
 
         <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-primary-900 mb-8">Learn More (Manage)</h1>
+            <h1 className="text-3xl font-bold text-primary-900 mb-8">Administration (Manage)</h1>
 
             {errorMsg && (
               <div className="mb-6 bg-danger-50 text-danger-700 px-6 py-4 rounded-xl border border-danger-200 flex items-center gap-3">
@@ -170,7 +170,7 @@ export function AdminDashboard() {
               <div className="p-6 border-b border-primary-200 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-primary-900">Subscribe</h2>
                 <span className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-bold">
-                  {pendingEnrollments.length} Learn More
+                  {pendingEnrollments.length} pending requests
                 </span>
               </div>
 
@@ -178,10 +178,10 @@ export function AdminDashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-primary-50 border-b border-primary-200">
                     <tr>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Learn More</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Administration</th>
                       <th className="py-4 px-6 text-sm font-bold text-primary-700">Course</th>
                       <th className="py-4 px-6 text-sm font-bold text-primary-700">Order</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">Learn More</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">Administration</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100">
@@ -189,7 +189,7 @@ export function AdminDashboard() {
                       <tr>
                         <td colSpan={4} className="py-12 text-center">
                           <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto mb-4" />
-                          <p className="text-primary-500 font-medium">Processing......</p>
+                          <p className="text-primary-500 font-medium">Loading...</p>
                         </td>
                       </tr>
                     ) : pendingEnrollments.length === 0 ? (
@@ -203,7 +203,7 @@ export function AdminDashboard() {
                         const studentName = enrollment.users?.full_name || 'Not Found';
                         const studentEmail = enrollment.users?.email || '';
                         const courseTitle = enrollment.courses?.title || 'Not Found';
-                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'Learn More';
+                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'Administration';
 
                         return (
                           <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
@@ -232,14 +232,14 @@ export function AdminDashboard() {
                                 onClick={() => handleDecision(enrollment.id, 'active')}
                                 disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
                                 className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title={(!enrollment.users || !enrollment.courses) ? "Learn More" : "Order"}
+                                title={(!enrollment.users || !enrollment.courses) ? "Administration" : "Order"}
                               >
                                 {actionLoadingId === enrollment.id ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                   <CheckCircle className="w-4 h-4" />
                                 )}
-                                Learn More
+                                Administration
                               </button>
                               <button
                                 onClick={() => handleDecision(enrollment.id, 'cancelled')}
@@ -248,7 +248,7 @@ export function AdminDashboard() {
                                 title="Order"
                               >
                                 <XCircle className="w-4 h-4" />
-                                Learn More
+                                Administration
                               </button>
                               </div>
                             </td>

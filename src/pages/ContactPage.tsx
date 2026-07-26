@@ -46,7 +46,7 @@ export function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-primary-900 mb-1">Email Address</h3>
-                    <p className="text-primary-600 mb-2">Learn More</p>
+                    <p className="text-primary-600 mb-2">Contact Information</p>
                     <a href="mailto:support@tutiba.com" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">support@tutiba.com</a>
                   </div>
                 </div>
@@ -56,8 +56,8 @@ export function ContactPage() {
                     <Phone className="w-6 h-6 text-accent-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-primary-900 mb-1">Learn More / Learn More</h3>
-                    <p className="text-primary-600 mb-2">Learn More (9 Learn More - 5 Learn More)</p>
+                    <h3 className="font-bold text-primary-900 mb-1">Contact Information / Contact Information</h3>
+                    <p className="text-primary-600 mb-2">Contact Information (9 Contact Information - 5 Contact Information)</p>
                     <a href="tel:+20100000000" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">+20 100 000 0000</a>
                   </div>
                 </div>
@@ -66,7 +66,7 @@ export function ContactPage() {
 
             {/* Contact Form */}
             <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-10">
-              <h2 className="text-2xl font-bold text-primary-900 mb-6">Learn More</h2>
+              <h2 className="text-2xl font-bold text-primary-900 mb-6">Contact Information</h2>
 
               {isSuccess ? (
                 <div className="bg-success-50 text-success-700 p-6 rounded-xl border border-success-200 text-center animate-in fade-in duration-300">
@@ -74,7 +74,7 @@ export function ContactPage() {
                     <Mail className="w-6 h-6 text-success-600" />
                   </div>
                   <h3 className="font-bold text-lg mb-2">Submit!</h3>
-                  <p>Learn More.</p>
+                  <p>Contact Information.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -85,15 +85,15 @@ export function ContactPage() {
                         type="text"
                         required
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                        placeholder="Learn More"
+                        placeholder="Enter details"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
                       <input
                         type="tel"
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                        placeholder="Learn More"
+                        placeholder="Enter details"
                         dir="ltr"
                       />
                     </div>
@@ -111,22 +111,22 @@ export function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
                     <select className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors">
-                      <option value="support">Learn More</option>
-                      <option value="billing">Learn More / Learn More</option>
+                      <option value="support">Contact Information</option>
+                      <option value="billing">Contact Information / Contact Information</option>
                       <option value="course">Courses</option>
-                      <option value="other">Learn More</option>
+                      <option value="other">Contact Information</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
                     <textarea
                       required
                       rows={4}
                       className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors resize-none"
-                      placeholder="Learn More"
+                      placeholder="Enter details"
                     ></textarea>
                   </div>
 
@@ -136,7 +136,7 @@ export function ContactPage() {
                     className="w-full h-12 text-lg"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Sending......' : 'Submit'}
+                    {isSubmitting ? 'Sending...' : 'Submit'}
                   </Button>
                 </form>
               )}

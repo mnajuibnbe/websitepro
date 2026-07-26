@@ -87,7 +87,36 @@ export function EnrollmentCard() {
         return;
       }
 
-      navigate(`/checkout?courseId=${encodeURIComponent(courseId)}`);
+      // Final check for existing enrollment before insert
+      const { data: existing } = await supabase
+        .from('enrollments')
+        .select('status')
+        .eq('course_id', courseId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existing) {
+        setErrorState('already_enrolled');
+        setEnrollmentStatus(existing.status as 'pending' | 'active' | 'cancelled');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('enrollments')
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          status: 'pending'
+        });
+
+      if (error) {
+        console.error("Enrollment error:", error);
+        return;
+      }
+
+      setEnrollmentStatus('pending');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
 
     } catch (err) {
       console.error(err);
@@ -108,7 +137,7 @@ export function EnrollmentCard() {
     return (
       <div className="bg-white border border-danger-200 rounded-2xl shadow-lg p-8 flex flex-col justify-center items-center text-center lg:sticky lg:top-28">
         <AlertCircle className="w-12 h-12 text-danger-500 mb-4" />
-        <h3 className="text-xl font-bold text-danger-900 mb-2">Learn More</h3>
+        <h3 className="text-xl font-bold text-danger-900 mb-2">Enrollment Information</h3>
         <p className="text-danger-600 mb-6">
           {errorState === 'invalid_uuid' ? 'Link.' : 'Course.'}
         </p>
@@ -124,7 +153,7 @@ export function EnrollmentCard() {
     if (enrollmentStatus === 'active') return 'Lesson (Subscribe)';
     if (enrollmentStatus === 'pending') return 'Pending Approval';
     if (enrollmentStatus === 'cancelled') return 'Order';
-    return 'Learn More';
+    return 'Enrollment Information';
   };
 
   const handleButtonClick = () => {
@@ -135,7 +164,8 @@ export function EnrollmentCard() {
     }
   };
 
-  const price = resolveCoursePrice(courseDetails || {}, pricingContext);
+  const price = courseDetails?.price !== undefined ?
+    (typeof courseDetails.price === 'number' ? courseDetails.price : parseFloat(courseDetails.price || '0')) : 199;
 
   return (
     <>
@@ -149,7 +179,7 @@ export function EnrollmentCard() {
       {errorState === 'already_enrolled' && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-warning-200 text-warning-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <AlertCircle className="w-6 h-6 text-warning-600" />
-          <p className="font-bold">Build practical skills with structured, expert-led course content..</p>
+          <p className="font-bold">The requested information could not be loaded. Please try again.</p>
         </div>
       )}
 
@@ -158,7 +188,7 @@ export function EnrollmentCard() {
       <div className="relative aspect-video bg-primary-100">
         <img
           src={courseDetails?.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
-          alt={courseDetails?.title || "Learn More"}
+          alt={courseDetails?.title || "Enrollment Information"}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center">
@@ -175,7 +205,7 @@ export function EnrollmentCard() {
           <span className="text-4xl font-bold text-primary-900">{price.formatted}</span>
         </div>
 
-        {/* Details List */}
+        {/* Enrollment Information List */}
         <ul className="space-y-4 text-primary-700 font-medium">
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
@@ -193,13 +223,13 @@ export function EnrollmentCard() {
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Clock className="w-4 h-4" />
             </div>
-            <span>Learn More</span>
+            <span>Enrollment Information</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Award className="w-4 h-4" />
             </div>
-            <span>Learn More</span>
+            <span>Enrollment Information</span>
           </li>
         </ul>
 
@@ -221,7 +251,7 @@ export function EnrollmentCard() {
         {/* Guarantee */}
         <div className="flex items-center justify-center gap-2 text-sm text-primary-500 font-medium mt-2">
           <ShieldCheck className="w-4 h-4" />
-          <span>Learn More 30 Learn More</span>
+          <span>Enrollment Information 30 Enrollment Information</span>
         </div>
       </div>
     </div>

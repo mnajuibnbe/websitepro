@@ -28,7 +28,7 @@ export function ForgotPassword() {
 
       setSuccess(true);
     } catch (err: any) {
-      setError('Link. Please review the information and try again..');
+      setError('Unable to send the password reset link. Please verify your email address and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +92,7 @@ export function ForgotPassword() {
                 className="w-full h-12 text-lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'Sending......' : 'Link'}
+                {isLoading ? 'Sending...' : 'Link'}
               </Button>
             </form>
           </>

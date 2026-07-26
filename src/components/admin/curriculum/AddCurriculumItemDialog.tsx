@@ -45,8 +45,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'article',
-      label: 'Lesson / Learn More',
-      description: 'Content HTML Learn More Markdown',
+      label: 'Lesson / Curriculum Item',
+      description: 'Content HTML Curriculum Item Markdown',
       icon: FileText,
       color: 'bg-emerald-50 text-emerald-600 border-emerald-200',
       type: 'article',
@@ -54,8 +54,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'pdf',
-      label: 'Learn More PDF',
-      description: 'Learn More',
+      label: 'PDF Document',
+      description: 'Curriculum Item',
       icon: FileCode,
       color: 'bg-red-50 text-red-600 border-red-200',
       type: 'pdf',
@@ -63,8 +63,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'audio',
-      label: 'Learn More / Learn More',
-      description: 'Learn More MP3 Learn More',
+      label: 'Curriculum Item / Curriculum Item',
+      description: 'Curriculum Item MP3 Curriculum Item',
       icon: Volume2,
       color: 'bg-purple-50 text-purple-600 border-purple-200',
       type: 'audio',
@@ -73,7 +73,7 @@ export function AddCurriculumItemDialog({
     {
       id: 'embed',
       label: 'Content (Embed)',
-      description: 'Learn More iFrame Learn More',
+      description: 'Curriculum Item iFrame Curriculum Item',
       icon: Code,
       color: 'bg-indigo-50 text-indigo-600 border-indigo-200',
       type: 'embed',
@@ -90,8 +90,8 @@ export function AddCurriculumItemDialog({
     },
     {
       id: 'live',
-      label: 'Learn More (Live)',
-      description: 'Learn More Zoom Learn More Google Meet',
+      label: 'Curriculum Item (Live)',
+      description: 'Curriculum Item Zoom Curriculum Item Google Meet',
       icon: Radio,
       color: 'bg-rose-50 text-rose-600 border-rose-200',
       type: 'live',
@@ -105,17 +105,17 @@ export function AddCurriculumItemDialog({
       color: 'bg-amber-50 text-amber-400 border-amber-200 opacity-70',
       type: 'quiz',
       disabled: true,
-      badge: 'Learn More',
+      badge: 'Curriculum Item',
     },
     {
       id: 'assignment',
-      label: 'Learn More / Learn More (Assignment)',
+      label: 'Curriculum Item / Curriculum Item (Assignment)',
       description: 'Instructor',
       icon: ClipboardCheck,
       color: 'bg-teal-50 text-teal-400 border-teal-200 opacity-70',
       type: 'assignment',
       disabled: true,
-      badge: 'Learn More',
+      badge: 'Curriculum Item',
     },
   ];
 

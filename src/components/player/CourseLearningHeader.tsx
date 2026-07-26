@@ -37,7 +37,7 @@ export function CourseLearningHeader({
               {courseTitle}
             </h1>
             <p className="text-xs text-primary-500 font-medium hidden sm:block">
-              {completedCount} Learn More {totalCount} Completed — {progressPercentage}%
+              {completedCount} Details {totalCount} Completed — {progressPercentage}%
             </p>
           </div>
         </div>
@@ -46,7 +46,7 @@ export function CourseLearningHeader({
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="hidden md:flex flex-col items-end gap-1 min-w-[140px]">
             <span className="text-xs font-bold text-primary-700">
-              Learn More: {progressPercentage}%
+              Details: {progressPercentage}%
             </span>
             <div className="w-36 h-2 bg-primary-100 rounded-full overflow-hidden">
               <div

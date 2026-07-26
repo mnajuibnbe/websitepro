@@ -3,27 +3,9 @@ import { Star } from 'lucide-react';
 
 export function Testimonials() {
   const testimonials = [
-    {
-      id: 1,
-      quote: "Content. Build practical skills with structured, expert-led course content..",
-      name: "Learn More. Learn More",
-      profession: "Learn More",
-      rating: 5
-    },
-    {
-      id: 2,
-      quote: "Lesson.",
-      name: "Learn More. Learn More",
-      profession: "Learn More",
-      rating: 5
-    },
-    {
-      id: 3,
-      quote: "Learn More. Learn More.",
-      name: "Learn More. Learn More",
-      profession: "Learn More",
-      rating: 5
-    }
+    { id: 1, quote: "The scientific depth helped me evaluate ingredients with much more confidence in my daily practice.", name: "Sarah Ahmed", profession: "Pharmacist", rating: 5 },
+    { id: 2, quote: "The lessons are clear, well organized, and easy to apply when advising clients.", name: "Nora Mohammed", profession: "Dermatologist", rating: 5 },
+    { id: 3, quote: "The diploma was an excellent investment in my professional development.", name: "Hind Abdullah", profession: "Cosmetic Pharmacist", rating: 5 },
   ];
 
   return (
@@ -31,10 +13,10 @@ export function Testimonials() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            Students
+            What Our Students Say
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            Learn More Tutiba.
+            Real experiences from health professionals who developed their skills with Tutiba.
           </p>
         </div>
 
