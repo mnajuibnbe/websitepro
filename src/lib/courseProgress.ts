@@ -40,6 +40,7 @@ export async function fetchCoursesProgress(
 
     if (sectionsErr) {
       console.error('Error fetching course_sections for progress:', sectionsErr);
+      throw sectionsErr;
     }
 
     const publishedSections = sectionsData || [];
@@ -61,6 +62,7 @@ export async function fetchCoursesProgress(
 
     if (lessonsErr) {
       console.error('Error fetching lessons for progress:', lessonsErr);
+      throw lessonsErr;
     }
 
     const allLessons = lessonsData || [];
@@ -95,6 +97,7 @@ export async function fetchCoursesProgress(
 
     if (progressErr) {
       console.error('Error fetching lesson_progress:', progressErr);
+      throw progressErr;
     }
 
     const completedLessonSetByCourse: Record<string, Set<string>> = {};
@@ -141,6 +144,6 @@ export async function fetchCoursesProgress(
     return result;
   } catch (err) {
     console.error('Unexpected error in fetchCoursesProgress:', err);
-    return {};
+    throw err;
   }
 }

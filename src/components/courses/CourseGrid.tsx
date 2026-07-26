@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
+import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
 
 export function CourseGrid() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export function CourseGrid() {
       const { data, error: dbError } = await supabase
         .from('courses')
         .select('*')
-        .eq('status', 'active')
+        .eq('status', PUBLIC_COURSE_STATUS)
         .order('created_at', { ascending: false });
 
       if (dbError) throw dbError;
