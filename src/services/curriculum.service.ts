@@ -32,7 +32,7 @@ function isSupabaseLikeError(value: unknown): value is SupabaseLikeError {
  * Maps Supabase / PostgreSQL errors into clean Arabic messages
  */
 export function mapCurriculumError(error: unknown): Error {
-  if (!error) return new Error('حدث خطأ غير متوقع أثناء معالجة المنهج.');
+  if (!error) return new Error('Curriculum.');
 
   let msg = '';
   let code = '';
@@ -53,12 +53,12 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('Could not find the function') ||
     (msg.includes('function') && msg.includes('does not exist'))
   ) {
-    return new Error('ميزة ترتيب وإدارة المنهج تحتاج إلى تطبيق تحديث قاعدة البيانات (Migration) في Supabase أولاً.');
+    return new Error('Manage (Migration) Learn More Supabase Learn More.');
   }
 
   // Permission denied / RLS
   if (code === '42501' || msg.includes('permission denied') || msg.includes('row-level security') || msg.includes('Access denied')) {
-    return new Error('ليس لديك الصلاحيات الكافية لتنفيذ هذه العملية على المنهج الدراسي.');
+    return new Error('Curriculum.');
   }
 
   // Mismatched course / relation error
@@ -67,25 +67,25 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('does not belong to specified course') ||
     msg.includes('Destination section does not belong')
   ) {
-    return new Error('لا يمكن تنفيذ العملية: العناصر المحددة لا تنتمي لنفس الدورة التدريبية.');
+    return new Error('Learn More: Build practical skills with structured, expert-led course content..');
   }
 
   // Deleted item / section error
   if (msg.includes('Section is deleted') || msg.includes('Lesson is deleted') || msg.includes('not found or deleted')) {
-    return new Error('فشلت العملية: القسم أو الدرس محذوف أو غير موجود.');
+    return new Error('Learn More: Lesson.');
   }
 
   // Duplicate or constraint violation
   if (code === '23505' || code === '23502' || code === '23503' || msg.includes('Duplicate')) {
-    return new Error('فشلت العملية بسبب وجود تعارض في البيانات أو تكرار في الترتيب.');
+    return new Error('Sort.');
   }
 
   // Network error
   if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
-    return new Error('تعذر الاتصال بقاعدة البيانات. يرجى التحقق من اتصال شبكة الإنترنت.');
+    return new Error('Unable to complete this action. Please review the information and try again..');
   }
 
-  return new Error(msg || 'حدث خطأ في تنفيذ عملية المنهج الدراسي.');
+  return new Error(msg || 'Curriculum.');
 }
 
 export class CurriculumService {
@@ -117,7 +117,7 @@ export class CurriculumService {
       title: lesson.title,
       itemType: normalizedType,
       orderIndex: lesson.order_index ?? 0,
-      duration: lesson.duration || (lesson.estimated_minutes ? `${lesson.estimated_minutes} دقيقة` : null),
+      duration: lesson.duration || (lesson.estimated_minutes ? `${lesson.estimated_minutes} Minute` : null),
       estimatedMinutes: lesson.estimated_minutes,
       isPublished: Boolean(lesson.is_published),
       isPreview: Boolean(lesson.is_preview),
@@ -320,7 +320,7 @@ export class CurriculumService {
     const fullCurriculum = await this.getCurriculum(courseId);
     const createdViewModel = fullCurriculum.find((s) => s.id === newSecId);
     if (!createdViewModel) {
-      throw new Error('تعذر تحميل بيانات القسم المكرر.');
+      throw new Error('Section.');
     }
 
     return createdViewModel;

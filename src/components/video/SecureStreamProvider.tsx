@@ -18,12 +18,12 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
   useEffect(() => {
     console.log("[DevLog] SecureStreamProvider lessonId:", typeof lessonId, lessonId);
     let isMounted = true;
-    
+
     const fetchToken = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         console.log(`[DevLog] Token requested for lessonId: ${lessonId}`);
         const response = await fetch('/api/video/token', {
           method: 'POST',
@@ -33,7 +33,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           },
           body: JSON.stringify({ lessonId })
         });
-        
+
         if (!response.ok) {
           let errorMessage = `Failed to get streaming token (${response.status})`;
           try {
@@ -48,7 +48,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           }
           throw new Error(errorMessage);
         }
-        
+
         let data;
         try {
           data = await response.json();
@@ -61,7 +61,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         }
 
         console.log(`[DevLog] Token received successfully`);
-        
+
         if (isMounted) {
           // Construct stream URL
           const url = `/api/video/stream?token=${data.token}`;
@@ -76,9 +76,9 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         }
       }
     };
-    
+
     fetchToken();
-    
+
     return () => {
       isMounted = false;
     };
@@ -106,7 +106,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           </div>
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
           >

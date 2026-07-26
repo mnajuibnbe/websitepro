@@ -13,25 +13,25 @@ export function Newsletter() {
               <Mail className="w-8 h-8 text-accent-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-4">
-              احصلي على دروس علمية وتحديثات الكورسات
+              Build practical skills with structured, expert-led course content.
             </h2>
             <p className="text-primary-600 text-lg leading-relaxed">
-              لا رسائل مزعجة، يمكنك إلغاء الاشتراك في أي وقت.
+              Cancel.
             </p>
           </div>
           <div className="lg:w-1/2 w-full max-w-md">
             <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
               <div className="flex-grow">
-                <Input 
-                  type="email" 
-                  placeholder="أدخلي بريدك الإلكتروني" 
+                <Input
+                  type="email"
+                  placeholder="Learn More"
                   className="w-full h-14 text-lg bg-primary-50 border-primary-200 focus:bg-white"
                   required
-                  aria-label="البريد الإلكتروني"
+                  aria-label="Email Address"
                 />
               </div>
               <Button variant="primary" className="h-14 px-8 text-lg whitespace-nowrap">
-                اشتراك
+                Subscribe
               </Button>
             </form>
           </div>

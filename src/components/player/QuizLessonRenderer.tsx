@@ -75,13 +75,13 @@ export function QuizLessonRenderer({
 
       if (quizError) {
         console.error('Error fetching quiz metadata:', quizError);
-        setErrorMessage('حدث خطأ أثناء تحميل بيانات الاختبار.');
+        setErrorMessage('Review the quiz information and continue when you are ready..');
         setPhase('error');
         return;
       }
 
       if (!quiz) {
-        setErrorMessage('لا يوجد اختبار منشور مرتبط بهذا الدرس حالياً.');
+        setErrorMessage('No items are available yet..');
         setPhase('error');
         return;
       }
@@ -114,7 +114,7 @@ export function QuizLessonRenderer({
       }
     } catch (err: any) {
       console.error('Unexpected error loading quiz:', err);
-      setErrorMessage(err.message || 'حدث خطأ غير متوقع أثناء تحميل الاختبار.');
+      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready..');
       setPhase('error');
     }
   }, [user, lessonId]);
@@ -164,7 +164,7 @@ export function QuizLessonRenderer({
 
       if (error) {
         console.error('RPC start_quiz_attempt error:', error);
-        setErrorMessage(error.message || 'تعذر بدء محاولة الاختبار.');
+        setErrorMessage(error.message || 'Quiz.');
         setPhase('error');
         return;
       }
@@ -183,7 +183,7 @@ export function QuizLessonRenderer({
       setPhase('active');
     } catch (err: any) {
       console.error('Error starting quiz attempt:', err);
-      setErrorMessage(err.message || 'حدث خطأ أثناء الاتصال بالخادم لبدء الاختبار.');
+      setErrorMessage(err.message || 'Review the quiz information and continue when you are ready..');
       setPhase('error');
     } finally {
       setIsActionLoading(false);
@@ -235,7 +235,7 @@ export function QuizLessonRenderer({
 
       if (error) {
         console.error('RPC submit_quiz_attempt error:', error);
-        setErrorMessage(error.message || 'تعذر تسليم الاختبار.');
+        setErrorMessage(error.message || 'Quiz.');
         setPhase('active'); // allow user to retry submitting
         return;
       }
@@ -250,7 +250,7 @@ export function QuizLessonRenderer({
       await fetchSubmittedResult(activeAttempt.attempt_id);
     } catch (err: any) {
       console.error('Unexpected error submitting quiz:', err);
-      setErrorMessage(err.message || 'حدث خطأ أثناء تسليم الاختبار.');
+      setErrorMessage(err.message || 'Quiz.');
       setPhase('active');
     } finally {
       setIsActionLoading(false);
@@ -266,7 +266,7 @@ export function QuizLessonRenderer({
 
       if (error) {
         console.error('RPC get_quiz_attempt_result error:', error);
-        setErrorMessage(error.message || 'تعذر الحصول على نتيجة الاختبار.');
+        setErrorMessage(error.message || 'Quiz.');
         setPhase('error');
         return;
       }
@@ -281,7 +281,7 @@ export function QuizLessonRenderer({
       setPhase('submitted');
     } catch (err: any) {
       console.error('Unexpected error fetching quiz result:', err);
-      setErrorMessage(err.message || 'حدث خطأ أثناء تحميل النتيجة.');
+      setErrorMessage(err.message || 'Result.');
       setPhase('error');
     }
   };
@@ -303,9 +303,9 @@ export function QuizLessonRenderer({
   // Loading State
   if (phase === 'loading') {
     return (
-      <div className="bg-white border border-primary-200 rounded-2xl p-8 shadow-sm text-center py-16" dir="rtl">
+      <div className="bg-white border border-primary-200 rounded-2xl p-8 shadow-sm text-center py-16" dir="ltr">
         <Loader2 className="w-10 h-10 text-amber-600 animate-spin mx-auto mb-4" />
-        <p className="text-primary-700 font-bold text-base">جاري تحميل بيانات الاختبار...</p>
+        <p className="text-primary-700 font-bold text-base">Loading quiz...</p>
       </div>
     );
   }
@@ -313,18 +313,18 @@ export function QuizLessonRenderer({
   // Error State
   if (phase === 'error') {
     return (
-      <div className="bg-white border border-danger-200 rounded-2xl p-6 md:p-8 shadow-sm text-right" dir="rtl">
+      <div className="bg-white border border-danger-200 rounded-2xl p-6 md:p-8 shadow-sm text-left" dir="ltr">
         <div className="flex items-center gap-3 text-danger-600 mb-4 pb-3 border-b border-danger-100">
           <AlertCircle className="w-6 h-6 flex-shrink-0" />
-          <h3 className="font-bold text-lg">خطأ في الاختبار</h3>
+          <h3 className="font-bold text-lg">Unable to Load Quiz</h3>
         </div>
-        <p className="text-primary-700 text-sm leading-relaxed mb-6">{errorMessage || 'حدث خطأ أثناء تنفيذ الطلب.'}</p>
+        <p className="text-primary-700 text-sm leading-relaxed mb-6">{errorMessage || 'Please try again.'}</p>
         <button
           onClick={() => loadQuizAndAttempt()}
           className="inline-flex items-center gap-2 bg-primary-900 hover:bg-primary-800 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>إعادة المحاولة</span>
+          <span>Retry</span>
         </button>
       </div>
     );
@@ -333,11 +333,11 @@ export function QuizLessonRenderer({
   // Intro State
   if (phase === 'intro' && quizInfo) {
     return (
-      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-10 shadow-sm text-right" dir="rtl">
+      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-10 shadow-sm text-left" dir="ltr">
         {/* Header Badge */}
         <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-primary-100 text-amber-600">
           <HelpCircle className="w-6 h-6 flex-shrink-0" />
-          <span className="font-bold text-sm">اختبار تقييمي فني</span>
+          <span className="font-bold text-sm">Quiz</span>
         </div>
 
         <div className="max-w-2xl mx-auto text-center py-4">
@@ -348,27 +348,27 @@ export function QuizLessonRenderer({
           <h2 className="text-2xl font-bold text-primary-900 mb-3">{quizInfo.title}</h2>
 
           <p className="text-primary-600 text-base leading-relaxed mb-8">
-            {quizInfo.description || 'اختبر مدى استيعابك للمفاهيم الفنية المطروحة في هذا الدرس.'}
+            {quizInfo.description || 'Lesson.'}
           </p>
 
           {/* Key Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 text-right">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 text-left">
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-200/60">
-              <span className="text-xs text-primary-500 font-medium block mb-1">نسبة النجاح</span>
+              <span className="text-xs text-primary-500 font-medium block mb-1">Success</span>
               <span className="text-lg font-bold text-primary-900">{quizInfo.pass_percentage}%</span>
             </div>
 
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-200/60">
-              <span className="text-xs text-primary-500 font-medium block mb-1">الوقت المخصص</span>
+              <span className="text-xs text-primary-500 font-medium block mb-1">Learn More</span>
               <span className="text-lg font-bold text-primary-900">
-                {quizInfo.time_limit_minutes ? `${quizInfo.time_limit_minutes} دقيقة` : 'بدون حد زمني'}
+                {quizInfo.time_limit_minutes ? `${quizInfo.time_limit_minutes} Minute` : 'Learn More'}
               </span>
             </div>
 
             <div className="bg-primary-50 p-4 rounded-xl border border-primary-200/60 col-span-2 sm:col-span-1">
-              <span className="text-xs text-primary-500 font-medium block mb-1">المحاولات المتاحة</span>
+              <span className="text-xs text-primary-500 font-medium block mb-1">Learn More</span>
               <span className="text-lg font-bold text-primary-900">
-                {quizInfo.max_attempts ? `${quizInfo.max_attempts} محاولات` : 'غير محدودة'}
+                {quizInfo.max_attempts ? `${quizInfo.max_attempts} Learn More` : 'Learn More'}
               </span>
             </div>
           </div>
@@ -382,12 +382,12 @@ export function QuizLessonRenderer({
             {isActionLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>جاري إعداد الاختبار...</span>
+                <span>Processing......</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5" />
-                <span>بدء الاختبار الآن</span>
+                <span>Quiz</span>
               </>
             )}
           </button>
@@ -399,13 +399,13 @@ export function QuizLessonRenderer({
   // Active or Submitting State
   if ((phase === 'active' || phase === 'submitting') && activeAttempt) {
     return (
-      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-right relative" dir="rtl">
+      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-left relative" dir="ltr">
         {/* Sticky Active Top Info Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-primary-200">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 w-fit mb-1.5">
               <HelpCircle className="w-3.5 h-3.5" />
-              <span>محاولة رقم #{activeAttempt.attempt_number} {activeAttempt.max_attempts ? `من ${activeAttempt.max_attempts}` : ''}</span>
+              <span>Learn More #{activeAttempt.attempt_number} {activeAttempt.max_attempts ? `Learn More ${activeAttempt.max_attempts}` : ''}</span>
             </div>
             <h2 className="text-xl font-bold text-primary-900">{activeAttempt.title}</h2>
           </div>
@@ -423,7 +423,7 @@ export function QuizLessonRenderer({
             >
               <Clock className="w-4 h-4 flex-shrink-0" />
               <span>
-                {isTimeExpired ? 'انتهى الوقت' : `المتبقي: ${formatTimer(remainingSeconds)}`}
+                {isTimeExpired ? 'Learn More' : `Learn More: ${formatTimer(remainingSeconds)}`}
               </span>
             </div>
           )}
@@ -434,9 +434,9 @@ export function QuizLessonRenderer({
           <div className="p-4 mb-6 bg-danger-50 border border-danger-200 rounded-xl text-danger-900 text-sm flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-danger-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold mb-1">انتهى الوقت المخصص للاختبار!</p>
+              <p className="font-bold mb-1">Quiz!</p>
               <p className="text-xs text-danger-800 leading-relaxed">
-                لا يمكنك تغيير الإجابات الآن. يُرجى النقر على زر "تسليم الاختبار" أدناه لتقييم الإجابات التي تم حفظها.
+                Learn More. Learn More "Quiz" Save.
               </p>
             </div>
           </div>
@@ -445,7 +445,7 @@ export function QuizLessonRenderer({
         {/* Progress Summary Header */}
         <div className="mb-8 bg-primary-50 p-4 rounded-xl border border-primary-200/80 flex items-center justify-between gap-4">
           <div className="text-xs font-bold text-primary-700">
-            تقدم الإجابات: <span className="text-amber-700">{answeredQuestionsCount}</span> من <span className="text-primary-900">{totalQuestionsCount}</span> سؤال
+            Learn More: <span className="text-amber-700">{answeredQuestionsCount}</span> Learn More <span className="text-primary-900">{totalQuestionsCount}</span> Learn More
           </div>
           <div className="w-32 sm:w-48 bg-primary-200 rounded-full h-2 overflow-hidden">
             <div
@@ -479,18 +479,18 @@ export function QuizLessonRenderer({
 
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-xs font-semibold text-primary-500 bg-primary-100 px-2.5 py-1 rounded-md">
-                      {question.points} {question.points === 1 ? 'درجة' : 'درجات'}
+                      {question.points} {question.points === 1 ? 'Learn More' : 'Learn More'}
                     </span>
                     {status === 'saving' && (
                       <span className="text-xs text-amber-600 flex items-center gap-1 font-medium">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        حفظ...
+                        Save...
                       </span>
                     )}
                     {status === 'saved' && (
                       <span className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        تم الحفظ
+                        Save
                       </span>
                     )}
                   </div>
@@ -507,7 +507,7 @@ export function QuizLessonRenderer({
                         type="button"
                         disabled={isTimeExpired || phase === 'submitting'}
                         onClick={() => handleSelectOption(question.question_id, option.option_id)}
-                        className={`w-full text-right p-4 rounded-xl border text-sm md:text-base font-medium transition-all flex items-center justify-between min-h-[48px] ${
+                        className={`w-full text-left p-4 rounded-xl border text-sm md:text-base font-medium transition-all flex items-center justify-between min-h-[48px] ${
                           isSelected
                             ? 'border-amber-600 bg-amber-50/80 text-amber-950 font-bold shadow-xs'
                             : 'border-primary-200 hover:border-amber-300 hover:bg-primary-50/50 text-primary-800'
@@ -535,7 +535,7 @@ export function QuizLessonRenderer({
         {/* Submit Actions Bar */}
         <div className="pt-6 border-t border-primary-200 flex flex-wrap items-center justify-between gap-4">
           <div className="text-xs text-primary-500">
-            * تتم عملية حفظ الإجابات تلقائياً فور اختيارك.
+            * Save.
           </div>
 
           <button
@@ -546,12 +546,12 @@ export function QuizLessonRenderer({
             {phase === 'submitting' ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>جاري تسليم الاختبار...</span>
+                <span>Processing......</span>
               </>
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                <span>تسليم الاختبار</span>
+                <span>Quiz</span>
               </>
             )}
           </button>
@@ -560,21 +560,21 @@ export function QuizLessonRenderer({
         {/* Confirmation Modal */}
         {showSubmitModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 text-right shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
               <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
                 <HelpCircle className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl font-bold text-primary-900 mb-2">تأكيد تسليم الاختبار</h3>
+              <h3 className="text-xl font-bold text-primary-900 mb-2">Quiz</h3>
 
               <p className="text-primary-600 text-sm leading-relaxed mb-4">
-                لقد قمت بالإجابة على <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> من أصل <span className="font-bold text-primary-900">{totalQuestionsCount}</span> أسئلة.
+                Answer <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> Learn More <span className="font-bold text-primary-900">{totalQuestionsCount}</span> Learn More.
               </p>
 
               {answeredQuestionsCount < totalQuestionsCount && (
                 <div className="p-3 bg-warning-50 border border-warning-200 rounded-xl text-warning-800 text-xs mb-6 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-warning-600 flex-shrink-0 mt-0.5" />
-                  <span>تنبيه: الأسئلة التي لم يتم الإجابة عليها ستُحسب كإجابات خاطئة عند التقييم.</span>
+                  <span>Learn More: Answer.</span>
                 </div>
               )}
 
@@ -584,14 +584,14 @@ export function QuizLessonRenderer({
                   disabled={isActionLoading}
                   className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
                 >
-                  {isActionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'تأكيد وتسليم'}
+                  {isActionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm'}
                 </button>
                 <button
                   onClick={() => setShowSubmitModal(false)}
                   disabled={isActionLoading}
                   className="flex-1 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-4 rounded-xl text-sm transition-colors"
                 >
-                  العودة للاختبار
+                  Back
                 </button>
               </div>
             </div>
@@ -606,7 +606,7 @@ export function QuizLessonRenderer({
     const isPassed = resultData.passed;
 
     return (
-      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-right" dir="rtl">
+      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm text-left" dir="ltr">
         {/* Result Header Hero Banner */}
         <div
           className={`p-6 md:p-8 rounded-2xl mb-8 border text-center ${
@@ -626,35 +626,35 @@ export function QuizLessonRenderer({
           </div>
 
           <h2 className="text-2xl font-bold mb-2">
-            {isPassed ? 'تهانينا! لقد اجتزت الاختبار بنجاح' : 'لم تتجاوز درجة النجاح المطلوبة'}
+            {isPassed ? 'Congratulations! Quiz' : 'Success'}
           </h2>
 
           <p className="text-sm opacity-80 mb-6">
             {isPassed
-              ? 'تم توثيق إنجازك واجتياز هذا الدرس بنجاح في سجل تقدم الكورس.'
-              : `درجة النجاح المطلوبة هي ${resultData.pass_percentage}%. يمكنك مراجعة الإجابات أدناه وإعادة المحاولة.`}
+              ? 'Build practical skills with structured, expert-led course content..'
+              : `Success ${resultData.pass_percentage}%. Retry.`}
           </p>
 
           {/* Metric Badges */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold">
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
-              <span>النتيجة: </span>
+              <span>Result: </span>
               <span className={isPassed ? 'text-emerald-700' : 'text-danger-700'}>
                 {resultData.score_percentage}%
               </span>
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
-              <span>النقاط: </span>
+              <span>Learn More: </span>
               <span>
-                {resultData.score_points} من {resultData.total_points}
+                {resultData.score_points} Learn More {resultData.total_points}
               </span>
             </div>
 
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
-              <span>الحالة: </span>
+              <span>Learn More: </span>
               <span className={isPassed ? 'text-emerald-700' : 'text-danger-700'}>
-                {isPassed ? 'ناجح' : 'راسب'}
+                {isPassed ? 'Learn More' : 'Learn More'}
               </span>
             </div>
           </div>
@@ -663,7 +663,7 @@ export function QuizLessonRenderer({
         {/* Detailed Questions Review */}
         <h3 className="text-lg font-bold text-primary-900 mb-6 flex items-center gap-2">
           <FileText className="w-5 h-5 text-amber-600" />
-          <span>مراجعة الأسئلة والإجابات النموذجية:</span>
+          <span>Learn More:</span>
         </h3>
 
         <div className="space-y-8 mb-10">
@@ -701,7 +701,7 @@ export function QuizLessonRenderer({
                         : 'bg-danger-100 text-danger-800'
                     }`}
                   >
-                    {question.points_awarded || 0} / {question.points} درجة
+                    {question.points_awarded || 0} / {question.points} Learn More
                   </span>
                 </div>
 
@@ -731,7 +731,7 @@ export function QuizLessonRenderer({
                           <span className="leading-relaxed">{option.option_text}</span>
                           {isSelected && (
                             <span className="text-xs px-2 py-0.5 rounded-md bg-black/5 font-semibold">
-                              إجابتك
+                              Learn More
                             </span>
                           )}
                         </div>
@@ -744,7 +744,7 @@ export function QuizLessonRenderer({
                 {/* Question Explanation Box */}
                 {question.explanation && (
                   <div className="mt-4 p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-amber-950 text-sm leading-relaxed">
-                    <span className="font-bold block mb-1 text-amber-900">الشرح والتوضيح الفني:</span>
+                    <span className="font-bold block mb-1 text-amber-900">Learn More:</span>
                     <p className="text-amber-900/90 text-xs md:text-sm">{question.explanation}</p>
                   </div>
                 )}
@@ -756,7 +756,7 @@ export function QuizLessonRenderer({
         {/* Retry / Re-attempt Action */}
         <div className="pt-6 border-t border-primary-200 flex flex-wrap items-center justify-between gap-4">
           <div className="text-xs text-primary-500">
-            تم تقييم النتيجة واعتمادها في سجل الأداء.
+            Result.
           </div>
 
           {quizInfo &&
@@ -772,7 +772,7 @@ export function QuizLessonRenderer({
                 ) : (
                   <>
                     <RotateCcw className="w-4 h-4" />
-                    <span>إعادة المحاولة</span>
+                    <span>Retry</span>
                   </>
                 )}
               </button>

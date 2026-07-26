@@ -13,7 +13,7 @@ function detectProvider(url: string | null): string {
   const cleanUrl = url.trim();
 
   if (cleanUrl.match(/drive\.google\.com/)) return 'google_drive';
-  
+
   const ytMatch = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
   if (ytMatch) return 'youtube';
 
@@ -32,9 +32,9 @@ export function VideoLessonRenderer({ lessonId, videoUrl, title }: VideoLessonRe
         <div className="w-16 h-16 bg-primary-900/80 rounded-full flex items-center justify-center text-primary-400 mb-3 border border-primary-800">
           <VideoOff className="w-8 h-8" />
         </div>
-        <h3 className="text-lg font-bold mb-1 text-primary-100">فيديو الدرس غير متوفر حالياً</h3>
+        <h3 className="text-lg font-bold mb-1 text-primary-100">Lesson</h3>
         <p className="text-sm text-primary-400 max-w-md">
-          لم يتم تضمين رابط فيديو صالح لهذا الدرس بعد. يمكنك قراءة التفاصيل المرفقة أدناه.
+          Lesson. Details.
         </p>
       </div>
     );

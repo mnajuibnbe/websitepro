@@ -8,57 +8,57 @@ import { QuizResult } from '../components/quiz/QuizResult';
 const mockQuestions: QuestionData[] = [
   {
     id: 1,
-    question: "أي من المكونات التالية يعتبر من المرطبات الجاذبة للماء (Humectants)؟",
-    options: ["حمض الهيالورونيك", "زيت الجوجوبا", "زبدة الشيا", "السيليكون"],
+    question: "Next (Humectants)Learn More",
+    options: ["Learn More", "Learn More", "Learn More", "Learn More"],
     correctIndex: 0,
-    explanation: "حمض الهيالورونيك يجذب الماء، بينما الزيوت هي مطريات.",
+    explanation: "Learn More.",
     aiExplanation: {
-      scientific: "الـ Humectants هي جزيئات محبة للماء (Hydrophilic) تحتوي على مجموعات هيدروكسيل (-OH) تقوم بعمل روابط هيدروجينية مع جزيئات الماء، مما يسحبها إلى الطبقة القرنية.",
-      practical: "سيروم الهيالورونيك من The Ordinary يعتمد كلياً على هذه الخاصية، ولهذا يُنصح بوضعه على بشرة ندية (Damp skin)."
+      scientific: "Learn More Humectants Learn More (Hydrophilic) Learn More (-OH) Learn More.",
+      practical: "Learn More The Ordinary Learn More (Damp skin)."
     },
     memoryCoach: {
-      type: "رابط ذهني",
-      content: "تخيل حمض الهيالورونيك كـ (إسفنجة) عطشى تسحب الماء من الجو المحيط لتروي بها سطح البشرة."
+      type: "Link",
+      content: "Learn More (Learn More) Learn More."
     }
   },
   {
     id: 2,
-    question: "ما هو الترتيب الصحيح لطبقات البشرة من الخارج إلى الداخل؟",
+    question: "Sort",
     options: [
-      "الطبقة القاعدية، الطبقة الشائكة، الطبقة القرنية",
-      "الطبقة القرنية، الطبقة الشائكة، الطبقة القاعدية",
-      "الطبقة الشائكة، الطبقة القرنية، الطبقة القاعدية",
-      "الطبقة القرنية، الطبقة القاعدية، الطبقة الشائكة"
+      "Learn More",
+      "Learn More",
+      "Learn More",
+      "Learn More"
     ],
     correctIndex: 1,
-    explanation: "الطبقة القرنية هي الخارجية، والقاعدية هي الأعمق.",
+    explanation: "Learn More.",
     aiExplanation: {
-      scientific: "تبدأ دورة حياة خلية الكيراتين من الطبقة القاعدية (حيث الانقسام)، وتصعد مروراً بالطبقة الشائكة والمحببة لتفقد نواتها وتتسطح في الطبقة القرنية كحاجز حماية.",
-      practical: "المقشرات الكيميائية (AHA/BHA) تعمل فقط على الطبقة القرنية السطحية لإزالة الخلايا الميتة، ولا تصل للقاعدية إلا في التقشير الطبي العميق."
+      scientific: "Learn More (Learn More)Learn More.",
+      practical: "Learn More (AHA/BHA) Learn More."
     },
     memoryCoach: {
-      type: "اختصار",
-      content: "تذكر الكلمة (قـ.شـ.ق): قرنية (خارج) -> شائكة (وسط) -> قاعدية (داخل)."
+      type: "Learn More",
+      content: "Learn More (Learn More.Learn More.Learn More): Learn More (Learn More) -> Learn More (Learn More) -> Learn More (Learn More)."
     }
   },
   {
     id: 3,
-    question: "متى يكون استخدام المواد الحافظة (Preservatives) إلزامياً في منتجات العناية؟",
+    question: "Learn More (Preservatives) Learn More",
     options: [
-      "في المنتجات الزيتية 100%",
-      "في المنتجات التي تحتوي على ماء (Aqueous)",
-      "في المنتجات الصلبة (Solid bars)",
-      "جميع المنتجات التجميلية بدون استثناء"
+      "Learn More 100%",
+      "Learn More (Aqueous)",
+      "Learn More (Solid bars)",
+      "Learn More"
     ],
     correctIndex: 1,
-    explanation: "الماء بيئة خصبة للبكتيريا، لذا المنتجات المائية تتطلب مواد حافظة.",
+    explanation: "Learn More.",
     aiExplanation: {
-      scientific: "النشاط المائي (Water Activity - Aw) العالي يسمح للكائنات الدقيقة بالنمو الأسي. المواد الحافظة تعطل الأغشية الخلوية أو إنزيمات هذه البكتيريا والفطريات.",
-      practical: "لهذا السبب كريم الوجه يحتاج بارابين أو فينوكسي إيثانول، بينما سيروم فيتامين C الزيتي 100% قد لا يحتاج إلى مادة حافظة ميكروبية (فقط مضاد أكسدة)."
+      scientific: "Learn More (Water Activity - Aw) Minute. Learn More.",
+      practical: "Learn More C Learn More 100% Learn More (Learn More)."
     },
     memoryCoach: {
-      type: "صورة ذهنية",
-      content: "تخيل (قطرة ماء) كأنها (حمام سباحة) للبكتيريا. أينما وجد المسبح (الماء)، وجب وضع الكلور (المادة الحافظة)."
+      type: "Learn More",
+      content: "Learn More (Learn More) Learn More (Learn More) Learn More. Learn More (Learn More)Learn More (Learn More)."
     }
   }
 ];
@@ -102,10 +102,10 @@ export function QuizPage() {
       <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
         <Link to="/my-courses" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
           <ArrowRight className="w-5 h-5 group-hover:-translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />
-          <span className="font-bold text-sm hidden sm:block">الخروج من الاختبار</span>
+          <span className="font-bold text-sm hidden sm:block">Quiz</span>
         </Link>
         <div className="font-bold text-primary-900 text-sm md:text-base">
-          دبلومة العناية بالبشرة والشعر
+          Learn More
         </div>
         <button onClick={() => navigate('/my-courses')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
           <X className="w-5 h-5" />
@@ -115,11 +115,11 @@ export function QuizPage() {
       {/* Quiz Area */}
       <main className="flex-grow py-12 px-4 sm:px-8 flex items-center justify-center">
         <div className="w-full max-w-[1200px] mx-auto">
-          
+
           {quizState === 'intro' && (
-            <QuizIntro 
-              title="اختبار القسم الثاني: فسيولوجيا البشرة"
-              description="هذا الاختبار يقيس مدى فهمك لوظائف طبقات الجلد وحاجز البشرة. تأكدي من مراجعة الملاحظات قبل البدء."
+            <QuizIntro
+              title="Section: Learn More"
+              description="Review the quiz information and continue when you are ready.. Learn More."
               questionsCount={mockQuestions.length}
               passMark={80}
               attemptsLeft={3}
@@ -128,7 +128,7 @@ export function QuizPage() {
           )}
 
           {quizState === 'question' && (
-            <QuizQuestion 
+            <QuizQuestion
               questionData={mockQuestions[currentQuestionIndex]}
               currentIndex={currentQuestionIndex}
               totalQuestions={mockQuestions.length}
@@ -137,7 +137,7 @@ export function QuizPage() {
           )}
 
           {quizState === 'result' && (
-            <QuizResult 
+            <QuizResult
               score={score}
               totalQuestions={mockQuestions.length}
               passMark={80}

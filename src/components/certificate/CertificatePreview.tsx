@@ -18,11 +18,11 @@ export function CertificatePreview({
   instructorName
 }: CertificatePreviewProps) {
   return (
-    <div className="relative w-full aspect-[1.414/1] md:aspect-[1.414/1] bg-white border-8 border-primary-100 rounded-lg p-6 md:p-12 shadow-2xl overflow-hidden flex flex-col justify-between" dir="rtl">
+    <div className="relative w-full aspect-[1.414/1] md:aspect-[1.414/1] bg-white border-8 border-primary-100 rounded-lg p-6 md:p-12 shadow-2xl overflow-hidden flex flex-col justify-between" dir="ltr">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-accent-50 rounded-bl-full -z-10 opacity-50"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary-50 rounded-tr-full -z-10 opacity-50"></div>
-      
+
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
@@ -40,10 +40,10 @@ export function CertificatePreview({
 
       {/* Main Content */}
       <div className="text-center my-8 md:my-12">
-        <h2 className="text-3xl md:text-5xl font-bold text-primary-900 mb-4 md:mb-6">شهادة إتمام</h2>
-        <p className="text-primary-600 text-sm md:text-lg mb-6 md:mb-8 font-medium">تشهد منصة Tutiba بأن</p>
+        <h2 className="text-3xl md:text-5xl font-bold text-primary-900 mb-4 md:mb-6">Learn More</h2>
+        <p className="text-primary-600 text-sm md:text-lg mb-6 md:mb-8 font-medium">Learn More Tutiba Learn More</p>
         <h1 className="text-4xl md:text-6xl font-bold text-accent-600 mb-6 md:mb-8 leading-tight">{studentName}</h1>
-        <p className="text-primary-600 text-sm md:text-lg mb-4 md:mb-6 font-medium">قد أتم/أتمت بنجاح كافة متطلبات اجتياز</p>
+        <p className="text-primary-600 text-sm md:text-lg mb-4 md:mb-6 font-medium">Learn More/Success</p>
         <h3 className="text-2xl md:text-4xl font-bold text-primary-900 leading-snug">{courseName}</h3>
       </div>
 
@@ -51,7 +51,7 @@ export function CertificatePreview({
       <div className="flex justify-between items-end border-t border-primary-200 pt-6 md:pt-8 mt-auto">
         <div className="text-center w-28 md:w-48">
           <p className="font-bold text-primary-900 text-sm md:text-xl border-b border-primary-300 pb-2 mb-2">{completionDate}</p>
-          <span className="text-primary-500 text-xs md:text-sm font-medium">تاريخ الإصدار</span>
+          <span className="text-primary-500 text-xs md:text-sm font-medium">Learn More</span>
         </div>
         <div className="flex items-center justify-center hidden sm:flex">
           <Award className="w-12 h-12 md:w-20 md:h-20 text-warning-400 opacity-20 absolute" />
@@ -61,7 +61,7 @@ export function CertificatePreview({
         </div>
         <div className="text-center w-28 md:w-48">
           <p className="font-bold text-primary-900 text-base md:text-2xl border-b border-primary-300 pb-2 mb-2 italic font-serif">{instructorName}</p>
-          <span className="text-primary-500 text-xs md:text-sm font-medium">توقيع المدربة</span>
+          <span className="text-primary-500 text-xs md:text-sm font-medium">Instructor</span>
         </div>
       </div>
     </div>

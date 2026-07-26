@@ -109,7 +109,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setSections(data);
     } catch (err: any) {
       console.error('Failed loading curriculum:', err);
-      setError('تعذر تحميل بيانات منهج الكورس. يرجى التحقق من الاتصال وإعادة المحاولة.');
+      setError('Course. Please review the information and try again..');
     } finally {
       setLoading(false);
     }
@@ -216,7 +216,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         } catch (err) {
           console.error('Failed to save section reorder:', err);
           setSections(snapshot);
-          setError('فشل حفظ ترتيب الأقسام. تم التراجع عن التغييرات.');
+          setError('Save. Learn More.');
         } finally {
           setIsSavingOrder(false);
         }
@@ -256,7 +256,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       } catch (err) {
         console.error('Failed to save item reorder:', err);
         setSections(snapshot);
-        setError('فشل حفظ ترتيب الدروس. تم التراجع عن التغييرات.');
+        setError('Save. Learn More.');
       } finally {
         setIsSavingOrder(false);
       }
@@ -277,7 +277,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setAddSectionDialogOpen(false);
     } catch (err) {
       console.error('Error creating section:', err);
-      setError('تعذر إنشاء القسم الجديد.');
+      setError('Create.');
     }
   };
 
@@ -290,7 +290,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       );
     } catch (err) {
       console.error('Error updating section:', err);
-      setError('تعذر تعديل بيانات القسم.');
+      setError('Edit.');
     }
   };
 
@@ -306,7 +306,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       });
     } catch (err: any) {
       console.error('Error duplicating section:', err);
-      setError(err?.message || 'تعذر تكرار القسم.');
+      setError(err?.message || 'Section.');
     }
   };
 
@@ -339,7 +339,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       await loadCurriculum();
     } catch (err: any) {
       console.error('Error deleting section:', err);
-      setError(err?.message || 'تعذر حذف القسم.');
+      setError(err?.message || 'Delete.');
     }
   };
 
@@ -360,7 +360,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       );
     } catch (err) {
       console.error('Error duplicating item:', err);
-      setError('تعذر تكرار الدرس.');
+      setError('Lesson.');
     }
   };
 
@@ -377,7 +377,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       );
     } catch (err) {
       console.error('Error toggling publish:', err);
-      setError('تعذر تحديث حالة النشر.');
+      setError('Update.');
     }
   };
 
@@ -435,7 +435,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setUndoToast({
         show: true,
         itemIds: [itemId],
-        message: `تم حذف "${item?.title || 'العنصر'}" بنجاح.`,
+        message: `Delete "${item?.title || 'Learn More'}" Success.`,
         timeoutId: timeout,
       });
     } catch (err) {
@@ -456,7 +456,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       await loadCurriculum();
     } catch (err) {
       console.error('Error restoring items:', err);
-      setError('تعذر استعادة العناصر المحذوفة.');
+      setError('Unable to complete this action.');
     }
   };
 
@@ -493,7 +493,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setSelectedItemIds([]);
     } catch (err: any) {
       console.error('Error bulk publishing:', err);
-      setError(err?.message || 'تعذر تحديث حالة العناصر المحددة.');
+      setError(err?.message || 'Update.');
     }
   };
 
@@ -518,7 +518,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setUndoToast({
         show: true,
         itemIds: ids,
-        message: `تم حذف ${ids.length} عنصر/دروس بنجاح.`,
+        message: `Delete ${ids.length} Learn More/Lessons.`,
         timeoutId: timeout,
       });
     } catch (err) {
@@ -536,7 +536,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       await loadCurriculum();
     } catch (err: any) {
       console.error('Error bulk moving items:', err);
-      setError(err?.message || 'تعذر نقل العناصر المحددة.');
+      setError(err?.message || 'Unable to complete this action.');
     }
   };
 
@@ -555,72 +555,72 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
   if (loading) {
     return (
-      <div className="p-12 text-center bg-white rounded-2xl border border-primary-200/80 shadow-2xs space-y-4 rtl" dir="rtl">
+      <div className="p-12 text-center bg-white rounded-2xl border border-primary-200/80 shadow-2xs space-y-4" dir="ltr">
         <Loader2 className="w-8 h-8 text-amber-600 animate-spin mx-auto" />
-        <p className="text-sm font-bold text-primary-700">جاري تحميل منهج الكورس والأقسام...</p>
+        <p className="text-sm font-bold text-primary-700">Course...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 rtl" dir="rtl">
+    <div className="space-y-6" dir="ltr">
       {/* Top Toolbar */}
       <div className="bg-white rounded-2xl border border-primary-200/90 p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>مُحرر المنهج التفاعلي</span>
+              <span>Curriculum</span>
             </span>
 
             {isSavingOrder && (
               <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5 animate-pulse">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span>جاري حفظ الترتيب...</span>
+                <span>Save...</span>
               </span>
             )}
           </div>
-          <h2 className="text-lg font-bold text-primary-900">منهج الكورس والهيكلية التعليمية</h2>
+          <h2 className="text-lg font-bold text-primary-900">Course</h2>
           <p className="text-xs text-primary-500 mt-0.5">
-            قم بإضافة الأقسام والدروس وترتيبها بسلاسة عن طريق السحب والإفلات.
+            Add.
           </p>
         </div>
 
         {/* Action Controls & Stats */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="hidden sm:flex items-center gap-3 text-xs font-bold text-primary-700 border-l border-primary-200 pl-4 ml-1">
-            <span>{totalSections} أقسام</span>
+            <span>{totalSections} Learn More</span>
             <span className="text-primary-300">•</span>
-            <span>{totalItems} دروس</span>
+            <span>{totalItems} Lessons</span>
             <span className="text-primary-300">•</span>
-            <span className="text-emerald-700">{totalPublished} منشور</span>
+            <span className="text-emerald-700">{totalPublished} Published</span>
           </div>
 
           <button
             type="button"
             onClick={() => handleToggleExpandAll(true)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="توسيع الكل"
+            title="Learn More"
           >
             <Maximize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">توسيع الكل</span>
+            <span className="hidden sm:inline">Learn More</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleToggleExpandAll(false)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="طي الكل"
+            title="Learn More"
           >
             <Minimize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">طي الكل</span>
+            <span className="hidden sm:inline">Learn More</span>
           </button>
 
           <button
             type="button"
             onClick={() => loadCurriculum()}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors"
-            title="تحديث المنهج"
+            title="Update"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -631,7 +631,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-4 py-2.5 bg-primary-900 hover:bg-primary-950 text-white font-bold text-xs rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
           >
             <FolderPlus className="w-4 h-4 text-amber-400" />
-            <span>إضافة قسم جديد</span>
+            <span>Add</span>
           </button>
         </div>
       </div>
@@ -657,7 +657,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         <div className="sticky top-4 z-30 p-3 bg-primary-900 text-white rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-3 duration-200">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold bg-amber-500 text-primary-950 px-2.5 py-1 rounded-lg">
-              تحديد {selectedItemIds.length} عنصر
+              Learn More {selectedItemIds.length} Learn More
             </span>
 
             <button
@@ -665,7 +665,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               onClick={handleSelectAllItems}
               className="text-xs text-primary-300 hover:text-white underline font-bold"
             >
-              إلغاء التحديد
+              Cancel
             </button>
           </div>
 
@@ -676,7 +676,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>نشر المحدد</span>
+              <span>Publish</span>
             </button>
 
             <button
@@ -685,7 +685,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <EyeOff className="w-3.5 h-3.5" />
-              <span>تحويل لمسودة</span>
+              <span>Draft</span>
             </button>
 
             <button
@@ -698,7 +698,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <MoveRight className="w-3.5 h-3.5" />
-              <span>نقل لقسم آخر</span>
+              <span>Learn More</span>
             </button>
 
             <button
@@ -707,7 +707,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               className="px-3 py-1.5 bg-danger-600 hover:bg-danger-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>حذف المحدد</span>
+              <span>Delete</span>
             </button>
           </div>
         </div>
@@ -726,7 +726,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold text-xs rounded-xl flex items-center gap-1.5 flex-shrink-0 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>تراجع</span>
+            <span>Learn More</span>
           </button>
         </div>
       )}
@@ -738,9 +738,9 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <Layers className="w-8 h-8" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
-            <h3 className="font-bold text-base text-primary-900">لا يوجد منهج أو أقسام حتى الآن</h3>
+            <h3 className="font-bold text-base text-primary-900">No items are available yet.</h3>
             <p className="text-xs text-primary-500 leading-relaxed">
-              ابدأ بإنشاء القسم الأول لكورسك، ثم أضف الدروس ومصادر التعلم بسهولة.
+              Build practical skills with structured, expert-led course content..
             </p>
           </div>
           <button
@@ -749,7 +749,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center gap-2 shadow-2xs"
           >
             <Plus className="w-4 h-4" />
-            <span>إضافة أول قسم الآن</span>
+            <span>Add</span>
           </button>
         </div>
       ) : (
@@ -799,12 +799,12 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Add Section */}
       {addSectionDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs rtl" dir="rtl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-primary-100 pb-3">
               <h3 className="text-base font-bold text-primary-900 flex items-center gap-2">
                 <FolderPlus className="w-5 h-5 text-amber-600" />
-                <span>إضافة قسم جديد إلى الكورس</span>
+                <span>Course</span>
               </h3>
               <button
                 onClick={() => setAddSectionDialogOpen(false)}
@@ -817,13 +817,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-primary-800 mb-1">
-                  عنوان القسم *
+                  Section *
                 </label>
                 <input
                   type="text"
                   value={newSectionTitle}
                   onChange={(e) => setNewSectionTitle(e.target.value)}
-                  placeholder="مثال: الفصل الأول - مقدمة المفهوم"
+                  placeholder="Learn More: Learn More - Learn More"
                   className="w-full text-xs font-bold p-3 bg-primary-50/50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
                   autoFocus
                 />
@@ -831,13 +831,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
               <div>
                 <label className="block text-xs font-bold text-primary-800 mb-1">
-                  وصف القسم (اختياري)
+                  Section (Learn More)
                 </label>
                 <textarea
                   rows={3}
                   value={newSectionDesc}
                   onChange={(e) => setNewSectionDesc(e.target.value)}
-                  placeholder="وصف مختصر لمحتوى ودوافع هذا القسم..."
+                  placeholder="Content..."
                   className="w-full text-xs p-3 bg-primary-50/50 border border-primary-200 rounded-xl outline-none resize-none"
                 />
               </div>
@@ -849,7 +849,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 onClick={() => setAddSectionDialogOpen(false)}
                 className="px-4 py-2 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold text-xs rounded-xl"
               >
-                إلغاء
+                Cancel
               </button>
               <button
                 type="button"
@@ -857,7 +857,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 disabled={!newSectionTitle.trim()}
                 className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors"
               >
-                إنشاء القسم
+                Create
               </button>
             </div>
           </div>
@@ -875,23 +875,23 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Delete Section Prompt */}
       {deleteSectionModal.isOpen && deleteSectionModal.section && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs rtl" dir="rtl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 text-danger-600">
               <AlertCircle className="w-6 h-6" />
-              <h3 className="text-base font-bold text-primary-900">تأكيد حذف القسم</h3>
+              <h3 className="text-base font-bold text-primary-900">Delete</h3>
             </div>
 
             <p className="text-xs text-primary-600 leading-relaxed">
-              القسم <strong>&quot;{deleteSectionModal.section.title}&quot;</strong> يحتوي على{' '}
-              <strong className="text-amber-800">{deleteSectionModal.section.items.length} دروس</strong>.
-              اختر إجراء التعاطي مع محتواه:
+              Section <strong>&quot;{deleteSectionModal.section.title}&quot;</strong> Learn More{' '}
+              <strong className="text-amber-800">{deleteSectionModal.section.items.length} Lessons</strong>.
+              Select:
             </p>
 
             {sections.filter((s) => s.id !== deleteSectionModal.section?.id).length > 0 && (
               <div className="space-y-2 p-3 bg-amber-50 rounded-xl border border-amber-200">
                 <label className="block text-xs font-bold text-amber-900">
-                  نقل الدروس إلى قسم آخر قبل الحذف:
+                  Delete:
                 </label>
                 <select
                   value={deleteSectionModal.moveTargetId}
@@ -918,7 +918,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   }
                   className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg transition-colors mt-2"
                 >
-                  نقل الدروس وحذف القسم
+                  Delete
                 </button>
               </div>
             )}
@@ -931,7 +931,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 }
                 className="px-4 py-2 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold text-xs rounded-xl"
               >
-                إلغاء
+                Cancel
               </button>
 
               <button
@@ -939,7 +939,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 onClick={() => confirmDeleteSection(deleteSectionModal.section!.id)}
                 className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white font-bold text-xs rounded-xl transition-colors"
               >
-                حذف النهائي مع المحتوى
+                Delete
               </button>
             </div>
           </div>
@@ -948,14 +948,14 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Bulk Move Selection */}
       {showBulkMoveDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs rtl" dir="rtl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <h3 className="text-base font-bold text-primary-900">
-              نقل {selectedItemIds.length} عنصر إلى قسم آخر
+              Learn More {selectedItemIds.length} Learn More
             </h3>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-primary-800">اختر القسم الوجهة:</label>
+              <label className="block text-xs font-bold text-primary-800">Section:</label>
               <select
                 value={targetBulkSectionId}
                 onChange={(e) => setTargetBulkSectionId(e.target.value)}
@@ -963,7 +963,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               >
                 {sections.map((sec) => (
                   <option key={sec.id} value={sec.id}>
-                    {sec.title} ({sec.items.length} دروس)
+                    {sec.title} ({sec.items.length} Lessons)
                   </option>
                 ))}
               </select>
@@ -975,7 +975,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 onClick={() => setShowBulkMoveDialog(false)}
                 className="px-4 py-2 bg-primary-100 text-primary-800 font-bold text-xs rounded-xl"
               >
-                إلغاء
+                Cancel
               </button>
 
               <button
@@ -983,7 +983,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 onClick={handleBulkMove}
                 className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors"
               >
-                تأكيد النقل
+                Confirm
               </button>
             </div>
           </div>
