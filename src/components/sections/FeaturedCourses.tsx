@@ -17,12 +17,12 @@ export function FeaturedCourses() {
       try {
         setIsLoading(true);
         setError(null);
-        // Home intentionally shows only explicitly featured, published courses.
+        // Home shows the latest published courses. Public/private visibility is
+        // enforced by course RLS, including for signed-in visitors.
         const { data, error } = await supabase
           .from('courses')
           .select('*')
           .eq('status', PUBLIC_COURSE_STATUS)
-          .eq('is_featured', true)
           .order('created_at', { ascending: false })
           .limit(3);
 

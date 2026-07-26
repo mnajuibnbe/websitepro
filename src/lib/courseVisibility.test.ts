@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { isActiveEnrollment, isHomeCourse } from './courseVisibility.js';
 
-test('Home includes only published featured courses', () => {
-  assert.equal(isHomeCourse({ status: 'published', is_featured: true }), true);
-  assert.equal(isHomeCourse({ status: 'published', is_featured: false }), false);
-  assert.equal(isHomeCourse({ status: 'draft', is_featured: true }), false);
+test('Home includes published courses and excludes drafts', () => {
+  assert.equal(isHomeCourse({ status: 'published' }), true);
+  assert.equal(isHomeCourse({ status: 'draft' }), false);
+  assert.equal(isHomeCourse({ status: 'archived' }), false);
 });
 
 test('student course access treats only active enrollment as approved', () => {

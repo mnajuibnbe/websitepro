@@ -61,3 +61,6 @@ The browser build additionally requires `VITE_SUPABASE_ANON_KEY`.
 
 - Added a separate enrolled-course SELECT policy so an active student can resolve published course metadata without making private/unlisted courses public.
 - Changed progress retrieval to propagate Supabase failures to the existing error states instead of silently displaying 0% progress.
+- Restored the established latest-three Home rule after proving `is_featured` has no Admin control.
+- Replaced fake static pagination with working data-driven pagination that is hidden for a single page.
+- Added a narrowly scoped admin pending-to-active enrollment policy and made the approval UI verify that RLS actually updated a row.

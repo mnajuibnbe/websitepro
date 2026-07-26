@@ -6,21 +6,23 @@ A course managed by an administrator can be absent from Home, the public catalog
 
 ## Intended rules found in the repository
 
-`Course.status` defines `draft`, `published`, and `archived`; `Course.is_featured` exists for Home selection. Enrollments use `pending`, `active`, and `cancelled`. Learning access checks `status = 'active'`, and lesson/section RLS requires `has_active_enrollment(course_id)`. Thus drafts remain admin-only, public catalogue rows are published/public, Home is the featured subset, pending is displayed as pending by the existing enrolment UX, and only active enrollment unlocks learning.
+`Course.status` defines `draft`, `published`, and `archived`. The implemented Home section was documented in its original code as the latest three courses; the Admin UI does not provide an `is_featured` control. Enrollments use `pending`, `active`, and `cancelled`. Learning access checks `status = 'active'`, and lesson/section RLS requires `has_active_enrollment(course_id)`. Thus drafts remain admin-only, public catalogue rows are published/public, Home is the newest-three published/public subset, pending is displayed as pending by the existing enrolment UX, and only active enrollment unlocks learning.
 
 ## Root cause by surface
 
 ### Home — proven in code
 
-`FeaturedCourses.tsx` queried `status = 'active'`. Admin create/edit/builder and the shared type publish courses with `status = 'published'`; `active` is an enrollment status, not a course publication status. The query also ignored the existing `is_featured` field despite presenting a featured section. Finally, Supabase errors were swallowed and rendered as no section.
+`FeaturedCourses.tsx` queried `status = 'active'`. Admin create/edit/builder and the shared type publish courses with `status = 'published'`; `active` is an enrollment status, not a course publication status. A first repair incorrectly required `is_featured=true`, although no Admin workflow sets that field, which kept the entire section empty. Finally, Supabase errors were originally swallowed and rendered as no section.
 
-**Repair:** query `status = 'published' AND is_featured = true`, retain newest-three ordering, and show a retryable error. A published non-featured course is intentionally absent from Home.
+**Repair:** query the newest three `published` rows, let RLS enforce public/enrolled visibility, and show a retryable error. This matches the pre-existing latest-three Home rule without requiring an unmanageable flag.
 
 ### Public Courses — proven in code; deployed RLS requires runtime verification
 
 `CourseGrid.tsx` also queried the nonexistent course publication value `active`, proving why correctly published rows were filtered out. It already distinguished errors from empty results. The repository contained no migration defining SELECT policies for `courses`, so the exact production RLS state is not provable from source.
 
 **Repair:** query `published`. Add an additive, least-privilege policy allowing anon/authenticated SELECT only when `status = 'published'` and visibility is public (null legacy visibility is treated as public).
+
+The supplied screenshots also show courses configured as `private` and `unlisted` in Admin. Those rows are intentionally absent from the anonymous and unenrolled catalogue after RLS is applied; set visibility to `public` in the existing Admin editor when catalogue display is desired. This is configuration, not a reason to weaken RLS.
 
 ### Dashboard / My Courses — mixed: UI causes proven; deployed RLS/data require runtime verification
 
@@ -34,6 +36,10 @@ All student queries correctly bind `enrollments.user_id` to the authenticated `a
 `MyCourses.tsx` already surfaces enrollment/course failures and selects active enrollments only. Its second course query can still return no row if deployed course RLS is missing or differs; that production cause cannot be proven locally.
 
 **Repair:** fail visibly on enrollment/course errors, remove public-course fallbacks from enrollment widgets, and add own-row enrollment SELECT RLS. The public published-course policy lets the separate course lookup resolve without exposing draft/private data. Existing lesson policies and service-side lesson-course enrollment authorization are unchanged.
+
+### Admin pending approval — proven in code and screenshot
+
+The approval button used nonexistent theme colors (`success-600`/`success-700`), producing white text on a transparent background. More importantly, no tracked enrollment UPDATE policy authorized the operation, and the UI treated a zero-row RLS update as success because it checked only `error`. The button now uses existing accent colors, the mutation requires and verifies a returned `pending -> active` row, and an additive policy permits only that transition for an authenticated `app_metadata.role = admin` user.
 
 ## Affected data flow and files
 
