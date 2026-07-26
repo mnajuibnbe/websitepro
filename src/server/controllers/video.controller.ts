@@ -82,7 +82,7 @@ export const generateToken = async (req: Request, res: Response): Promise<void> 
   } catch (error: any) {
     console.error('[VideoController] Error generating token:', error.message, error.code, error.status, error.stack);
     res.status(500).json({ 
-      error: 'Failed to generate token', 
+      error: error.message || 'Failed to generate token', 
       originalError: error.message
     });
   }
