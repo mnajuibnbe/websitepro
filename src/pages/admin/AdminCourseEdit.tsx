@@ -82,7 +82,7 @@ export function AdminCourseEdit() {
       // Load instructors
       const { data: profData } = await supabase.from('profiles').select('id, full_name');
       if (profData) {
-        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Learn More' })));
+        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Instructor' })));
       }
 
       // Fetch course
@@ -106,7 +106,7 @@ export function AdminCourseEdit() {
       setSlug(course.slug || '');
       setShortDescription(course.short_description || '');
       setDescription(course.description || '');
-      setCategory(course.category || 'Learn More');
+      setCategory(course.category || 'Uncategorized');
       setLevel((course.level as any) || 'all_levels');
       setLanguage(course.language || 'Arabic');
       setPriceEgp(course.price_egp == null ? '' : String(course.price_egp));
@@ -201,7 +201,7 @@ export function AdminCourseEdit() {
           updates.published_at = new Date().toISOString();
         }
         if (visibility === 'private') {
-          addToast('info', 'Course "Learn More" (Private)Learn More.');
+          addToast('info', 'This course is private and will not appear in the public catalog.');
         }
       } else if (status === 'archived') {
         updates.archived_at = new Date().toISOString();
@@ -268,7 +268,7 @@ export function AdminCourseEdit() {
                 className="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-colors"
               >
                 <Sparkle className="w-4 h-4 text-amber-600" />
-                <span>Learn More Course Builder</span>
+                <span>Open Course Builder</span>
               </button>
 
               <Button
@@ -321,7 +321,7 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-amber-600" />
-                  <span>Learn More</span>
+                  <span>Publishing and Visibility</span>
                 </h2>
 
                 <div className="space-y-6">
@@ -418,27 +418,27 @@ export function AdminCourseEdit() {
                     >
                       <option value="draft">Draft (Draft)</option>
                       <option value="published">Published (Published)</option>
-                      <option value="archived">Learn More (Archived)</option>
+                      <option value="archived">Archived</option>
                     </select>
                   </div>
 
                   {/* Visibility */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Visibility</label>
                     <select
                       value={visibility}
                       onChange={(e) => setVisibility(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="public">Learn More (Learn More)</option>
-                      <option value="unlisted">Learn More (Link)</option>
-                      <option value="private">Learn More (Learn More)</option>
+                      <option value="public">Public (Course Catalog)</option>
+                      <option value="unlisted">Unlisted (Direct Link)</option>
+                      <option value="private">Private (Enrolled Students Only)</option>
                     </select>
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Category</label>
                     <input
                       type="text"
                       value={category}
@@ -455,7 +455,7 @@ export function AdminCourseEdit() {
                       onChange={(e) => setLevel(e.target.value as any)}
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
-                      <option value="all_levels">Learn More</option>
+                      <option value="all_levels">All Levels</option>
                       <option value="beginner">Beginner</option>
                       <option value="intermediate">Intermediate</option>
                       <option value="advanced">Advanced</option>
@@ -486,7 +486,7 @@ export function AdminCourseEdit() {
 
                   {/* Instructor */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Learn More</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Assigned Instructor</label>
                     <select
                       value={instructorId}
                       onChange={(e) => setInstructorId(e.target.value)}
@@ -507,7 +507,7 @@ export function AdminCourseEdit() {
               <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-amber-600" />
-                  <span>Learn More</span>
+                  <span>Images and Media</span>
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -523,7 +523,7 @@ export function AdminCourseEdit() {
                     />
                     {thumbnail && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={thumbnail} alt="Learn More" className="w-full h-full object-cover" />
+                        <img src={thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -540,7 +540,7 @@ export function AdminCourseEdit() {
                     />
                     {coverImage && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={coverImage} alt="Learn More" className="w-full h-full object-cover" />
+                        <img src={coverImage} alt="Cover image preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
