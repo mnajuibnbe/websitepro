@@ -7,29 +7,29 @@ export function FreeContent() {
   const contents = [
     {
       id: 1,
-      type: 'Learning Resource',
-      title: 'Learning Resource',
+      type: 'Guide',
+      title: 'A Practical Guide to Building a Professional Skin-Care Routine',
       icon: FileText,
       image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600&auto=format&fit=crop',
-      cta: 'Learning Resource',
+      cta: 'Read the Guide',
       isProminent: false
     },
     {
       id: 2,
-      type: 'Lesson',
-      title: 'Learning Resource',
+      type: 'Video Lesson',
+      title: 'How to Evaluate Active Ingredients in Skin-Care Products',
       icon: PlayCircle,
       image: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=600&auto=format&fit=crop',
-      cta: 'Lesson',
+      cta: 'Watch the Lesson',
       isProminent: true
     },
     {
       id: 3,
       type: 'Learning Resource',
-      title: 'Learning Resource (INCI)Learning Resource',
+      title: 'How to Read and Understand an INCI Ingredient List',
       icon: Play,
       image: 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=600&auto=format&fit=crop',
-      cta: 'Learning Resource',
+      cta: 'Read the Guide',
       isProminent: false
     }
   ];
@@ -39,10 +39,10 @@ export function FreeContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            Start
+            Explore Free Learning Resources
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            Content.
+            Preview our evidence-based teaching approach with practical guides and complimentary lessons.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export function FreeContent() {
 
         <div className="flex justify-center mt-12 md:mt-16">
           <Button variant="secondary" className="px-8 text-lg h-12">
-            Free
+            View All Free Resources
           </Button>
         </div>
       </div>

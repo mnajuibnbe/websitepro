@@ -36,7 +36,7 @@ export function ContactPage() {
             <div>
               <h1 className="text-4xl font-bold text-primary-900 mb-4">Contact Us</h1>
               <p className="text-lg text-primary-600 mb-12 max-w-lg leading-relaxed">
-                Answer. Next.
+                Have a question about a course, enrollment, or your account? Our support team is ready to help.
               </p>
 
               <div className="space-y-8">
@@ -46,7 +46,7 @@ export function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-primary-900 mb-1">Email Address</h3>
-                    <p className="text-primary-600 mb-2">Contact Information</p>
+                    <p className="text-primary-600 mb-2">Email our learner support team</p>
                     <a href="mailto:support@tutiba.com" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">support@tutiba.com</a>
                   </div>
                 </div>
@@ -56,8 +56,8 @@ export function ContactPage() {
                     <Phone className="w-6 h-6 text-accent-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-primary-900 mb-1">Contact Information / Contact Information</h3>
-                    <p className="text-primary-600 mb-2">Contact Information (9 Contact Information - 5 Contact Information)</p>
+                    <h3 className="font-bold text-primary-900 mb-1">Phone Support</h3>
+                    <p className="text-primary-600 mb-2">Available Sunday–Thursday, 9:00 AM–5:00 PM</p>
                     <a href="tel:+20100000000" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">+20 100 000 0000</a>
                   </div>
                 </div>
@@ -66,15 +66,15 @@ export function ContactPage() {
 
             {/* Contact Form */}
             <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-10">
-              <h2 className="text-2xl font-bold text-primary-900 mb-6">Contact Information</h2>
+              <h2 className="text-2xl font-bold text-primary-900 mb-6">Send Us a Message</h2>
 
               {isSuccess ? (
                 <div className="bg-success-50 text-success-700 p-6 rounded-xl border border-success-200 text-center animate-in fade-in duration-300">
                   <div className="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Mail className="w-6 h-6 text-success-600" />
                   </div>
-                  <h3 className="font-bold text-lg mb-2">Submit!</h3>
-                  <p>Contact Information.</p>
+                  <h3 className="font-bold text-lg mb-2">Message Sent</h3>
+                  <p>Thank you for contacting us. We will respond as soon as possible.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -85,15 +85,15 @@ export function ContactPage() {
                         type="text"
                         required
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                        placeholder="Enter details"
+                        placeholder="Enter your full name"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
+                      <label className="block text-sm font-bold text-primary-900 mb-2">Phone Number</label>
                       <input
                         type="tel"
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                        placeholder="Enter details"
+                        placeholder="Enter your phone number"
                         dir="ltr"
                       />
                     </div>
@@ -111,22 +111,22 @@ export function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Topic</label>
                     <select className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors">
-                      <option value="support">Contact Information</option>
-                      <option value="billing">Contact Information / Contact Information</option>
-                      <option value="course">Courses</option>
-                      <option value="other">Contact Information</option>
+                      <option value="support">Account Support</option>
+                      <option value="billing">Billing and Payments</option>
+                      <option value="course">Course Information</option>
+                      <option value="other">Other Inquiry</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Contact Information</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Message</label>
                     <textarea
                       required
                       rows={4}
                       className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors resize-none"
-                      placeholder="Enter details"
+                      placeholder="How can we help?"
                     ></textarea>
                   </div>
 
@@ -136,7 +136,7 @@ export function ContactPage() {
                     className="w-full h-12 text-lg"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Sending...' : 'Submit'}
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </Button>
                 </form>
               )}
