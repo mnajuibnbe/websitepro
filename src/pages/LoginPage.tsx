@@ -32,7 +32,7 @@ export function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary-900 mb-2">Sign In</h1>
-          <p className="text-primary-600">Welcome</p>
+          <p className="text-primary-600">Welcome back. Sign in to continue learning.</p>
         </div>
 
         {error && (

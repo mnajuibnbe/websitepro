@@ -85,7 +85,7 @@ export function Dashboard() {
             </button>
 
             <div className="w-10 h-10 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 font-bold border border-accent-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-              Learning Information
+              Learning Dashboard
             </div>
           </div>
         </header>
@@ -112,7 +112,7 @@ export function Dashboard() {
                  <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mb-6">
                    <BookOpen className="w-12 h-12 text-primary-400" />
                  </div>
-                 <h2 className="text-2xl font-bold text-primary-900 mb-3">Subscribe</h2>
+                 <h2 className="text-2xl font-bold text-primary-900 mb-3">No Enrolled Courses Yet</h2>
                  <p className="text-primary-600 mb-8 max-w-md">
                    The requested information could not be loaded. Please try again.
                  </p>

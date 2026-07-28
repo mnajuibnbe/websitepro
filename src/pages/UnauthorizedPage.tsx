@@ -15,7 +15,7 @@ export function UnauthorizedPage() {
 
         <h1 className="text-3xl font-bold text-primary-900 mb-4">Access Denied</h1>
         <p className="text-primary-600 mb-8 leading-relaxed">
-          Details. Please review the information and try again.
+          You do not have permission to view this page. Return to your dashboard or go back to the previous page.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

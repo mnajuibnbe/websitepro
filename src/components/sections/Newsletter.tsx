@@ -13,10 +13,10 @@ export function Newsletter() {
               <Mail className="w-8 h-8 text-accent-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-4">
-              Build practical skills with structured, expert-led course content.
+              Stay Current with Cosmeceutical Insights
             </h2>
             <p className="text-primary-600 text-lg leading-relaxed">
-              Cancel.
+              Receive new articles, course announcements, and practical learning resources directly in your inbox.
             </p>
           </div>
           <div className="lg:w-1/2 w-full max-w-md">
@@ -24,7 +24,7 @@ export function Newsletter() {
               <div className="flex-grow">
                 <Input
                   type="email"
-                  placeholder="Enter details"
+                  placeholder="Enter your email address"
                   className="w-full h-14 text-lg bg-primary-50 border-primary-200 focus:bg-white"
                   required
                   aria-label="Email Address"

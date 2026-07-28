@@ -24,47 +24,47 @@ export function PrivacyPolicy() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-primary-900 mb-2">Privacy Policy</h1>
-                <p className="text-primary-600">Update: 23 Privacy Information 2026</p>
+                <p className="text-primary-600">Last updated: July 23, 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Privacy Information</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Our Commitment to Privacy</h2>
                 <p className="leading-relaxed">
-                  Privacy Information (Tutiba) Privacy Information. Privacy Policy.
+                  Tutiba respects your privacy and handles personal information responsibly. This policy explains what we collect, why we collect it, and the choices available to you.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Privacy Information</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Information We Collect</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li><strong>Account:</strong> Email Address.</li>
-                  <li><strong>Payment:</strong> Privacy Information.</li>
-                  <li><strong>Privacy Information:</strong> Review the quiz information and continue when you are ready.</li>
+                  <li><strong>Account information:</strong> Your name, email address, and profile details.</li>
+                  <li><strong>Transaction information:</strong> Purchase and billing records needed to process enrollment.</li>
+                  <li><strong>Learning activity:</strong> Course progress, quiz results, and certificate eligibility.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Privacy Information</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. How We Use Information</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>Certificates.</li>
-                  <li>User.</li>
-                  <li>Update.</li>
+                  <li>Provide courses, track progress, and issue certificates.</li>
+                  <li>Manage your account and respond to support requests.</li>
+                  <li>Maintain, secure, and improve the learning experience.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Privacy Information</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Data Security</h2>
                 <p className="leading-relaxed">
-                  Privacy Information (SSL/TLS) Privacy Information. Privacy Information.
+                  We use appropriate technical and organizational safeguards, including encrypted connections, to protect personal information from unauthorized access, loss, or misuse.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Privacy Information</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Your Choices and Rights</h2>
                 <p className="leading-relaxed">
-                  Delete.
+                  You may request access to, correction of, or deletion of your personal information by contacting our support team. Some records may be retained where required for legal or operational purposes.
                 </p>
               </section>
             </div>

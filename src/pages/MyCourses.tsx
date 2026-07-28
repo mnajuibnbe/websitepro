@@ -141,9 +141,9 @@ export function MyCourses() {
                 <div className="w-24 h-24 bg-warning-50 rounded-full flex items-center justify-center mb-6">
                   <BookOpen className="w-12 h-12 text-warning-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-warning-900 mb-3">Course Information</h2>
+                <h2 className="text-2xl font-bold text-warning-900 mb-3">Courses Unavailable</h2>
                 <p className="text-warning-600 mb-8 max-w-md">
-                  Course Information. Please review the information and try again.
+                  We could not load your course information. Please try again shortly.
                 </p>
                 <Button
                   variant="primary"
@@ -160,7 +160,7 @@ export function MyCourses() {
                 </div>
                 <h2 className="text-2xl font-bold text-primary-900 mb-3">No items found</h2>
                 <p className="text-primary-600 mb-8 max-w-md">
-                  Course Information.
+                  Enroll in a course to begin your learning journey.
                 </p>
                 <Button
                   variant="primary"
@@ -211,7 +211,7 @@ export function MyCourses() {
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center gap-2 text-sm text-primary-500">
                             <Clock className="w-4 h-4" />
-                            <span>Course Information</span>
+                            <span>View Course</span>
                           </div>
                           <Button
                             variant={progress === 100 ? 'secondary' : 'primary'}

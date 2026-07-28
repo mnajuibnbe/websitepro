@@ -23,46 +23,46 @@ export function Terms() {
                 <FileText className="w-8 h-8 text-accent-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms</h1>
-                <p className="text-primary-600">Update: 23 Terms 2026</p>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms of Service</h1>
+                <p className="text-primary-600">Last updated: July 23, 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Terms</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Acceptance of Terms</h2>
                 <p className="leading-relaxed">
-                  Terms (Tutiba)Terms. Please review the information and try again.
+                  By accessing Tutiba or enrolling in a course, you agree to these terms. Please review them before using the platform.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Terms</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Course Access</h2>
                 <p className="leading-relaxed">
-                  Terms (PDF DocumentTerms) Terms. Terms.
+                  Enrollment provides a personal, limited right to access the purchased course materials. Course files and resources may not be redistributed, resold, or published without permission.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Users</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Account Responsibilities</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>Sign In.</li>
-                  <li>Share.</li>
-                  <li>Share.</li>
+                  <li>Provide accurate account information and keep it current.</li>
+                  <li>Protect your sign-in credentials and do not share your account.</li>
+                  <li>Use the platform lawfully and respect intellectual property rights.</li>
                 </ul>
               </section>
 
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Certificates</h2>
                 <p className="leading-relaxed">
-                  Review the quiz information and continue when you are ready.
+                  Certificates are issued only after the applicable completion requirements have been met. They confirm course completion and do not replace a regulated professional license.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancel</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancellations and Refunds</h2>
                 <p className="leading-relaxed">
-                  Terms "Terms". Terms 14 Terms 10% Course.
+                  Refund requests are reviewed according to the policy presented during checkout and any applicable consumer-protection requirements. Contact support promptly if you experience an enrollment or payment issue.
                 </p>
               </section>
             </div>
