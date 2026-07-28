@@ -37,6 +37,10 @@ import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { LessonService } from '../../services/lesson.service';
 import { sanitizeSlug } from './AdminCourseCreate';
+import { defaultCompletionRule, isLessonContentType, LessonContentType } from '../../domain/courseAuthoring';
+import { MediaService, VideoMetadataResult } from '../../services/media.service';
+import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
+import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
 
 type EditorTab = 'general' | 'content' | 'access' | 'settings';
 
@@ -45,7 +49,7 @@ export function AdminLessonEditor() {
   const [searchParams] = useSearchParams();
   const initialSectionId = searchParams.get('sectionId') || '';
   const rawParamType = searchParams.get('lessonType') || searchParams.get('type') || 'video';
-  const initialType = (['quiz', 'assignment'].includes(rawParamType) ? 'video' : rawParamType) as any;
+  const initialType: LessonContentType = isLessonContentType(rawParamType) ? rawParamType : 'video';
 
   const navigate = useNavigate();
   const isEditMode = Boolean(lessonId && lessonId !== 'new');
@@ -68,9 +72,7 @@ export function AdminLessonEditor() {
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [sectionId, setSectionId] = useState(initialSectionId);
-  const [lessonType, setLessonType] = useState<
-    'video' | 'article' | 'pdf' | 'audio' | 'embed' | 'external_link' | 'live' | 'quiz' | 'assignment'
-  >(initialType);
+  const [lessonType, setLessonType] = useState<LessonContentType>(initialType);
   const [duration, setDuration] = useState('');
   const [estimatedMinutes, setEstimatedMinutes] = useState<number>(0);
   const [thumbnail, setThumbnail] = useState('');
@@ -102,6 +104,8 @@ export function AdminLessonEditor() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [videoMetadata, setVideoMetadata] = useState<VideoMetadataResult | null>(null);
+  const [videoMetadataState, setVideoMetadataState] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error'>('idle');
 
   const addToast = (type: 'success' | 'error' | 'info', message: string) => {
     const id = Date.now().toString();
@@ -167,12 +171,11 @@ export function AdminLessonEditor() {
         setDescription(lessonData.description || '');
         setSectionId(lessonData.section_id || currentSectionId);
 
-        const type = (lessonData.lesson_type || lessonData.type || 'video') as any;
-        setLessonType(
-          ['video', 'article', 'pdf', 'audio', 'embed', 'external_link', 'live', 'quiz', 'assignment'].includes(type)
-            ? type
-            : type === 'text' ? 'article' : 'video'
-        );
+        const type = lessonData.content_type || lessonData.lesson_type || lessonData.type;
+        if (!isLessonContentType(type)) {
+          throw new Error('This legacy lesson type must be migrated before it can be edited.');
+        }
+        setLessonType(type);
 
         setDuration(lessonData.duration || '');
         setEstimatedMinutes(lessonData.estimated_minutes ?? 0);
@@ -227,6 +230,16 @@ export function AdminLessonEditor() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
+  useEffect(() => {
+    if (lessonType !== 'video' || !videoUrl.trim()) { setVideoMetadata(null); setVideoMetadataState('idle'); return; }
+    const timeout = window.setTimeout(async () => {
+      setVideoMetadataState('loading');
+      try { const result = await MediaService.inspectVideo(videoUrl.trim()); setVideoMetadata(result); setVideoMetadataState(result.status); }
+      catch { setVideoMetadata(null); setVideoMetadataState('error'); }
+    }, 700);
+    return () => window.clearTimeout(timeout);
+  }, [lessonType, videoUrl]);
+
   // Generate Slug
   const handleGenerateSlug = () => {
     if (!title.trim()) return;
@@ -246,10 +259,6 @@ export function AdminLessonEditor() {
     if (!title.trim()) {
       newErrors.title = 'Lesson';
     }
-    if (estimatedMinutes < 0) {
-      newErrors.estimatedMinutes = 'Duration must be greater than zero.';
-    }
-
     // URL validation if type demands URL
     if (['video'].includes(lessonType) && videoUrl.trim() && !videoUrl.trim().startsWith('http')) {
       newErrors.videoUrl = 'Enter a valid URL beginning with http:// or https://.';
@@ -277,10 +286,11 @@ export function AdminLessonEditor() {
         slug: cleanSlug || null,
         description: description.trim() || null,
         lesson_type: lessonType,
-        type: lessonType === 'article' || lessonType === 'pdf' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
-        duration: (typeof duration === 'string' ? duration.trim() : typeof duration === 'number' ? String(duration) : '') || (estimatedMinutes ? `${estimatedMinutes} Minute` : null),
-        estimated_minutes: estimatedMinutes,
-        thumbnail: thumbnail.trim() || null,
+        content_type: lessonType,
+        type: lessonType === 'pdf' || lessonType === 'external_link' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
+        duration: null,
+        estimated_minutes: 0,
+        thumbnail: null,
         video_url: videoUrl.trim() || null,
         content_url: contentUrl.trim() || null,
         content: content || null,
@@ -299,20 +309,22 @@ export function AdminLessonEditor() {
         seo_description: seoDescription.trim() || null,
       };
 
+      let savedLesson: Lesson;
       if (isEditMode && lessonId) {
-        await LessonService.updateLesson(lessonId, payload);
+        savedLesson = await LessonService.updateLesson(lessonId, payload);
         addToast('success', 'Save!');
       } else {
-        const newLesson = await LessonService.createLesson(payload);
+        savedLesson = await LessonService.createLesson(payload);
         addToast('success', 'Create!');
-        setIsDirty(false);
-        setTimeout(() => {
-          navigate(`/admin/courses/${courseId}/lessons/${newLesson.id}/edit`, { replace: true });
-        }, 500);
-        return;
+      }
+
+      if (lessonType === 'video' && videoUrl.trim()) {
+        const metadataToPersist: VideoMetadataResult = videoMetadata || { provider: 'unknown', durationSeconds: null, status: videoMetadataState === 'loading' ? 'pending' : 'failed' };
+        await MediaService.persistVideoMetadata(savedLesson.id, videoUrl.trim(), metadataToPersist);
       }
 
       setIsDirty(false);
+      if (!isEditMode) setTimeout(() => navigate(`/admin/courses/${courseId}/lessons/${savedLesson.id}/edit`, { replace: true }), 500);
     } catch (err: any) {
       console.error('Error saving lesson:', err);
       addToast('error', err.message || 'Save.');
@@ -556,33 +568,7 @@ export function AdminLessonEditor() {
                       {errors.title && <p className="text-danger-600 text-xs font-bold mt-1">{errors.title}</p>}
                     </div>
 
-                    {/* Slug */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-bold text-primary-900">
-                          Lesson (Slug)
-                        </label>
-                        <button
-                          type="button"
-                          onClick={handleGenerateSlug}
-                          className="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1"
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Lesson settings</span>
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        value={slug}
-                        onChange={(e) => {
-                          setSlug(e.target.value);
-                          setIsDirty(true);
-                        }}
-                        placeholder="lesson-slug-example"
-                        dir="ltr"
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium text-left"
-                      />
-                    </div>
+
 
                     {/* Section Selector */}
                     <div>
@@ -613,13 +599,9 @@ export function AdminLessonEditor() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
                           { id: 'video', label: 'Video', icon: Video, color: 'text-amber-600' },
-                          { id: 'article', label: 'Article', icon: FileText, color: 'text-emerald-600' },
                           { id: 'pdf', label: 'PDF Document', icon: FileCode, color: 'text-red-600' },
-                          { id: 'audio', label: 'Audio', icon: Volume2, color: 'text-purple-600' },
                           { id: 'external_link', label: 'Link', icon: ExternalLink, color: 'text-blue-600' },
-                          { id: 'embed', label: 'Embedded Content', icon: Code, color: 'text-indigo-600' },
-                          { id: 'live', label: 'Live Session', icon: Radio, color: 'text-rose-600' },
-                          { id: 'quiz', label: 'Quiz Quiz', icon: HelpCircle, color: 'text-amber-600' },
+                          { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-600' },
                           { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
                         ].map((typeItem) => {
                           const Icon = typeItem.icon;
@@ -629,7 +611,9 @@ export function AdminLessonEditor() {
                               key={typeItem.id}
                               type="button"
                               onClick={() => {
-                                setLessonType(typeItem.id as any);
+                                const nextType = typeItem.id as LessonContentType;
+                                setLessonType(nextType);
+                                setCompletionRule(defaultCompletionRule(nextType));
                                 setIsDirty(true);
                               }}
                               className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all ${
@@ -644,43 +628,6 @@ export function AdminLessonEditor() {
                           );
                         })}
                       </div>
-                    </div>
-
-                    {/* Estimated Duration */}
-                    <div>
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Duration (Lesson settings)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={estimatedMinutes}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value) || 0;
-                          setEstimatedMinutes(val);
-                          setDuration(`${val} Minute`);
-                          setIsDirty(true);
-                        }}
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
-                      />
-                    </div>
-
-                    {/* Thumbnail URL */}
-                    <div>
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Lesson (Thumbnail)
-                      </label>
-                      <input
-                        type="url"
-                        value={thumbnail}
-                        onChange={(e) => {
-                          setThumbnail(e.target.value);
-                          setIsDirty(true);
-                        }}
-                        placeholder="https://example.com/thumb.jpg"
-                        dir="ltr"
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium text-left"
-                      />
                     </div>
 
                     {/* Description */}
@@ -730,6 +677,10 @@ export function AdminLessonEditor() {
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium text-left"
                         />
                         {errors.videoUrl && <p className="text-danger-600 text-xs font-bold mt-1">{errors.videoUrl}</p>}
+                        {videoMetadataState === 'loading' && <p role="status" className="mt-2 flex items-center gap-2 text-xs font-bold text-primary-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />Detecting video duration…</p>}
+                        {videoMetadataState === 'ready' && videoMetadata?.durationSeconds && <p className="mt-2 text-xs font-bold text-success-700">Duration detected automatically: {Math.ceil(videoMetadata.durationSeconds / 60)} min</p>}
+                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">The provider is supported, but duration is not available automatically yet.</p>}
+                        {videoMetadataState === 'error' && <p className="mt-2 text-xs font-bold text-danger-600">This video URL could not be verified. Check the provider and URL.</p>}
                       </div>
 
                       <div>
@@ -959,33 +910,14 @@ export function AdminLessonEditor() {
 
                   {/* Quiz Notification */}
                   {lessonType === 'quiz' && (
-                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs leading-relaxed space-y-2">
-                      <p className="font-bold">Review the quiz information and continue when you are ready.:</p>
-                      <p>
-                        Lesson (Quiz). Review the quiz information and continue when you are ready. (Quiz Builder).
-                      </p>
-                    </div>
+                    isEditMode && lessonId
+                      ? <QuizBuilder lessonId={lessonId} lessonTitle={title} />
+                      : <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><p className="font-bold">Save the lesson to open the quiz builder.</p><p className="mt-1">Questions, correct answers, pass score, and retry limits are configured after the lesson has been created.</p></div>
                   )}
 
                   {/* Assignment Notification */}
                   {lessonType === 'assignment' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Students
-                        </label>
-                        <textarea
-                          rows={6}
-                          value={content}
-                          onChange={(e) => {
-                            setContent(e.target.value);
-                            setIsDirty(true);
-                          }}
-                          placeholder="Enter details..."
-                          className="w-full p-4 bg-white border border-primary-200 rounded-xl text-sm font-medium"
-                        />
-                      </div>
-                    </div>
+                    isEditMode && lessonId ? <AssignmentBuilder lessonId={lessonId} /> : <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm"><p className="font-bold">Save the lesson to open the assignment builder.</p><p className="mt-1">Instructions, deadlines, grading points, and response format are configured after creation.</p></div>
                   )}
                 </div>
               )}
@@ -1136,7 +1068,7 @@ export function AdminLessonEditor() {
       </main>
 
       <ConfirmDialog open={showDeleteConfirm} title="Delete lesson?" description={`“${title || 'Untitled lesson'}” will be permanently removed. This action cannot be undone.`} busy={isSaving} onCancel={() => setShowDeleteConfirm(false)} onConfirm={handleDelete} />
-      <ConfirmDialog open={showLeaveConfirm} title="Discard unsaved changes?" description="Your changes to this lesson have not been saved." confirmLabel="Discard changes" onCancel={() => setShowLeaveConfirm(false)} onConfirm={() => navigate(`/admin/courses/${courseId}/builder`)} />
+      <ConfirmDialog open={showLeaveConfirm} title="Discard unsaved changes?" description="Your changes to this lesson have not been saved." confirmLabel="Discard changes" cancelLabel="Keep editing" onCancel={() => setShowLeaveConfirm(false)} onConfirm={() => navigate(`/admin/courses/${courseId}/builder`)} />
     </div>
   );
 }

@@ -584,10 +584,8 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               </span>
             )}
           </div>
-          <h2 className="text-lg font-bold text-primary-900">Course</h2>
-          <p className="text-xs text-primary-500 mt-0.5">
-            Add.
-          </p>
+          <h2 className="text-lg font-bold text-primary-900">Build your course curriculum</h2>
+          <p className="text-xs text-primary-500 mt-0.5">Group lessons into sections. Published sections appear automatically on the course sales page.</p>
         </div>
 
         {/* Action Controls & Stats */}
@@ -604,27 +602,28 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             type="button"
             onClick={() => handleToggleExpandAll(true)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="Curriculum"
+            title="Expand all sections"
           >
             <Maximize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Curriculum</span>
+            <span className="hidden sm:inline">Expand all</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleToggleExpandAll(false)}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors text-xs font-bold flex items-center gap-1"
-            title="Curriculum"
+            title="Collapse all sections"
           >
             <Minimize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Curriculum</span>
+            <span className="hidden sm:inline">Collapse all</span>
           </button>
 
           <button
             type="button"
             onClick={() => loadCurriculum()}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors"
-            title="Update"
+            title="Refresh curriculum"
+            aria-label="Refresh curriculum"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -635,7 +634,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-4 py-2.5 bg-primary-900 hover:bg-primary-950 text-white font-bold text-xs rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
           >
             <FolderPlus className="w-4 h-4 text-amber-400" />
-            <span>Add</span>
+            <span>Add section</span>
           </button>
         </div>
       </div>
@@ -742,9 +741,9 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <Layers className="w-8 h-8" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
-            <h3 className="font-bold text-base text-primary-900">No items are available yet.</h3>
+            <h3 className="font-bold text-base text-primary-900">Start with your first section</h3>
             <p className="text-xs text-primary-500 leading-relaxed">
-              The requested information could not be loaded. Please try again.
+              Sections organize lessons into a clear learning path and appear on the course sales page when published.
             </p>
           </div>
           <button
@@ -753,7 +752,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center gap-2 shadow-2xs"
           >
             <Plus className="w-4 h-4" />
-            <span>Add</span>
+            <span>Add section</span>
           </button>
         </div>
       ) : (
@@ -804,14 +803,16 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       {/* Dialog: Add Section */}
       {addSectionDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
-          <div role="alertdialog" aria-modal="true" aria-labelledby="delete-section-title" className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
+          <div role="dialog" aria-modal="true" aria-labelledby="add-section-title" className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-primary-100 pb-3">
-              <h3 className="text-base font-bold text-primary-900 flex items-center gap-2">
+              <h3 id="add-section-title" className="text-base font-bold text-primary-900 flex items-center gap-2">
                 <FolderPlus className="w-5 h-5 text-amber-600" />
-                <span>Course</span>
+                <span>Add a new section</span>
               </h3>
               <button
+                type="button"
                 onClick={() => setAddSectionDialogOpen(false)}
+                aria-label="Close add section dialog"
                 className="p-1 text-primary-400 hover:text-primary-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
@@ -821,13 +822,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-primary-800 mb-1">
-                  Section *
+                  Section title *
                 </label>
                 <input
                   type="text"
                   value={newSectionTitle}
                   onChange={(e) => setNewSectionTitle(e.target.value)}
-                  placeholder="Curriculum: Curriculum - Curriculum"
+                  placeholder="Example: Skin care foundations"
                   className="w-full text-xs font-bold p-3 bg-primary-50/50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
                   autoFocus
                 />
@@ -835,13 +836,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
               <div>
                 <label className="block text-xs font-bold text-primary-800 mb-1">
-                  Section (Curriculum)
+                  Section description (optional)
                 </label>
                 <textarea
                   rows={3}
                   value={newSectionDesc}
                   onChange={(e) => setNewSectionDesc(e.target.value)}
-                  placeholder="Content..."
+                  placeholder="Explain what students will learn in this section"
                   className="w-full text-xs p-3 bg-primary-50/50 border border-primary-200 rounded-xl outline-none resize-none"
                 />
               </div>
@@ -861,7 +862,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 disabled={!newSectionTitle.trim()}
                 className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors"
               >
-                Create
+                Create section
               </button>
             </div>
           </div>
