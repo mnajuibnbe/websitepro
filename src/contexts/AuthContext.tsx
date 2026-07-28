@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { User } from '../services/api';
+import { getAuthErrorMessage } from '../lib/authErrors';
+import { runAuthRequest } from '../lib/authAsync';
+import { reportClientError } from '../lib/clientMonitoring';
 
 export interface RegisterResult {
   user: User | null;
@@ -16,9 +19,11 @@ export interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  sessionError: string | null;
+  retrySession: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<RegisterResult>;
-  logout: () => Promise<void>;
+  logout: () => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,18 +72,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+
+  const loadSession = useCallback(async () => {
+    setIsLoading(true);
+    setSessionError(null);
+    try {
+      const { data: { session }, error } = await runAuthRequest(supabase.auth.getSession());
+      if (error) throw error;
+      setSession(session);
+      setUser(previousUser => updateLocalUser(previousUser, session?.user));
+    } catch {
+      setSession(null);
+      setUser(null);
+      setSessionError('We could not verify your account session. Check your connection and try again.');
+      reportClientError(new Error('Auth session initialization failed'), 'auth-session');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.removeItem('auth_token');
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser((previousUser) => updateLocalUser(previousUser, session?.user));
-      setIsLoading(false);
-    }).catch((err) => {
-      console.error('Session retrieval failed', err);
-      setIsLoading(false);
-    });
+    void loadSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -89,19 +106,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loadSession]);
 
   const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await runAuthRequest(supabase.auth.signInWithPassword({
       email,
       password,
-    });
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        throw new Error('Incorrect email address or password.');
-      }
-      throw error;
-    }
+    }));
+    if (error) throw new Error(getAuthErrorMessage(error, 'login'));
 
     if (!data.session) {
       throw new Error('Unable to complete this action. Please try again.');
@@ -109,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (name: string, email: string, password: string): Promise<RegisterResult> => {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await runAuthRequest(supabase.auth.signUp({
       email,
       password,
       options: {
@@ -117,9 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: name,
         }
       }
-    });
+    }));
 
-    if (error) throw error;
+    if (error) throw new Error(getAuthErrorMessage(error, 'register'));
 
     const requiresEmailConfirmation = !data.session;
 
@@ -131,17 +143,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Logout error:', error);
+    try {
+      const { error } = await runAuthRequest(supabase.auth.signOut());
+      if (error) throw error;
+      navigate('/login');
+      return true;
+    } catch {
+      reportClientError(new Error('Auth sign out failed'), 'auth-sign-out');
+      return false;
     }
-    navigate('/login');
   };
 
   const token = session?.access_token || null;
 
   return (
-    <AuthContext.Provider value={{ user, session, token, isAuthenticated: !!session, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, session, token, isAuthenticated: !!session, isLoading, sessionError, retrySession: loadSession, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PricingProvider } from './contexts/PricingContext';
 import { RequireAuth } from './components/auth/RequireAuth';
+import { RequireGuest } from './components/auth/RequireGuest';
 import { PageMeta } from './components/layout/PageMeta';
 import { AppErrorBoundary } from './components/errors/AppErrorBoundary';
 import { Permission } from './types/auth';
@@ -62,9 +63,9 @@ function AppContent() {
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog-post" element={<BlogPost />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<RequireGuest><LoginPage /></RequireGuest>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register" element={<RequireGuest><RegisterPage /></RequireGuest>} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<Terms />} />

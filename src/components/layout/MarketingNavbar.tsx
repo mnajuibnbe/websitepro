@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { Menu, Search, X, FlaskConical, Droplet } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { TutibaBrand } from './TutibaBrand';
+
+const navigationItems = [
+  { label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
+  { label: 'Courses', to: '/courses', matches: (pathname: string) => pathname.startsWith('/course') },
+  { label: 'About', to: '/about', matches: (pathname: string) => pathname === '/about' },
+  { label: 'Blog', to: '/blog', matches: (pathname: string) => pathname.startsWith('/blog') },
+  { label: 'Contact', to: '/contact', matches: (pathname: string) => pathname === '/contact' },
+] as const;
 
 export function MarketingNavbar() {
   const navigate = useNavigate();
@@ -11,61 +20,74 @@ export function MarketingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const hasSolidBackground = location.pathname !== '/' || isScrolled || isMobileMenuOpen;
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => event.key === 'Escape' && setIsMobileMenuOpen(false);
+    const mainContent = document.getElementById('main-content');
+    const previousOverflow = document.body.style.overflow;
+    const mainWasInert = mainContent?.inert ?? false;
+    const closeButton = drawerRef.current?.querySelector<HTMLButtonElement>('[data-drawer-close]');
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !drawerRef.current) return;
+      const focusable = Array.from(drawerRef.current.querySelectorAll('a[href], button:not([disabled])')) as HTMLElement[];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
     document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', closeOnEscape);
+    if (mainContent) mainContent.inert = true;
+    window.addEventListener('keydown', handleKeyDown);
+    closeButton?.focus();
     return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+      if (mainContent) mainContent.inert = mainWasInert;
+      window.removeEventListener('keydown', handleKeyDown);
+      menuTriggerRef.current?.focus();
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => setIsMobileMenuOpen(false), [location.pathname]);
 
   return (
     <>
     <a href="#main-content" className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-white px-4 py-3 font-semibold text-primary-900 shadow-lg focus:not-sr-only">Skip to main content</a>
     <nav aria-label="Primary navigation"
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-sm py-1' : 'bg-transparent py-2'
+      className={`fixed top-0 w-full z-50 transition-all duration-300 motion-reduce:transition-none ${
+        hasSolidBackground ? 'bg-white/95 shadow-sm backdrop-blur-md py-1' : 'bg-transparent py-2'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="relative flex items-center justify-center text-accent-600">
-               <FlaskConical className="w-8 h-8" strokeWidth={1.5} />
-               <Droplet className="w-3 h-3 absolute bottom-0 right-0 text-accent-400 fill-current" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight text-primary-900 leading-none font-sans uppercase">TUTIBA</span>
-              <span className="text-[10px] text-primary-500 font-medium tracking-widest uppercase">Cosmeceutical Education</span>
-            </div>
-          </Link>
+          <TutibaBrand className="flex-shrink-0" />
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-8">
-            <Link to="/courses" aria-current={location.pathname.startsWith('/course') ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Courses</Link>
-            <Link to="/about" aria-current={location.pathname === '/about' ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">About</Link>
-            <Link to="/blog" aria-current={location.pathname.startsWith('/blog') ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Blog</Link>
-            <Link to="/contact" aria-current={location.pathname === '/contact' ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Contact</Link>
-
-            <div className="h-6 w-px bg-primary-200 mx-2"></div>
-
-            <button type="button" aria-label="Search courses" onClick={() => navigate('/courses')} className="text-primary-900 hover:text-accent-600 transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
+            {navigationItems.slice(1).map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="relative rounded py-2 text-primary-900 font-medium transition-colors hover:text-accent-700 aria-[current=page]:text-accent-700 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-accent-600 after:transition-transform aria-[current=page]:after:scale-x-100">{item.label}</Link>)}
 
             {isAuthenticated ? (
               <Link to="/dashboard" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Dashboard</Link>
@@ -79,15 +101,15 @@ export function MarketingNavbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center gap-4 lg:hidden">
-            <button type="button" aria-label="Search courses" onClick={() => navigate('/courses')} className="text-primary-900 hover:text-accent-600">
-              <Search className="w-5 h-5" />
-            </button>
+          <div className="flex items-center lg:hidden">
             <button
+              ref={menuTriggerRef}
+              type="button"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open navigation menu"
               aria-expanded={isMobileMenuOpen}
-              className="text-primary-900 hover:text-accent-600 focus:outline-none"
+              aria-controls="marketing-navigation-drawer"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-primary-900 hover:bg-primary-100 hover:text-accent-700"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -99,20 +121,22 @@ export function MarketingNavbar() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
-          <div
+          <button
+            type="button"
+            aria-label="Close navigation menu"
+            tabIndex={-1}
             className="fixed inset-0 bg-primary-900/50 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
-          ></div>
+          />
 
           {/* Drawer */}
-          <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform">
+          <div id="marketing-navigation-drawer" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Navigation menu" className="mobile-drawer-viewport fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform motion-reduce:transition-none">
             <div className="flex items-center justify-between h-20 px-6 border-b border-primary-100">
-              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
-                <FlaskConical className="w-7 h-7 text-accent-600" />
-                <span className="font-bold text-lg text-primary-900 uppercase">TUTIBA</span>
-              </Link>
+              <TutibaBrand compact onClick={() => setIsMobileMenuOpen(false)} />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
+                data-drawer-close
+                type="button"
                 aria-label="Close navigation menu"
                 className="text-primary-500 hover:text-primary-900 focus:outline-none bg-primary-50 p-2 rounded-full"
               >
@@ -121,10 +145,7 @@ export function MarketingNavbar() {
             </div>
 
             <div className="flex flex-col py-6 px-6 space-y-6 overflow-y-auto">
-              <Link to="/courses" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
-              <Link to="/about" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-              <Link to="/blog" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
-              <Link to="/contact" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+              {navigationItems.map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="rounded-lg px-3 py-2 text-lg font-medium text-primary-900 transition-colors hover:bg-primary-50 hover:text-accent-700 aria-[current=page]:bg-accent-50 aria-[current=page]:text-accent-800" onClick={() => setIsMobileMenuOpen(false)}>{item.label}</Link>)}
               <hr className="border-primary-100" />
               {isAuthenticated ? (
                 <Link to="/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>

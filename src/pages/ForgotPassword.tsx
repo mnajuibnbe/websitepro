@@ -1,118 +1,56 @@
 import React, { useState } from 'react';
-import { useNavigate , Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { CheckCircle2, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AuthField } from '../components/auth/AuthField';
+import { AuthLayout } from '../components/layout/AuthLayout';
 import { Button } from '../components/ui/Button';
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { getAuthErrorMessage } from '../lib/authErrors';
+import { runAuthRequest } from '../lib/authAsync';
 
 export function ForgotPassword() {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setIsLoading(true);
     setError(null);
-
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + window.location.pathname + '#/update-password',
-      });
-
-      if (resetError) {
-        throw resetError;
-      }
-
+      const { error: resetError } = await runAuthRequest(supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}${window.location.pathname}#/update-password`,
+      }));
+      if (resetError) throw resetError;
       setSuccess(true);
-    } catch (err: any) {
-      setError('Unable to send the password reset link. Please verify your email address and try again.');
+    } catch (caughtError) {
+      setError(getAuthErrorMessage(caughtError, 'recovery'));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4" dir="ltr">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary-900 mb-2">Reset Password</h1>
-          <p className="text-primary-600">Enter your email address and we will send you a secure reset link.</p>
-        </div>
-
-        {success ? (
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-success-100 mb-6">
-              <CheckCircle2 className="h-8 w-8 text-success-600" />
-            </div>
-            <h3 className="text-xl font-bold text-primary-900 mb-2">Check Your Email</h3>
-            <p className="text-primary-600 mb-8">
-              If an account exists for <strong>{email}</strong>, a secure reset link is on its way.
-            </p>
-            <Button
-              onClick={() => navigate('/login')}
-              variant="primary"
-              className="w-full h-12 text-lg"
-            >
-              Sign In
-            </Button>
+    <AuthLayout title={success ? 'Check your email' : 'Reset your password'} description={success ? 'If an account matches that address, a secure reset link is on its way.' : 'Enter the email address connected to your Tutiba account.'} eyebrow="Account recovery">
+      {success ? (
+        <div className="text-center">
+          <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-success-500" aria-hidden="true" />
+          <p role="status" className="mb-2 text-primary-700">Check your inbox and spam folder for the reset email.</p>
+          <p className="mb-7 break-all text-sm text-primary-500">Request sent for <strong>{email}</strong></p>
+          <div className="grid gap-3">
+            <Button onClick={() => setSuccess(false)} variant="secondary" className="w-full">Try another email</Button>
+            <Link to="/login" className="rounded-lg py-2 text-sm font-semibold text-accent-700 hover:text-accent-800">Back to sign in</Link>
           </div>
-        ) : (
-          <>
-            {error && (
-              <div role="alert" className="bg-danger-50 text-danger-600 px-4 py-3 rounded-xl border border-danger-200 text-sm mb-6 font-medium text-center">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="recovery-email" className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary-400">
-                    <Mail className="h-5 w-5" />
-                  </div>
-                  <input
-                    type="email"
-                    id="recovery-email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="block w-full pl-11 pr-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                    placeholder="name@example.com"
-                    dir="ltr"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full h-12 text-lg"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Sending…' : 'Send reset link'}
-              </Button>
-            </form>
-          </>
-        )}
-
-        <div className="mt-8 text-center">
-          <Link to="/login"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate('/login');
-            }}
-            className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>Back to sign in</span>
-          </Link>
         </div>
-      </div>
-    </div>
+      ) : (
+        <form onSubmit={handleSubmit} aria-busy={isLoading} className="space-y-6">
+          {error && <div role="alert" className="rounded-xl border border-danger-200 bg-danger-50 p-4 text-sm font-medium text-danger-700">{error}</div>}
+          <AuthField id="recovery-email" type="email" label="Email address" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required disabled={isLoading} placeholder="name@example.com" dir="ltr" leadingIcon={<Mail className="h-5 w-5" />} />
+          <Button type="submit" isLoading={isLoading} className="w-full">{isLoading ? 'Sending reset link…' : 'Send reset link'}</Button>
+          <div className="text-center"><Link to="/login" className="text-sm font-semibold text-primary-600 hover:text-accent-700">Back to sign in</Link></div>
+        </form>
+      )}
+    </AuthLayout>
   );
 }
