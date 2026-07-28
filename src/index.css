@@ -36,9 +36,22 @@
 }
 
 @layer base {
-  html { direction: ltr; scroll-behavior: smooth; }
-  body { text-align: left; }
+  html { scroll-behavior: smooth; }
   :focus-visible { outline: 2px solid var(--color-accent-600); outline-offset: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible { outline: 2px solid CanvasText; }
 }
 
 @layer utilities {

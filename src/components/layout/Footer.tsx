@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FlaskConical, Droplet, ChevronDown, Globe, Mail } from 'lucide-react';
+import { ChevronDown, Globe, Mail } from 'lucide-react';
+import { TutibaBrand } from './TutibaBrand';
 
 export function Footer() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -44,16 +45,7 @@ export function Footer() {
 
           {/* Logo & Brand Message */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="relative flex items-center justify-center text-accent-400">
-                 <FlaskConical className="w-10 h-10" strokeWidth={1.5} />
-                 <Droplet className="w-4 h-4 absolute bottom-0 right-0 text-accent-300 fill-current" />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-bold text-2xl tracking-tight text-white leading-none font-sans uppercase">TUTIBA</span>
-                <span className="text-[10px] text-primary-400 font-medium tracking-widest uppercase">Cosmeceutical Education</span>
-              </div>
-            </div>
+            <TutibaBrand inverted className="mb-6" />
             <p className="text-primary-400 leading-relaxed max-w-sm mb-8 text-sm md:text-base">
               Evidence-based learning for health professionals who want to build practical confidence in cosmeceuticals.
             </p>

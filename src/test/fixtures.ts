@@ -33,9 +33,11 @@ export function createTestAuthValue(
     token: null,
     isAuthenticated: true,
     isLoading: false,
+    sessionError: null,
+    retrySession: async () => {},
     login: async () => {},
     register: async () => ({ user: testUsers[role], session: null, requiresEmailConfirmation: false }),
-    logout: async () => {},
+    logout: async () => true,
     ...overrides,
   };
 }

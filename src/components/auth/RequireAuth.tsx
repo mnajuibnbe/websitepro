@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAuthorization } from '../../hooks/useAuthorization';
 import { Permission } from '../../types/auth';
 import { Loader2 } from 'lucide-react';
+import { SessionRecovery } from './SessionRecovery';
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -13,12 +14,12 @@ interface RequireAuthProps {
 export function RequireAuth({ children, permission }: RequireAuthProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, sessionError, retrySession } = useAuth();
   const { hasPermission } = useAuthorization();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !sessionError) {
       if (!isAuthenticated) {
         navigate('/login', { state: { from: location }, replace: true });
       } else if (permission && !hasPermission(permission)) {
@@ -27,7 +28,9 @@ export function RequireAuth({ children, permission }: RequireAuthProps) {
         setIsReady(true);
       }
     }
-  }, [isAuthenticated, isLoading, permission, hasPermission, navigate, location]);
+  }, [isAuthenticated, isLoading, sessionError, permission, hasPermission, navigate, location]);
+
+  if (sessionError) return <SessionRecovery message={sessionError} onRetry={retrySession} />;
 
   if (isLoading || !isReady) {
     return (

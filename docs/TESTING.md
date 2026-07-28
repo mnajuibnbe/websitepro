@@ -1,5 +1,7 @@
 # Testing
 
+Authentication and public-navigation releases must also complete the production checklist in [`AUTH_RELEASE_READINESS.md`](./AUTH_RELEASE_READINESS.md). Automated tests are necessary but do not replace staging verification of Supabase redirects, email delivery, rate limits, sessions, keyboard behavior, or screen-reader announcements.
+
 ## Available suites
 
 - `npm test` runs the existing server tests.
