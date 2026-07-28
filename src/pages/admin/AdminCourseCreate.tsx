@@ -186,7 +186,7 @@ export function AdminCourseCreate() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <main id="main-content" className="lg:pl-72 pt-8 pb-24 transition-all duration-300">
+      <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
           <div className="flex items-center justify-between gap-4 mb-8">

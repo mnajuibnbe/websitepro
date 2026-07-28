@@ -7,7 +7,7 @@ export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
-      sourcemap: 'hidden',
+      sourcemap: 'hidden' as const,
       chunkSizeWarningLimit: 700,
       rollupOptions: {
         output: {
