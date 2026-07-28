@@ -34,7 +34,7 @@ export function VideoLessonRenderer({ lessonId, videoUrl, title }: VideoLessonRe
         </div>
         <h3 className="text-lg font-bold mb-1 text-primary-100">Lesson</h3>
         <p className="text-sm text-primary-400 max-w-md">
-          Lesson. Details.
+          This video lesson is currently unavailable.
         </p>
       </div>
     );

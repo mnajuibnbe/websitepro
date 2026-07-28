@@ -43,13 +43,13 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
       </div>
 
       <h1 className="text-2xl md:text-3xl font-bold text-primary-900 mb-4">
-        {isPassed ? 'Congratulations! Quiz' : 'Quiz'}
+        {isPassed ? 'Quiz Passed' : 'Quiz Not Passed'}
       </h1>
       <p className="text-lg text-primary-600 mb-8 leading-relaxed">
-        Details <strong className="text-primary-900">{score}</strong> Details <strong className="text-primary-900">{totalQuestions}</strong> Details.
+        You answered <strong className="text-primary-900">{score}</strong> of <strong className="text-primary-900">{totalQuestions}</strong> questions correctly.
         {isPassed
-          ? ' The requested information could not be loaded. Please try again.'
-          : ' Details.'}
+          ? ' You may continue to the next lesson.'
+          : ` A score of ${passMark}% is required to pass.`}
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -68,7 +68,7 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
               className="w-full sm:w-auto h-14 px-8 text-lg font-bold"
               onClick={onRetry}
             >
-              Details
+              Review Answers
             </Button>
           </>
         ) : (
@@ -86,7 +86,7 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
               className="w-full sm:w-auto h-14 px-8 text-lg font-bold"
               icon={<BookOpen className="w-5 h-5" />}
             >
-              Lesson
+              Review Lesson
             </Button>
           </>
         )}

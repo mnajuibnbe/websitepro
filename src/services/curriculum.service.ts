@@ -53,7 +53,7 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('Could not find the function') ||
     (msg.includes('function') && msg.includes('does not exist'))
   ) {
-    return new Error('Manage (Migration) Details Supabase Details.');
+    return new Error('The curriculum service is unavailable because the required database migration has not been applied.');
   }
 
   // Permission denied / RLS
@@ -67,12 +67,12 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('does not belong to specified course') ||
     msg.includes('Destination section does not belong')
   ) {
-    return new Error('Details: The requested information could not be loaded. Please try again.');
+    return new Error('Unable to load the curriculum. Please try again.');
   }
 
   // Deleted item / section error
   if (msg.includes('Section is deleted') || msg.includes('Lesson is deleted') || msg.includes('not found or deleted')) {
-    return new Error('Details: Lesson.');
+    return new Error('Unable to update the lesson.');
   }
 
   // Duplicate or constraint violation

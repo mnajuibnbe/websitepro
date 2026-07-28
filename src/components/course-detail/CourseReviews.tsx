@@ -5,34 +5,34 @@ export function CourseReviews() {
   const reviews = [
     {
       id: 1,
-      name: "Course Review. Course Review",
+      name: "Amelia Carter",
       profession: "Healthcare Professional",
-      date: "Course Review",
+      date: "2 weeks ago",
       rating: 5,
-      content: "Content. The requested information could not be loaded. Please try again."
+      content: "The lessons were clear, practical, and easy to apply in my work."
     },
     {
       id: 2,
-      name: "Course Review. Course Review",
+      name: "Daniel Brooks",
       profession: "Healthcare Professional",
-      date: "Course Review 3 Course Review",
+      date: "3 weeks ago",
       rating: 5,
-      content: "Lesson. Course."
+      content: "The course structure made it easy to learn at my own pace."
     },
     {
       id: 3,
-      name: "Course Review",
+      name: "Sophia Bennett",
       profession: "Healthcare Professional",
-      date: "Course Review",
+      date: "1 month ago",
       rating: 5,
-      content: "Course Review. Course Review. The requested information could not be loaded. Please try again."
+      content: "Useful examples and thoughtful explanations throughout the course."
     }
   ];
 
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Students
+        Student Reviews
       </h2>
 
       <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm">
@@ -48,7 +48,7 @@ export function CourseReviews() {
               <Star className="w-5 h-5 fill-current" />
               <Star className="w-5 h-5 fill-current opacity-50" />
             </div>
-            <span className="text-sm text-primary-500 font-medium">120 Course Review</span>
+            <span className="text-sm text-primary-500 font-medium">120 reviews</span>
           </div>
 
           {/* Rating Bars - Mockup */}
@@ -106,7 +106,7 @@ export function CourseReviews() {
 
         <div className="mt-8 text-center">
           <button className="text-accent-600 font-bold hover:text-accent-700 transition-colors">
-            View
+            View All Reviews
           </button>
         </div>
       </div>

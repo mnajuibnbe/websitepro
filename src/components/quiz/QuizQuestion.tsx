@@ -52,7 +52,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-sm font-bold text-primary-500 mb-2">
-          <span>Question {currentIndex + 1} Details {totalQuestions}</span>
+          <span>Question {currentIndex + 1} of {totalQuestions}</span>
           <span>{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">

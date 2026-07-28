@@ -50,7 +50,7 @@ export function UpdatePassword() {
             setError(null);
           } else {
             setHasSession(false);
-            setError('Password. Link.');
+            setError('This reset link is invalid or has expired.');
           }
           setIsVerifyingSession(false);
         }, 3000);
@@ -85,12 +85,12 @@ export function UpdatePassword() {
     setSuccess(false);
 
     if (password !== confirmPassword) {
-      setError('Details.');
+      setError('Please enter and confirm your new password.');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password 6 Details.');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
@@ -100,7 +100,7 @@ export function UpdatePassword() {
       // Verify session exists right before calling updateUser
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('Details. Link.');
+        throw new Error('Unable to update your password. Please request a new reset link.');
       }
 
       const { error: updateError } = await supabase.auth.updateUser({

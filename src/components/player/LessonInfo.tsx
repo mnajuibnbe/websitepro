@@ -31,7 +31,7 @@ export function LessonInfo() {
       }
     } catch (err) {
       console.error('Failed to save progress:', err);
-      setError('Save. Details.');
+      setError('Your note could not be saved. Please try again.');
     } finally {
       setIsCompleting(false);
     }
@@ -41,10 +41,10 @@ export function LessonInfo() {
     <div className="py-6 border-b border-primary-200 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
       <div>
         <div className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-2">
-          <span>Section 2: Details</span>
+          <span>Lesson Notes</span>
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-primary-900 leading-snug">
-          Details (Skin Barrier) Details
+          Record key ideas or questions from this lesson.
         </h1>
         {error && (
           <p className="text-danger-600 text-sm mt-2 font-medium">{error}</p>

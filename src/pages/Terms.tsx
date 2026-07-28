@@ -32,30 +32,30 @@ export function Terms() {
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Terms</h2>
                 <p className="leading-relaxed">
-                  Terms (Tutiba)Terms. Please review the information and try again.
+                  By accessing Tutiba or enrolling in a course, you agree to these Terms of Use.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Terms</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Course Access</h2>
                 <p className="leading-relaxed">
-                  Terms (PDF DocumentTerms) Terms. Terms.
+                  Course materials are provided for your personal educational use. Access may be subject to the enrollment terms shown at checkout.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Users</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>Sign In.</li>
-                  <li>Share.</li>
-                  <li>Share.</li>
+                  <li>Keep your account credentials secure.</li>
+                  <li>Do not share, resell, or redistribute course materials.</li>
+                  <li>Provide accurate account and payment information.</li>
                 </ul>
               </section>
 
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Certificates</h2>
                 <p className="leading-relaxed">
-                  Review the quiz information and continue when you are ready.
+                  Certificates confirm completion of the platform requirements for a course and do not constitute a professional license.
                 </p>
               </section>
 

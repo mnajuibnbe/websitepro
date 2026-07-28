@@ -477,7 +477,7 @@ export function AdminCourseCreate() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Save...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>

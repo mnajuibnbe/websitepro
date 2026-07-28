@@ -10,20 +10,20 @@ export function FAQ() {
 
   const faqs = [
     {
-      q: "Help Information",
-      a: "Help Information."
+      q: "How do I enroll in a course?",
+      a: "Open the course page, select the enrollment option, and complete checkout. The course will then appear in My Courses."
     },
     {
-      q: "Certificates",
-      a: "Add."
+      q: "When will I receive my certificate?",
+      a: "Your certificate becomes available after you complete all required lessons and assessments."
     },
     {
-      q: "Payment",
-      a: "Payment."
+      q: "Which payment methods are accepted?",
+      a: "Available payment methods are displayed securely during checkout."
     },
     {
-      q: "Help Information",
-      a: "The requested information could not be loaded. Please try again."
+      q: "How can I reset my password?",
+      a: "Select Forgot Password on the Sign In page and follow the instructions sent to your email address."
     }
   ];
 
@@ -38,7 +38,7 @@ export function FAQ() {
               <HelpCircle className="w-8 h-8 text-accent-600" />
             </div>
             <h1 className="text-4xl font-bold text-primary-900 mb-4">Frequently Asked Questions</h1>
-            <p className="text-xl text-primary-600">Help Information</p>
+            <p className="text-xl text-primary-600">Find answers to common questions about courses, payments, and your account.</p>
           </div>
 
           <div className="space-y-4">

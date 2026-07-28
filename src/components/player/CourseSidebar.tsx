@@ -74,7 +74,7 @@ export function CourseSidebar({
         <p className="text-xs text-primary-600 font-semibold mt-2.5 flex items-center justify-between">
           <span>Course Progress</span>
           <span>
-            {completedCount} Details {totalLessons} Lessons ({progressPercentage}%)
+            {completedCount} of {totalLessons} lessons completed ({progressPercentage}%)
           </span>
         </p>
       </div>

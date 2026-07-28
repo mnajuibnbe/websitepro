@@ -31,8 +31,8 @@ export function OrderSummary() {
             className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
           />
           <div>
-            <h3 className="font-bold text-primary-900 leading-snug mb-1">Order Information</h3>
-            <p className="text-sm text-primary-500">Order Information</p>
+            <h3 className="font-bold text-primary-900 leading-snug mb-1">Professional Skincare Fundamentals</h3>
+            <p className="text-sm text-primary-500">Online course</p>
           </div>
         </div>
 
@@ -43,7 +43,7 @@ export function OrderSummary() {
             <span className="font-medium">$249</span>
           </div>
           <div className="flex items-center justify-between text-accent-600">
-            <span>Order Information (Order Information)</span>
+            <span>Promotional Discount</span>
             <span className="font-medium">-$50</span>
           </div>
           <div className="flex items-center justify-between text-lg font-bold text-primary-900 pt-2 border-t border-primary-50">
@@ -57,10 +57,10 @@ export function OrderSummary() {
           <label className="block text-sm font-bold text-primary-700 mb-2">Discount</label>
           <div className="flex gap-2">
             <div className="relative flex-grow">
-              <Input type="text" placeholder="Enter details" className="w-full pl-10 text-left" dir="ltr" />
+              <Input type="text" placeholder="Enter coupon code" className="w-full pl-10 text-left" dir="ltr" />
               <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary-400" />
             </div>
-            <Button variant="secondary" className="px-6 text-sm">Order Information</Button>
+            <Button variant="secondary" className="px-6 text-sm">Apply</Button>
           </div>
         </div>
 
@@ -77,14 +77,14 @@ export function OrderSummary() {
               Loading...
             </span>
           ) : (
-            'Order Information - $199'
+            'Pay $199'
           )}
         </Button>
 
         {/* Guarantee */}
         <div className="flex items-center justify-center gap-2 text-xs text-primary-500 font-medium mt-6 text-center">
           <ShieldCheck className="w-4 h-4 text-accent-600 flex-shrink-0" />
-          <span>Order Information SSL. Order Information.</span>
+          <span>Secure checkout protected with SSL encryption.</span>
         </div>
       </div>
     </div>

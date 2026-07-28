@@ -153,7 +153,7 @@ export function AdminCourseEdit() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'Save.');
+      addToast('error', 'Unable to save the course. Please try again.');
       return;
     }
 
@@ -230,7 +230,7 @@ export function AdminCourseEdit() {
       loadCourse();
     } catch (err: any) {
       console.error('Error updating course:', err);
-      addToast('error', err.message || 'Save.');
+      addToast('error', err.message || 'Unable to save the course. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -280,7 +280,7 @@ export function AdminCourseEdit() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Save...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>
@@ -565,7 +565,7 @@ export function AdminCourseEdit() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Save...</span>
+                      <span>Saving...</span>
                     </>
                   ) : (
                     <>

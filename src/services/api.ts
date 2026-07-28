@@ -112,7 +112,7 @@ export async function getUserProfile(token: string): Promise<User | null> {
       if (!user) {
         user = {
           id: userId,
-          name: 'Details (Details Supabase)',
+          name: 'Demo User (Supabase unavailable)',
           email: 'user@example.com',
           role: 'student',
           joinedAt: new Date().toISOString()
