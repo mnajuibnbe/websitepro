@@ -31,7 +31,8 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
   return (
     <aside
       id="course-filter-panel"
-      className={`${mobileOpen ? 'flex' : 'hidden'} lg:flex flex-col w-full p-5 lg:pt-0 lg:pr-0 lg:pb-0 lg:pl-8 border border-primary-200 lg:border-y-0 lg:border-r-0 lg:border-l rounded-xl lg:rounded-none bg-primary-50/50 lg:bg-transparent`}
+      aria-label="Course filters"
+      className={`${mobileOpen ? 'flex' : 'hidden'} lg:flex flex-col w-full p-5 lg:pt-0 lg:pl-0 lg:pb-0 lg:pr-8 border border-primary-200 lg:border-y-0 lg:border-l-0 lg:border-r rounded-xl lg:rounded-none bg-primary-50/50 lg:bg-transparent`}
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-primary-900">Filters</h2>

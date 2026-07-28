@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, forwardRef } from 'react';
+import React, { InputHTMLAttributes, forwardRef, useId } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -7,7 +7,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className = '', label, error, id, ...props }, ref) => {
-    const inputId = id || Math.random().toString(36).substr(2, 9);
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    const errorId = `${inputId}-error`;
 
     return (
       <div className="flex flex-col gap-2">
@@ -17,8 +19,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
         <input
+          {...props}
           ref={ref}
           id={inputId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : props['aria-describedby']}
           className={`
             px-4 py-3 bg-white border rounded-lg text-primary-900 placeholder:text-primary-400
             focus:outline-none focus:ring-2 transition-all duration-200
@@ -29,10 +34,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             }
             ${className}
           `}
-          {...props}
         />
         {error && (
-          <span className="text-sm font-medium text-danger-500">{error}</span>
+          <span id={errorId} role="alert" className="text-sm font-medium text-danger-500">{error}</span>
         )}
       </div>
     );

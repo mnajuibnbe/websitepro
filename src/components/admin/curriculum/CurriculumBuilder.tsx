@@ -43,6 +43,7 @@ import { CurriculumService } from '../../../services/curriculum.service';
 import { CurriculumSectionCard } from './CurriculumSectionCard';
 import { AddCurriculumItemDialog } from './AddCurriculumItemDialog';
 import { CurriculumDragOverlay } from './CurriculumDragOverlay';
+import { recordAdminAudit } from '../../../lib/adminAudit';
 
 interface CurriculumBuilderProps {
   courseId: string;
@@ -335,6 +336,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
   ) => {
     try {
       await CurriculumService.deleteSection(courseId, sectionId, { moveItemsToSectionId });
+      await recordAdminAudit('delete', 'course_section', sectionId, { courseId, moveItemsToSectionId });
       setDeleteSectionModal({ isOpen: false, section: null, moveTargetId: '' });
       await loadCurriculum();
     } catch (err: any) {
@@ -424,6 +426,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
     try {
       await CurriculumService.deleteItem(itemId);
+      await recordAdminAudit('delete', 'curriculum_item', itemId, { courseId });
 
       // Trigger Undo Toast
       if (undoToast.timeoutId) clearTimeout(undoToast.timeoutId);
@@ -509,6 +512,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
     try {
       await CurriculumService.bulkDelete(ids);
+      await recordAdminAudit('bulk_delete', 'curriculum_item', courseId, { itemIds: ids });
 
       if (undoToast.timeoutId) clearTimeout(undoToast.timeoutId);
       const timeout = setTimeout(() => {
@@ -800,7 +804,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       {/* Dialog: Add Section */}
       {addSectionDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
-          <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="delete-section-title" className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-primary-100 pb-3">
               <h3 className="text-base font-bold text-primary-900 flex items-center gap-2">
                 <FolderPlus className="w-5 h-5 text-amber-600" />
@@ -879,7 +883,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 text-danger-600">
               <AlertCircle className="w-6 h-6" />
-              <h3 className="text-base font-bold text-primary-900">Delete</h3>
+              <h3 id="delete-section-title" className="text-base font-bold text-primary-900">Delete curriculum section?</h3>
             </div>
 
             <p className="text-xs text-primary-600 leading-relaxed">

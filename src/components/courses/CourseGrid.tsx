@@ -51,7 +51,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       setCourses(data || []);
       setCurrentPage(1);
     } catch (err) {
-      setError('Courses. Please.');
+      setError('We could not load the course catalog. Please try again.');
       console.error('Error fetching courses:', err);
     } finally {
       setIsLoading(false);
@@ -86,7 +86,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
           <p className="font-bold mb-2">No items found</p>
-          <p>Course Information.</p>
+          <p>New courses are being prepared. Please check back soon.</p>
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     ...filters.categories.map(value => ({ label: value, clear: () => onFiltersChange({ ...filters, categories: filters.categories.filter(item => item !== value) }) })),
     ...filters.levels.map(value => ({ label: ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' } as Record<string, string>)[value] || value, clear: () => onFiltersChange({ ...filters, levels: filters.levels.filter(item => item !== value) }) })),
     ...(filters.price === 'all' ? [] : [{ label: filters.price === 'free' ? 'Free' : 'Paid', clear: () => onFiltersChange({ ...filters, price: 'all' }) }]),
-    ...filters.durations.map(value => ({ label: ({ short: 'Course Information 5 Course Information', medium: '5 - 20 Hour', long: 'Course Information 20 Hour' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
+    ...filters.durations.map(value => ({ label: ({ short: 'Under 5 hours', medium: '5–20 hours', long: 'Over 20 hours' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
     ...(filters.search ? [{ label: `Search: ${filters.search}`, clear: () => onFiltersChange({ ...filters, search: '' }) }] : []),
   ];
 
@@ -104,18 +104,18 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     <div className="flex-grow">
       {appliedFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          <span className="text-sm font-bold text-primary-900 ml-2">Course Information:</span>
+          <span className="text-sm font-bold text-primary-900 me-2">Active filters:</span>
           {appliedFilters.map(item => (
             <button type="button" key={item.label} onClick={item.clear} className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
               {item.label}<X className="w-4 h-4 text-primary-400" />
             </button>
           ))}
-          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">Course Information</button>
+          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">Clear all</button>
         </div>
       )}
 
       {visibleCourses.length === 0 ? (
-        <div className="py-20 text-center text-primary-600 font-bold">No items are available yet..</div>
+        <div className="py-20 text-center"><p className="text-lg font-bold text-primary-900">No courses match your filters</p><button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="mt-3 font-semibold text-accent-700 hover:text-accent-800">Clear filters</button></div>
       ) : (
         <>
 
@@ -125,13 +125,13 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
           <CourseCard
             key={course.id}
             title={course.title}
-            category="Course"
+            category={course.category || course.level || 'Professional course'}
             description={course.description || course.short_description || ''}
             duration={course.duration || 'TBD'}
             lessonsCount={0}
             price={resolveCoursePrice(course, pricingContext).formatted}
             imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
-            ctaText="Course"
+            ctaText="View course"
             onEnroll={() => navigate(`/course/${course.id}`)}
           />
         ))}

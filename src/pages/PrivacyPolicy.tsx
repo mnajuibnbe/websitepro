@@ -15,7 +15,7 @@ export function PrivacyPolicy() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
 
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-12">
             <div className="flex items-center gap-4 mb-8">

@@ -10,20 +10,20 @@ export function FAQ() {
 
   const faqs = [
     {
-      q: "Help Information",
-      a: "Help Information."
+      q: "Who are Tutiba courses designed for?",
+      a: "Our courses are designed for health, beauty, and skincare professionals who want structured, evidence-based cosmeceutical education. Each course page lists its specific prerequisites."
     },
     {
-      q: "Certificates",
-      a: "Add."
+      q: "Will I receive a certificate?",
+      a: "Eligible courses award a completion certificate after you finish the required lessons and assessments. Certificate availability is shown on each course page."
     },
     {
-      q: "Payment",
-      a: "Payment."
+      q: "Which payment methods are available?",
+      a: "Available payment methods and the final billing currency are shown securely at checkout before you confirm your purchase."
     },
     {
-      q: "Help Information",
-      a: "The requested information could not be loaded. Please try again."
+      q: "How do I get technical support?",
+      a: "Use the Contact page to describe the issue and include the email address associated with your account. Our support team will follow up as soon as possible."
     }
   ];
 
@@ -31,7 +31,7 @@ export function FAQ() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
 
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center mx-auto mb-6">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { Award, BookOpen, GraduationCap } from 'lucide-react';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function CourseInstructor() {
   return (
@@ -11,7 +12,7 @@ export function CourseInstructor() {
       <div className="bg-white border border-primary-200 p-6 md:p-8 rounded-2xl shadow-sm">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-right">
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden flex-shrink-0 border-4 border-primary-50 shadow-md">
-            <img
+            <OptimizedImage displayWidth={400} width="400" height="400"
               src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop"
               alt="Instructor Information. Instructor Information"
               className="w-full h-full object-cover"

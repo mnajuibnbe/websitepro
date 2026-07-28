@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '../ui/Button';
 import { PlayCircle, FileText, Play } from 'lucide-react';
 import { Badge } from '../ui/Badge';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function FreeContent() {
   const contents = [
@@ -60,7 +61,7 @@ export function FreeContent() {
                 }`}
               >
                 <div className="relative aspect-[16/10] bg-primary-200 overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <OptimizedImage src={item.image} alt={item.title} displayWidth={600} width="600" height="338" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute top-4 right-4 z-10">
                     <Badge variant={isProminent ? 'accent' : 'default'} className={isProminent ? 'bg-accent-600 text-white' : 'bg-white text-primary-700'}>
                       {item.type}

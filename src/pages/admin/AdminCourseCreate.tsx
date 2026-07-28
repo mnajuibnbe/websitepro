@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { OptimizedImage } from '../../components/ui/OptimizedImage';
 import {
   ArrowRight,
   Save,
@@ -18,17 +19,11 @@ import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
+import { sanitizeCourseSlug, validateCourseForm } from '../../lib/adminCourseForm';
+import { recordAdminAudit } from '../../lib/adminAudit';
 
 // Helper to sanitize slug
-export function sanitizeSlug(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/[^\w\u0621-\u064A\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+export const sanitizeSlug = sanitizeCourseSlug;
 
 export function AdminCourseCreate() {
   const navigate = useNavigate();
@@ -106,19 +101,12 @@ export function AdminCourseCreate() {
     if (isSubmitting) return; // Prevent double click
 
     // Validation
-    const newErrors: Record<string, string> = {};
-    if (!title.trim()) {
-      newErrors.title = 'Course';
-    }
-
+    const newErrors = validateCourseForm({ title, slug, priceEgp, priceUsd });
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
-    if (!/^\d+(\.\d{1,2})?$/.test(priceEgp)) newErrors.priceEgp = 'Egypt Price is required and cannot be negative.';
-    if (!/^\d+(\.\d{1,2})?$/.test(priceUsd)) newErrors.priceUsd = 'International Price is required and cannot be negative.';
-    if (!newErrors.priceEgp && !newErrors.priceUsd && ((Number(priceEgp) === 0) !== (Number(priceUsd) === 0))) newErrors.priceUsd = 'A free course must have both prices set to zero.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'Please review the information and try again..');
+      addToast('error', 'Review the highlighted fields before creating the course.');
       return;
     }
 
@@ -135,8 +123,8 @@ export function AdminCourseCreate() {
           .maybeSingle();
 
         if (existingCourse) {
-          setErrors({ slug: 'Course (Slug) Please review the information and try again..' });
-          addToast('error', 'Please review the information and try again..');
+          setErrors({ slug: 'This course URL slug is already in use.' });
+          addToast('error', 'Choose a unique course URL slug.');
           setIsSubmitting(false);
           return;
         }
@@ -182,7 +170,8 @@ export function AdminCourseCreate() {
         return;
       }
 
-      addToast('success', 'Course!');
+      await recordAdminAudit('create', 'course', String(rpcCourseId), { title: title.trim() });
+      addToast('success', 'Course draft created.');
       setTimeout(() => {
         navigate(`/admin/courses/${rpcCourseId}/builder`);
       }, 800);
@@ -197,7 +186,7 @@ export function AdminCourseCreate() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
+      <main id="main-content" className="lg:pl-72 pt-8 pb-24 transition-all duration-300">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
           <div className="flex items-center justify-between gap-4 mb-8">
@@ -211,9 +200,9 @@ export function AdminCourseCreate() {
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create course</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
-                  Build practical skills with structured, expert-led course content..
+                  Add the course details, pricing, instructor, and media before building the curriculum.
                 </p>
               </div>
             </div>
@@ -432,7 +421,7 @@ export function AdminCourseCreate() {
                   />
                   {thumbnail && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      <OptimizedImage src={thumbnail} alt="Thumbnail preview" displayWidth={800} className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -452,7 +441,7 @@ export function AdminCourseCreate() {
                   />
                   {coverImage && (
                     <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                      <img src={coverImage} alt="Cover image preview" className="w-full h-full object-cover" />
+                      <OptimizedImage src={coverImage} alt="Cover image preview" displayWidth={1200} className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>

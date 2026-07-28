@@ -1,22 +1,18 @@
 import React from 'react';
 import { Input } from '../ui/Input';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function AccountDetails() {
+  const { user } = useAuth();
   return (
     <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm mb-8">
       <h2 className="text-xl font-bold text-primary-900 mb-6">Account</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-bold text-primary-700 mb-2">Full Name</label>
-          <Input type="text" placeholder="Account Information: Account Information" className="w-full" />
-        </div>
-        <div>
-          <label className="block text-sm font-bold text-primary-700 mb-2">Email Address</label>
-          <Input type="email" placeholder="example@email.com" className="w-full text-left" dir="ltr" />
-        </div>
+        <Input type="text" label="Full name" value={user?.name || ''} readOnly className="w-full" />
+        <Input type="email" label="Email address" value={user?.email || ''} readOnly className="w-full text-left" dir="ltr" />
       </div>
       <p className="text-sm text-primary-500 mt-4">
-        The requested information could not be loaded. Please try again.
+        Your order and enrollment will be linked to this account.
       </p>
     </div>
   );

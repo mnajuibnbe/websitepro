@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Play, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { fetchCoursesProgress } from '../../lib/courseProgress';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function MyCoursesList() {
   const { user } = useAuth();
@@ -87,7 +88,7 @@ export function MyCoursesList() {
           >
             <div className="flex h-32">
               <div className="w-1/3 relative overflow-hidden">
-                <img src={course.thumbnail || 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=400&auto=format&fit=crop'} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <OptimizedImage src={course.thumbnail || 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=400&auto=format&fit=crop'} alt={course.title} displayWidth={600} width="600" height="338" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-primary-900/20 group-hover:bg-primary-900/10 transition-colors flex items-center justify-center">
                   <div className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100 shadow-lg">
                     <Play className="w-4 h-4 fill-current ms-0.5" />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Pause, Volume2, Maximize, Settings, SkipForward, Rewind } from 'lucide-react';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -7,7 +8,7 @@ export function VideoPlayer() {
   return (
     <div className="relative w-full aspect-video bg-primary-900 rounded-2xl overflow-hidden shadow-lg group flex flex-col">
       {/* Video Placeholder */}
-      <img
+      <OptimizedImage priority displayWidth={1200} width="1200" height="675"
         src="https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=1200&auto=format&fit=crop"
         alt="Video Thumbnail"
         className="w-full h-full object-cover opacity-60"

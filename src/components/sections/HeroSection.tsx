@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { CheckCircle2, BookOpen, Award, Play } from 'lucide-react';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ export function HeroSection() {
               <Button variant="primary" className="w-full sm:w-auto text-lg h-14" onClick={() => navigate('/courses')}>
                 Explore Courses
               </Button>
-              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => navigate('/courses')}>
-                Watch a Free Lesson
+              <Button variant="secondary" className="w-full sm:w-auto text-lg h-14 bg-white" icon={<Play className="w-4 h-4 fill-current" />} onClick={() => navigate('/about')}>
+                See How Tutiba Works
               </Button>
             </div>
 
@@ -56,13 +57,17 @@ export function HeroSection() {
           {/* Visual Content */}
           <div className="lg:col-span-6 relative">
             <div className="relative aspect-[4/3] lg:aspect-square bg-primary-200 rounded-2xl overflow-hidden shadow-lg border border-primary-200 flex items-center justify-center">
-               <img
+               <OptimizedImage
                  src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=1000&auto=format&fit=crop"
-                 alt="Cosmeceutical Education"
+                 alt="Professional reviewing cosmeceutical products in a clinical setting"
+                 width="1000"
+                 height="1000"
+                 displayWidth={1000}
+                 priority
                  className="w-full h-full object-cover"
                />
                <div className="absolute inset-0 bg-primary-900/10 flex items-center justify-center">
-                  <button className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
+                  <button type="button" aria-label="Learn how Tutiba courses work" onClick={() => navigate('/about')} className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
                     <Play className="w-8 h-8 fill-current ms-1" />
                   </button>
                </div>

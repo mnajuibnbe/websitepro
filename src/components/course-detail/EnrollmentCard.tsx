@@ -7,6 +7,7 @@ import { BookOpen, Clock, Award, ShieldCheck, Play, Loader2, CheckCircle2, Alert
 import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate } from 'react-router-dom';
 import { isValidUUID } from '../../lib/uuid';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function EnrollmentCard() {
   const { user } = useAuth();
@@ -83,40 +84,10 @@ export function EnrollmentCard() {
       setErrorState(null);
 
       if (!user) {
-        navigate('/login');
+        navigate('/login', { state: { from: `/course/${courseId}` } });
         return;
       }
-
-      // Final check for existing enrollment before insert
-      const { data: existing } = await supabase
-        .from('enrollments')
-        .select('status')
-        .eq('course_id', courseId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (existing) {
-        setErrorState('already_enrolled');
-        setEnrollmentStatus(existing.status as 'pending' | 'active' | 'cancelled');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('enrollments')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          status: 'pending'
-        });
-
-      if (error) {
-        console.error("Enrollment error:", error);
-        return;
-      }
-
-      setEnrollmentStatus('pending');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 5000);
+      navigate('/checkout', { state: { courseId, course: courseDetails } });
 
     } catch (err) {
       console.error(err);
@@ -139,10 +110,10 @@ export function EnrollmentCard() {
         <AlertCircle className="w-12 h-12 text-danger-500 mb-4" />
         <h3 className="text-xl font-bold text-danger-900 mb-2">Enrollment Information</h3>
         <p className="text-danger-600 mb-6">
-          {errorState === 'invalid_uuid' ? 'Link.' : 'Course.'}
+          {errorState === 'invalid_uuid' ? 'This course link is invalid.' : 'This course is unavailable or no longer published.'}
         </p>
         <Button variant="secondary" onClick={() => navigate('/courses')} className="w-full">
-          Back
+          Browse courses
         </Button>
       </div>
     );
@@ -150,10 +121,10 @@ export function EnrollmentCard() {
 
   const renderButtonContent = () => {
     if (isEnrolling) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
-    if (enrollmentStatus === 'active') return 'Lesson (Subscribe)';
+    if (enrollmentStatus === 'active') return 'Continue learning';
     if (enrollmentStatus === 'pending') return 'Pending Approval';
-    if (enrollmentStatus === 'cancelled') return 'Order';
-    return 'Enrollment Information';
+    if (enrollmentStatus === 'cancelled') return 'Enrollment unavailable';
+    return user ? 'Continue to checkout' : 'Sign in to enroll';
   };
 
   const handleButtonClick = () => {
@@ -164,35 +135,37 @@ export function EnrollmentCard() {
     }
   };
 
-  const price = courseDetails?.price !== undefined ?
-    (typeof courseDetails.price === 'number' ? courseDetails.price : parseFloat(courseDetails.price || '0')) : 199;
+  const price = resolveCoursePrice(courseDetails || {}, pricingContext);
 
   return (
     <>
       {showToast && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <CheckCircle2 className="w-6 h-6 text-success-600" />
-          <p className="font-bold">Submit. Course.</p>
+          <p className="font-bold">Your enrollment request was submitted.</p>
         </div>
       )}
 
       {errorState === 'already_enrolled' && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-warning-200 text-warning-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <AlertCircle className="w-6 h-6 text-warning-600" />
-          <p className="font-bold">The requested information could not be loaded. Please try again.</p>
+          <p className="font-bold">You already have an enrollment for this course.</p>
         </div>
       )}
 
       <div className="bg-white border border-primary-200 rounded-2xl shadow-lg overflow-hidden lg:sticky lg:top-28 mb-8 lg:mb-0">
         {/* Course Image */}
       <div className="relative aspect-video bg-primary-100">
-        <img
+        <OptimizedImage
           src={courseDetails?.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
           alt={courseDetails?.title || "Enrollment Information"}
+          width="800"
+          height="450"
+          displayWidth={800}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center">
-          <button className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
+          <button type="button" aria-label="Preview course" className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
             <Play className="w-6 h-6 fill-current ms-1" />
           </button>
         </div>
@@ -211,25 +184,25 @@ export function EnrollmentCard() {
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <span>Beginner</span>
+            <span className="capitalize">{courseDetails?.level?.replace('_', ' ') || 'All levels'}</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <BookOpen className="w-4 h-4" />
             </div>
-            <span>Lessons</span>
+            <span>Structured lessons and resources</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Clock className="w-4 h-4" />
             </div>
-            <span>Enrollment Information</span>
+            <span>{courseDetails?.duration || 'Learn at your own pace'}</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Award className="w-4 h-4" />
             </div>
-            <span>Enrollment Information</span>
+            <span>Certificate of completion</span>
           </li>
         </ul>
 
@@ -243,15 +216,15 @@ export function EnrollmentCard() {
           >
             {renderButtonContent()}
           </Button>
-          <Button variant="secondary" className="w-full h-14 text-lg bg-white" icon={<Play className="w-4 h-4 fill-current" />}>
-            Lesson
+          <Button variant="secondary" onClick={() => document.getElementById('course-curriculum')?.scrollIntoView({ behavior: 'smooth' })} className="w-full h-14 text-lg bg-white" icon={<Play className="w-4 h-4 fill-current" />}>
+            Preview curriculum
           </Button>
         </div>
 
         {/* Guarantee */}
         <div className="flex items-center justify-center gap-2 text-sm text-primary-500 font-medium mt-2">
           <ShieldCheck className="w-4 h-4" />
-          <span>Enrollment Information 30 Enrollment Information</span>
+          <span>Secure checkout · Pricing confirmed before submission</span>
         </div>
       </div>
     </div>

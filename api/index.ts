@@ -3,6 +3,7 @@ import videoRoutes from '../src/server/routes/video.routes.js';
 import { getMissingServerEnvironmentVariables } from '../src/server/config/environment.js';
 import pricingRoutes from '../src/server/routes/pricing.routes.js';
 import checkoutRoutes from '../src/server/routes/checkout.routes.js';
+import clientErrorRoutes from '../src/server/routes/client-error.routes.js';
 
 const missingEnvironmentVariables = getMissingServerEnvironmentVariables();
 if (missingEnvironmentVariables.length > 0) {
@@ -40,6 +41,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use('/api/video', videoRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/checkout', checkoutRoutes);
+app.use('/api/client-errors', clientErrorRoutes);
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

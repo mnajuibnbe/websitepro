@@ -464,6 +464,8 @@ export function QuizLessonRenderer({
             return (
               <div
                 key={question.question_id}
+                role="group"
+                aria-labelledby={`quiz-question-${question.question_id}`}
                 className="p-5 md:p-6 rounded-2xl border border-primary-200 bg-white shadow-2xs hover:border-primary-300 transition-colors"
               >
                 {/* Question Header */}
@@ -472,7 +474,7 @@ export function QuizLessonRenderer({
                     <span className="w-7 h-7 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg flex items-center justify-center flex-shrink-0">
                       {qIdx + 1}
                     </span>
-                    <h3 className="text-base md:text-lg font-bold text-primary-900 leading-snug">
+                    <h3 id={`quiz-question-${question.question_id}`} className="text-base md:text-lg font-bold text-primary-900 leading-snug">
                       {question.question_text}
                     </h3>
                   </div>
@@ -482,15 +484,15 @@ export function QuizLessonRenderer({
                       {question.points} {question.points === 1 ? 'point' : 'points'}
                     </span>
                     {status === 'saving' && (
-                      <span className="text-xs text-amber-600 flex items-center gap-1 font-medium">
+                      <span aria-live="polite" className="text-xs text-amber-600 flex items-center gap-1 font-medium">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Save...
+                        Saving…
                       </span>
                     )}
                     {status === 'saved' && (
-                      <span className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
+                      <span aria-live="polite" className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        Save
+                        Saved
                       </span>
                     )}
                   </div>
@@ -507,6 +509,7 @@ export function QuizLessonRenderer({
                         type="button"
                         disabled={isTimeExpired || phase === 'submitting'}
                         onClick={() => handleSelectOption(question.question_id, option.option_id)}
+                        aria-pressed={isSelected}
                         className={`w-full text-left p-4 rounded-xl border text-sm md:text-base font-medium transition-all flex items-center justify-between min-h-[48px] ${
                           isSelected
                             ? 'border-amber-600 bg-amber-50/80 text-amber-950 font-bold shadow-xs'
@@ -535,7 +538,7 @@ export function QuizLessonRenderer({
         {/* Submit Actions Bar */}
         <div className="pt-6 border-t border-primary-200 flex flex-wrap items-center justify-between gap-4">
           <div className="text-xs text-primary-500">
-            * Save.
+            Answers are saved automatically so you can safely resume this attempt.
           </div>
 
           <button
@@ -551,7 +554,7 @@ export function QuizLessonRenderer({
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                <span>Quiz</span>
+                <span>Submit quiz</span>
               </>
             )}
           </button>
@@ -560,21 +563,21 @@ export function QuizLessonRenderer({
         {/* Confirmation Modal */}
         {showSubmitModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div role="dialog" aria-modal="true" aria-labelledby="submit-quiz-title" className="bg-white rounded-2xl max-w-md w-full p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
               <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
                 <HelpCircle className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl font-bold text-primary-900 mb-2">Quiz</h3>
+              <h3 id="submit-quiz-title" className="text-xl font-bold text-primary-900 mb-2">Submit quiz?</h3>
 
               <p className="text-primary-600 text-sm leading-relaxed mb-4">
-                Answer <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> Quiz Information <span className="font-bold text-primary-900">{totalQuestionsCount}</span> Quiz Information.
+                You answered <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> of <span className="font-bold text-primary-900">{totalQuestionsCount}</span> questions. Submitted answers cannot be changed.
               </p>
 
               {answeredQuestionsCount < totalQuestionsCount && (
                 <div className="p-3 bg-warning-50 border border-warning-200 rounded-xl text-warning-800 text-xs mb-6 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-warning-600 flex-shrink-0 mt-0.5" />
-                  <span>Quiz Information: Answer.</span>
+                  <span>Some questions are unanswered. You can return and complete them before submitting.</span>
                 </div>
               )}
 
