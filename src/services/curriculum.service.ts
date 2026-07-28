@@ -32,7 +32,7 @@ function isSupabaseLikeError(value: unknown): value is SupabaseLikeError {
  * Maps Supabase / PostgreSQL errors into clean Arabic messages
  */
 export function mapCurriculumError(error: unknown): Error {
-  if (!error) return new Error('Curriculum.');
+  if (!error) return new Error('Unable to complete the curriculum operation.');
 
   let msg = '';
   let code = '';
@@ -53,12 +53,12 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('Could not find the function') ||
     (msg.includes('function') && msg.includes('does not exist'))
   ) {
-    return new Error('Manage (Migration) Details Supabase Details.');
+    return new Error('The curriculum service is unavailable because the required database migration has not been applied.');
   }
 
   // Permission denied / RLS
   if (code === '42501' || msg.includes('permission denied') || msg.includes('row-level security') || msg.includes('Access denied')) {
-    return new Error('Curriculum.');
+    return new Error('The curriculum request is invalid.');
   }
 
   // Mismatched course / relation error
@@ -67,25 +67,25 @@ export function mapCurriculumError(error: unknown): Error {
     msg.includes('does not belong to specified course') ||
     msg.includes('Destination section does not belong')
   ) {
-    return new Error('Details: The requested information could not be loaded. Please try again.');
+    return new Error('Unable to load the curriculum. Please try again.');
   }
 
   // Deleted item / section error
   if (msg.includes('Section is deleted') || msg.includes('Lesson is deleted') || msg.includes('not found or deleted')) {
-    return new Error('Details: Lesson.');
+    return new Error('Unable to update the lesson.');
   }
 
   // Duplicate or constraint violation
   if (code === '23505' || code === '23502' || code === '23503' || msg.includes('Duplicate')) {
-    return new Error('Sort.');
+    return new Error('Unable to save the new curriculum order.');
   }
 
   // Network error
   if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network')) {
-    return new Error('Unable to complete this action. Please review the information and try again.');
+    return new Error('The curriculum service returned an unexpected response. Please try again.');
   }
 
-  return new Error(msg || 'Curriculum.');
+  return new Error(msg || 'Unable to update the curriculum.');
 }
 
 export class CurriculumService {
@@ -320,7 +320,7 @@ export class CurriculumService {
     const fullCurriculum = await this.getCurriculum(courseId);
     const createdViewModel = fullCurriculum.find((s) => s.id === newSecId);
     if (!createdViewModel) {
-      throw new Error('Section.');
+      throw new Error('The curriculum section could not be found.');
     }
 
     return createdViewModel;

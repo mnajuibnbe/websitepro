@@ -123,7 +123,7 @@ export function RegisterPage() {
         </form>
 
         <div className="mt-8 text-center text-primary-600">
-          Details{' '}
+          Already have an account?{' '}
           <Link to="/login"
             onClick={(e) => {
               e.preventDefault();

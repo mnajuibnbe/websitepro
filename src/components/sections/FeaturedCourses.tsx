@@ -85,7 +85,7 @@ export function FeaturedCourses() {
             <CourseCard
               key={course.id}
               title={course.title}
-              category="Course"
+              category={course.category || 'Uncategorized'}
               description={course.description}
               duration="TBD"
               lessonsCount={0}
@@ -100,7 +100,7 @@ export function FeaturedCourses() {
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
-            Courses
+            View All Courses
           </Button>
         </div>
       </div>

@@ -108,7 +108,7 @@ export function LessonPlayer() {
 
         if (enrollmentError) {
           console.error('Error verifying enrollment:', enrollmentError);
-          setErrorMessage('The requested information could not be loaded. Please try again.');
+          setErrorMessage('This lesson could not be loaded. Please return to the course curriculum and try again.');
           setAccessState('error');
           return;
         }
@@ -162,7 +162,7 @@ export function LessonPlayer() {
 
         if (lessonsRes.error) {
           console.error('Error fetching lessons:', lessonsRes.error);
-          setErrorMessage('The requested information could not be loaded. Please try again.');
+          setErrorMessage('This lesson could not be loaded. Please return to the course curriculum and try again.');
           setAccessState('error');
           return;
         }
@@ -346,7 +346,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Lesson</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This lesson could not be loaded. Please return to the course curriculum and try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -368,7 +368,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Build practical skills with structured, expert-led course content.</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This lesson could not be loaded. Please return to the course curriculum and try again.
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
@@ -400,7 +400,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Pending Approval</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This lesson could not be loaded. Please return to the course curriculum and try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -425,7 +425,7 @@ export function LessonPlayer() {
           </h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             {accessState === 'course_not_found'
-              ? 'The requested information could not be loaded. Please try again.'
+              ? 'This lesson could not be loaded. Please return to the course curriculum and try again.'
               : 'Published.'}
           </p>
           <button
@@ -445,7 +445,7 @@ export function LessonPlayer() {
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This lesson could not be loaded. Please return to the course curriculum and try again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -527,7 +527,7 @@ export function LessonPlayer() {
             ) : (
               <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="ltr">
                 <h3 className="text-xl font-bold text-primary-900 mb-2">Lesson</h3>
-                <p className="text-primary-500 text-sm">Content.</p>
+                <p className="text-primary-500 text-sm">No lesson description is available.</p>
               </div>
             )}
 

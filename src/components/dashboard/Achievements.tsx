@@ -17,7 +17,7 @@ export function Achievements() {
           </div>
           <div>
             <h4 className="font-bold text-primary-900 text-sm mb-1">Skin Care Foundations Certificate</h4>
-            <p className="text-xs text-primary-500 font-medium">Completed 15 Details 2026</p>
+            <p className="text-xs text-primary-500 font-medium">Completed July 15, 2026</p>
           </div>
         </div>
 

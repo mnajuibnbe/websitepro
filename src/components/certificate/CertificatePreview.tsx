@@ -40,10 +40,10 @@ export function CertificatePreview({
 
       {/* Main Content */}
       <div className="text-center my-8 md:my-12">
-        <h2 className="text-3xl md:text-5xl font-bold text-primary-900 mb-4 md:mb-6">Certificate</h2>
-        <p className="text-primary-600 text-sm md:text-lg mb-6 md:mb-8 font-medium">Certificate Tutiba Certificate</p>
+        <h2 className="text-3xl md:text-5xl font-bold text-primary-900 mb-4 md:mb-6">Certificate of Completion</h2>
+        <p className="text-primary-600 text-sm md:text-lg mb-6 md:mb-8 font-medium">Tutiba proudly certifies that</p>
         <h1 className="text-4xl md:text-6xl font-bold text-accent-600 mb-6 md:mb-8 leading-tight">{studentName}</h1>
-        <p className="text-primary-600 text-sm md:text-lg mb-4 md:mb-6 font-medium">Certificate/Success</p>
+        <p className="text-primary-600 text-sm md:text-lg mb-4 md:mb-6 font-medium">has successfully completed</p>
         <h3 className="text-2xl md:text-4xl font-bold text-primary-900 leading-snug">{courseName}</h3>
       </div>
 
@@ -51,7 +51,7 @@ export function CertificatePreview({
       <div className="flex justify-between items-end border-t border-primary-200 pt-6 md:pt-8 mt-auto">
         <div className="text-center w-28 md:w-48">
           <p className="font-bold text-primary-900 text-sm md:text-xl border-b border-primary-300 pb-2 mb-2">{completionDate}</p>
-          <span className="text-primary-500 text-xs md:text-sm font-medium">Certificate</span>
+          <span className="text-primary-500 text-xs md:text-sm font-medium">Completion Date</span>
         </div>
         <div className="flex items-center justify-center hidden sm:flex">
           <Award className="w-12 h-12 md:w-20 md:h-20 text-warning-400 opacity-20 absolute" />

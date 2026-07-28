@@ -70,7 +70,7 @@ export function AdminCourseEdit() {
   // Load course data
   const loadCourse = useCallback(async () => {
     if (!courseId) {
-      setErrorMessage('Course.');
+      setErrorMessage('The course could not be loaded.');
       setIsLoading(false);
       return;
     }
@@ -143,7 +143,7 @@ export function AdminCourseEdit() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'Course';
+      newErrors.title = 'Enter a course title.'
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
@@ -153,7 +153,7 @@ export function AdminCourseEdit() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'Save.');
+      addToast('error', 'Unable to save the course. Please try again.');
       return;
     }
 
@@ -230,7 +230,7 @@ export function AdminCourseEdit() {
       loadCourse();
     } catch (err: any) {
       console.error('Error updating course:', err);
-      addToast('error', err.message || 'Save.');
+      addToast('error', err.message || 'Unable to save the course. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -254,7 +254,7 @@ export function AdminCourseEdit() {
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Course</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Edit Course</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
                   Update.
                 </p>
@@ -280,7 +280,7 @@ export function AdminCourseEdit() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Save...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>
@@ -303,7 +303,7 @@ export function AdminCourseEdit() {
             <div className="bg-white border border-danger-200 rounded-2xl p-6 md:p-8 text-left shadow-xs">
               <div className="flex items-center gap-3 text-danger-600 mb-3">
                 <AlertCircle className="w-6 h-6 flex-shrink-0" />
-                <h3 className="font-bold text-lg">Course</h3>
+                <h3 className="font-bold text-lg">Unable to Save Course</h3>
               </div>
               <p className="text-primary-700 text-sm mb-6">{errorMessage}</p>
               <button
@@ -410,7 +410,7 @@ export function AdminCourseEdit() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Status */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Course</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Course Language</label>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value as any)}
@@ -530,7 +530,7 @@ export function AdminCourseEdit() {
 
                   {/* Cover */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Link</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Promotional Video URL</label>
                     <input
                       type="url"
                       value={coverImage}
@@ -565,7 +565,7 @@ export function AdminCourseEdit() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Save...</span>
+                      <span>Saving...</span>
                     </>
                   ) : (
                     <>

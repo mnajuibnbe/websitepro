@@ -64,7 +64,7 @@ export function CourseSidebar({
     <div className="bg-white border border-primary-200 rounded-2xl flex flex-col h-full max-h-[800px] shadow-sm text-left" dir="ltr">
       {/* Header */}
       <div className="p-4 md:p-5 border-b border-primary-200 bg-primary-50/50 rounded-t-2xl">
-        <h2 className="font-bold text-primary-900 mb-2 text-base">Course</h2>
+        <h2 className="font-bold text-primary-900 mb-2 text-base">Course Curriculum</h2>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-accent-600 transition-all duration-500 rounded-full"
@@ -74,7 +74,7 @@ export function CourseSidebar({
         <p className="text-xs text-primary-600 font-semibold mt-2.5 flex items-center justify-between">
           <span>Course Progress</span>
           <span>
-            {completedCount} Details {totalLessons} Lessons ({progressPercentage}%)
+            {completedCount} of {totalLessons} lessons completed ({progressPercentage}%)
           </span>
         </p>
       </div>
@@ -161,7 +161,7 @@ export function CourseSidebar({
                                 ) : (
                                   <FileText className="w-3.5 h-3.5 text-primary-400" />
                                 )}
-                                <span>{lesson.duration || (lesson.type === 'video' ? 'Video lesson' : 'Content')}</span>
+                                <span>{lesson.duration || (lesson.type === 'video' ? 'Video lesson' : 'Learning activity')}</span>
                               </div>
                             </div>
                           </button>

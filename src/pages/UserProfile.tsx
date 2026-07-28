@@ -47,7 +47,7 @@ export function UserProfile() {
               <section>
                 <h2 className="text-xl font-bold text-primary-900 mb-6 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-accent-600" />
-                  Details
+                  Learning Preferences
                 </h2>
                 <div className="bg-primary-50 p-6 rounded-2xl border border-primary-100 space-y-4">
                   <div className="flex items-center justify-between">

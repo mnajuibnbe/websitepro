@@ -50,7 +50,7 @@ export function UpdatePassword() {
             setError(null);
           } else {
             setHasSession(false);
-            setError('Password. Link.');
+            setError('This reset link is invalid or has expired.');
           }
           setIsVerifyingSession(false);
         }, 3000);
@@ -85,12 +85,12 @@ export function UpdatePassword() {
     setSuccess(false);
 
     if (password !== confirmPassword) {
-      setError('Details.');
+      setError('Please enter and confirm your new password.');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password 6 Details.');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
@@ -100,7 +100,7 @@ export function UpdatePassword() {
       // Verify session exists right before calling updateUser
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('Details. Link.');
+        throw new Error('Unable to update your password. Please request a new reset link.');
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -116,7 +116,7 @@ export function UpdatePassword() {
         navigate('/login');
       }, 3000);
     } catch (err: any) {
-      setError(err.message || 'Password.');
+      setError(err.message || 'Unable to update your password. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +128,7 @@ export function UpdatePassword() {
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-primary-200 text-center max-w-md w-full">
           <Loader2 className="w-10 h-10 text-accent-600 animate-spin mx-auto mb-4" />
           <h3 className="text-lg font-bold text-primary-900 mb-2">Loading...</h3>
-          <p className="text-sm text-primary-600">Please review the information and try again.</p>
+          <p className="text-sm text-primary-600">Verifying your password reset link...</p>
         </div>
       </div>
     );
@@ -141,16 +141,16 @@ export function UpdatePassword() {
           <div className="w-12 h-12 bg-danger-100 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-primary-900 mb-2">Password Updated</h2>
+          <h2 className="text-xl font-bold text-primary-900 mb-2">Reset Link Unavailable</h2>
           <p className="text-primary-600 text-sm mb-6">
-            {error || 'Password.'}
+            {error || 'This password reset link is invalid or has expired.'}
           </p>
           <div className="space-y-3">
             <button
               onClick={() => navigate('/forgot-password')}
               className="w-full py-3 px-4 bg-accent-600 hover:bg-accent-700 text-white font-bold rounded-xl transition-colors text-sm"
             >
-              Link
+              Request a New Link
             </button>
             <button
               onClick={() => navigate('/login')}
@@ -171,10 +171,10 @@ export function UpdatePassword() {
           <Lock className="w-12 h-12" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-primary-900">
-          Password
+          Reset Password
         </h2>
         <p className="mt-2 text-center text-sm text-primary-600">
-          Password
+          Choose a strong new password for your account.
         </p>
       </div>
 
@@ -185,9 +185,9 @@ export function UpdatePassword() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-success-100 mb-4">
                 <CheckCircle2 className="h-6 w-6 text-success-600" />
               </div>
-              <h3 className="text-lg font-bold text-primary-900 mb-2">Password</h3>
+              <h3 className="text-lg font-bold text-primary-900 mb-2">Password Updated</h3>
               <p className="text-sm text-primary-500 mb-6">
-                Sign In...
+                Your password has been updated. You can now sign in.
               </p>
               <button
                 onClick={() => navigate('/login')}
@@ -206,7 +206,7 @@ export function UpdatePassword() {
 
               <div>
                 <label className="block text-sm font-bold text-primary-700 mb-1">
-                  Password
+                  New Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -282,4 +282,3 @@ export function UpdatePassword() {
     </div>
   );
 }
-

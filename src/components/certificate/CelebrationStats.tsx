@@ -13,9 +13,9 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
         <Trophy className="w-12 h-12 text-success-600" />
       </div>
 
-      <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">Congratulations! <br className="sm:hidden" />Course</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">Congratulations! <br className="sm:hidden" />Course Completed</h1>
       <p className="text-lg text-primary-600 mb-10 leading-relaxed">
-        Details. Details.
+        Course completed. Your certificate is ready.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
@@ -24,21 +24,21 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
             <PlayCircle className="w-6 h-6 text-accent-600" />
             <span className="text-3xl font-bold text-primary-900">42</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">Completed</span>
+          <span className="text-sm font-medium text-primary-500">Lessons Completed</span>
         </div>
         <div className="bg-primary-50 p-6 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-6 h-6 text-success-600" />
             <span className="text-3xl font-bold text-primary-900">5</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">Quiz</span>
+          <span className="text-sm font-medium text-primary-500">Quizzes Passed</span>
         </div>
         <div className="bg-primary-50 p-6 rounded-xl flex flex-col items-center justify-center border border-primary-100">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-6 h-6 text-info-600" />
             <span className="text-3xl font-bold text-primary-900">45</span>
           </div>
-          <span className="text-sm font-medium text-primary-500">Hour</span>
+          <span className="text-sm font-medium text-primary-500">Learning Hours</span>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ export function CelebrationStats({ onNext }: CelebrationStatsProps) {
         className="w-full sm:w-auto h-14 px-12 text-lg font-bold"
         onClick={onNext}
       >
-        Certificate
+        View Certificate
       </Button>
     </div>
   );

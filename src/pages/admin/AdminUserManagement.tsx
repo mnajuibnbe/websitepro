@@ -68,8 +68,8 @@ export function AdminUserManagement() {
 
       const mappedStudents: StudentData[] = (usersData || []).map((user: any) => ({
         id: user.id,
-        name: user.full_name || 'User Information',
-        email: user.email || 'User Information',
+        name: user.full_name || 'Not provided',
+        email: user.email || 'Not provided',
         joined: new Date(user.created_at).toLocaleDateString('ar-EG'),
         courses: activeCounts[user.id] || 0,
       }));
@@ -97,7 +97,7 @@ export function AdminUserManagement() {
 
       <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-8">Manage</h1>
+          <h1 className="text-3xl font-bold text-primary-900 mb-8">User Management</h1>
 
           <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-primary-200 flex items-center gap-4">
@@ -105,7 +105,7 @@ export function AdminUserManagement() {
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search by name or email address..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-4 pr-10 py-2 bg-primary-50 border border-primary-200 rounded-lg focus:ring-2 focus:ring-accent-500 transition-colors"
@@ -117,9 +117,9 @@ export function AdminUserManagement() {
               <table className="w-full text-left">
                 <thead className="bg-primary-50 text-primary-600 font-medium border-b border-primary-200">
                   <tr>
-                    <th className="py-4 px-6 text-sm">User Information</th>
+                    <th className="py-4 px-6 text-sm">Name</th>
                     <th className="py-4 px-6 text-sm">Email Address</th>
-                    <th className="py-4 px-6 text-sm">User Information</th>
+                    <th className="py-4 px-6 text-sm">Role</th>
                     <th className="py-4 px-6 text-sm">Courses</th>
                   </tr>
                 </thead>

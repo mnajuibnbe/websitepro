@@ -188,10 +188,10 @@ export function AdminCourseBuilder() {
       setSections((prev) => [...prev, data]);
       setNewSectionTitle('');
       setIsAddSectionOpen(false);
-      addToast('success', 'Add');
+      addToast('success', 'Item added successfully.');
     } catch (err: any) {
       console.error('Error adding section:', err);
-      addToast('error', err.message || 'Add.');
+      addToast('error', err.message || 'Unable to add the item.');
     } finally {
       setIsSaving(false);
     }
@@ -212,15 +212,15 @@ export function AdminCourseBuilder() {
         prev.map((s) => (s.id === sectionId ? { ...s, title: editingSectionTitle.trim() } : s))
       );
       setEditingSectionId(null);
-      addToast('success', 'Update');
+      addToast('success', 'Changes saved successfully.');
     } catch (err: any) {
       console.error('Error updating section:', err);
-      addToast('error', 'Update.');
+      addToast('error', 'Unable to save the changes.');
     }
   };
 
   const handleDeleteSection = async (sectionId: string) => {
-    if (!window.confirm('Delete')) return;
+    if (!window.confirm('Delete this item? This action cannot be undone.')) return;
 
     try {
       // Delete lessons in section first
@@ -232,10 +232,10 @@ export function AdminCourseBuilder() {
 
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
       setLessons((prev) => prev.filter((l) => l.section_id !== sectionId));
-      addToast('success', 'Delete');
+      addToast('success', 'Item deleted successfully.');
     } catch (err: any) {
       console.error('Error deleting section:', err);
-      addToast('error', 'Delete.');
+      addToast('error', 'Unable to delete the item.');
     }
   };
 
@@ -294,10 +294,10 @@ export function AdminCourseBuilder() {
       setNewLessonDuration('');
       setNewLessonPreview(false);
       setIsAddLessonOpen(null);
-      addToast('success', 'Add');
+      addToast('success', 'Item added successfully.');
     } catch (err: any) {
       console.error('Error adding lesson:', err);
-      addToast('error', err.message || 'Add.');
+      addToast('error', err.message || 'Unable to add the item.');
     } finally {
       setIsSaving(false);
     }
@@ -313,25 +313,25 @@ export function AdminCourseBuilder() {
       } else {
         setLessons((prev) => [...prev, duplicated]);
       }
-      addToast('success', 'Lesson');
+      addToast('success', 'Lesson duplicated successfully.');
     } catch (err: any) {
       console.error('Error duplicating lesson:', err);
-      addToast('error', 'Lesson.');
+      addToast('error', 'Unable to complete the lesson action.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteLesson = async (lessonId: string, sectionId?: string | null) => {
-    if (!window.confirm('Delete')) return;
+    if (!window.confirm('Delete this item? This action cannot be undone.')) return;
 
     try {
       await LessonService.deleteLesson(lessonId, sectionId || undefined);
       setLessons((prev) => prev.filter((l) => l.id !== lessonId));
-      addToast('success', 'Delete');
+      addToast('success', 'Item deleted successfully.');
     } catch (err: any) {
       console.error('Error deleting lesson:', err);
-      addToast('error', 'Delete.');
+      addToast('error', 'Unable to delete the item.');
     }
   };
 
@@ -361,10 +361,10 @@ export function AdminCourseBuilder() {
 
     try {
       await LessonService.reorderLessons(sectionId, orderedIds);
-      addToast('success', 'Update');
+      addToast('success', 'Changes saved successfully.');
     } catch (err: any) {
       console.error('Error reordering lessons:', err);
-      addToast('error', 'Lesson.');
+      addToast('error', 'Unable to complete the lesson action.');
       // Refresh from server
       if (courseId) {
         const fresh = await LessonService.getLessonsByCourse(courseId);
@@ -400,10 +400,10 @@ export function AdminCourseBuilder() {
       if (error) throw error;
 
       setCourse((prev) => (prev ? { ...prev, ...updates } : null));
-      addToast('success', newStatus === 'published' ? 'Course!' : 'Course');
+      addToast('success', newStatus === 'published' ? 'Course published successfully.' : 'Course moved to Draft.');
     } catch (err: any) {
       console.error('Error toggling status:', err);
-      addToast('error', 'Publish.');
+      addToast('error', 'Unable to update the publishing status.');
     }
   };
 
@@ -492,7 +492,7 @@ export function AdminCourseBuilder() {
                   </div>
 
                   <h1 className="text-xl sm:text-2xl font-bold text-primary-900 leading-tight">
-                    {course?.title || 'Course...'}
+                    {course?.title || 'Untitled Course'}
                   </h1>
                 </div>
               </div>
@@ -506,7 +506,7 @@ export function AdminCourseBuilder() {
                     className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
                   >
                     <Eye className="w-4 h-4 text-primary-600" />
-                    <span>Course</span>
+                    <span>View Course</span>
                   </Link>
                 )}
 
@@ -516,7 +516,7 @@ export function AdminCourseBuilder() {
                   className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
                 >
                   <Settings className="w-4 h-4 text-primary-600" />
-                  <span>Course</span>
+                  <span>Edit Course</span>
                 </button>
 
                 <Button
@@ -529,7 +529,7 @@ export function AdminCourseBuilder() {
                   }`}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>{course?.status === 'published' ? 'Draft' : 'Course'}</span>
+                  <span>{course?.status === 'published' ? 'Move to Draft' : 'Publish Course'}</span>
                 </Button>
               </div>
             </div>
@@ -537,11 +537,11 @@ export function AdminCourseBuilder() {
             {/* Navigation Tabs Bar */}
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
-                { id: 'curriculum', label: 'Curriculum (Curriculum)', icon: BookOpen },
+                { id: 'curriculum', label: 'Curriculum', icon: BookOpen },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'pricing', label: 'Pricing', icon: DollarSign },
-                { id: 'seo', label: 'Search (SEO)', icon: Globe },
-                { id: 'publish', label: 'Publish (Publish)', icon: CheckCircle },
+                { id: 'seo', label: 'SEO', icon: Globe },
+                { id: 'publish', label: 'Publishing', icon: CheckCircle },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -567,7 +567,7 @@ export function AdminCourseBuilder() {
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
               <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-              <p className="text-primary-700 font-bold text-sm">Processing... Course Builder...</p>
+              <p className="text-primary-700 font-bold text-sm">Loading Course Builder...</p>
             </div>
           ) : errorMessage ? (
             <div className="bg-white border border-danger-200 rounded-2xl p-6 text-left shadow-xs">
@@ -596,7 +596,7 @@ export function AdminCourseBuilder() {
                     <div>
                       <h2 className="text-xl font-bold text-primary-900">Curriculum</h2>
                       <p className="text-primary-600 text-xs mt-0.5">
-                        Add.
+                        Organize lessons into sections and define the course learning sequence.
                       </p>
                     </div>
 
@@ -605,7 +605,7 @@ export function AdminCourseBuilder() {
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Add</span>
+                      <span>Add Section</span>
                     </Button>
                   </div>
 
@@ -618,7 +618,7 @@ export function AdminCourseBuilder() {
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-amber-900 text-base flex items-center gap-2">
                           <Layers className="w-5 h-5 text-amber-600" />
-                          <span>Add</span>
+                          <span>Add Section</span>
                         </h4>
                         <button
                           type="button"
@@ -655,7 +655,7 @@ export function AdminCourseBuilder() {
                           className="px-5 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 flex items-center gap-1.5"
                         >
                           {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                          <span>Save</span>
+                          <span>Save Changes</span>
                         </button>
                       </div>
                     </form>
@@ -667,14 +667,14 @@ export function AdminCourseBuilder() {
                       <Layers className="w-12 h-12 text-primary-300 mx-auto mb-3" />
                       <h3 className="text-base font-bold text-primary-900 mb-1">No items are available yet.</h3>
                       <p className="text-primary-500 text-xs mb-4">
-                        Add.
+                        Organize lessons into sections and define the course learning sequence.
                       </p>
                       <Button
                         onClick={() => setIsAddSectionOpen(true)}
                         className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-xl text-xs"
                       >
                         <Plus className="w-4 h-4 ml-1 inline" />
-                        <span>Add</span>
+                        <span>Add Section</span>
                       </Button>
                     </div>
                   ) : (
@@ -836,7 +836,7 @@ export function AdminCourseBuilder() {
                                         type="button"
                                         onClick={() => handleDuplicateLesson(lesson.id)}
                                         className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                        title="Lesson"
+                                        title="Duplicate Lesson"
                                       >
                                         <Copy className="w-4 h-4" />
                                       </button>
@@ -861,7 +861,7 @@ export function AdminCourseBuilder() {
                                   className="mt-4 p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3"
                                 >
                                   <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-xs text-amber-900">Add</h5>
+                                    <h5 className="font-bold text-xs text-amber-900">Add Lesson</h5>
                                     <button
                                       type="button"
                                       onClick={() => setIsAddLessonOpen(null)}
@@ -880,7 +880,7 @@ export function AdminCourseBuilder() {
                                         type="text"
                                         value={newLessonTitle}
                                         onChange={(e) => setNewLessonTitle(e.target.value)}
-                                        placeholder="Lesson"
+                                        placeholder="Enter lesson title"
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-medium"
                                       />
                                     </div>
@@ -898,14 +898,14 @@ export function AdminCourseBuilder() {
                                         <option value="article">Article</option>
                                         <option value="pdf">PDF Document</option>
                                         <option value="audio">Audio Lesson</option>
-                                        <option value="quiz">Quiz (Quiz)</option>
+                                        <option value="quiz">Quiz</option>
                                       </select>
                                     </div>
 
                                     {newLessonType === 'video' && (
                                       <div>
                                         <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                          Link (Video URL)
+                                          Video URL
                                         </label>
                                         <input
                                           type="text"
@@ -926,7 +926,7 @@ export function AdminCourseBuilder() {
                                         type="text"
                                         value={newLessonDuration}
                                         onChange={(e) => setNewLessonDuration(e.target.value)}
-                                        placeholder="12 Minute"
+                                        placeholder="For example, 12 minutes"
                                         className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs"
                                       />
                                     </div>
@@ -950,7 +950,7 @@ export function AdminCourseBuilder() {
                                       to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
                                       className="text-xs text-amber-800 font-bold hover:underline"
                                     >
-                                      Lessons ←
+                                      Open Lesson Editor ←
                                     </Link>
 
                                     <div className="flex items-center gap-2">
@@ -967,7 +967,7 @@ export function AdminCourseBuilder() {
                                         className="px-4 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 flex items-center gap-1"
                                       >
                                         {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                        <span>Save</span>
+                                        <span>Save Changes</span>
                                       </button>
                                     </div>
                                   </div>
@@ -986,7 +986,7 @@ export function AdminCourseBuilder() {
                                     className="flex-1 py-2.5 border border-dashed border-primary-300 bg-primary-50/50 hover:bg-primary-50 text-primary-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
                                   >
                                     <Plus className="w-4 h-4 text-primary-600" />
-                                    <span>Add</span>
+                                    <span>Add Section</span>
                                   </button>
 
                                   <Link
@@ -994,7 +994,7 @@ export function AdminCourseBuilder() {
                                     className="py-2.5 px-4 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
                                   >
                                     <Edit2 className="w-3.5 h-3.5 text-amber-600" />
-                                    <span>Advanced</span>
+                                    <span>Lesson Editor</span>
                                   </Link>
                                 </div>
                               )}
@@ -1012,12 +1012,12 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Settings className="w-5 h-5 text-amber-600" />
-                    <span>Course</span>
+                    <span>View Course</span>
                   </h2>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                     <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-                      <span className="text-xs text-primary-500 font-bold block mb-1">Course</span>
+                      <span className="text-xs text-primary-500 font-bold block mb-1">Course Title</span>
                       <span className="font-bold text-primary-900">{course?.title}</span>
                     </div>
 
@@ -1119,7 +1119,7 @@ export function AdminCourseBuilder() {
                       className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      <span>Save</span>
+                      <span>Save Changes</span>
                     </Button>
                   </div>
                 </div>
@@ -1130,7 +1130,7 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-amber-600" />
-                    <span>Search (SEO)</span>
+                    <span>Search Engine Optimization</span>
                   </h2>
 
                   <div className="space-y-6">
@@ -1151,7 +1151,7 @@ export function AdminCourseBuilder() {
                         rows={3}
                         value={seoDescription}
                         onChange={(e) => setSeoDescription(e.target.value)}
-                        placeholder="Search..."
+                        placeholder="Summarize the course for search results"
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm leading-relaxed"
                       />
                     </div>
@@ -1184,13 +1184,13 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-amber-600" />
-                    <span>Publish</span>
+                    <span>Publishing Checklist</span>
                   </h2>
 
                   {/* Checklist */}
                   <div className="space-y-3">
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary-900">Course</span>
+                      <span className="font-bold text-sm text-primary-900">Basic Information Complete</span>
                       <CheckCircle className="w-5 h-5 text-emerald-600" />
                     </div>
 
@@ -1227,7 +1227,7 @@ export function AdminCourseBuilder() {
                       }`}
                     >
                       <CheckCircle className="w-5 h-5" />
-                      <span>{course?.status === 'published' ? 'Course' : 'Course'}</span>
+                      <span>{course?.status === 'published' ? 'Move to Draft' : 'Publish Course'}</span>
                     </Button>
                   </div>
                 </div>

@@ -108,7 +108,7 @@ export function AdminCourseCreate() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'Course';
+      newErrors.title = 'Enter a course title.'
     }
 
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
@@ -211,7 +211,7 @@ export function AdminCourseCreate() {
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create Course</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
                   Build practical skills with structured, expert-led course content..
                 </p>
@@ -477,7 +477,7 @@ export function AdminCourseCreate() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Save...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>

@@ -213,7 +213,7 @@ export function AdminCourseManager() {
           updates.published_at = new Date().toISOString();
         }
         if (currentCourse?.visibility === 'private') {
-          addToast('info', 'Course "Course Management" (Private)Course Management.');
+          addToast('info', 'This published course remains private and is available only to enrolled students.');
         }
       } else if (newStatus === 'archived') {
         updates.archived_at = new Date().toISOString();
@@ -235,14 +235,14 @@ export function AdminCourseManager() {
       );
 
       const statusLabels = {
-        published: 'Course',
-        draft: 'Course',
-        archived: 'Course',
+        published: 'Course published successfully.',
+        draft: 'Course moved to Draft.',
+        archived: 'Course archived successfully.',
       };
       addToast('success', statusLabels[newStatus]);
     } catch (err: any) {
       console.error('Error updating course status:', err);
-      addToast('error', err.message || 'Course.');
+      addToast('error', err.message || 'Unable to update the course status.');
     }
   };
 
@@ -263,7 +263,7 @@ export function AdminCourseManager() {
         if (error.code === '23503' || error.message?.includes('foreign key constraint')) {
           addToast(
             'error',
-            'Unable to complete this action. Please try again.. Create, review, and manage your course catalog.'
+            'This course cannot be deleted because related records still exist. Archive it instead.'
           );
           setSelectedCourseForDelete(null);
           return;
@@ -272,11 +272,11 @@ export function AdminCourseManager() {
       }
 
       setCourses((prev) => prev.filter((c) => c.id !== selectedCourseForDelete.id));
-      addToast('success', 'Course');
+      addToast('success', 'Course deleted successfully.');
       setSelectedCourseForDelete(null);
     } catch (err: any) {
       console.error('Error deleting course:', err);
-      addToast('error', err.message || 'Course.');
+      addToast('error', err.message || 'Unable to delete the course.');
     } finally {
       setIsDeleting(false);
     }
@@ -331,9 +331,9 @@ export function AdminCourseManager() {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
               >
-                <option value="all">Course Management</option>
-                <option value="published">Published (Published)</option>
-                <option value="draft">Draft (Draft)</option>
+                <option value="all">All Statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
                 <option value="archived">Archived</option>
               </select>
             </div>
@@ -346,7 +346,7 @@ export function AdminCourseManager() {
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
                 >
-                  <option value="all">Course Management</option>
+                  <option value="all">All Categories</option>
                   {categoriesList.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
@@ -362,7 +362,7 @@ export function AdminCourseManager() {
             <div className="bg-white border border-danger-200 rounded-2xl p-6 shadow-xs mb-8 text-left">
               <div className="flex items-center gap-3 text-danger-600 mb-2">
                 <AlertTriangle className="w-5 h-5" />
-                <h3 className="font-bold text-base">Courses</h3>
+                <h3 className="font-bold text-base">Unable to Load Courses</h3>
               </div>
               <p className="text-primary-700 text-sm mb-4">{errorMessage}</p>
               <button
@@ -380,16 +380,16 @@ export function AdminCourseManager() {
             {isLoading ? (
               <div className="p-12 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-                <p className="text-primary-600 font-bold text-sm">Courses...</p>
+                <p className="text-primary-600 font-bold text-sm">Loading courses...</p>
               </div>
             ) : filteredCourses.length === 0 ? (
               <div className="p-12 text-center">
                 <BookOpen className="w-12 h-12 text-primary-300 mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-primary-900 mb-1">No items found</h3>
+                <h3 className="text-lg font-bold text-primary-900 mb-1">No Courses Found</h3>
                 <p className="text-primary-500 text-sm mb-6 max-w-md mx-auto">
                   {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all'
-                    ? 'Search.'
-                    : 'Create, review, and manage your course catalog. Create, review, and manage your course catalog.'}
+                    ? 'No courses match your search or selected filters.'
+                    : 'Create your first course to begin building the catalog.'}
                 </p>
                 <Button
                   variant="primary"
@@ -407,11 +407,11 @@ export function AdminCourseManager() {
                     <tr>
                       <th className="py-4 px-5">Course</th>
                       <th className="py-4 px-4">Price</th>
-                      <th className="py-4 px-4">Course Management</th>
-                      <th className="py-4 px-4">Course Management</th>
-                      <th className="py-4 px-4">Update</th>
-                      <th className="py-4 px-4 text-center">Home</th>
-                      <th className="py-4 px-5 text-center">Course Management</th>
+                      <th className="py-4 px-4">Curriculum</th>
+                      <th className="py-4 px-4">Course Status</th>
+                      <th className="py-4 px-4">Last Updated</th>
+                      <th className="py-4 px-4 text-center">Home Order</th>
+                      <th className="py-4 px-5 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100 text-sm">
@@ -451,7 +451,7 @@ export function AdminCourseManager() {
                                         ? 'Intermediate'
                                         : course.level === 'advanced'
                                         ? 'Advanced'
-                                        : 'Course Management'}
+                                        : 'All Levels'}
                                     </span>
                                   )}
                                 </div>
@@ -467,15 +467,15 @@ export function AdminCourseManager() {
                           {/* Stats */}
                           <td className="py-4 px-4 text-xs text-primary-600 font-medium">
                             <div className="flex items-center gap-3">
-                              <span className="flex items-center gap-1" title="Course Management">
+                              <span className="flex items-center gap-1" title="Curriculum sections">
                                 <Layers className="w-3.5 h-3.5 text-primary-400" />
                                 {course.sections_count} sections
                               </span>
                               <span className="flex items-center gap-1" title="Lessons">
                                 <FileText className="w-3.5 h-3.5 text-primary-400" />
-                                {course.lessons_count} Lesson
+                                {course.lessons_count} lessons
                               </span>
-                              <span className="flex items-center gap-1 text-amber-700 font-bold" title="Course Management">
+                              <span className="flex items-center gap-1 text-amber-700 font-bold" title="Enrolled students">
                                 <Users className="w-3.5 h-3.5 text-amber-600" />
                                 {course.enrolled_count} students
                               </span>
@@ -497,7 +497,7 @@ export function AdminCourseManager() {
                                 {isPublished ? 'Published' : isArchived ? 'Archived' : 'Draft'}
                               </span>
                               <span className="text-[11px] text-primary-500 font-medium">
-                                Course Management: {course.visibility === 'private' ? 'Course Management' : course.visibility === 'unlisted' ? 'Course Management' : 'Course Management'}
+                                Course Visibility: {course.visibility === 'private' ? 'Private (Enrolled Students Only)' : course.visibility === 'unlisted' ? 'Unlisted (Direct Link)' : 'Public (Course Catalog)'}
                               </span>
                             </div>
                           </td>
@@ -513,7 +513,7 @@ export function AdminCourseManager() {
 
                           {/* Home order: lower numbers appear first; blank uses newest-first. */}
                           <td className="py-4 px-4 text-center">
-                            <label className="inline-flex items-center gap-2" title="Course Management">
+                            <label className="inline-flex items-center gap-2" title="Display order on the home page">
                               <ListOrdered className="w-4 h-4 text-primary-400" />
                               <input
                                 key={`${course.id}-${course.home_order ?? 'auto'}`}
@@ -522,9 +522,9 @@ export function AdminCourseManager() {
                                 defaultValue={course.home_order ?? ''}
                                 onBlur={(event) => handleHomeOrderChange(course.id, event.target.value, course.home_order)}
                                 disabled={!isPublished || homeOrderSavingId === course.id}
-                                placeholder="Enter details"
+                                placeholder="Auto"
                                 className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                aria-label={`Course Management ${course.title} Home`}
+                                aria-label={`Home page display order for ${course.title}`}
                               />
                               {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-amber-600" />}
                             </label>
@@ -537,10 +537,10 @@ export function AdminCourseManager() {
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/builder`)}
                                 className="p-2 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"
-                                title="Course Management Course Builder"
+                                title="Open Curriculum Builder"
                               >
                                 <Sparkles className="w-4 h-4 text-amber-600" />
-                                <span className="hidden xl:inline">Course Management</span>
+                                <span className="hidden xl:inline">Curriculum</span>
                               </button>
 
                               {/* Edit Metadata */}
@@ -565,7 +565,7 @@ export function AdminCourseManager() {
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'published')}
                                   className="p-2 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                                  title="Course"
+                                  title="Publish Course"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
@@ -576,7 +576,7 @@ export function AdminCourseManager() {
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'archived')}
                                   className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                  title="Course"
+                                  title="Archive Course"
                                 >
                                   <Archive className="w-4 h-4" />
                                 </button>
@@ -586,7 +586,7 @@ export function AdminCourseManager() {
                               <button
                                 onClick={() => setSelectedCourseForDelete(course)}
                                 className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-                                title="Course"
+                                title="Delete Course"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -614,15 +614,15 @@ export function AdminCourseManager() {
                   <AlertTriangle className="w-6 h-6" />
                 </div>
 
-                <h3 className="text-xl font-bold text-primary-900 mb-2">Course</h3>
+                <h3 className="text-xl font-bold text-primary-900 mb-2">Archive Course Instead?</h3>
 
                 <p className="text-primary-700 text-sm leading-relaxed mb-4">
-                  Course <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span> Course Management{' '}
-                  <span className="font-bold text-amber-700">{selectedCourseForDelete.enrolled_count} Course Management</span>.
+                  <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span> currently has{' '}
+                  <span className="font-bold text-amber-700">{selectedCourseForDelete.enrolled_count} enrolled students</span>.
                 </p>
 
                 <p className="text-xs text-primary-500 leading-relaxed bg-primary-50 p-3 rounded-xl border border-primary-200 mb-6">
-                  Create, review, and manage your course catalog. Course "Course Management" Students.
+                  Courses with enrolled students cannot be deleted. Archive the course to remove it from active administration views while preserving student access and records.
                 </p>
 
                 <div className="flex items-center gap-3">
@@ -633,7 +633,7 @@ export function AdminCourseManager() {
                     }}
                     className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors"
                   >
-                    Course
+                    Archive Course
                   </button>
                   <button
                     onClick={() => setSelectedCourseForDelete(null)}
@@ -650,10 +650,10 @@ export function AdminCourseManager() {
                   <Trash2 className="w-6 h-6" />
                 </div>
 
-                <h3 className="text-xl font-bold text-primary-900 mb-2">Course</h3>
+                <h3 className="text-xl font-bold text-primary-900 mb-2">Delete Course?</h3>
 
                 <p className="text-primary-700 text-sm leading-relaxed mb-6">
-                  Build practical skills with structured, expert-led course content. <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span>Course Management.
+                  Permanently delete <span className="font-bold text-primary-900">"{selectedCourseForDelete.title}"</span>? This action cannot be undone.
                 </p>
 
                 <div className="flex items-center gap-3">

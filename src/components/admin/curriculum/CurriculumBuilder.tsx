@@ -216,7 +216,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         } catch (err) {
           console.error('Failed to save section reorder:', err);
           setSections(snapshot);
-          setError('Save. Curriculum.');
+          setError('Unable to save the curriculum. Please try again.');
         } finally {
           setIsSavingOrder(false);
         }
@@ -256,7 +256,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       } catch (err) {
         console.error('Failed to save item reorder:', err);
         setSections(snapshot);
-        setError('Save. Curriculum.');
+        setError('Unable to save the curriculum. Please try again.');
       } finally {
         setIsSavingOrder(false);
       }
@@ -360,7 +360,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       );
     } catch (err) {
       console.error('Error duplicating item:', err);
-      setError('Lesson.');
+      setError('Unable to add the lesson. Please try again.');
     }
   };
 
@@ -377,7 +377,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       );
     } catch (err) {
       console.error('Error toggling publish:', err);
-      setError('Update.');
+      setError('Unable to update the section. Please try again.');
     }
   };
 
@@ -493,7 +493,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       setSelectedItemIds([]);
     } catch (err: any) {
       console.error('Error bulk publishing:', err);
-      setError(err?.message || 'Update.');
+      setError(err?.message || 'Unable to update the curriculum item.');
     }
   };
 
@@ -576,11 +576,11 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             {isSavingOrder && (
               <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5 animate-pulse">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span>Save...</span>
+                <span>Saving...</span>
               </span>
             )}
           </div>
-          <h2 className="text-lg font-bold text-primary-900">Course</h2>
+          <h2 className="text-lg font-bold text-primary-900">Curriculum Builder</h2>
           <p className="text-xs text-primary-500 mt-0.5">
             Add.
           </p>
@@ -620,7 +620,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             type="button"
             onClick={() => loadCurriculum()}
             className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-100 rounded-xl transition-colors"
-            title="Update"
+            title="Refresh Curriculum"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -631,7 +631,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-4 py-2.5 bg-primary-900 hover:bg-primary-950 text-white font-bold text-xs rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
           >
             <FolderPlus className="w-4 h-4 text-amber-400" />
-            <span>Add</span>
+            <span>Add Section</span>
           </button>
         </div>
       </div>
@@ -740,7 +740,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <div className="max-w-md mx-auto space-y-1">
             <h3 className="font-bold text-base text-primary-900">No items are available yet.</h3>
             <p className="text-xs text-primary-500 leading-relaxed">
-              The requested information could not be loaded. Please try again.
+              The curriculum could not be loaded. Please try again.
             </p>
           </div>
           <button
@@ -749,7 +749,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center gap-2 shadow-2xs"
           >
             <Plus className="w-4 h-4" />
-            <span>Add</span>
+            <span>Add Section</span>
           </button>
         </div>
       ) : (
@@ -804,7 +804,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <div className="flex items-center justify-between border-b border-primary-100 pb-3">
               <h3 className="text-base font-bold text-primary-900 flex items-center gap-2">
                 <FolderPlus className="w-5 h-5 text-amber-600" />
-                <span>Course</span>
+                <span>Curriculum</span>
               </h3>
               <button
                 onClick={() => setAddSectionDialogOpen(false)}
@@ -837,7 +837,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   rows={3}
                   value={newSectionDesc}
                   onChange={(e) => setNewSectionDesc(e.target.value)}
-                  placeholder="Content..."
+                  placeholder="Enter the item title"
                   className="w-full text-xs p-3 bg-primary-50/50 border border-primary-200 rounded-xl outline-none resize-none"
                 />
               </div>

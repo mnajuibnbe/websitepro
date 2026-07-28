@@ -11,7 +11,7 @@ export function Requirements() {
         <ul className="space-y-3 text-primary-700 font-medium">
           <li className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-accent-500"></div>
-            <span>The requested information could not be loaded. Please try again.</span>
+            <span>No prerequisites are required for this course.</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-accent-500"></div>
@@ -25,7 +25,7 @@ export function Requirements() {
         <div className="mt-6 flex items-start gap-3 bg-info-100 text-info-700 p-4 rounded-lg text-sm font-medium">
           <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <p>
-            Level. Requirement.
+            A reliable internet connection and a willingness to learn.
           </p>
         </div>
       </div>

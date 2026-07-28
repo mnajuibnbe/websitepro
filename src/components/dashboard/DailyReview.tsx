@@ -5,7 +5,7 @@ export function DailyReview() {
   const tasks = [
     { id: 1, title: 'Lesson', completed: true },
     { id: 2, title: 'Section', completed: false },
-    { id: 3, title: 'Details: Details (Details)', completed: false },
+    { id: 3, title: 'Review: Course Fundamentals', completed: false },
   ];
 
   return (
@@ -13,7 +13,7 @@ export function DailyReview() {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-bold text-primary-900">Tasks and Review</h3>
         <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-accent-100 text-accent-700">
-          Details
+          Daily Review
         </span>
       </div>
 

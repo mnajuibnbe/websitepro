@@ -12,7 +12,7 @@ export function CourseHero({ course }: { course?: any }) {
         <ChevronLeft className="w-4 h-4 flex-shrink-0" />
         <Link to="/courses" className="hover:text-accent-600 transition-colors">Courses</Link>
         <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-        <span className="text-primary-900 font-bold">{course?.title || 'Course Information'}</span>
+        <span className="text-primary-900 font-bold">{course?.title || 'Course Details'}</span>
       </nav>
 
       {/* Title & Subtitle */}
@@ -21,11 +21,11 @@ export function CourseHero({ course }: { course?: any }) {
       </span>
 
       <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-900 mb-6 leading-snug">
-        {course?.title || 'Course Information - Course Information'}
+        {course?.title || 'Course title unavailable'}
       </h1>
 
       <p className="text-lg md:text-xl text-primary-600 mb-8 leading-relaxed max-w-3xl">
-        {course?.description || 'Course Information.'}
+        {course?.description || 'A course description has not been provided.'}
       </p>
 
       {/* Meta Info */}
@@ -39,7 +39,7 @@ export function CourseHero({ course }: { course?: any }) {
             <Star className="w-5 h-5 fill-current" />
           </div>
           <span className="font-bold text-primary-900">4.9</span>
-          <span className="text-primary-500 underline decoration-primary-300">(120 Course Information)</span>
+          <span className="text-primary-500 underline decoration-primary-300">(120 reviews)</span>
         </div>
 
         <div className="w-1.5 h-1.5 rounded-full bg-primary-300 hidden sm:block"></div>
@@ -53,13 +53,13 @@ export function CourseHero({ course }: { course?: any }) {
 
         <div className="flex items-center gap-2 text-primary-700 font-medium">
            <Award className="w-5 h-5 text-primary-400" />
-           <span>Course Information</span>
+           <span>Last updated recently</span>
         </div>
       </div>
 
       {/* Trailer Button */}
       <Button variant="secondary" icon={<PlayCircle className="w-5 h-5" />} className="h-12 px-6">
-        Course Information
+        Course Details
       </Button>
     </div>
   );

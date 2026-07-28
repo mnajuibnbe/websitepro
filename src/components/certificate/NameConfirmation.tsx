@@ -27,11 +27,11 @@ export function NameConfirmation({ onConfirm, defaultName }: NameConfirmationPro
 
       <h2 className="text-2xl font-bold text-primary-900 mb-4">Certificate Name</h2>
       <p className="text-primary-600 mb-6 leading-relaxed">
-        Please review the information and try again. Certificate Name.
+        Confirm how your name should appear on your certificate.
       </p>
 
       <div className="mb-8">
-        <label className="block text-sm font-bold text-primary-700 mb-2">Full Name (Certificate Name)</label>
+        <label className="block text-sm font-bold text-primary-700 mb-2">Full Name</label>
         <Input
           type="text"
           value={name}
@@ -40,7 +40,7 @@ export function NameConfirmation({ onConfirm, defaultName }: NameConfirmationPro
         />
         <div className="flex items-start gap-2 mt-3 text-warning-700 bg-warning-50 p-3 rounded-lg text-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          <span className="leading-snug">Certificate Name. Certificate Name.</span>
+          <span className="leading-snug">Enter your name exactly as you want it displayed. It cannot be changed after the certificate is issued.</span>
         </div>
       </div>
 
@@ -50,7 +50,7 @@ export function NameConfirmation({ onConfirm, defaultName }: NameConfirmationPro
         onClick={handleConfirm}
         disabled={name.trim().length < 3 || isProcessing}
       >
-        {isProcessing ? 'Loading...' : 'Certificate'}
+        {isProcessing ? 'Preparing Certificate...' : 'Confirm and Continue'}
       </Button>
     </div>
   );

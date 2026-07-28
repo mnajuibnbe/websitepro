@@ -39,7 +39,7 @@ export function ForgotPassword() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-primary-900 mb-2">Reset Password</h1>
-          <p className="text-primary-600">Password.</p>
+          <p className="text-primary-600">Enter your email address to receive a secure password reset link.</p>
         </div>
 
         {success ? (
@@ -47,9 +47,9 @@ export function ForgotPassword() {
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-success-100 mb-6">
               <CheckCircle2 className="h-8 w-8 text-success-600" />
             </div>
-            <h3 className="text-xl font-bold text-primary-900 mb-2">Link!</h3>
+            <h3 className="text-xl font-bold text-primary-900 mb-2">Check Your Email</h3>
             <p className="text-primary-600 mb-8">
-              Please ({email}) Password.
+              We sent password reset instructions to {email}.
             </p>
             <Button
               onClick={() => navigate('/login')}
@@ -92,7 +92,7 @@ export function ForgotPassword() {
                 className="w-full h-12 text-lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'Sending...' : 'Link'}
+                {isLoading ? 'Sending...' : 'Send Reset Link'}
               </Button>
             </form>
           </>

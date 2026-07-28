@@ -72,7 +72,7 @@ export async function register(name: string, email: string, password: string): P
     setTimeout(() => {
       const existingUser = MOCK_USERS.find(u => u.email === email);
       if (existingUser) {
-        reject(new Error('Email Address.'));
+        reject(new Error('An account with this email address already exists.'));
         return;
       }
       const newUser: User = {
@@ -112,7 +112,7 @@ export async function getUserProfile(token: string): Promise<User | null> {
       if (!user) {
         user = {
           id: userId,
-          name: 'Details (Details Supabase)',
+          name: 'Demo User (Supabase unavailable)',
           email: 'user@example.com',
           role: 'student',
           joinedAt: new Date().toISOString()

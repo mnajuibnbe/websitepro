@@ -23,44 +23,44 @@ export function Terms() {
                 <FileText className="w-8 h-8 text-accent-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms</h1>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms of Use</h1>
                 <p className="text-primary-600">Update: 23 Terms 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Terms</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Acceptance of Terms</h2>
                 <p className="leading-relaxed">
-                  Terms (Tutiba)Terms. Please review the information and try again.
+                  By accessing Tutiba or enrolling in a course, you agree to these Terms of Use.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Terms</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Course Access</h2>
                 <p className="leading-relaxed">
-                  Terms (PDF DocumentTerms) Terms. Terms.
+                  Course materials are provided for your personal educational use. Access may be subject to the enrollment terms shown at checkout.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Users</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Account Responsibilities</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>Sign In.</li>
-                  <li>Share.</li>
-                  <li>Share.</li>
+                  <li>Keep your account credentials secure.</li>
+                  <li>Do not share, resell, or redistribute course materials.</li>
+                  <li>Provide accurate account and payment information.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Certificates</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Course Certificates</h2>
                 <p className="leading-relaxed">
-                  Review the quiz information and continue when you are ready.
+                  Certificates confirm completion of the platform requirements for a course and do not constitute a professional license.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancel</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancellations and Refunds</h2>
                 <p className="leading-relaxed">
                   Terms "Terms". Terms 14 Terms 10% Course.
                 </p>

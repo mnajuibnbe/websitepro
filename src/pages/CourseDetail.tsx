@@ -75,12 +75,12 @@ export function CourseDetail() {
         <div className="flex-grow flex flex-col items-center justify-center p-8 text-center">
           <AlertCircle className="w-16 h-16 text-danger-500 mb-6" />
           <h1 className="text-3xl font-bold text-primary-900 mb-4">
-            {errorState === 'invalid_uuid' ? 'Course' : 'Course'}
+            {errorState === 'invalid_uuid' ? 'Invalid Course Link' : 'Course Unavailable'}
           </h1>
           <p className="text-lg text-primary-600 mb-8 max-w-md">
             {errorState === 'invalid_uuid'
-              ? 'Link.'
-              : 'The requested information could not be loaded. Please try again.'}
+              ? 'This course link is invalid.'
+              : 'Course details could not be loaded. Please try again.'}
           </p>
           <Button variant="primary" onClick={() => navigate('/courses')} className="px-8">
             Courses

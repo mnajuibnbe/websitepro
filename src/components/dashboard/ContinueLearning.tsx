@@ -80,7 +80,7 @@ export function ContinueLearning() {
     );
   }
 
-  if (hasError) return <div className="bg-white border border-danger-200 rounded-2xl p-8 text-danger-600 font-bold">Course.</div>;
+  if (hasError) return <div className="bg-white border border-danger-200 rounded-2xl p-8 text-danger-600 font-bold">Your course progress could not be loaded.</div>;
 
   if (!course) {
     return null; // Or return a placeholder if no courses exist
@@ -103,7 +103,7 @@ export function ContinueLearning() {
             {course.title}
           </h2>
           <p className="text-primary-600 font-medium mb-6">
-            Lesson: <strong className="text-primary-800">Course</strong>
+            Current lesson: <strong className="text-primary-800">Course introduction</strong>
           </p>
 
           {/* Progress */}

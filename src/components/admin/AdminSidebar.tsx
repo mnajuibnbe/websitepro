@@ -16,7 +16,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const navItems = [
     { icon: BarChart3, label: 'Overview', href: '/admin' },
     { icon: BookOpen, label: 'Courses', href: '/admin/courses' },
-    { icon: Users, label: 'Manage', href: '/admin/users' },
+    { icon: Users, label: 'User Management', href: '/admin/users' },
   ];
 
   return (
@@ -37,7 +37,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
-            <span>Details - Manage</span>
+            <span>Administration</span>
           </div>
         </div>
 

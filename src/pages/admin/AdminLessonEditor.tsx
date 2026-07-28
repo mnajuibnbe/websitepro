@@ -156,7 +156,7 @@ export function AdminLessonEditor() {
       if (isEditMode && lessonId) {
         const lessonData = await LessonService.getLessonById(lessonId);
         if (!lessonData) {
-          throw new Error('Lesson.');
+          throw new Error('The lesson could not be loaded.');
         }
 
         setTitle(lessonData.title || '');
@@ -241,7 +241,7 @@ export function AdminLessonEditor() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'Lesson';
+      newErrors.title = 'Enter a lesson title.'
     }
     if (estimatedMinutes < 0) {
       newErrors.estimatedMinutes = 'Duration 0 Lesson Settings';
@@ -257,7 +257,7 @@ export function AdminLessonEditor() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'Save.');
+      addToast('error', 'Unable to save the lesson. Please try again.');
       return;
     }
 
@@ -312,7 +312,7 @@ export function AdminLessonEditor() {
       setIsDirty(false);
     } catch (err: any) {
       console.error('Error saving lesson:', err);
-      addToast('error', err.message || 'Save.');
+      addToast('error', err.message || 'Unable to save the lesson. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -330,7 +330,7 @@ export function AdminLessonEditor() {
       }, 500);
     } catch (err: any) {
       console.error('Error duplicating lesson:', err);
-      addToast('error', 'Lesson.');
+      addToast('error', 'Unable to complete the lesson action.');
     } finally {
       setIsSaving(false);
     }
@@ -440,7 +440,7 @@ export function AdminLessonEditor() {
                       onClick={handleDuplicate}
                       disabled={isSaving}
                       className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
-                      title="Lesson"
+                      title="Delete Lesson"
                     >
                       <Copy className="w-4 h-4 text-primary-600" />
                       <span className="hidden sm:inline">Lesson Settings (Duplicate)</span>
@@ -466,7 +466,7 @@ export function AdminLessonEditor() {
                   className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xs"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>{isSaving ? 'Save...' : 'Save'}</span>
+                  <span>{isSaving ? 'Saving...' : 'Save'}</span>
                 </Button>
               </div>
             </div>
@@ -475,7 +475,7 @@ export function AdminLessonEditor() {
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
                 { id: 'general', label: 'General', icon: SettingsIcon },
-                { id: 'content', label: 'Content (Content)', icon: FileText },
+                { id: 'content', label: 'Lesson Content', icon: FileText },
                 { id: 'access', label: 'Access', icon: Lock },
                 { id: 'settings', label: 'SettingsSEO (Settings)', icon: Globe },
               ].map((tab) => {
@@ -527,7 +527,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <SettingsIcon className="w-5 h-5 text-amber-600" />
-                    <span>Lesson</span>
+                    <span>Basic Information</span>
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1023,7 +1023,7 @@ export function AdminLessonEditor() {
                       <div>
                         <h4 className="font-bold text-primary-900 text-sm">Free (Free Preview)</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          The requested information could not be loaded. Please try again.
+                          The lesson could not be loaded. Please try again.
                         </p>
                       </div>
 
@@ -1056,8 +1056,8 @@ export function AdminLessonEditor() {
                       >
                         <option value="manual">Confirm</option>
                         <option value="watch90">Lesson Settings 90% Lesson Settings</option>
-                        <option value="read_end">Content</option>
-                        <option value="pass_quiz">Lesson</option>
+                        <option value="read_end">After the student reaches the end</option>
+                        <option value="pass_quiz">After the student passes the quiz</option>
                         <option value="upload_assignment">Lesson Settings</option>
                       </select>
                     </div>

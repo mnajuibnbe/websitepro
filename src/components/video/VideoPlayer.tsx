@@ -51,7 +51,7 @@ class VideoPlayerErrorBoundary extends Component<{ children: ReactNode }, { hasE
         <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 border border-red-900/30 rounded-2xl">
           <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
           <h3 className="text-xl font-bold text-red-400 mb-2">Unable to complete this action</h3>
-          <p className="text-red-200 text-center max-w-md">Error. Link.</p>
+          <p className="text-red-200 text-center max-w-md">The video could not be played. Check the video URL or try again later.</p>
         </div>
       );
     }

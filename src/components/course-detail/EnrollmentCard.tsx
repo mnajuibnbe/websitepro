@@ -137,9 +137,9 @@ export function EnrollmentCard() {
     return (
       <div className="bg-white border border-danger-200 rounded-2xl shadow-lg p-8 flex flex-col justify-center items-center text-center lg:sticky lg:top-28">
         <AlertCircle className="w-12 h-12 text-danger-500 mb-4" />
-        <h3 className="text-xl font-bold text-danger-900 mb-2">Enrollment Information</h3>
+        <h3 className="text-xl font-bold text-danger-900 mb-2">Enrollment Unavailable</h3>
         <p className="text-danger-600 mb-6">
-          {errorState === 'invalid_uuid' ? 'Link.' : 'Course.'}
+          {errorState === 'invalid_uuid' ? 'This course link is invalid.' : 'Enrollment options are unavailable.'}
         </p>
         <Button variant="secondary" onClick={() => navigate('/courses')} className="w-full">
           Back
@@ -153,7 +153,7 @@ export function EnrollmentCard() {
     if (enrollmentStatus === 'active') return 'Lesson (Subscribe)';
     if (enrollmentStatus === 'pending') return 'Pending Approval';
     if (enrollmentStatus === 'cancelled') return 'Order';
-    return 'Enrollment Information';
+    return 'Enroll Now';
   };
 
   const handleButtonClick = () => {
@@ -172,14 +172,14 @@ export function EnrollmentCard() {
       {showToast && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <CheckCircle2 className="w-6 h-6 text-success-600" />
-          <p className="font-bold">Submit. Course.</p>
+          <p className="font-bold">Enrollment could not be completed.</p>
         </div>
       )}
 
       {errorState === 'already_enrolled' && (
         <div className="fixed bottom-4 left-4 z-[100] bg-white border border-warning-200 text-warning-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <AlertCircle className="w-6 h-6 text-warning-600" />
-          <p className="font-bold">The requested information could not be loaded. Please try again.</p>
+          <p className="font-bold">Course enrollment options could not be loaded. Please try again.</p>
         </div>
       )}
 
@@ -188,7 +188,7 @@ export function EnrollmentCard() {
       <div className="relative aspect-video bg-primary-100">
         <img
           src={courseDetails?.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
-          alt={courseDetails?.title || "Enrollment Information"}
+          alt={courseDetails?.title || "Course thumbnail"}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center">
@@ -223,13 +223,13 @@ export function EnrollmentCard() {
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Clock className="w-4 h-4" />
             </div>
-            <span>Enrollment Information</span>
+            <span>Lifetime access</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Award className="w-4 h-4" />
             </div>
-            <span>Enrollment Information</span>
+            <span>Lifetime access</span>
           </li>
         </ul>
 
@@ -251,7 +251,7 @@ export function EnrollmentCard() {
         {/* Guarantee */}
         <div className="flex items-center justify-center gap-2 text-sm text-primary-500 font-medium mt-2">
           <ShieldCheck className="w-4 h-4" />
-          <span>Enrollment Information 30 Enrollment Information</span>
+          <span>30-day money-back guarantee</span>
         </div>
       </div>
     </div>
