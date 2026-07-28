@@ -27,7 +27,7 @@ export function MyCourses() {
     try {
       setIsLoading(true);
       setErrorState('none');
-      
+
       const { data: enrollmentsData, error: enrollmentsError } = await supabase
         .from('enrollments')
         .select('*')
@@ -39,10 +39,10 @@ export function MyCourses() {
         setErrorState('error');
         return;
       }
-      
+
       if (enrollmentsData && enrollmentsData.length > 0) {
         const dbCourseIds = enrollmentsData.map(e => String(e.course_id)).filter(id => id && isValidUUID(id));
-        
+
         let dbCourses: any[] = [];
         let progressMap: Record<string, any> = {};
 
@@ -54,7 +54,7 @@ export function MyCourses() {
               .in('id', dbCourseIds),
             fetchCoursesProgress(user!.id, dbCourseIds)
           ]);
-            
+
           if (coursesError) {
             console.error('Error fetching courses:', coursesError);
             setErrorState('error');
@@ -95,26 +95,26 @@ export function MyCourses() {
   }
 
   return (
-    <div className="min-h-screen bg-primary-50 flex font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex font-sans" dir="ltr">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      
+
       <div className="flex-grow flex flex-col min-h-screen overflow-hidden">
         <header className="lg:hidden h-20 bg-white border-b border-primary-200 px-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               className="p-2 -ml-2 text-primary-600 hover:bg-primary-50 rounded-lg"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-xl font-bold text-primary-900">كورساتي</h1>
+            <h1 className="text-xl font-bold text-primary-900">My Courses</h1>
           </div>
         </header>
 
         <main className="flex-grow p-4 sm:p-8 overflow-y-auto">
           <div className="max-w-6xl mx-auto space-y-8 pb-12">
-            <h1 className="text-3xl font-bold text-primary-900 mb-8 hidden lg:block">كورساتي</h1>
-            
+            <h1 className="text-3xl font-bold text-primary-900 mb-8 hidden lg:block">My Courses</h1>
+
             {isLoading ? (
               <div className="flex justify-center py-20">
                 <Loader2 className="w-10 h-10 animate-spin text-accent-600" />
@@ -124,16 +124,16 @@ export function MyCourses() {
                 <div className="w-24 h-24 bg-danger-50 rounded-full flex items-center justify-center mb-6">
                   <PlayCircle className="w-12 h-12 text-danger-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-danger-900 mb-3">عذراً، حدث خطأ</h2>
+                <h2 className="text-2xl font-bold text-danger-900 mb-3">Error</h2>
                 <p className="text-danger-600 mb-8 max-w-md">
-                  حدث خطأ أثناء تحميل الكورسات الخاصة بك. يرجى المحاولة مرة أخرى.
+                  Unable to load your courses. Please try again.
                 </p>
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   onClick={() => fetchMyCourses()}
                   className="h-12 px-8 text-lg"
                 >
-                  إعادة المحاولة
+                  Retry
                 </Button>
               </div>
             ) : errorState === 'inconsistent' ? (
@@ -141,16 +141,16 @@ export function MyCourses() {
                 <div className="w-24 h-24 bg-warning-50 rounded-full flex items-center justify-center mb-6">
                   <BookOpen className="w-12 h-12 text-warning-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-warning-900 mb-3">بيانات غير متطابقة</h2>
+                <h2 className="text-2xl font-bold text-warning-900 mb-3">Course Information</h2>
                 <p className="text-warning-600 mb-8 max-w-md">
-                  يبدو أنك مسجل في كورسات غير متوفرة حالياً. يرجى مراجعة الدعم الفني أو استكشاف كورسات أخرى.
+                  Course Information. Please review the information and try again.
                 </p>
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   onClick={() => navigate('/courses')}
                   className="h-12 px-8 text-lg"
                 >
-                  استكشاف الكورسات
+                  Courses
                 </Button>
               </div>
             ) : enrollments.length === 0 ? (
@@ -158,16 +158,16 @@ export function MyCourses() {
                 <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mb-6">
                   <BookOpen className="w-12 h-12 text-primary-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-primary-900 mb-3">لا توجد كورسات متاحة حالياً</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-3">No items found</h2>
                 <p className="text-primary-600 mb-8 max-w-md">
-                  يبدو أنه لم يتم اعتماد أي كورسات لك حتى الآن، أو أنك لم تقم بالتسجيل في أي كورس بعد.
+                  Course Information.
                 </p>
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   onClick={() => navigate('/courses')}
                   className="h-12 px-8 text-lg"
                 >
-                  استكشاف الكورسات
+                  Courses
                 </Button>
               </div>
             ) : (
@@ -175,7 +175,7 @@ export function MyCourses() {
                 {enrollments.map((enrollment) => {
                   const course = enrollment.courses;
                   if (!course) return null;
-                  
+
                   const progress: number = enrollment.progress || 0;
                   const completedLessons: number = enrollment.completedLessons || 0;
                   const totalLessons: number = enrollment.totalLessons || 0;
@@ -187,22 +187,22 @@ export function MyCourses() {
                         <img src={thumbnail} alt={course.title} className="w-full h-full object-cover" />
                         {progress === 100 && (
                           <div className="absolute top-4 left-4 bg-success-500 text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-1">
-                            <Award className="w-4 h-4" /> مكتمل
+                            <Award className="w-4 h-4" /> Completed
                           </div>
                         )}
                       </div>
                       <div className="p-6 flex-1 flex flex-col">
                         <h3 className="text-xl font-bold text-primary-900 mb-4">{course.title}</h3>
-                        
+
                         <div className="mb-6 mt-auto">
                           <div className="flex justify-between text-sm mb-2">
                             <span className="font-medium text-primary-700">
-                              {totalLessons > 0 ? `${completedLessons} من ${totalLessons} دروس مكتملة` : 'نسبة الإنجاز'}
+                              {totalLessons > 0 ? `${completedLessons} Course Information ${totalLessons} Completed` : 'Course Information'}
                             </span>
                             <span className="font-bold text-accent-600" dir="ltr">{progress}%</span>
                           </div>
                           <div className="h-2 bg-primary-100 rounded-full overflow-hidden">
-                            <div 
+                            <div
                               className={`h-full rounded-full transition-all duration-1000 ${progress === 100 ? 'bg-success-500' : 'bg-accent-500'}`}
                               style={{ width: `${progress}%` }}
                             ></div>
@@ -211,14 +211,14 @@ export function MyCourses() {
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center gap-2 text-sm text-primary-500">
                             <Clock className="w-4 h-4" />
-                            <span>متاح الآن</span>
+                            <span>Course Information</span>
                           </div>
-                          <Button 
-                            variant={progress === 100 ? 'secondary' : 'primary'} 
+                          <Button
+                            variant={progress === 100 ? 'secondary' : 'primary'}
                             onClick={() => navigate(`/learn/${course.id}`)}
                             className="px-6"
                           >
-                            {progress === 100 ? 'مراجعة الكورس' : 'متابعة التعلم'}
+                            {progress === 100 ? 'Course' : 'Continue Learning'}
                           </Button>
                         </div>
                       </div>

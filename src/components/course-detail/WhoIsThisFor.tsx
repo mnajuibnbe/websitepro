@@ -4,23 +4,23 @@ import { Stethoscope, Pill, GraduationCap, Sparkles } from 'lucide-react';
 export function WhoIsThisFor() {
   const audiences = [
     {
-      title: 'أطباء الجلدية والتجميل',
-      description: 'لدمج العناية التجميلية مع الخطط العلاجية بدقة علمية.',
+      title: 'Intended Audience',
+      description: 'Health and beauty professionals building evidence-based knowledge.',
       icon: Stethoscope
     },
     {
-      title: 'الصيادلة',
-      description: 'لتقديم استشارات موثوقة للعملاء حول المنتجات المتوفرة.',
+      title: 'Intended Audience',
+      description: 'Pharmacists and clinicians who advise clients on skin care.',
       icon: Pill
     },
     {
-      title: 'طلاب المهن الطبية',
-      description: 'لبناء أساس قوي في الكوسميسوتيكال قبل التخرج.',
+      title: 'Intended Audience',
+      description: 'Students seeking a structured introduction to cosmeceuticals.',
       icon: GraduationCap
     },
     {
-      title: 'المهتمين والمبتدئين',
-      description: 'الراغبين في فهم العناية بالبشرة بعيداً عن الخرافات التسويقية.',
+      title: 'Beginner',
+      description: 'Professionals who want practical, case-based learning.',
       icon: Sparkles
     }
   ];
@@ -28,7 +28,7 @@ export function WhoIsThisFor() {
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        لمن هذا الكورس؟
+        Course
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
         {audiences.map((audience, index) => {

@@ -16,7 +16,7 @@ export function ForgotPassword() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + window.location.pathname + '#/update-password',
@@ -28,18 +28,18 @@ export function ForgotPassword() {
 
       setSuccess(true);
     } catch (err: any) {
-      setError('تعذر إرسال رابط إعادة التعيين. يرجى التأكد من صحة البريد الإلكتروني.');
+      setError('Unable to send the password reset link. Please verify your email address and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4" dir="ltr">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary-900 mb-2">استعادة كلمة المرور</h1>
-          <p className="text-primary-600">أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.</p>
+          <h1 className="text-2xl font-bold text-primary-900 mb-2">Reset Password</h1>
+          <p className="text-primary-600">Enter your email address and we will send you a secure password reset link.</p>
         </div>
 
         {success ? (
@@ -47,16 +47,16 @@ export function ForgotPassword() {
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-success-100 mb-6">
               <CheckCircle2 className="h-8 w-8 text-success-600" />
             </div>
-            <h3 className="text-xl font-bold text-primary-900 mb-2">تم إرسال الرابط!</h3>
+            <h3 className="text-xl font-bold text-primary-900 mb-2">Link!</h3>
             <p className="text-primary-600 mb-8">
-              يرجى التحقق من بريدك الإلكتروني ({email}) واتباع الرابط لإعادة تعيين كلمة المرور.
+              Please ({email}) Password.
             </p>
-            <Button 
+            <Button
               onClick={() => navigate('/login')}
               variant="primary"
               className="w-full h-12 text-lg"
             >
-              العودة لتسجيل الدخول
+              Sign In
             </Button>
           </div>
         ) : (
@@ -69,7 +69,7 @@ export function ForgotPassword() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-primary-900 mb-2">البريد الإلكتروني</label>
+                <label className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
                     <Mail className="h-5 w-5" />
@@ -86,18 +86,18 @@ export function ForgotPassword() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                variant="primary" 
+              <Button
+                type="submit"
+                variant="primary"
                 className="w-full h-12 text-lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'جاري الإرسال...' : 'إرسال رابط الاستعادة'}
+                {isLoading ? 'Sending...' : 'Send Reset Link'}
               </Button>
             </form>
           </>
         )}
-                
+
         <div className="mt-8 text-center">
           <Link to="/login"
             onClick={(e) => {
@@ -107,7 +107,7 @@ export function ForgotPassword() {
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors font-medium"
           >
             <ArrowRight className="w-4 h-4" />
-            <span>العودة لتسجيل الدخول</span>
+            <span>Sign In</span>
           </Link>
         </div>
       </div>

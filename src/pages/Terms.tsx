@@ -12,9 +12,9 @@ export function Terms() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
-      
+
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-12">
@@ -23,46 +23,46 @@ export function Terms() {
                 <FileText className="w-8 h-8 text-accent-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">شروط الاستخدام</h1>
-                <p className="text-primary-600">آخر تحديث: 23 يوليو 2026</p>
+                <h1 className="text-3xl font-bold text-primary-900 mb-2">Terms</h1>
+                <p className="text-primary-600">Update: 23 Terms 2026</p>
               </div>
             </div>
 
             <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-8">
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. قبول الشروط</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">1. Acceptance of Terms</h2>
                 <p className="leading-relaxed">
-                  باستخدامك لمنصة توتيبا (Tutiba)، فإنك توافق على الالتزام بشروط الاستخدام الموضحة أدناه. إذا كنت لا توافق على أي من هذه الشروط، يرجى التوقف عن استخدام المنصة.
+                  By using Tutiba, you agree to these terms and the policies referenced below.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. الملكية الفكرية</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">2. Intellectual Property</h2>
                 <p className="leading-relaxed">
-                  جميع المحتويات التعليمية (فيديوهات، ملفات PDF، نصوص، تصميمات) هي ملكية حصرية لمنصة توتيبا. يُمنع منعاً باتاً نسخ، توزيع، أو بيع أي من هذه المحتويات دون إذن كتابي مسبق.
+                  Course materials, including downloadable documents, are protected by intellectual property laws.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. حسابات المستخدمين</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">3. Users</h2>
                 <ul className="list-disc list-inside space-y-2 leading-relaxed">
-                  <li>أنت مسؤول عن الحفاظ على سرية بيانات تسجيل الدخول الخاصة بك.</li>
-                  <li>لا يُسمح بمشاركة الحساب الواحد مع أشخاص آخرين.</li>
-                  <li>يحتفظ فريق المنصة بالحق في إيقاف أي حساب يثبت قيامه بمشاركة المحتوى المدفوع أو انتهاك حقوق الملكية.</li>
+                  <li>Keep your account credentials secure and confidential.</li>
+                  <li>Do not share, reproduce, or redistribute paid course content.</li>
+                  <li>Use the platform only for lawful educational purposes.</li>
                 </ul>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. الشهادات والإتمام</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">4. Certificates and Assessments</h2>
                 <p className="leading-relaxed">
-                  يتم منح الشهادات فقط بعد استكمال جميع متطلبات الدورة بنجاح، بما في ذلك مشاهدة الدروس واجتياز الاختبارات المقررة بالنسبة المحددة.
+                  Certificates are issued after learners satisfy the applicable course and assessment requirements.
                 </p>
               </section>
 
               <section>
-                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. الاسترداد والإلغاء</h2>
+                <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancellations and Refunds</h2>
                 <p className="leading-relaxed">
-                  تخضع سياسة استرداد الأموال للشروط المحددة في "سياسة الاسترجاع". بشكل عام، يمكن طلب الاسترداد خلال 14 يوماً من تاريخ الشراء، بشرط عدم استهلاك أكثر من 10% من محتوى الكورس.
+                  Refund requests are reviewed according to the applicable course policy and statutory consumer rights.
                 </p>
               </section>
             </div>
@@ -76,7 +76,7 @@ export function Terms() {
                 className="inline-flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors font-bold"
               >
                 <ArrowRight className="w-5 h-5" />
-                العودة للصفحة الرئيسية
+                Home
               </Link>
             </div>
           </div>

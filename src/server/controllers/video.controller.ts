@@ -23,7 +23,7 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
 
   try {
     const { lessonId } = req.body;
-    
+
     if (!lessonId) {
       res.status(400).json({ error: 'Lesson ID is required' });
       return;
@@ -36,13 +36,13 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
       return;
     }
     const token = authHeader.split(' ')[1];
-    
+
     // 2. Setup Supabase Admin Client
     const supabase = dependencies.getSupabaseAdmin();
-    
+
     // 3. Verify User JWT
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    
+
     if (userError || !userData?.user) {
       console.warn('[VideoController] Invalid or expired user token');
       res.status(401).json({ error: 'Unauthorized: Invalid token' });

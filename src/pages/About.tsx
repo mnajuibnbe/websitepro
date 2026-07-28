@@ -9,39 +9,39 @@ export function About() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
-      
+
       <main className="pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-primary-900 mb-6">من نحن</h1>
+            <h1 className="text-4xl font-bold text-primary-900 mb-6">About Us</h1>
             <p className="text-xl text-primary-600 max-w-3xl mx-auto leading-relaxed">
-              توتيبا هي المنصة العربية الأولى المتخصصة في التعليم المستمر للمهنيين الصحيين في مجال الكوسميسوتيكال (Cosmeceuticals) والعناية بالبشرة.
+              Arabic (Cosmeceuticals) About Tutiba.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
             <div className="bg-white rounded-3xl p-8 border border-primary-200 shadow-sm">
-              <h2 className="text-3xl font-bold text-primary-900 mb-6">رؤيتنا</h2>
+              <h2 className="text-3xl font-bold text-primary-900 mb-6">About Tutiba</h2>
               <p className="text-lg text-primary-600 leading-relaxed">
-                نسعى لسد الفجوة بين المعرفة الأكاديمية والتطبيق العملي في مجال العناية بالبشرة والشعر، من خلال تقديم محتوى علمي دقيق، موثق، ومصمم خصيصاً للصيادلة وأطباء الجلدية.
+                We bridge the gap between academic knowledge and practical professional application through evidence-based education.
               </p>
             </div>
             <div className="bg-white rounded-3xl p-8 border border-primary-200 shadow-sm">
-              <h2 className="text-3xl font-bold text-primary-900 mb-6">مهمتنا</h2>
+              <h2 className="text-3xl font-bold text-primary-900 mb-6">About Tutiba</h2>
               <p className="text-lg text-primary-600 leading-relaxed">
-                تمكين الممارسين الصحيين بالمعرفة الثقة والمبنية على الأدلة لتقديم أفضل استشارات العناية بالبشرة، والارتقاء بمستوى الرعاية التجميلية العلاجية في الوطن العربي.
+                About Tutiba.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
             {[
-              { icon: BookOpen, title: "مناهج علمية", desc: "مبنية على أحدث الأبحاث" },
-              { icon: Users, title: "مجتمع مهني", desc: "تواصل مع خبراء المجال" },
-              { icon: Award, title: "شهادات معتمدة", desc: "عزز مسارك المهني" },
-              { icon: Info, title: "دعم مستمر", desc: "إجابات لاستفساراتك" }
+              { icon: BookOpen, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Users, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Award, title: "About Tutiba", desc: "About Tutiba" },
+              { icon: Info, title: "About Tutiba", desc: "About Tutiba" }
             ].map((feature, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-primary-200 text-center">
                 <div className="w-16 h-16 mx-auto bg-accent-50 rounded-xl flex items-center justify-center mb-4">

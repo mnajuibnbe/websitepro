@@ -21,7 +21,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         {/* In RTL, previous page points to the right */}
         <ChevronRight className="w-5 h-5" />
       </button>
-      
+
       {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
         <button
           type="button"

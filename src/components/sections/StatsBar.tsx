@@ -3,10 +3,10 @@ import { Users, BookOpen, Clock, ListChecks } from 'lucide-react';
 
 export function StatsBar() {
   const stats = [
-    { id: 1, value: '1000+', label: 'طالب', icon: Users },
-    { id: 2, value: '8+', label: 'كورسات', icon: BookOpen },
-    { id: 3, value: '200+', label: 'ساعة تعليمية', icon: Clock },
-    { id: 4, value: '50+', label: 'موضوع', icon: ListChecks },
+    { id: 1, value: '1000+', label: 'Learner Milestone', icon: Users },
+    { id: 2, value: '8+', label: 'Learner Milestone', icon: BookOpen },
+    { id: 3, value: '200+', label: 'Hour', icon: Clock },
+    { id: 4, value: '50+', label: 'Learner Milestone', icon: ListChecks },
   ];
 
   return (
@@ -16,8 +16,8 @@ export function StatsBar() {
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div 
-                key={stat.id} 
+              <div
+                key={stat.id}
                 className={`flex flex-col items-center text-center ${
                   index % 2 === 0 ? 'border-l border-primary-100 md:border-l-0' : ''
                 }`}

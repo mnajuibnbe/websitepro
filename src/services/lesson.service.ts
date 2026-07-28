@@ -216,12 +216,12 @@ export class LessonService {
   }
 
   /**
-   * Duplicate a lesson with " (نسخة)" appended to title and placed directly after the source lesson.
+   * Duplicate a lesson with " (Copy)" appended to title and placed directly after the source lesson.
    */
   static async duplicateLesson(lessonId: string): Promise<Lesson> {
     const original = await this.getLessonById(lessonId);
     if (!original) {
-      throw new Error('الدرس المطلوب غير موجود.');
+      throw new Error('Unable to duplicate the lesson.');
     }
 
     const targetOrder = (original.order_index ?? 0) + 1;
@@ -242,7 +242,7 @@ export class LessonService {
     const duplicatedData: Partial<Lesson> = {
       ...original,
       id: undefined,
-      title: `${original.title} (نسخة)`,
+      title: `${original.title} (Copy)`,
       slug: original.slug ? `${original.slug}-copy-${Date.now()}` : null,
       order_index: targetOrder,
       created_at: undefined,

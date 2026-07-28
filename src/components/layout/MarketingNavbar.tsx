@@ -27,7 +27,7 @@ export function MarketingNavbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          
+
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="relative flex items-center justify-center text-accent-600">
@@ -48,9 +48,9 @@ export function MarketingNavbar() {
             </Link>
             <Link to="/about" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">About</Link>
             <Link to="/blog" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Blog</Link>
-            
+
             <div className="h-6 w-px bg-primary-200 mx-2"></div>
-            
+
             <button className="text-primary-900 hover:text-accent-600 focus:outline-none transition-colors">
               <Search className="w-5 h-5" />
             </button>
@@ -85,11 +85,11 @@ export function MarketingNavbar() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 bg-primary-900/50 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
-          
+
           {/* Drawer */}
           <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform">
             <div className="flex items-center justify-between h-20 px-6 border-b border-primary-100">

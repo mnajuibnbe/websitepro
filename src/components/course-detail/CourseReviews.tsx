@@ -5,38 +5,38 @@ export function CourseReviews() {
   const reviews = [
     {
       id: 1,
-      name: "د. سارة أحمد",
-      profession: "صيدلانية",
-      date: "قبل شهر",
+      name: "Course Review. Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review",
       rating: 5,
-      content: "أخيراً وجدت محتوى عربي يشرح الكوسميسوتيكال بعمق علمي. الدورة غيرت طريقتي في قراءة مكونات المنتجات تماماً وبنيت ثقتي في تقديم الاستشارات في الصيدلية."
+      content: "The course presents scientific concepts clearly and connects them to professional practice."
     },
     {
       id: 2,
-      name: "د. نورة محمد",
-      profession: "طبيبة أمراض جلدية",
-      date: "قبل 3 أشهر",
+      name: "Course Review. Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review 3 Course Review",
       rating: 5,
-      content: "المعلومات منظمة جداً والتطبيق العملي بعد كل درس ساعدني كثيراً في تقديم نصائح أفضل للمراجعين في عيادتي الخاصة. الكورس دسم جداً."
+      content: "The lessons are organized, practical, and easy to follow."
     },
     {
       id: 3,
-      name: "أمل عبدالله",
-      profession: "متخصصة عناية بالبشرة",
-      date: "قبل أسبوعين",
+      name: "Course Review",
+      profession: "Healthcare Professional",
+      date: "Course Review",
       rating: 5,
-      content: "الدبلومة رائعة، شرح د. آية سلس جداً ويوصل المعلومة المعقدة بطريقة سهلة. طريقة ربط المكونات بالحالات العملية هي أفضل ما في الكورس."
+      content: "A valuable course for professionals who want to strengthen their evidence-based knowledge."
     }
   ];
 
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        تقييمات الطلاب
+        Students
       </h2>
-      
+
       <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm">
-        
+
         {/* Overall Rating */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 sm:gap-12 mb-10 pb-8 border-b border-primary-100">
           <div className="flex flex-col items-center justify-center flex-shrink-0">
@@ -48,9 +48,9 @@ export function CourseReviews() {
               <Star className="w-5 h-5 fill-current" />
               <Star className="w-5 h-5 fill-current opacity-50" />
             </div>
-            <span className="text-sm text-primary-500 font-medium">120 تقييم</span>
+            <span className="text-sm text-primary-500 font-medium">120 Course Review</span>
           </div>
-          
+
           {/* Rating Bars - Mockup */}
           <div className="flex-grow w-full max-w-sm space-y-2">
             {[
@@ -65,8 +65,8 @@ export function CourseReviews() {
                   {bar.stars} <Star className="w-3 h-3 fill-current text-warning-500" />
                 </span>
                 <div className="flex-grow h-2 bg-primary-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-warning-500 rounded-full" 
+                  <div
+                    className="h-full bg-warning-500 rounded-full"
                     style={{ width: `${bar.percentage}%` }}
                   ></div>
                 </div>
@@ -103,10 +103,10 @@ export function CourseReviews() {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-8 text-center">
           <button className="text-accent-600 font-bold hover:text-accent-700 transition-colors">
-            عرض المزيد من التقييمات
+            View
           </button>
         </div>
       </div>

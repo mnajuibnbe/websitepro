@@ -19,28 +19,28 @@ export function RegisterPage() {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
-    
+
     try {
       const result = await register(name.trim(), email.trim(), password);
-      
+
       if (result.requiresEmailConfirmation) {
-        setSuccessMessage('تم إنشاء حسابك بنجاح. يرجى مراجعة بريدك الإلكتروني لتفعيل الحساب.');
+        setSuccessMessage('Sign Up. Please review the information and try again.');
       } else {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'حدث خطأ أثناء التسجيل');
+      setError(err.message || 'Error');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4" dir="ltr">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary-900 mb-2">إنشاء حساب جديد</h1>
-          <p className="text-primary-600">انضم لمنصة توتيبا التعليمية الآن</p>
+          <h1 className="text-2xl font-bold text-primary-900 mb-2">Sign Up</h1>
+          <p className="text-primary-600">Create your Tutiba account and start learning.</p>
         </div>
 
         {error && (
@@ -57,7 +57,7 @@ export function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-primary-900 mb-2">الاسم الكامل</label>
+            <label className="block text-sm font-bold text-primary-900 mb-2">Full Name</label>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
                 <UserIcon className="h-5 w-5" />
@@ -68,14 +68,14 @@ export function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                placeholder="الاسم الثلاثي"
+                placeholder="Enter details"
                 disabled={!!successMessage}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-primary-900 mb-2">البريد الإلكتروني</label>
+            <label className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
                 <Mail className="h-5 w-5" />
@@ -94,7 +94,7 @@ export function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-primary-900 mb-2">كلمة المرور</label>
+            <label className="block text-sm font-bold text-primary-900 mb-2">Password</label>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
                 <Lock className="h-5 w-5" />
@@ -112,29 +112,29 @@ export function RegisterPage() {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            variant="primary" 
+          <Button
+            type="submit"
+            variant="primary"
             className="w-full h-12 text-lg"
             disabled={isLoading || !!successMessage}
           >
-            {isLoading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}
+            {isLoading ? 'Create...' : 'Sign Up'}
           </Button>
         </form>
 
         <div className="mt-8 text-center text-primary-600">
-          لديك حساب بالفعل؟{' '}
-          <Link to="/login" 
+          Already have an account?{' '}
+          <Link to="/login"
             onClick={(e) => {
               e.preventDefault();
               navigate('/login');
             }}
             className="font-bold text-accent-600 hover:text-accent-700"
           >
-            تسجيل الدخول
+            Sign In
           </Link>
         </div>
-        
+
         <div className="mt-6 text-center">
           <Link to="/"
             onClick={(e) => {
@@ -144,7 +144,7 @@ export function RegisterPage() {
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
-            <span>العودة للرئيسية</span>
+            <span>Back</span>
           </Link>
         </div>
       </div>

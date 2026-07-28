@@ -10,71 +10,56 @@ export function Footer() {
   };
 
   const footerLinks = [
-    {
-      title: 'الدورات',
-      links: [
-        { label: 'دبلومة العناية بالبشرة', href: '#/courses' },
-        { label: 'دبلومة العناية بالشعر', href: '#/courses' },
-        { label: 'كورسات متخصصة', href: '#/courses' },
-        { label: 'الدروس المجانية', href: '#/courses' }
-      ]
-    },
-    {
-      title: 'الشركة',
-      links: [
-        { label: 'عن المنصة', href: '#/about' },
-        { label: 'د. آية البراشي', href: '#/about' },
-        { label: 'منهجيتنا', href: '#/about' },
-        { label: 'قصص نجاح', href: '#/' }
-      ]
-    },
-    {
-      title: 'الموارد',
-      links: [
-        { label: 'المدونة', href: '#/blog' },
-        { label: 'قاموس المكونات', href: '#/blog' },
-        { label: 'تحليل المنتجات', href: '#/blog' },
-        { label: 'أدوات مجانية', href: '#/blog' }
-      ]
-    },
-    {
-      title: 'الدعم',
-      links: [
-        { label: 'مركز المساعدة', href: '#/faq' },
-        { label: 'تواصل معنا', href: '#/contact' },
-        { label: 'الأسئلة الشائعة', href: '#/faq' },
-        { label: 'واتساب', href: '#/contact' }
-      ]
-    },
-    {
-      title: 'القانونية',
-      links: [
-        { label: 'شروط الاستخدام', href: '#/terms' },
-        { label: 'سياسة الخصوصية', href: '#/privacy' },
-        { label: 'سياسة الاسترجاع', href: '#/terms' }
-      ]
-    }
+    { title: 'Courses', links: [
+      { label: 'All Courses', href: '#/courses' },
+      { label: 'Diploma Programs', href: '#/courses' },
+      { label: 'Specialized Courses', href: '#/courses' },
+      { label: 'Free Lessons', href: '#/courses' },
+    ] },
+    { title: 'Tutiba', links: [
+      { label: 'About Us', href: '#/about' },
+      { label: 'Our Learning Method', href: '#/about' },
+      { label: 'Our Instructors', href: '#/about' },
+      { label: 'Student Success', href: '#/' },
+    ] },
+    { title: 'Resources', links: [
+      { label: 'Blog', href: '#/blog' },
+      { label: 'Scientific Articles', href: '#/blog' },
+      { label: 'Educational Videos', href: '#/blog' },
+      { label: 'Free Resources', href: '#/blog' },
+    ] },
+    { title: 'Support', links: [
+      { label: 'Help Center', href: '#/faq' },
+      { label: 'Contact Us', href: '#/contact' },
+      { label: 'Frequently Asked Questions', href: '#/faq' },
+      { label: 'Technical Support', href: '#/contact' },
+    ] },
+    { title: 'Legal', links: [
+      { label: 'Terms and Conditions', href: '#/terms' },
+      { label: 'Privacy Policy', href: '#/privacy' },
+      { label: 'Refund Policy', href: '#/terms' },
+    ] },
   ];
 
   return (
     <footer className="bg-primary-900 text-primary-300 pt-16 md:pt-24 pb-8 border-t-4 border-accent-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          
+
           {/* Logo & Brand Message */}
-          <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-right">
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
             <div className="flex items-center gap-3 mb-6">
               <div className="relative flex items-center justify-center text-accent-400">
                  <FlaskConical className="w-10 h-10" strokeWidth={1.5} />
                  <Droplet className="w-4 h-4 absolute bottom-0 right-0 text-accent-300 fill-current" />
               </div>
-              <div className="flex flex-col text-right">
+              <div className="flex flex-col text-left">
                 <span className="font-bold text-2xl tracking-tight text-white leading-none font-sans uppercase">TUTIBA</span>
                 <span className="text-[10px] text-primary-400 font-medium tracking-widest uppercase">Cosmeceutical Education</span>
               </div>
             </div>
             <p className="text-primary-400 leading-relaxed max-w-sm mb-8 text-sm md:text-base">
-              المرجع العلمي العربي الأول في الكوسميسوتيكال للمهنيين الصحيين. نبني ثقتك العلمية بأسس تطبيقية دقيقة.
+              Evidence-based learning for health professionals who want to build practical confidence in cosmeceuticals.
             </p>
             <div className="flex items-center gap-4">
               <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Facebook">
@@ -119,7 +104,7 @@ export function Footer() {
                   <span className="text-lg">{section.title}</span>
                   <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${openAccordion === section.title ? 'rotate-180 text-accent-400' : 'text-primary-500'}`} />
                 </button>
-                <div 
+                <div
                   className={`overflow-hidden transition-all duration-300 ${
                     openAccordion === section.title ? 'max-h-64 mb-4 opacity-100' : 'max-h-0 opacity-0'
                   }`}
@@ -139,14 +124,14 @@ export function Footer() {
 
         {/* Bottom Footer */}
         <div className="pt-8 border-t border-primary-800 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-sm text-primary-500 order-2 md:order-1 text-center md:text-right">
-            <span>© {new Date().getFullYear()} Tutiba. جميع الحقوق محفوظة.</span>
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-sm text-primary-500 order-2 md:order-1 text-center md:text-left">
+            <span>© {new Date().getFullYear()} Tutiba. All rights reserved.</span>
             <div className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors bg-primary-800 px-3 py-1.5 rounded-full">
               <Globe className="w-4 h-4" />
-              <span className="font-medium">العربية</span>
+              <span className="font-medium">English</span>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap justify-center gap-3 order-1 md:order-2 opacity-60 hover:opacity-100 transition-opacity duration-300">
              {/* Payment Methods placeholders */}
              <div className="h-8 w-12 bg-primary-800 rounded flex items-center justify-center text-xs font-bold text-primary-400">Visa</div>

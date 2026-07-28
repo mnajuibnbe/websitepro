@@ -22,7 +22,7 @@ export function LegacyLessonRedirector() {
 
   return (
     <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4">
-      <p className="text-primary-600 font-medium">جاري إعادة التوجيه إلى مساحة التعلم...</p>
+      <p className="text-primary-600 font-medium">Loading...</p>
     </div>
   );
 }

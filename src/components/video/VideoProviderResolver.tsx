@@ -40,7 +40,7 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
   // If it's google_drive, we use our SecureStreamProvider to fetch token and stream
   if (provider === 'google_drive' || videoUrl.includes('drive.google.com')) {
     return (
-      <SecureStreamProvider 
+      <SecureStreamProvider
         lessonId={lessonId}
         title={title}
         poster={poster}
@@ -81,7 +81,7 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
 
   // Determine standard src for Vidstack (MP4)
   return (
-    <VideoPlayer 
+    <VideoPlayer
       src={videoUrl}
       title={title}
       poster={poster}

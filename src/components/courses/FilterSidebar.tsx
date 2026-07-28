@@ -10,16 +10,16 @@ interface FilterSidebarProps {
   onClose: () => void;
 }
 
-const categories = ['برامج الدبلومة', 'العناية بالبشرة', 'العناية بالشعر', 'كورسات متخصصة'];
+const categories = ['Skin Care', 'Hair Care', 'Diploma Programs', 'Specialized Courses'];
 const levels = [
-  { label: 'مبتدئ', value: 'beginner' },
-  { label: 'متوسط', value: 'intermediate' },
-  { label: 'متقدم', value: 'advanced' },
+  { label: 'Beginner', value: 'beginner' },
+  { label: 'Intermediate', value: 'intermediate' },
+  { label: 'Advanced', value: 'advanced' },
 ];
 const durations = [
-  { label: 'أقل من 5 ساعات', value: 'short' },
-  { label: '5 - 20 ساعة', value: 'medium' },
-  { label: 'أكثر من 20 ساعة', value: 'long' },
+  { label: 'Under 5 Hours', value: 'short' },
+  { label: '5–20 Hours', value: 'medium' },
+  { label: 'Over 20 Hours', value: 'long' },
 ] as const;
 
 export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: FilterSidebarProps) {
@@ -34,15 +34,15 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
       className={`${mobileOpen ? 'flex' : 'hidden'} lg:flex flex-col w-full p-5 lg:pt-0 lg:pr-0 lg:pb-0 lg:pl-8 border border-primary-200 lg:border-y-0 lg:border-r-0 lg:border-l rounded-xl lg:rounded-none bg-primary-50/50 lg:bg-transparent`}
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-primary-900">الفلاتر</h2>
-        <button type="button" onClick={onClose} className="lg:hidden p-2 rounded-lg text-primary-600 hover:bg-primary-100" aria-label="إغلاق الفلاتر">
+        <h2 className="text-xl font-bold text-primary-900">Filters</h2>
+        <button type="button" onClick={onClose} className="lg:hidden p-2 rounded-lg text-primary-600 hover:bg-primary-100" aria-label="Close filters">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Category */}
       <div className="mb-8">
-        <h3 className="font-bold text-primary-900 mb-4">التصنيف</h3>
+        <h3 className="font-bold text-primary-900 mb-4">Category</h3>
         <div className="flex flex-col gap-3">
           {categories.map((item) => (
             <label key={item} className="flex items-center gap-3 cursor-pointer group">
@@ -58,7 +58,7 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
 
       {/* Level */}
       <div className="mb-8">
-        <h3 className="font-bold text-primary-900 mb-4">المستوى</h3>
+        <h3 className="font-bold text-primary-900 mb-4">Level</h3>
         <div className="flex flex-col gap-3">
           {levels.map((item) => (
             <label key={item.value} className="flex items-center gap-3 cursor-pointer group">
@@ -74,9 +74,9 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
 
       {/* Price */}
       <div className="mb-8">
-        <h3 className="font-bold text-primary-900 mb-4">السعر</h3>
+        <h3 className="font-bold text-primary-900 mb-4">Price</h3>
         <div className="flex flex-col gap-3">
-          {[{ label: 'الكل', value: 'all' }, { label: 'مجاني', value: 'free' }, { label: 'مدفوع', value: 'paid' }].map((item) => (
+          {[{ label: 'All Prices', value: 'all' }, { label: 'Free', value: 'free' }, { label: 'Paid', value: 'paid' }].map((item) => (
             <label key={item.value} className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center justify-center w-5 h-5 border border-primary-300 rounded-full group-hover:border-accent-500 transition-colors">
                 <input type="radio" name="price" checked={filters.price === item.value} onChange={() => onChange({ ...filters, price: item.value as CourseCatalogFilters['price'] })} className="peer sr-only" />
@@ -90,7 +90,7 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
 
       {/* Duration */}
       <div className="mb-8">
-        <h3 className="font-bold text-primary-900 mb-4">المدة</h3>
+        <h3 className="font-bold text-primary-900 mb-4">Duration</h3>
         <div className="flex flex-col gap-3">
           {durations.map((item) => (
             <label key={item.value} className="flex items-center gap-3 cursor-pointer group">
@@ -105,7 +105,7 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
       </div>
 
       <Button variant="tertiary" onClick={() => onChange(EMPTY_CATALOG_FILTERS)} className="mt-4 border border-primary-200 hover:bg-primary-50 hover:border-primary-300">
-        مسح الفلاتر
+        Clear Filters
       </Button>
     </aside>
   );

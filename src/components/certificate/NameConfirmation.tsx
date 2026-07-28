@@ -24,33 +24,33 @@ export function NameConfirmation({ onConfirm, defaultName }: NameConfirmationPro
       <div className="w-16 h-16 bg-accent-50 rounded-full flex items-center justify-center mb-6">
         <User className="w-8 h-8 text-accent-600" />
       </div>
-      
-      <h2 className="text-2xl font-bold text-primary-900 mb-4">كيف ترغبين أن يظهر اسمك؟</h2>
+
+      <h2 className="text-2xl font-bold text-primary-900 mb-4">Certificate Name</h2>
       <p className="text-primary-600 mb-6 leading-relaxed">
-        يرجى التأكد من كتابة الاسم بشكل صحيح كما ترغبين ظهوره في الشهادة المعتمدة. لن تتمكني من تغييره لاحقاً بسهولة.
+        Please review the information and try again. Certificate Name.
       </p>
 
       <div className="mb-8">
-        <label className="block text-sm font-bold text-primary-700 mb-2">الاسم الكامل (عربي أو إنجليزي)</label>
-        <Input 
-          type="text" 
+        <label className="block text-sm font-bold text-primary-700 mb-2">Full Name (Certificate Name)</label>
+        <Input
+          type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full h-14 text-lg font-bold"
         />
         <div className="flex items-start gap-2 mt-3 text-warning-700 bg-warning-50 p-3 rounded-lg text-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          <span className="leading-snug">تأكدي من خلو الاسم من الأخطاء الإملائية. سيتم طباعة الاسم تماماً كما هو مكتوب هنا.</span>
+          <span className="leading-snug">Certificate Name. Certificate Name.</span>
         </div>
       </div>
 
-      <Button 
-        variant="primary" 
+      <Button
+        variant="primary"
         className="w-full h-14 text-lg font-bold"
         onClick={handleConfirm}
         disabled={name.trim().length < 3 || isProcessing}
       >
-        {isProcessing ? 'جاري الإصدار...' : 'تأكيد وإصدار الشهادة'}
+        {isProcessing ? 'Issuing Certificate...' : 'Confirm and Issue Certificate'}
       </Button>
     </div>
   );

@@ -31,7 +31,7 @@ export function AdminDashboard() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('تم اعتماد الطلب بنجاح');
+  const [toastMessage, setToastMessage] = useState('Order');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,18 +75,18 @@ export function AdminDashboard() {
 
       if (error) {
         console.error('Error fetching enrollments:', error);
-        setErrorMsg('حدث خطأ أثناء تحميل الطلبات.');
+        setErrorMsg('Unable to load enrollment requests. Please try again.');
       }
-      
+
       if (data) {
-        // Supabase typings can sometimes return an array for relations if it thinks it's one-to-many, 
+        // Supabase typings can sometimes return an array for relations if it thinks it's one-to-many,
         // but since users/courses are foreign keys on enrollments (many-to-one), they should be objects.
         // We cast as any to handle potential TS mismatches if the generated types differ, but the runtime shape is correct.
         setPendingEnrollments(data as any as PendingEnrollment[]);
       }
     } catch (e) {
       console.error('Exception during fetch:', e);
-      setErrorMsg('حدث خطأ غير متوقع.');
+      setErrorMsg('Unable to process this enrollment request. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -103,19 +103,19 @@ export function AdminDashboard() {
         .eq('status', 'pending')
         .select('id, status')
         .maybeSingle();
-        
+
       if (!error && updatedEnrollment?.status === status) {
         setPendingEnrollments(prev => prev.filter(e => e.id !== id));
-        setToastMessage(status === 'active' ? 'تم اعتماد الطلب بنجاح' : 'تم رفض الطلب');
+        setToastMessage(status === 'active' ? 'Order' : 'Order');
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       } else {
-        setErrorMsg('فشل في اعتماد الطلب، يرجى المحاولة مرة أخرى.');
+        setErrorMsg('Please review the information and try again.');
         console.error('Enrollment decision did not update a pending row:', error || { id, status });
       }
     } catch (e) {
       console.error(e);
-      setErrorMsg('حدث خطأ أثناء الاعتماد.');
+      setErrorMsg('Unable to process this enrollment request. Please try again.');
     } finally {
       setActionLoadingId(null);
     }
@@ -137,43 +137,43 @@ export function AdminDashboard() {
           <p className="font-bold">{toastMessage}</p>
         </div>
       )}
-      
-      <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+
+      <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-        
+
         <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-primary-900 mb-8">لوحة الاعتمادات (إدارة الطلبات)</h1>
-            
+            <h1 className="text-3xl font-bold text-primary-900 mb-8">Administration (Manage)</h1>
+
             {errorMsg && (
               <div className="mb-6 bg-danger-50 text-danger-700 px-6 py-4 rounded-xl border border-danger-200 flex items-center gap-3">
                 <AlertCircle className="w-6 h-6 flex-shrink-0" />
                 <p className="font-bold">{errorMsg}</p>
-                <button 
+                <button
                   onClick={loadPendingEnrollments}
                   className="mr-auto text-sm bg-white px-4 py-2 rounded-lg border border-danger-200 hover:bg-danger-100 transition-colors"
                 >
-                  إعادة المحاولة
+                  Retry
                 </button>
               </div>
             )}
 
             <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden mb-8">
               <div className="p-6 border-b border-primary-200 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-primary-900">طلبات الاشتراك المعلقة</h2>
+                <h2 className="text-xl font-bold text-primary-900">Subscribe</h2>
                 <span className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-bold">
-                  {pendingEnrollments.length} طلبات
+                  {pendingEnrollments.length} pending requests
                 </span>
               </div>
-              
+
               <div className="overflow-x-auto">
-                <table className="w-full text-right">
+                <table className="w-full text-left">
                   <thead className="bg-primary-50 border-b border-primary-200">
                     <tr>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">الطالب</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">الكورس</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">تاريخ الطلب</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">الإجراء</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Administration</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Course</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Order</th>
+                      <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">Administration</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100">
@@ -181,21 +181,21 @@ export function AdminDashboard() {
                       <tr>
                         <td colSpan={4} className="py-12 text-center">
                           <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto mb-4" />
-                          <p className="text-primary-500 font-medium">جاري تحميل الطلبات...</p>
+                          <p className="text-primary-500 font-medium">Loading...</p>
                         </td>
                       </tr>
                     ) : pendingEnrollments.length === 0 ? (
                       <tr>
                         <td colSpan={4} className="py-12 text-center text-primary-500 font-medium">
-                          لا توجد طلبات معلقة حالياً
+                          No items found
                         </td>
                       </tr>
                     ) : (
                       pendingEnrollments.map((enrollment) => {
-                        const studentName = enrollment.users?.full_name || 'مستخدم غير موجود';
+                        const studentName = enrollment.users?.full_name || 'Not Found';
                         const studentEmail = enrollment.users?.email || '';
-                        const courseTitle = enrollment.courses?.title || 'كورس غير موجود';
-                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'غير متوفر';
+                        const courseTitle = enrollment.courses?.title || 'Not Found';
+                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'Administration';
 
                         return (
                           <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
@@ -223,23 +223,23 @@ export function AdminDashboard() {
                                 onClick={() => handleDecision(enrollment.id, 'active')}
                                 disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
                                 className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title={(!enrollment.users || !enrollment.courses) ? "لا يمكن الاعتماد لعدم اكتمال البيانات" : "اعتماد الطلب"}
+                                title={(!enrollment.users || !enrollment.courses) ? "Administration" : "Order"}
                               >
                                 {actionLoadingId === enrollment.id ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                   <CheckCircle className="w-4 h-4" />
                                 )}
-                                اعتماد
+                                Administration
                               </button>
                               <button
                                 onClick={() => handleDecision(enrollment.id, 'cancelled')}
                                 disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
                                 className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-danger-500 hover:bg-red-600 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="رفض الطلب"
+                                title="Order"
                               >
                                 <XCircle className="w-4 h-4" />
-                                رفض
+                                Administration
                               </button>
                               </div>
                             </td>

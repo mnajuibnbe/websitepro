@@ -32,14 +32,14 @@ export interface Lesson {
 const MOCK_USERS: User[] = [
   {
     id: 'usr_1',
-    name: 'أحمد محمد',
+    name: 'Instructor',
     email: 'student@example.com',
     role: 'student',
     joinedAt: '2026-07-01'
   },
   {
     id: 'usr_admin',
-    name: 'مدير النظام',
+    name: 'Instructor',
     email: 'admin@example.com',
     role: 'admin',
     joinedAt: '2026-01-01'
@@ -72,7 +72,7 @@ export async function register(name: string, email: string, password: string): P
     setTimeout(() => {
       const existingUser = MOCK_USERS.find(u => u.email === email);
       if (existingUser) {
-        reject(new Error('البريد الإلكتروني مسجل مسبقاً.'));
+        reject(new Error('An account with this email address already exists.'));
         return;
       }
       const newUser: User = {
@@ -112,7 +112,7 @@ export async function getUserProfile(token: string): Promise<User | null> {
       if (!user) {
         user = {
           id: userId,
-          name: 'طالب (تم التحقق عبر Supabase)',
+          name: 'Demo User (Supabase unavailable)',
           email: 'user@example.com',
           role: 'student',
           joinedAt: new Date().toISOString()

@@ -10,35 +10,35 @@ export function FAQ() {
 
   const faqs = [
     {
-      q: "لمن موجهة كورسات المنصة؟",
-      a: "كورساتنا مصممة خصيصاً للصيادلة، أطباء الجلدية، والممارسين الصحيين المهتمين بمجال الكوسميسوتيكال والعناية العلاجية بالبشرة والشعر."
+      q: "What is Tutiba?",
+      a: "Tutiba provides structured, evidence-based cosmeceutical education for health and beauty professionals."
     },
     {
-      q: "هل الشهادات معتمدة؟",
-      a: "نعم، نقدم شهادات إتمام موثقة برقم تعريفي فريد يمكن التحقق منه عبر منصتنا، وتعتبر إضافة قيمة لسيرتك الذاتية المهنية."
+      q: "How do I enroll in a course?",
+      a: "Create an account, choose a course, and complete the enrollment process."
     },
     {
-      q: "كيف يمكنني الدفع؟",
-      a: "ندعم وسائل الدفع الإلكتروني المختلفة بما في ذلك البطاقات الائتمانية، مدى، وبوابات الدفع المحلية المعتمدة."
+      q: "Which payment methods are accepted?",
+      a: "Available payment methods are displayed securely during checkout."
     },
     {
-      q: "هل يمكنني الوصول للكورسات في أي وقت؟",
-      a: "بمجرد اشتراكك في الكورس، يمكنك الوصول للمحتوى في أي وقت ومن أي جهاز، وتستمر صلاحية الوصول حسب خطة الاشتراك الموضحة في تفاصيل الكورس."
+      q: "Where can I find my enrolled courses?",
+      a: "You can access your enrolled courses from My Courses after signing in."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
-      
+
       <main className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <HelpCircle className="w-8 h-8 text-accent-600" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-900 mb-4">الأسئلة الشائعة</h1>
-            <p className="text-xl text-primary-600">إجابات على استفساراتكم حول منصة توتيبا</p>
+            <h1 className="text-4xl font-bold text-primary-900 mb-4">Frequently Asked Questions</h1>
+            <p className="text-xl text-primary-600">Help Information</p>
           </div>
 
           <div className="space-y-4">

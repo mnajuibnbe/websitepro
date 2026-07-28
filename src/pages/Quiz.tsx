@@ -8,58 +8,49 @@ import { QuizResult } from '../components/quiz/QuizResult';
 const mockQuestions: QuestionData[] = [
   {
     id: 1,
-    question: "أي من المكونات التالية يعتبر من المرطبات الجاذبة للماء (Humectants)؟",
-    options: ["حمض الهيالورونيك", "زيت الجوجوبا", "زبدة الشيا", "السيليكون"],
+    question: "Which ingredient is classified as a humectant?",
+    options: ["Hyaluronic acid", "Jojoba oil", "Shea butter", "Silicone"],
     correctIndex: 0,
-    explanation: "حمض الهيالورونيك يجذب الماء، بينما الزيوت هي مطريات.",
+    explanation: "Hyaluronic acid attracts and retains water, while oils primarily act as emollients.",
     aiExplanation: {
-      scientific: "الـ Humectants هي جزيئات محبة للماء (Hydrophilic) تحتوي على مجموعات هيدروكسيل (-OH) تقوم بعمل روابط هيدروجينية مع جزيئات الماء، مما يسحبها إلى الطبقة القرنية.",
-      practical: "سيروم الهيالورونيك من The Ordinary يعتمد كلياً على هذه الخاصية، ولهذا يُنصح بوضعه على بشرة ندية (Damp skin)."
+      scientific: "Humectants are hydrophilic molecules that bind water and help increase hydration in the stratum corneum.",
+      practical: "Apply a hyaluronic acid serum to slightly damp skin, then follow with a moisturizer to reduce water loss."
     },
-    memoryCoach: {
-      type: "رابط ذهني",
-      content: "تخيل حمض الهيالورونيك كـ (إسفنجة) عطشى تسحب الماء من الجو المحيط لتروي بها سطح البشرة."
-    }
+    memoryCoach: { type: "Memory Aid", content: "Think of hyaluronic acid as a sponge that attracts water to the skin's surface." }
   },
   {
     id: 2,
-    question: "ما هو الترتيب الصحيح لطبقات البشرة من الخارج إلى الداخل؟",
+    question: "What is the correct order of these epidermal layers from outermost to deepest?",
     options: [
-      "الطبقة القاعدية، الطبقة الشائكة، الطبقة القرنية",
-      "الطبقة القرنية، الطبقة الشائكة، الطبقة القاعدية",
-      "الطبقة الشائكة، الطبقة القرنية، الطبقة القاعدية",
-      "الطبقة القرنية، الطبقة القاعدية، الطبقة الشائكة"
+      "Basal, spinous, corneal",
+      "Corneal, spinous, basal",
+      "Spinous, corneal, basal",
+      "Corneal, basal, spinous"
     ],
     correctIndex: 1,
-    explanation: "الطبقة القرنية هي الخارجية، والقاعدية هي الأعمق.",
+    explanation: "The stratum corneum is the outermost layer, while the basal layer is the deepest of these layers.",
     aiExplanation: {
-      scientific: "تبدأ دورة حياة خلية الكيراتين من الطبقة القاعدية (حيث الانقسام)، وتصعد مروراً بالطبقة الشائكة والمحببة لتفقد نواتها وتتسطح في الطبقة القرنية كحاجز حماية.",
-      practical: "المقشرات الكيميائية (AHA/BHA) تعمل فقط على الطبقة القرنية السطحية لإزالة الخلايا الميتة، ولا تصل للقاعدية إلا في التقشير الطبي العميق."
+      scientific: "Keratinocytes originate in the basal layer and move upward through the spinous layers before forming the protective stratum corneum.",
+      practical: "Most cosmetic exfoliants act on the superficial stratum corneum rather than the deeper living layers."
     },
-    memoryCoach: {
-      type: "اختصار",
-      content: "تذكر الكلمة (قـ.شـ.ق): قرنية (خارج) -> شائكة (وسط) -> قاعدية (داخل)."
-    }
+    memoryCoach: { type: "Mnemonic", content: "Remember the outside-in order: corneal, spinous, basal." }
   },
   {
     id: 3,
-    question: "متى يكون استخدام المواد الحافظة (Preservatives) إلزامياً في منتجات العناية؟",
+    question: "When are antimicrobial preservatives generally required in a cosmetic formula?",
     options: [
-      "في المنتجات الزيتية 100%",
-      "في المنتجات التي تحتوي على ماء (Aqueous)",
-      "في المنتجات الصلبة (Solid bars)",
-      "جميع المنتجات التجميلية بدون استثناء"
+      "In products made entirely from oils",
+      "In products that contain water",
+      "Only in solid cleansing bars",
+      "In every cosmetic product without exception"
     ],
     correctIndex: 1,
-    explanation: "الماء بيئة خصبة للبكتيريا، لذا المنتجات المائية تتطلب مواد حافظة.",
+    explanation: "Water-containing formulas can support microbial growth and therefore generally require an appropriate preservation system.",
     aiExplanation: {
-      scientific: "النشاط المائي (Water Activity - Aw) العالي يسمح للكائنات الدقيقة بالنمو الأسي. المواد الحافظة تعطل الأغشية الخلوية أو إنزيمات هذه البكتيريا والفطريات.",
-      practical: "لهذا السبب كريم الوجه يحتاج بارابين أو فينوكسي إيثانول، بينما سيروم فيتامين C الزيتي 100% قد لا يحتاج إلى مادة حافظة ميكروبية (فقط مضاد أكسدة)."
+      scientific: "Sufficient water activity can support bacteria, yeast, and mold. A suitable preservative system helps protect product safety and stability.",
+      practical: "A water-based face cream typically needs antimicrobial preservation, while a fully anhydrous oil may have different stability requirements."
     },
-    memoryCoach: {
-      type: "صورة ذهنية",
-      content: "تخيل (قطرة ماء) كأنها (حمام سباحة) للبكتيريا. أينما وجد المسبح (الماء)، وجب وضع الكلور (المادة الحافظة)."
-    }
+    memoryCoach: { type: "Memory Aid", content: "Where there is available water, assess the need for microbial protection." }
   }
 ];
 
@@ -102,10 +93,10 @@ export function QuizPage() {
       <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
         <Link to="/my-courses" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
           <ArrowRight className="w-5 h-5 group-hover:-translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />
-          <span className="font-bold text-sm hidden sm:block">الخروج من الاختبار</span>
+          <span className="font-bold text-sm hidden sm:block">Quiz</span>
         </Link>
         <div className="font-bold text-primary-900 text-sm md:text-base">
-          دبلومة العناية بالبشرة والشعر
+          Quiz Content
         </div>
         <button onClick={() => navigate('/my-courses')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
           <X className="w-5 h-5" />
@@ -115,11 +106,11 @@ export function QuizPage() {
       {/* Quiz Area */}
       <main className="flex-grow py-12 px-4 sm:px-8 flex items-center justify-center">
         <div className="w-full max-w-[1200px] mx-auto">
-          
+
           {quizState === 'intro' && (
-            <QuizIntro 
-              title="اختبار القسم الثاني: فسيولوجيا البشرة"
-              description="هذا الاختبار يقيس مدى فهمك لوظائف طبقات الجلد وحاجز البشرة. تأكدي من مراجعة الملاحظات قبل البدء."
+            <QuizIntro
+              title="Section: Quiz Content"
+              description="Review the quiz instructions and begin when you are ready."
               questionsCount={mockQuestions.length}
               passMark={80}
               attemptsLeft={3}
@@ -128,7 +119,7 @@ export function QuizPage() {
           )}
 
           {quizState === 'question' && (
-            <QuizQuestion 
+            <QuizQuestion
               questionData={mockQuestions[currentQuestionIndex]}
               currentIndex={currentQuestionIndex}
               totalQuestions={mockQuestions.length}
@@ -137,7 +128,7 @@ export function QuizPage() {
           )}
 
           {quizState === 'result' && (
-            <QuizResult 
+            <QuizResult
               score={score}
               totalQuestions={mockQuestions.length}
               passMark={80}

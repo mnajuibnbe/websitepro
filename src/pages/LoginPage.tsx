@@ -16,23 +16,23 @@ export function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       await login(email.trim(), password);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'حدث خطأ أثناء تسجيل الدخول');
+      setError(err.message || 'Sign In');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4 rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 flex items-center justify-center p-4" dir="ltr">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-primary-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-primary-900 mb-2">تسجيل الدخول</h1>
-          <p className="text-primary-600">مرحباً بك مجدداً في منصة توتيبا</p>
+          <h1 className="text-2xl font-bold text-primary-900 mb-2">Sign In</h1>
+          <p className="text-primary-600">Welcome</p>
         </div>
 
         {error && (
@@ -43,7 +43,7 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-primary-900 mb-2">البريد الإلكتروني</label>
+            <label className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
                 <Mail className="h-5 w-5" />
@@ -62,8 +62,8 @@ export function LoginPage() {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-bold text-primary-900">كلمة المرور</label>
-              <Link to="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }} className="text-sm font-medium text-accent-600 hover:text-accent-700">نسيت كلمة المرور؟</Link>
+              <label className="block text-sm font-bold text-primary-900">Password</label>
+              <Link to="/forgot-password" onClick={(e) => { e.preventDefault(); navigate('/forgot-password'); }} className="text-sm font-medium text-accent-600 hover:text-accent-700">Forgot Password</Link>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
@@ -81,29 +81,29 @@ export function LoginPage() {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            variant="primary" 
+          <Button
+            type="submit"
+            variant="primary"
             className="w-full h-12 text-lg"
             disabled={isLoading}
           >
-            {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+            {isLoading ? 'Sign In...' : 'Sign In'}
           </Button>
         </form>
 
         <div className="mt-8 text-center text-primary-600">
-          ليس لديك حساب؟{' '}
-          <Link to="/register" 
+          Don’t have an account?{' '}
+          <Link to="/register"
             onClick={(e) => {
               e.preventDefault();
               navigate('/register');
             }}
             className="font-bold text-accent-600 hover:text-accent-700"
           >
-            إنشاء حساب جديد
+            Sign Up
           </Link>
         </div>
-        
+
         <div className="mt-6 text-center">
           <Link to="/"
             onClick={(e) => {
@@ -113,7 +113,7 @@ export function LoginPage() {
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors"
           >
             <ArrowRight className="w-4 h-4" />
-            <span>العودة للرئيسية</span>
+            <span>Back</span>
           </Link>
         </div>
       </div>

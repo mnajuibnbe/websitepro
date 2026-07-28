@@ -156,7 +156,7 @@ export function AdminLessonEditor() {
       if (isEditMode && lessonId) {
         const lessonData = await LessonService.getLessonById(lessonId);
         if (!lessonData) {
-          throw new Error('الدرس المطلوب غير موجود.');
+          throw new Error('Unable to load this lesson.');
         }
 
         setTitle(lessonData.title || '');
@@ -200,7 +200,7 @@ export function AdminLessonEditor() {
       }
     } catch (err: any) {
       console.error('Error loading lesson editor data:', err);
-      setErrorMessage(err.message || 'تعذر تحميل بيانات المحرر.');
+      setErrorMessage(err.message || 'Unable to complete this action.');
     } finally {
       setIsLoading(false);
       setIsDirty(false);
@@ -241,23 +241,23 @@ export function AdminLessonEditor() {
     // Validation
     const newErrors: Record<string, string> = {};
     if (!title.trim()) {
-      newErrors.title = 'عنوان الدرس مطلوب';
+      newErrors.title = 'Lesson title is required.';
     }
     if (estimatedMinutes < 0) {
-      newErrors.estimatedMinutes = 'المدة يجب أن تكون 0 أو أكثر';
+      newErrors.estimatedMinutes = 'Duration must be greater than zero.';
     }
 
     // URL validation if type demands URL
     if (['video'].includes(lessonType) && videoUrl.trim() && !videoUrl.trim().startsWith('http')) {
-      newErrors.videoUrl = 'يرجى إدخال رابط فيديو صحيح يبدأ بـ http:// أو https://';
+      newErrors.videoUrl = 'Enter a valid URL beginning with http:// or https://.';
     }
     if (['pdf', 'audio', 'external_link'].includes(lessonType) && contentUrl.trim() && !contentUrl.trim().startsWith('http')) {
-      newErrors.contentUrl = 'يرجى إدخال رابط صحيح يبدأ بـ http:// أو https://';
+      newErrors.contentUrl = 'Enter a valid URL beginning with http:// or https://.';
     }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      addToast('error', 'يرجى تصحيح الأخطاء قبل الحفظ.');
+      addToast('error', 'Unable to save the lesson. Please try again.');
       return;
     }
 
@@ -275,7 +275,7 @@ export function AdminLessonEditor() {
         description: description.trim() || null,
         lesson_type: lessonType,
         type: lessonType === 'article' || lessonType === 'pdf' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
-        duration: (typeof duration === 'string' ? duration.trim() : typeof duration === 'number' ? String(duration) : '') || (estimatedMinutes ? `${estimatedMinutes} دقيقة` : null),
+        duration: (typeof duration === 'string' ? duration.trim() : typeof duration === 'number' ? String(duration) : '') || (estimatedMinutes ? `${estimatedMinutes} Minute` : null),
         estimated_minutes: estimatedMinutes,
         thumbnail: thumbnail.trim() || null,
         video_url: videoUrl.trim() || null,
@@ -298,10 +298,10 @@ export function AdminLessonEditor() {
 
       if (isEditMode && lessonId) {
         await LessonService.updateLesson(lessonId, payload);
-        addToast('success', 'تم حفظ التغيرات بنجاح!');
+        addToast('success', 'Save!');
       } else {
         const newLesson = await LessonService.createLesson(payload);
-        addToast('success', 'تم إنشاء الدرس بنجاح!');
+        addToast('success', 'Create!');
         setIsDirty(false);
         setTimeout(() => {
           navigate(`/admin/courses/${courseId}/lessons/${newLesson.id}/edit`, { replace: true });
@@ -312,7 +312,7 @@ export function AdminLessonEditor() {
       setIsDirty(false);
     } catch (err: any) {
       console.error('Error saving lesson:', err);
-      addToast('error', err.message || 'حدث خطأ أثناء حفظ الدرس.');
+      addToast('error', err.message || 'Unable to save the lesson. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -324,13 +324,13 @@ export function AdminLessonEditor() {
     try {
       setIsSaving(true);
       const copy = await LessonService.duplicateLesson(lessonId);
-      addToast('success', 'تم نسخ الدرس بنجاح!');
+      addToast('success', 'Lesson!');
       setTimeout(() => {
         navigate(`/admin/courses/${courseId}/lessons/${copy.id}/edit`);
       }, 500);
     } catch (err: any) {
       console.error('Error duplicating lesson:', err);
-      addToast('error', 'تعذر تكرار الدرس.');
+      addToast('error', 'Unable to create the lesson. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -342,11 +342,11 @@ export function AdminLessonEditor() {
     try {
       setIsSaving(true);
       await LessonService.deleteLesson(lessonId, sectionId);
-      addToast('success', 'تم حذف الدرس بنجاح.');
+      addToast('success', 'Lesson deleted successfully.');
       navigate(`/admin/courses/${courseId}/builder`);
     } catch (err: any) {
       console.error('Error deleting lesson:', err);
-      addToast('error', 'تعذر حذف الدرس.');
+      addToast('error', 'Unable to delete the lesson. Please try again.');
     } finally {
       setIsSaving(false);
       setShowDeleteConfirm(false);
@@ -369,7 +369,7 @@ export function AdminLessonEditor() {
   };
 
   return (
-    <div className="min-h-screen bg-primary-50 font-sans rtl" dir="rtl">
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
@@ -383,11 +383,11 @@ export function AdminLessonEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (isDirty && !window.confirm('لديك تغييرات غير محفوظة، هل أنت تأكد من المغادرة؟')) return;
+                    if (isDirty && !window.confirm('You have unsaved changes. Leave this page?')) return;
                     navigate(`/admin/courses/${courseId}/builder`);
                   }}
                   className="p-2.5 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
-                  title="العودة لـ Course Builder"
+                  title="Back to Course Builder"
                 >
                   <ArrowRight className="w-5 h-5" />
                 </button>
@@ -396,7 +396,7 @@ export function AdminLessonEditor() {
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
                       {getLessonTypeIcon(lessonType)}
-                      <span>محرر الدروس المتقدم</span>
+                      <span>Lesson</span>
                     </span>
 
                     <span
@@ -406,27 +406,27 @@ export function AdminLessonEditor() {
                           : 'bg-amber-100 text-amber-800 border-amber-200'
                       }`}
                     >
-                      {isPublished ? 'منشور' : 'مسودة'}
+                      {isPublished ? 'Published' : 'Draft'}
                     </span>
 
                     {isPreview && (
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-                        معاينة مجانية
+                        Free
                       </span>
                     )}
 
                     {isDirty && (
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white animate-pulse">
-                        تغيرات غير محفوظة
+                        Unsaved Changes
                       </span>
                     )}
                   </div>
 
                   <h1 className="text-xl sm:text-2xl font-bold text-primary-900 leading-tight">
-                    {title || (isEditMode ? 'تعديل الدرس' : 'إضافة درس جديد')}
+                    {title || (isEditMode ? 'Edit Lesson' : 'Add Lesson')}
                   </h1>
                   <p className="text-primary-500 text-xs mt-0.5">
-                    الكورس: <span className="font-bold text-primary-800">{course?.title || 'جاري التحميل...'}</span>
+                    Course: <span className="font-bold text-primary-800">{course?.title || 'Loading...'}</span>
                   </p>
                 </div>
               </div>
@@ -440,10 +440,10 @@ export function AdminLessonEditor() {
                       onClick={handleDuplicate}
                       disabled={isSaving}
                       className="bg-primary-50 hover:bg-primary-100 text-primary-800 border border-primary-200 font-bold py-2.5 px-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
-                      title="تكرار الدرس"
+                      title="Duplicate lesson"
                     >
                       <Copy className="w-4 h-4 text-primary-600" />
-                      <span className="hidden sm:inline">تكرار (Duplicate)</span>
+                      <span className="hidden sm:inline">Duplicate Lesson</span>
                     </button>
 
                     <button
@@ -451,10 +451,10 @@ export function AdminLessonEditor() {
                       onClick={() => setShowDeleteConfirm(true)}
                       disabled={isSaving}
                       className="bg-danger-50 hover:bg-danger-100 text-danger-700 border border-danger-200 font-bold py-2.5 px-3.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
-                      title="حذف الدرس"
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
-                      <span className="hidden sm:inline">حذف</span>
+                      <span className="hidden sm:inline">Delete</span>
                     </button>
                   </>
                 )}
@@ -466,7 +466,7 @@ export function AdminLessonEditor() {
                   className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xs"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>{isSaving ? 'جاري الحفظ...' : 'حفظ التغيرات'}</span>
+                  <span>{isSaving ? 'Saving...' : 'Save'}</span>
                 </Button>
               </div>
             </div>
@@ -474,10 +474,10 @@ export function AdminLessonEditor() {
             {/* Navigation Tabs Bar */}
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
-                { id: 'general', label: 'البيانات العامة (General)', icon: SettingsIcon },
-                { id: 'content', label: 'محتوى الدرس (Content)', icon: FileText },
-                { id: 'access', label: 'الوصول والشروط (Access)', icon: Lock },
-                { id: 'settings', label: 'الإعدادات وSEO (Settings)', icon: Globe },
+                { id: 'general', label: 'General', icon: SettingsIcon },
+                { id: 'content', label: 'Content (Content)', icon: FileText },
+                { id: 'access', label: 'Access', icon: Lock },
+                { id: 'settings', label: 'SettingsSEO (Settings)', icon: Globe },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -503,13 +503,13 @@ export function AdminLessonEditor() {
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
               <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-              <p className="text-primary-700 font-bold text-sm">جاري تحميل محرر الدرس...</p>
+              <p className="text-primary-700 font-bold text-sm">Loading...</p>
             </div>
           ) : errorMessage ? (
-            <div className="bg-white border border-danger-200 rounded-2xl p-6 text-right shadow-xs">
+            <div className="bg-white border border-danger-200 rounded-2xl p-6 text-left shadow-xs">
               <div className="flex items-center gap-3 text-danger-600 mb-2">
                 <AlertCircle className="w-5 h-5" />
-                <h3 className="font-bold text-base">خطأ في التحميل</h3>
+                <h3 className="font-bold text-base">Error</h3>
               </div>
               <p className="text-primary-700 text-sm mb-4">{errorMessage}</p>
               <button
@@ -517,7 +517,7 @@ export function AdminLessonEditor() {
                 onClick={loadData}
                 className="bg-primary-900 text-white font-bold text-xs py-2 px-4 rounded-xl hover:bg-primary-800"
               >
-                إعادة المحاولة
+                Retry
               </button>
             </div>
           ) : (
@@ -527,14 +527,14 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <SettingsIcon className="w-5 h-5 text-amber-600" />
-                    <span>المعلومات الأساسية للدرس</span>
+                    <span>Lesson</span>
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Title */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        عنوان الدرس *
+                        Lesson *
                       </label>
                       <input
                         type="text"
@@ -544,7 +544,7 @@ export function AdminLessonEditor() {
                           setIsDirty(true);
                           if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                         }}
-                        placeholder="مثال: مقدمة في إطار العمل وتثبيت البيئة"
+                        placeholder="Example: Introduction to Skin Physiology"
                         className={`w-full px-4 py-2.5 bg-white border ${
                           errors.title ? 'border-danger-500' : 'border-primary-200'
                         } rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium`}
@@ -556,7 +556,7 @@ export function AdminLessonEditor() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <label className="text-xs font-bold text-primary-900">
-                          رابط الدرس المخصص (Slug)
+                          Lesson (Slug)
                         </label>
                         <button
                           type="button"
@@ -564,7 +564,7 @@ export function AdminLessonEditor() {
                           className="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span>توليد تلقائي</span>
+                          <span>Generate from Title</span>
                         </button>
                       </div>
                       <input
@@ -583,7 +583,7 @@ export function AdminLessonEditor() {
                     {/* Section Selector */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        القسم التابع له (Section)
+                        Section (Section)
                       </label>
                       <select
                         value={sectionId}
@@ -595,7 +595,7 @@ export function AdminLessonEditor() {
                       >
                         {sections.map((sec, idx) => (
                           <option key={sec.id} value={sec.id}>
-                            القسم {idx + 1}: {sec.title}
+                            Section {idx + 1}: {sec.title}
                           </option>
                         ))}
                       </select>
@@ -604,19 +604,19 @@ export function AdminLessonEditor() {
                     {/* Lesson Type */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        نوع الدرس والمحتوى
+                        Content
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
-                          { id: 'video', label: 'فيديو (Video)', icon: Video, color: 'text-amber-600' },
-                          { id: 'article', label: 'مقال / نص (Article)', icon: FileText, color: 'text-emerald-600' },
-                          { id: 'pdf', label: 'ملف PDF', icon: FileCode, color: 'text-red-600' },
-                          { id: 'audio', label: 'صوتيات (Audio)', icon: Volume2, color: 'text-purple-600' },
-                          { id: 'external_link', label: 'رابط خارجي', icon: ExternalLink, color: 'text-blue-600' },
-                          { id: 'embed', label: 'تضمين Embed', icon: Code, color: 'text-indigo-600' },
-                          { id: 'live', label: 'بث مباشر Live', icon: Radio, color: 'text-rose-600' },
-                          { id: 'quiz', label: 'اختبار Quiz', icon: HelpCircle, color: 'text-amber-600' },
-                          { id: 'assignment', label: 'واجب Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
+                          { id: 'video', label: 'Video', icon: Video, color: 'text-amber-600' },
+                          { id: 'article', label: 'Article', icon: FileText, color: 'text-emerald-600' },
+                          { id: 'pdf', label: 'PDF Document', icon: FileCode, color: 'text-red-600' },
+                          { id: 'audio', label: 'Audio', icon: Volume2, color: 'text-purple-600' },
+                          { id: 'external_link', label: 'Link', icon: ExternalLink, color: 'text-blue-600' },
+                          { id: 'embed', label: 'Embedded Content', icon: Code, color: 'text-indigo-600' },
+                          { id: 'live', label: 'Live Session', icon: Radio, color: 'text-rose-600' },
+                          { id: 'quiz', label: 'Quiz Quiz', icon: HelpCircle, color: 'text-amber-600' },
+                          { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
                         ].map((typeItem) => {
                           const Icon = typeItem.icon;
                           const isSelected = lessonType === typeItem.id;
@@ -645,7 +645,7 @@ export function AdminLessonEditor() {
                     {/* Estimated Duration */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        المدة التقديرية (بالدقائق)
+                        Duration (Minutes)
                       </label>
                       <input
                         type="number"
@@ -654,7 +654,7 @@ export function AdminLessonEditor() {
                         onChange={(e) => {
                           const val = parseInt(e.target.value) || 0;
                           setEstimatedMinutes(val);
-                          setDuration(`${val} دقيقة`);
+                          setDuration(`${val} Minute`);
                           setIsDirty(true);
                         }}
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
@@ -664,7 +664,7 @@ export function AdminLessonEditor() {
                     {/* Thumbnail URL */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        رابط صورة مصغرة للدرس (Thumbnail)
+                        Lesson Thumbnail URL
                       </label>
                       <input
                         type="url"
@@ -682,7 +682,7 @@ export function AdminLessonEditor() {
                     {/* Description */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        وصف الدرس
+                        Lesson Description
                       </label>
                       <textarea
                         rows={3}
@@ -691,7 +691,7 @@ export function AdminLessonEditor() {
                           setDescription(e.target.value);
                           setIsDirty(true);
                         }}
-                        placeholder="اكتب نبذة مختصرة تشرح للطلاب ماذا سيتعلمون في هذا الدرس..."
+                        placeholder="Briefly describe what students will learn in this lesson..."
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                       />
                     </div>
@@ -704,7 +704,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     {getLessonTypeIcon(lessonType)}
-                    <span>تفاصيل المحتوى - {lessonType.toUpperCase()}</span>
+                    <span>Lesson Content — {lessonType.toUpperCase()}</span>
                   </h3>
 
                   {/* Video Content Fields */}
@@ -712,7 +712,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          رابط الفيديو (YouTube, Vimeo, MP4, HLS) *
+                          Video URL (YouTube, Vimeo, MP4, or HLS) *
                         </label>
                         <input
                           type="url"
@@ -730,7 +730,7 @@ export function AdminLessonEditor() {
 
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          تفريغ الفيديو النصي (Transcript)
+                          Transcript URL
                         </label>
                         <textarea
                           rows={4}
@@ -739,7 +739,7 @@ export function AdminLessonEditor() {
                             setTranscript(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="اكتب تفريغ الكلمات والحوار في الفيديو لتعزيز إمكانية الوصول وSEO..."
+                          placeholder="lesson-url-slug"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                         />
                       </div>
@@ -747,7 +747,7 @@ export function AdminLessonEditor() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-bold text-primary-900 mb-2">
-                            رابط ملف الترجمة (VTT / Captions)
+                            Link (VTT / Captions)
                           </label>
                           <input
                             type="url"
@@ -764,7 +764,7 @@ export function AdminLessonEditor() {
 
                         <div>
                           <label className="block text-xs font-bold text-primary-900 mb-2">
-                            ملاحظات إضافية تحت الفيديو
+                            Unsaved Changes
                           </label>
                           <input
                             type="text"
@@ -773,7 +773,7 @@ export function AdminLessonEditor() {
                               setNotes(e.target.value);
                               setIsDirty(true);
                             }}
-                            placeholder="ملاحظات أو روابط مكملة للفيديو..."
+                            placeholder="Enter details..."
                             className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                           />
                         </div>
@@ -786,7 +786,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          محتوى المقال أو الدرس النصي الكامل
+                          Content
                         </label>
                         <textarea
                           rows={12}
@@ -795,7 +795,7 @@ export function AdminLessonEditor() {
                             setContent(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="اكتب شروح المقال هنا بالتفصيل (يدعم تنسيقات HTML و Markdown)..."
+                          placeholder="Enter lesson content using HTML or Markdown..."
                           className="w-full p-4 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-mono leading-relaxed"
                         />
                       </div>
@@ -807,7 +807,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          رابط ملف PDF *
+                          Link PDF *
                         </label>
                         <input
                           type="url"
@@ -833,7 +833,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>السماح بتحميل الملف للمشتركين</span>
+                          <span>Generate from Title</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary-900">
@@ -846,7 +846,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>تفعيل العلامة المائية باسم الطالب</span>
+                          <span>Generate from Title</span>
                         </label>
                       </div>
                     </div>
@@ -857,7 +857,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          رابط ملف الصوت (MP3, WAV, Podcast URL) *
+                          Link (MP3, WAV, Podcast URL) *
                         </label>
                         <input
                           type="url"
@@ -879,7 +879,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          رابط الوجهة الخارجية (External URL) *
+                          Link (External URL) *
                         </label>
                         <input
                           type="url"
@@ -904,7 +904,7 @@ export function AdminLessonEditor() {
                           }}
                           className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                         />
-                        <span>فتح الرابط في تبويب جديد (New Tab)</span>
+                        <span>Link (New Tab)</span>
                       </label>
                     </div>
                   )}
@@ -914,7 +914,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          كود التضمين (Embed HTML Code / iFrame)
+                          Embed Code (HTML or iFrame)
                         </label>
                         <textarea
                           rows={6}
@@ -936,7 +936,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          رابط الجلسة المباشرة (Zoom, Google Meet, YouTube Live)
+                          Link (Zoom, Google Meet, YouTube Live)
                         </label>
                         <input
                           type="url"
@@ -956,9 +956,9 @@ export function AdminLessonEditor() {
                   {/* Quiz Notification */}
                   {lessonType === 'quiz' && (
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs leading-relaxed space-y-2">
-                      <p className="font-bold">ملاحظة حول إنشاء وتعديل أسئلة الاختبار:</p>
+                      <p className="font-bold">Review the quiz information and continue when you are ready.:</p>
                       <p>
-                        هذا الدرس من نوع (اختبار). يمكنك ضبط العنوان والمدة والشروط من هنا، وإدارة الأسئلة والإجابات عبر مُنشئ الاختبارات المخصص (Quiz Builder).
+                        Lesson (Quiz). Review the quiz information and continue when you are ready. (Quiz Builder).
                       </p>
                     </div>
                   )}
@@ -968,7 +968,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          تعليمات الواجب وتكليفات الطلاب
+                          Students
                         </label>
                         <textarea
                           rows={6}
@@ -977,7 +977,7 @@ export function AdminLessonEditor() {
                             setContent(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="اكتب التكليف والمطلوب من الطالب رفعه بالتفصيل..."
+                          placeholder="Enter details..."
                           className="w-full p-4 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                         />
                       </div>
@@ -991,16 +991,16 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Lock className="w-5 h-5 text-amber-600" />
-                    <span>شروط الوصول وحالة النشر</span>
+                    <span>Publish</span>
                   </h3>
 
                   <div className="space-y-6">
                     {/* Published Toggle */}
                     <div className="flex items-center justify-between p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
                       <div>
-                        <h4 className="font-bold text-primary-900 text-sm">حالة نشر الدرس</h4>
+                        <h4 className="font-bold text-primary-900 text-sm">Publish</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          عند النشر يصبح الدرس متاحًا للطلاب المشتركين.
+                          Publish.
                         </p>
                       </div>
 
@@ -1021,9 +1021,9 @@ export function AdminLessonEditor() {
                     {/* Free Preview Toggle */}
                     <div className="flex items-center justify-between p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
                       <div>
-                        <h4 className="font-bold text-primary-900 text-sm">معاينة مجانية (Free Preview)</h4>
+                        <h4 className="font-bold text-primary-900 text-sm">Free (Free Preview)</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          السماح للزوار غير المسجلين بمشاهدة هذا الدرس كمعاينة مجانية للكورس.
+                          Unable to load this content. Please try again.
                         </p>
                       </div>
 
@@ -1044,7 +1044,7 @@ export function AdminLessonEditor() {
                     {/* Completion Rule */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        شرط إكمال الدرس (Completion Rule)
+                        Lesson (Completion Rule)
                       </label>
                       <select
                         value={completionRule}
@@ -1054,11 +1054,11 @@ export function AdminLessonEditor() {
                         }}
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold"
                       >
-                        <option value="manual">تأكيد الإكمال يدويًا بواسطة الطالب</option>
-                        <option value="watch90">مشاهدة 90% من مدة الفيديو</option>
-                        <option value="read_end">قراءة المحتوى حتى نهاية الصفحة</option>
-                        <option value="pass_quiz">اجتياز الاختبار المرتبط بالدرس</option>
-                        <option value="upload_assignment">رفع الملف الخاص بالواجب</option>
+                        <option value="manual">Confirm</option>
+                        <option value="watch90">Watch 90% of Video</option>
+                        <option value="read_end">Content</option>
+                        <option value="pass_quiz">Lesson</option>
+                        <option value="upload_assignment">Upload Assignment</option>
                       </select>
                     </div>
                   </div>
@@ -1070,14 +1070,14 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-amber-600" />
-                    <span>إعدادات الترتيب ومحركات البحث (SEO)</span>
+                    <span>Search (SEO)</span>
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Order Index */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        ترتيب الدرس داخل القسم (Order Index)
+                        Lesson (Order Index)
                       </label>
                       <input
                         type="number"
@@ -1093,7 +1093,7 @@ export function AdminLessonEditor() {
                     {/* SEO Title */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        عنوان صفحة الدرس لمحركات البحث (SEO Title)
+                        Search (SEO Title)
                       </label>
                       <input
                         type="text"
@@ -1102,7 +1102,7 @@ export function AdminLessonEditor() {
                           setSeoTitle(e.target.value);
                           setIsDirty(true);
                         }}
-                        placeholder="عنوان جذاب لمحركات البحث..."
+                        placeholder="Search..."
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                       />
                     </div>
@@ -1110,7 +1110,7 @@ export function AdminLessonEditor() {
                     {/* SEO Description */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        وصف الدرس لمحركات البحث (SEO Meta Description)
+                        Search (SEO Meta Description)
                       </label>
                       <textarea
                         rows={3}
@@ -1119,7 +1119,7 @@ export function AdminLessonEditor() {
                           setSeoDescription(e.target.value);
                           setIsDirty(true);
                         }}
-                        placeholder="ملخص محرك البحث..."
+                        placeholder="Search..."
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
                       />
                     </div>
@@ -1137,10 +1137,10 @@ export function AdminLessonEditor() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-primary-200">
             <div className="flex items-center gap-3 text-danger-600">
               <ShieldAlert className="w-6 h-6" />
-              <h3 className="font-bold text-lg text-primary-900">تأكيد حذف الدرس</h3>
+              <h3 className="font-bold text-lg text-primary-900">Delete</h3>
             </div>
             <p className="text-primary-700 text-sm leading-relaxed">
-              هل أنت تأكد من رغبتك في حذف درس <strong className="text-primary-900">{title}</strong>؟ لا يمكن التراجع عن هذه العملية بعد إتمامها.
+              Delete <strong className="text-primary-900">{title}</strong>? This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-3 pt-3">
               <button
@@ -1148,7 +1148,7 @@ export function AdminLessonEditor() {
                 onClick={() => setShowDeleteConfirm(false)}
                 className="px-4 py-2 rounded-xl border border-primary-200 font-bold text-xs text-primary-700 hover:bg-primary-50"
               >
-                إلغاء
+                Cancel
               </button>
               <Button
                 type="button"
@@ -1157,7 +1157,7 @@ export function AdminLessonEditor() {
                 className="px-5 py-2 rounded-xl bg-danger-600 hover:bg-danger-700 text-white font-bold text-xs flex items-center gap-1.5"
               >
                 {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>نعم، احذف الدرس</span>
+                <span>Delete</span>
               </Button>
             </div>
           </div>

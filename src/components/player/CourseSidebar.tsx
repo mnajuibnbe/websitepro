@@ -61,10 +61,10 @@ export function CourseSidebar({
   const completedCount = lessons.filter((l) => completedLessonIds.includes(l.id)).length;
 
   return (
-    <div className="bg-white border border-primary-200 rounded-2xl flex flex-col h-full max-h-[800px] shadow-sm text-right" dir="rtl">
+    <div className="bg-white border border-primary-200 rounded-2xl flex flex-col h-full max-h-[800px] shadow-sm text-left" dir="ltr">
       {/* Header */}
       <div className="p-4 md:p-5 border-b border-primary-200 bg-primary-50/50 rounded-t-2xl">
-        <h2 className="font-bold text-primary-900 mb-2 text-base">محتوى الكورس</h2>
+        <h2 className="font-bold text-primary-900 mb-2 text-base">Course</h2>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-accent-600 transition-all duration-500 rounded-full"
@@ -72,9 +72,9 @@ export function CourseSidebar({
           />
         </div>
         <p className="text-xs text-primary-600 font-semibold mt-2.5 flex items-center justify-between">
-          <span>الإنجاز الكلي</span>
+          <span>Course Progress</span>
           <span>
-            {completedCount} من {totalLessons} دروس ({progressPercentage}%)
+            {completedCount} of {totalLessons} lessons ({progressPercentage}%)
           </span>
         </p>
       </div>
@@ -83,7 +83,7 @@ export function CourseSidebar({
       <div className="overflow-y-auto flex-grow divide-y divide-primary-100">
         {sections.length === 0 ? (
           <div className="p-6 text-center text-primary-500 text-sm">
-            لا توجد أقسام منشورة في هذا الكورس.
+            No items are available yet..
           </div>
         ) : (
           sections.map((section) => {
@@ -97,14 +97,14 @@ export function CourseSidebar({
               <div key={section.id} className="transition-colors">
                 <button
                   onClick={() => toggleSection(section.id)}
-                  className="w-full flex items-center justify-between p-4 min-h-[48px] hover:bg-primary-50/80 transition-colors focus:outline-none text-right"
+                  className="w-full flex items-center justify-between p-4 min-h-[48px] hover:bg-primary-50/80 transition-colors focus:outline-none text-left"
                 >
-                  <div className="flex flex-col items-start gap-1 text-right max-w-[85%]">
+                  <div className="flex flex-col items-start gap-1 text-left max-w-[85%]">
                     <span className={`font-bold text-sm leading-snug ${isOpen ? 'text-primary-900' : 'text-primary-800'}`}>
                       {section.title}
                     </span>
                     <span className="text-xs text-primary-500 font-medium">
-                      {secCompletedCount} / {sectionLessons.length} دروس مكتملة
+                      {secCompletedCount} / {sectionLessons.length} Completed
                     </span>
                   </div>
                   <ChevronDown
@@ -117,7 +117,7 @@ export function CourseSidebar({
                 {isOpen && (
                   <div className="bg-primary-50/40 pb-2 border-t border-primary-100">
                     {sectionLessons.length === 0 ? (
-                      <div className="p-3 px-4 text-xs text-primary-400">لا توجد دروس في هذا القسم.</div>
+                      <div className="p-3 px-4 text-xs text-primary-400">No items are available yet..</div>
                     ) : (
                       sectionLessons.map((lesson) => {
                         const isCurrent = lesson.id === currentLessonId;
@@ -127,7 +127,7 @@ export function CourseSidebar({
                           <button
                             key={lesson.id}
                             onClick={() => onLessonSelect(lesson)}
-                            className={`w-full flex items-start gap-3 p-3 px-4 min-h-[48px] transition-all text-right group ${
+                            className={`w-full flex items-start gap-3 p-3 px-4 min-h-[48px] transition-all text-left group ${
                               isCurrent
                                 ? 'bg-accent-50/90 border-r-4 border-accent-600 shadow-inner'
                                 : 'border-r-4 border-transparent hover:bg-white'
@@ -161,7 +161,7 @@ export function CourseSidebar({
                                 ) : (
                                   <FileText className="w-3.5 h-3.5 text-primary-400" />
                                 )}
-                                <span>{lesson.duration || (lesson.type === 'video' ? 'فيديو' : 'محتوى نصي')}</span>
+                                <span>{lesson.duration || (lesson.type === 'video' ? 'Video lesson' : 'Content')}</span>
                               </div>
                             </div>
                           </button>

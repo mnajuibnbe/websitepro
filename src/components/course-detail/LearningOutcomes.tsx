@@ -3,18 +3,18 @@ import { Check } from 'lucide-react';
 
 export function LearningOutcomes() {
   const outcomes = [
-    'فهم البنية الكيميائية لمستحضرات التجميل وكيفية تفاعل المكونات مع البشرة.',
-    'تقييم المنتجات المتوفرة في السوق بناءً على أسس علمية بعيداً عن التسويق.',
-    'تصميم روتين عناية متكامل ومخصص لمختلف أنواع ومشاكل البشرة والشعر.',
-    'تحليل ملصقات المكونات (INCI) ومعرفة الفعالية الحقيقية لكل منتج.',
-    'التعرف على التداخلات الكيميائية بين المواد الفعالة وتجنب الأضرار.',
-    'تقديم استشارات دقيقة وموثوقة للعملاء بثقة مبنية على دليل علمي.'
+    'Explain the scientific principles behind common cosmeceutical ingredients.',
+    'Evaluate product formulations using evidence-based criteria.',
+    'Recommend appropriate routines for common client needs.',
+    'Interpret ingredient lists using International Nomenclature of Cosmetic Ingredients (INCI).',
+    'Apply course concepts to practical professional scenarios.',
+    'Communicate product guidance clearly and responsibly.'
   ];
 
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        ماذا ستتعلمين؟
+        What You Will Learn
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         {outcomes.map((outcome, index) => (
