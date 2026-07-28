@@ -41,6 +41,10 @@ const AdminCourseEdit = lazyNamed(() => import('./pages/admin/AdminCourseEdit'),
 const AdminCourseBuilder = lazyNamed(() => import('./pages/admin/AdminCourseBuilder'), 'AdminCourseBuilder');
 const AdminLessonEditor = lazyNamed(() => import('./pages/admin/AdminLessonEditor'), 'AdminLessonEditor');
 const AdminUserManagement = lazyNamed(() => import('./pages/admin/AdminUserManagement'), 'AdminUserManagement');
+const AdminCourseEnrollments = lazyNamed(() => import('./pages/admin/AdminCourseEnrollments'), 'AdminCourseEnrollments');
+const InstructorApplication = lazyNamed(() => import('./pages/InstructorApplication'), 'InstructorApplication');
+const AdminInstructorApplications = lazyNamed(() => import('./pages/admin/AdminInstructorApplications'), 'AdminInstructorApplications');
+const AdminCourseReviews = lazyNamed(() => import('./pages/admin/AdminCourseReviews'), 'AdminCourseReviews');
 
 function RouteFallback() {
   return <div role="status" aria-live="polite" className="flex min-h-screen items-center justify-center bg-primary-50"><span className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-accent-600" /><span className="sr-only">Loading page</span></div>;
@@ -75,6 +79,8 @@ function AppContent() {
       <Route path="/checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
+      <Route path="/instructor/apply" element={<RequireAuth><InstructorApplication /></RequireAuth>} />
+      <Route path="/instructor/courses/new" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
       <Route path="/learn/:courseId" element={<RequireAuth><CourseLearnResolver /></RequireAuth>} />
       <Route path="/learn/:courseId/lesson/:lessonId" element={<RequireAuth><LessonPlayer /></RequireAuth>} />
@@ -86,12 +92,14 @@ function AppContent() {
       <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />
       <Route path="/admin/courses" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseManager /></RequireAuth>} />
       <Route path="/admin/courses/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
-      <Route path="/admin/courses/:courseId/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseEdit /></RequireAuth>} />
-      <Route path="/admin/courses/:courseId/builder" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseBuilder /></RequireAuth>} />
-      <Route path="/admin/courses/:courseId/lessons/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminLessonEditor /></RequireAuth>} />
-      <Route path="/admin/courses/:courseId/lessons/:lessonId/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminLessonEditor /></RequireAuth>} />
-      <Route path="/admin/courses/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/edit" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseEdit /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/builder" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseBuilder /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/students" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseEnrollments /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/lessons/new" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminLessonEditor /></RequireAuth>} />
+      <Route path="/admin/courses/:courseId/lessons/:lessonId/edit" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminLessonEditor /></RequireAuth>} />
       <Route path="/admin/users" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminUserManagement /></RequireAuth>} />
+      <Route path="/admin/instructors" element={<RequireAuth permission={Permission.MANAGE_INSTRUCTORS}><AdminInstructorApplications /></RequireAuth>} />
+      <Route path="/admin/course-reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviews /></RequireAuth>} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes></Suspense></>

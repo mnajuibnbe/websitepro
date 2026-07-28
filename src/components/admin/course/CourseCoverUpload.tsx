@@ -1,0 +1,45 @@
+import { ChangeEvent, useRef, useState } from 'react';
+import { ImagePlus, Loader2, Trash2, UploadCloud } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { supabase } from '../../../lib/supabase';
+import { OptimizedImage } from '../../ui/OptimizedImage';
+
+const MAX_BYTES = 5 * 1024 * 1024;
+const ACCEPTED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
+
+export function CourseCoverUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const { user } = useAuth();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const selectFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !user) return;
+    if (!ACCEPTED.has(file.type)) { setError('Choose a JPG, PNG, WebP, or AVIF image.'); return; }
+    if (file.size > MAX_BYTES) { setError('The cover image must be 5 MB or smaller.'); return; }
+    setUploading(true); setError(null);
+    try {
+      const bitmap = await createImageBitmap(file);
+      if (bitmap.width < 800 || bitmap.height < 450) throw new Error('Use an image at least 800 × 450 pixels.');
+      const ratio = bitmap.width / bitmap.height;
+      bitmap.close();
+      if (ratio < 1.4 || ratio > 2) throw new Error('Use a landscape image close to a 16:9 aspect ratio.');
+      const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+      const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
+      const { error: uploadError } = await supabase.storage.from('course-covers').upload(path, file, { contentType: file.type, cacheControl: '31536000', upsert: false });
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('course-covers').getPublicUrl(path);
+      onChange(data.publicUrl);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'The cover could not be uploaded. Please try again.');
+    } finally { setUploading(false); }
+  };
+
+  return <div className="max-w-2xl"><span className="mb-2 block text-sm font-bold text-primary-900">Course cover</span>
+    <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" onChange={event => void selectFile(event)} />
+    {value ? <div className="overflow-hidden rounded-2xl border border-primary-200 bg-primary-50"><div className="aspect-video"><OptimizedImage src={value} alt="Course cover preview" displayWidth={1200} className="h-full w-full object-cover" /></div><div className="flex flex-wrap items-center justify-between gap-3 p-3"><p className="text-xs text-primary-500">Used automatically in the catalog and course sales page.</p><div className="flex gap-2"><button type="button" disabled={uploading} onClick={() => inputRef.current?.click()} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-primary-200 bg-white px-3 text-sm font-bold text-primary-700"><UploadCloud className="h-4 w-4" />Replace</button><button type="button" onClick={() => onChange('')} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-danger-200 bg-white px-3 text-sm font-bold text-danger-700"><Trash2 className="h-4 w-4" />Remove</button></div></div></div> : <button type="button" disabled={uploading} onClick={() => inputRef.current?.click()} className="flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary-300 bg-primary-50 p-6 text-center hover:border-amber-500 hover:bg-amber-50/40 focus:ring-2 focus:ring-amber-500">{uploading ? <Loader2 className="mb-3 h-8 w-8 animate-spin text-amber-600" /> : <ImagePlus className="mb-3 h-8 w-8 text-amber-600" />}<span className="font-bold text-primary-900">{uploading ? 'Uploading cover…' : 'Upload course cover'}</span><span className="mt-1 text-xs text-primary-500">JPG, PNG, WebP, or AVIF · up to 5 MB · at least 800 × 450</span></button>}
+    {error && <p role="alert" className="mt-2 text-sm font-bold text-danger-600">{error}</p>}
+  </div>;
+}

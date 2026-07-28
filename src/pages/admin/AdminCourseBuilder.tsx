@@ -44,6 +44,7 @@ import { LessonService } from '../../services/lesson.service';
 import { CurriculumBuilder } from '../../components/admin/curriculum/CurriculumBuilder';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { recordAdminAudit } from '../../lib/adminAudit';
+import { CourseReviewPanel } from '../../components/admin/course/CourseReviewPanel';
 
 type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 
@@ -68,13 +69,6 @@ export function AdminCourseBuilder() {
   const [newSectionTitle, setNewSectionTitle] = useState('');
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [editingSectionTitle, setEditingSectionTitle] = useState('');
-
-  const [isAddLessonOpen, setIsAddLessonOpen] = useState<string | null>(null); // sectionId
-  const [newLessonTitle, setNewLessonTitle] = useState('');
-  const [newLessonType, setNewLessonType] = useState<'video' | 'text' | 'quiz'>('video');
-  const [newLessonUrl, setNewLessonUrl] = useState('');
-  const [newLessonDuration, setNewLessonDuration] = useState('');
-  const [newLessonPreview, setNewLessonPreview] = useState(false);
 
   // SEO Form Fields
   const [seoTitle, setSeoTitle] = useState('');
@@ -278,43 +272,6 @@ export function AdminCourseBuilder() {
     }
   };
 
-  const handleAddLesson = async (e: React.FormEvent, sectionId: string) => {
-    e.preventDefault();
-    if (!courseId || !newLessonTitle.trim()) return;
-
-    try {
-      setIsSaving(true);
-      const sectionLessons = lessons.filter((l) => l.section_id === sectionId);
-      const nextOrder = sectionLessons.length > 0 ? Math.max(...sectionLessons.map((l) => l.order_index)) + 1 : 0;
-
-      const createdLesson = await LessonService.createLesson({
-        course_id: courseId,
-        section_id: sectionId,
-        title: newLessonTitle.trim(),
-        lesson_type: newLessonType,
-        type: newLessonType,
-        video_url: newLessonUrl.trim() || null,
-        duration: typeof newLessonDuration === 'string' ? newLessonDuration.trim() || null : typeof newLessonDuration === 'number' ? String(newLessonDuration) : null,
-        is_preview: newLessonPreview,
-        is_published: true,
-        order_index: nextOrder,
-      });
-
-      setLessons((prev) => [...prev, createdLesson]);
-      setNewLessonTitle('');
-      setNewLessonUrl('');
-      setNewLessonDuration('');
-      setNewLessonPreview(false);
-      setIsAddLessonOpen(null);
-      addToast('success', 'Add');
-    } catch (err: any) {
-      console.error('Error adding lesson:', err);
-      addToast('error', err.message || 'Add.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleDuplicateLesson = async (lessonId: string) => {
     try {
       setIsSaving(true);
@@ -391,40 +348,6 @@ export function AdminCourseBuilder() {
         const fresh = await LessonService.getLessonsByCourse(courseId);
         setLessons(fresh);
       }
-    }
-  };
-
-  // Quick Status Toggle
-  const handleTogglePublish = async () => {
-    if (!course) return;
-    const newStatus: 'published' | 'draft' | 'archived' = course.status === 'published' ? 'draft' : 'published';
-
-    try {
-      const updates: any = {
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      };
-      if (newStatus === 'published') {
-        if (!course.published_at) {
-          updates.published_at = new Date().toISOString();
-        }
-        if (course.visibility === 'private') {
-          addToast('info', 'This course is private and will not appear in the public catalog.');
-        }
-      }
-
-      if ((course.status as string) === 'archived') {
-        updates.archived_at = null;
-      }
-
-      const { error } = await supabase.from('courses').update(updates).eq('id', course.id);
-      if (error) throw error;
-
-      setCourse((prev) => (prev ? { ...prev, ...updates } : null));
-      addToast('success', newStatus === 'published' ? 'Course!' : 'Course');
-    } catch (err: any) {
-      console.error('Error toggling status:', err);
-      addToast('error', 'Publish.');
     }
   };
 
@@ -542,7 +465,7 @@ export function AdminCourseBuilder() {
 
                 <Button
                   type="button"
-                  onClick={handleTogglePublish}
+                  onClick={() => setActiveTab('publish')}
                   className={`font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-colors ${
                     course?.status === 'published'
                       ? 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
@@ -550,7 +473,7 @@ export function AdminCourseBuilder() {
                   }`}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>{course?.status === 'published' ? 'Draft' : 'Course'}</span>
+                  <span>Review status</span>
                 </Button>
               </div>
             </div>
@@ -875,150 +798,14 @@ export function AdminCourseBuilder() {
                                 ))
                               )}
 
-                              {/* Add Lesson Controls */}
-                              {isAddLessonOpen === section.id ? (
-                                <form
-                                  onSubmit={(e) => handleAddLesson(e, section.id)}
-                                  className="mt-4 p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-xs text-amber-900">Add</h5>
-                                    <button
-                                      type="button"
-                                      onClick={() => setIsAddLessonOpen(null)}
-                                      className="text-primary-400 hover:text-primary-700"
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </button>
-                                  </div>
-
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div>
-                                      <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        Lesson *
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={newLessonTitle}
-                                        onChange={(e) => setNewLessonTitle(e.target.value)}
-                                        placeholder="Lesson"
-                                        className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-medium"
-                                      />
-                                    </div>
-
-                                    <div>
-                                      <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        Content
-                                      </label>
-                                      <select
-                                        value={newLessonType}
-                                        onChange={(e) => setNewLessonType(e.target.value as any)}
-                                        className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs font-bold"
-                                      >
-                                        <option value="video">Video Lesson</option>
-                                        <option value="article">Article</option>
-                                        <option value="pdf">PDF Document</option>
-                                        <option value="audio">Audio Lesson</option>
-                                        <option value="quiz">Quiz (Quiz)</option>
-                                      </select>
-                                    </div>
-
-                                    {newLessonType === 'video' && (
-                                      <div>
-                                        <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                          Link (Video URL)
-                                        </label>
-                                        <input
-                                          type="text"
-                                          value={newLessonUrl}
-                                          onChange={(e) => setNewLessonUrl(e.target.value)}
-                                          placeholder="https://..."
-                                          dir="ltr"
-                                          className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs"
-                                        />
-                                      </div>
-                                    )}
-
-                                    <div>
-                                      <label className="block text-[11px] font-bold text-primary-800 mb-1">
-                                        Duration (Example: 12 minutes)
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={newLessonDuration}
-                                        onChange={(e) => setNewLessonDuration(e.target.value)}
-                                        placeholder="12 Minute"
-                                        className="w-full px-3 py-2 bg-white border border-primary-200 rounded-lg text-xs"
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2 pt-1">
-                                    <input
-                                      type="checkbox"
-                                      id={`preview-${section.id}`}
-                                      checked={newLessonPreview}
-                                      onChange={(e) => setNewLessonPreview(e.target.checked)}
-                                      className="rounded border-primary-300 text-amber-600 focus:ring-amber-500"
-                                    />
-                                    <label htmlFor={`preview-${section.id}`} className="text-xs font-bold text-primary-800">
-                                      Lesson
-                                    </label>
-                                  </div>
-
-                                  <div className="flex items-center justify-between pt-2 border-t border-amber-200/60">
-                                    <Link
-                                      to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
-                                      className="text-xs text-amber-800 font-bold hover:underline"
-                                    >
-                                      Lessons ←
-                                    </Link>
-
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => setIsAddLessonOpen(null)}
-                                        className="px-3 py-1.5 bg-white text-primary-700 border border-primary-200 rounded-lg text-xs font-bold"
-                                      >
-                                        Cancel
-                                      </button>
-                                      <button
-                                        type="submit"
-                                        disabled={isSaving}
-                                        className="px-4 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 flex items-center gap-1"
-                                      >
-                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                        <span>Save</span>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </form>
-                              ) : (
-                                <div className="flex items-center gap-2 mt-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsAddLessonOpen(section.id);
-                                      setNewLessonTitle('');
-                                      setNewLessonUrl('');
-                                      setNewLessonDuration('');
-                                      setNewLessonPreview(false);
-                                    }}
-                                    className="flex-1 py-2.5 border border-dashed border-primary-300 bg-primary-50/50 hover:bg-primary-50 text-primary-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
-                                  >
-                                    <Plus className="w-4 h-4 text-primary-600" />
-                                    <span>Add</span>
-                                  </button>
-
-                                  <Link
-                                    to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
-                                    className="py-2.5 px-4 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
-                                  >
-                                    <Edit2 className="w-3.5 h-3.5 text-amber-600" />
-                                    <span>Advanced</span>
-                                  </Link>
-                                </div>
-                              )}
+                              {/* Canonical lesson creation entry point */}
+                              <Link
+                                to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
+                                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-amber-400 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition-colors hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                              >
+                                <Plus className="h-4 w-4" aria-hidden="true" />
+                                <span>Add lesson</span>
+                              </Link>
                             </div>
                           </div>
                         );
@@ -1208,49 +995,7 @@ export function AdminCourseBuilder() {
                     <span>Publish</span>
                   </h2>
 
-                  {/* Checklist */}
-                  <div className="space-y-3">
-                    <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary-900">Course</span>
-                      <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    </div>
-
-                    <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary-900">
-                        Publish ({sections.length} Sections)
-                      </span>
-                      {sections.length > 0 ? (
-                        <CheckCircle className="w-5 h-5 text-emerald-600" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-amber-600" />
-                      )}
-                    </div>
-
-                    <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary-900">
-                        Lessons ({lessons.length})
-                      </span>
-                      {lessons.length > 0 ? (
-                        <CheckCircle className="w-5 h-5 text-emerald-600" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-amber-600" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-4 flex items-center gap-4">
-                    <Button
-                      onClick={handleTogglePublish}
-                      className={`font-bold py-3.5 px-8 rounded-xl text-base flex items-center gap-2 ${
-                        course?.status === 'published'
-                          ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                          : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-                      }`}
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      <span>{course?.status === 'published' ? 'Course' : 'Course'}</span>
-                    </Button>
-                  </div>
+                  {courseId && <CourseReviewPanel courseId={courseId} />}
                 </div>
               )}
             </>

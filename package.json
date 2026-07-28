@@ -11,10 +11,11 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js dist/server.cjs",
     "lint": "tsc --noEmit",
-    "test": "tsx --test src/server/**/*.test.ts",
+    "test": "tsx --test src/server/**/*.test.ts src/domain/**/*.test.ts",
     "test:frontend": "tsx --test src/test/*.frontend.test.tsx",
     "test:browser-smoke": "npm run build && node --test tests/browser/*.test.mjs",
-    "test:quality": "node scripts/quality-audit.mjs"
+    "test:quality": "node scripts/quality-audit.mjs",
+    "test:course-authoring-release": "node scripts/verify-course-authoring-release.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

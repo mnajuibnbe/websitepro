@@ -6,8 +6,8 @@ import { EnrollmentCard } from '../components/course-detail/EnrollmentCard';
 import { LearningOutcomes } from '../components/course-detail/LearningOutcomes';
 import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
 import { Requirements } from '../components/course-detail/Requirements';
-import { CurriculumAccordion } from '../components/course-detail/CurriculumAccordion';
-import { CourseInstructor } from '../components/course-detail/CourseInstructor';
+import { CurriculumAccordion, PublicCurriculumSection } from '../components/course-detail/CurriculumAccordion';
+import { CourseInstructor, PublicInstructorProfile } from '../components/course-detail/CourseInstructor';
 import { CourseReviews } from '../components/course-detail/CourseReviews';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -19,6 +19,8 @@ export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [course, setCourse] = useState<any>(null);
+  const [curriculum, setCurriculum] = useState<PublicCurriculumSection[]>([]);
+  const [instructor, setInstructor] = useState<PublicInstructorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorState, setErrorState] = useState<'invalid_uuid' | 'not_found' | null>(null);
 
@@ -33,11 +35,11 @@ export function CourseDetail() {
           return;
         }
 
-        const { data, error } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('id', id)
-          .single();
+        const [{ data, error }, curriculumResult, instructorResult] = await Promise.all([
+          supabase.from('courses').select('*').eq('id', id).single(),
+          supabase.rpc('get_public_course_curriculum', { p_course_id: id }),
+          supabase.rpc('get_public_course_instructor', { p_course_id: id }),
+        ]);
 
         if (error || !data) {
           setErrorState('not_found');
@@ -45,6 +47,10 @@ export function CourseDetail() {
         }
 
         setCourse(data);
+        if (curriculumResult.error) throw curriculumResult.error;
+        setCurriculum((curriculumResult.data || []) as PublicCurriculumSection[]);
+        if (instructorResult.error) throw instructorResult.error;
+        setInstructor((instructorResult.data || null) as PublicInstructorProfile | null);
       } catch (err) {
         console.error('Error fetching course:', err);
         setErrorState('not_found');
@@ -109,8 +115,8 @@ export function CourseDetail() {
               <LearningOutcomes />
               <WhoIsThisFor />
               <Requirements />
-              <div id="course-curriculum"><CurriculumAccordion /></div>
-              <CourseInstructor />
+              <div id="course-curriculum"><CurriculumAccordion sections={curriculum} /></div>
+              <CourseInstructor instructor={instructor} />
               <CourseReviews />
             </div>
 

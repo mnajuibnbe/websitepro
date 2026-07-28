@@ -123,21 +123,24 @@ export function AdminCourseManager() {
       // Fetch section counts
       const { data: sectionsData, error: secErr } = await supabase
         .from('course_sections')
-        .select('id, course_id');
+        .select('id, course_id')
+        .is('deleted_at', null);
 
       if (secErr) console.error('Error fetching sections:', secErr);
 
       // Fetch lesson counts
       const { data: lessonsData, error: lesErr } = await supabase
         .from('lessons')
-        .select('id, course_id');
+        .select('id, course_id')
+        .is('deleted_at', null);
 
       if (lesErr) console.error('Error fetching lessons:', lesErr);
 
       // Fetch enrollment counts
       const { data: enrollmentsData, error: enrErr } = await supabase
         .from('enrollments')
-        .select('id, course_id');
+        .select('id, course_id')
+        .eq('status', 'active');
 
       if (enrErr) console.error('Error fetching enrollments:', enrErr);
 
@@ -205,19 +208,20 @@ export function AdminCourseManager() {
   const handleUpdateStatus = async (courseId: string, newStatus: 'published' | 'draft' | 'archived') => {
     try {
       const currentCourse = courses.find((c) => c.id === courseId);
+      if (newStatus === 'published' || (newStatus === 'draft' && currentCourse?.status === 'published')) {
+        const { error } = await supabase.rpc('admin_set_course_publication', { p_course_id: courseId, p_publish: newStatus === 'published' });
+        if (error) throw error;
+        setCourses((previous) => previous.map(course => course.id === courseId ? { ...course, status: newStatus } : course));
+        await recordAdminAudit('status_change', 'course', courseId, { from: currentCourse?.status, to: newStatus });
+        addToast('success', newStatus === 'published' ? 'Approved course published.' : 'Course unpublished.');
+        return;
+      }
       const updates: any = {
         status: newStatus,
         updated_at: new Date().toISOString(),
       };
 
-      if (newStatus === 'published') {
-        if (!currentCourse?.published_at) {
-          updates.published_at = new Date().toISOString();
-        }
-        if (currentCourse?.visibility === 'private') {
-          addToast('info', 'Course "course" (Private)course.');
-        }
-      } else if (newStatus === 'archived') {
+      if (newStatus === 'archived') {
         updates.archived_at = new Date().toISOString();
       }
 
@@ -335,9 +339,9 @@ export function AdminCourseManager() {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
               >
-                <option value="all">course</option>
-                <option value="published">Published (Published)</option>
-                <option value="draft">Draft (Draft)</option>
+                <option value="all">All statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
                 <option value="archived">Archived</option>
               </select>
             </div>
@@ -350,7 +354,7 @@ export function AdminCourseManager() {
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
                 >
-                  <option value="all">course</option>
+                  <option value="all">All categories</option>
                   {categoriesList.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
@@ -384,7 +388,7 @@ export function AdminCourseManager() {
             {isLoading ? (
               <div className="p-12 text-center">
                 <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
-                <p className="text-primary-600 font-bold text-sm">Courses...</p>
+                <p className="text-primary-600 font-bold text-sm">Loading courses…</p>
               </div>
             ) : filteredCourses.length === 0 ? (
               <div className="p-12 text-center">
@@ -405,17 +409,30 @@ export function AdminCourseManager() {
                 </Button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="divide-y divide-primary-100 md:hidden">
+                {filteredCourses.map(course => (
+                  <article key={course.id} className="p-4">
+                    <div className="flex items-start gap-3">
+                      {course.thumbnail ? <OptimizedImage src={course.thumbnail} alt="" displayWidth={160} className="h-16 w-24 flex-none rounded-lg object-cover" /> : <div className="flex h-16 w-24 flex-none items-center justify-center rounded-lg bg-amber-50 text-amber-700"><BookOpen className="h-6 w-6" /></div>}
+                      <div className="min-w-0 flex-1"><h2 className="break-words font-bold leading-snug text-primary-900">{course.title}</h2><p className="mt-1 text-sm font-bold text-primary-700">{course.price_egp == null ? 'Price unavailable' : formatCourseAmount(String(course.price_egp), 'EGP')}</p><span className="mt-2 inline-block rounded-full bg-primary-100 px-2.5 py-1 text-xs font-bold text-primary-700">{course.status}</span></div>
+                    </div>
+                    <dl className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-primary-50 p-3 text-center text-xs"><div><dt className="text-primary-500">Sections</dt><dd className="font-bold text-primary-900">{course.sections_count}</dd></div><div><dt className="text-primary-500">Lessons</dt><dd className="font-bold text-primary-900">{course.lessons_count}</dd></div><div><dt className="text-primary-500">Students</dt><dd className="font-bold text-primary-900">{course.enrolled_count}</dd></div></dl><p className="mt-3 text-xs font-bold text-primary-500">Review: {(course.review_status || 'not_submitted').replace('_', ' ')}</p>
+                    <div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="min-h-11 rounded-xl bg-amber-600 px-3 text-sm font-bold text-white">Manage course</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800">Manage students</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/edit`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800">Course settings</button><button type="button" onClick={() => setSelectedCourseForDelete(course)} className="min-h-11 rounded-xl border border-danger-200 px-3 text-sm font-bold text-danger-700">Delete course</button></div>
+                  </article>
+                ))}
+              </div>
+              <div className="hidden overflow-x-auto md:block">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-primary-50/80 text-primary-700 font-bold text-xs border-b border-primary-200">
                     <tr>
                       <th className="py-4 px-5">Course</th>
                       <th className="py-4 px-4">Price</th>
-                      <th className="py-4 px-4">course</th>
-                      <th className="py-4 px-4">course</th>
-                      <th className="py-4 px-4">Update</th>
-                      <th className="py-4 px-4 text-center">Home</th>
-                      <th className="py-4 px-5 text-center">course</th>
+                      <th className="py-4 px-4">Curriculum</th>
+                      <th className="py-4 px-4">Publication and review</th>
+                      <th className="py-4 px-4">Updated</th>
+                      <th className="py-4 px-4 text-center">Home order</th>
+                      <th className="py-4 px-5 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-primary-100 text-sm">
@@ -440,7 +457,7 @@ export function AdminCourseManager() {
                                 </div>
                               )}
                               <div className="min-w-0">
-                                <h4 className="font-bold text-primary-900 text-base leading-snug line-clamp-1 group-hover:text-amber-700 transition-colors">
+                                <h4 className="font-bold text-primary-900 text-base leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors">
                                   {course.title}
                                 </h4>
                                 <div className="flex items-center gap-2 mt-0.5">
@@ -465,7 +482,7 @@ export function AdminCourseManager() {
 
                           {/* Price */}
                           <td className="py-4 px-4 font-bold text-primary-900">
-                            {course.price ? `${course.price} SAR` : <span className="text-emerald-600 font-bold">Free</span>}
+                            {course.price_egp == null ? <span className="text-primary-500">Unavailable</span> : formatCourseAmount(String(course.price_egp), 'EGP')}
                           </td>
 
                           {/* Stats */}
@@ -501,14 +518,15 @@ export function AdminCourseManager() {
                                 {isPublished ? 'Published' : isArchived ? 'Archived' : 'Draft'}
                               </span>
                               <span className="text-[11px] text-primary-500 font-medium">
-                                course: {course.visibility === 'private' ? 'course' : course.visibility === 'unlisted' ? 'course' : 'course'}
+                                Visibility: {course.visibility === 'private' ? 'Private' : course.visibility === 'unlisted' ? 'Unlisted' : 'Public'}
                               </span>
+                              <span className="text-[11px] font-bold text-primary-600">Review: {(course.review_status || 'not_submitted').replace('_', ' ')}</span>
                             </div>
                           </td>
 
                           {/* Updated At */}
                           <td className="py-4 px-4 text-xs text-primary-500 font-medium">
-                            {new Date(course.updated_at || course.created_at).toLocaleDateString('ar-SA', {
+                            {new Date(course.updated_at || course.created_at).toLocaleDateString('en-EG', {
                               year: 'numeric',
                               month: 'short',
                               day: 'numeric',
@@ -528,7 +546,7 @@ export function AdminCourseManager() {
                                 disabled={!isPublished || homeOrderSavingId === course.id}
                                 placeholder="Enter details"
                                 className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                aria-label={`course ${course.title} Home`}
+                                aria-label={`Home page order for ${course.title}`}
                               />
                               {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-amber-600" />}
                             </label>
@@ -541,27 +559,32 @@ export function AdminCourseManager() {
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/builder`)}
                                 className="p-2 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"
-                                title="course Course Builder"
+                                aria-label={`Open curriculum builder for ${course.title}`}
+                                title="Curriculum builder"
                               >
                                 <Sparkles className="w-4 h-4 text-amber-600" />
-                                <span className="hidden xl:inline">course</span>
+                                <span className="hidden xl:inline">Curriculum</span>
                               </button>
 
                               {/* Edit Metadata */}
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/edit`)}
                                 className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-200/60 rounded-lg transition-colors"
-                                title="Edit"
+                                aria-label={`Edit course settings for ${course.title}`}
+                                title="Course settings"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
+
+                              <button onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="inline-flex min-h-10 items-center gap-1 rounded-lg bg-primary-100 px-2 text-xs font-bold text-primary-700 hover:bg-primary-200" aria-label={`Manage students in ${course.title}`} title="Manage students"><Users className="h-4 w-4" /><span className="hidden xl:inline">Students</span></button>
 
                               {/* Status Toggle Quick Button */}
                               {isPublished ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'draft')}
                                   className="p-2 text-amber-700 hover:bg-amber-50 rounded-lg transition-colors"
-                                  title="Draft"
+                                  aria-label={`Unpublish ${course.title}`}
+                                  title="Unpublish course"
                                 >
                                   <FileText className="w-4 h-4" />
                                 </button>
@@ -569,7 +592,8 @@ export function AdminCourseManager() {
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'published')}
                                   className="p-2 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                                  title="Course"
+                                  aria-label={`Publish approved course ${course.title}`}
+                                  title="Publish approved course"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
@@ -580,7 +604,8 @@ export function AdminCourseManager() {
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'archived')}
                                   className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                  title="Course"
+                                  aria-label={`Archive ${course.title}`}
+                                  title="Archive course"
                                 >
                                   <Archive className="w-4 h-4" />
                                 </button>
@@ -590,7 +615,8 @@ export function AdminCourseManager() {
                               <button
                                 onClick={() => setSelectedCourseForDelete(course)}
                                 className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-                                title="Course"
+                                aria-label={`Delete ${course.title}`}
+                                title="Delete course"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -602,6 +628,7 @@ export function AdminCourseManager() {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
         </div>

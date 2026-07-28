@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Home, BookOpen, Award, Settings, LogOut, X } from 'lucide-react';
+import { Home, BookOpen, Award, Settings, LogOut, X, GraduationCap } from 'lucide-react';
 import { FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAuthorization } from '../../hooks/useAuthorization';
@@ -23,6 +23,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { icon: BookOpen, label: 'My Courses', href: '/my-courses' },
     { icon: Award, label: 'Certificates', href: '/certificate' },
     { icon: Settings, label: 'Settings', href: '/profile' },
+    { icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' },
   ];
 
   return (

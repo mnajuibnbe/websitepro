@@ -1,3 +1,5 @@
+import type { CourseAuthoringStatus, CourseReviewStatus, CourseVisibility, LessonCompletionRule, LessonContentType } from '../domain/courseAuthoring';
+
 export interface Course {
   id: string;
   title: string;
@@ -8,6 +10,7 @@ export interface Course {
   price_egp: number | string | null;
   price_usd: number | string | null;
   duration: string | null;
+  total_video_duration_seconds?: number;
   category: string | null;
   thumbnail: string | null;
   cover_image: string | null;
@@ -16,7 +19,11 @@ export interface Course {
   instructor_id: string | null;
   level: 'beginner' | 'intermediate' | 'advanced' | 'all_levels' | string | null;
   language: string | null;
-  visibility: 'public' | 'private' | 'unlisted' | string | null;
+  visibility: CourseVisibility | string | null;
+  authoring_status?: CourseAuthoringStatus;
+  review_status?: CourseReviewStatus;
+  author_id?: string | null;
+  version?: number;
   is_featured: boolean | null;
   home_order: number | null;
   certificate_enabled: boolean | null;
@@ -67,9 +74,14 @@ export interface Lesson {
   description?: string | null;
   content?: string | null;
   video_url?: string | null;
+  video_provider?: string | null;
+  video_duration_seconds?: number | null;
+  video_metadata_status?: 'not_applicable' | 'pending' | 'ready' | 'unavailable' | 'failed';
+  video_metadata_updated_at?: string | null;
   content_url?: string | null;
   type?: 'video' | 'text' | 'quiz' | string;
-  lesson_type?: 'video' | 'article' | 'pdf' | 'audio' | 'embed' | 'external_link' | 'live' | 'quiz' | 'assignment' | string;
+  content_type?: LessonContentType | null;
+  lesson_type?: LessonContentType | 'article' | 'audio' | 'embed' | 'live' | string;
   duration?: string | null;
   estimated_minutes?: number | null;
   thumbnail?: string | null;
@@ -77,7 +89,8 @@ export interface Lesson {
   order_index: number;
   is_published: boolean;
   is_preview: boolean;
-  completion_rule?: 'manual' | 'watch90' | 'read_end' | 'pass_quiz' | 'upload_assignment' | string | null;
+  completion_rule?: LessonCompletionRule | 'read_end' | string | null;
+  version?: number;
   seo_title?: string | null;
   seo_description?: string | null;
   transcript?: string | null;

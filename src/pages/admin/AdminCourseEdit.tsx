@@ -22,10 +22,18 @@ import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 
 import { sanitizeCourseSlug as sanitizeSlug, validateCourseForm } from '../../lib/adminCourseForm';
 import { recordAdminAudit } from '../../lib/adminAudit';
+import { CourseCoverUpload } from '../../components/admin/course/CourseCoverUpload';
+import { InstructorPicker } from '../../components/admin/course/InstructorPicker';
+import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGuide';
+import { CategoryField } from '../../components/admin/course/CategoryField';
+import { COURSE_LANGUAGES } from '../../domain/courseTaxonomy';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function AdminCourseEdit() {
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
+  const { user } = useAuth();
+  const isInstructor = user?.role === 'instructor';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,11 +55,9 @@ export function AdminCourseEdit() {
   const [priceUsd, setPriceUsd] = useState('');
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
-  const [thumbnail, setThumbnail] = useState('');
   const [coverImage, setCoverImage] = useState('');
   const [instructorId, setInstructorId] = useState('');
 
-  const [instructors, setInstructors] = useState<{ id: string; name: string }[]>([]);
 
   // Validation & Toasts
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -81,11 +87,7 @@ export function AdminCourseEdit() {
       setIsLoading(true);
       setErrorMessage(null);
 
-      // Load instructors
-      const { data: profData } = await supabase.from('profiles').select('id, full_name');
-      if (profData) {
-        setInstructors(profData.map((p) => ({ id: p.id, name: p.full_name || 'Instructor' })));
-      }
+
 
       // Fetch course
       const { data: course, error } = await supabase
@@ -115,8 +117,7 @@ export function AdminCourseEdit() {
       setPriceUsd(course.price_usd == null ? '' : String(course.price_usd));
       setStatus((course.status as any) || 'draft');
       setVisibility((course.visibility as any) || 'public');
-      setThumbnail(course.thumbnail || '');
-      setCoverImage(course.cover_image || '');
+      setCoverImage(course.cover_image || course.thumbnail || '');
       setInstructorId(course.instructor_id || '');
     } catch (err: any) {
       console.error('Error fetching course details:', err);
@@ -131,12 +132,7 @@ export function AdminCourseEdit() {
     loadCourse();
   }, [loadCourse]);
 
-  const generateSlug = () => {
-    if (!title.trim()) return;
-    const cleanSlug = sanitizeSlug(title);
-    setSlug(cleanSlug);
-    if (errors.slug) setErrors((prev) => ({ ...prev, slug: '' }));
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,9 +179,9 @@ export function AdminCourseEdit() {
         language: language.trim() || 'Arabic',
         price_egp: priceEgp,
         price_usd: priceUsd,
-        status: status,
+        status: status === 'published' || originalCourse?.status === 'published' ? originalCourse?.status : status,
         visibility: visibility,
-        thumbnail: thumbnail.trim() || null,
+        thumbnail: coverImage.trim() || null,
         cover_image: coverImage.trim() || null,
         instructor_id: instructorId || null,
         updated_at: new Date().toISOString(),
@@ -219,6 +215,11 @@ export function AdminCourseEdit() {
           return;
         }
         throw error;
+      }
+
+      if ((status === 'published') !== (originalCourse?.status === 'published')) {
+        const { error: publicationError } = await supabase.rpc('admin_set_course_publication', { p_course_id: courseId, p_publish: status === 'published' });
+        if (publicationError) throw publicationError;
       }
 
       await recordAdminAudit('update', 'course', courseId, { title: title.trim(), status, visibility });
@@ -312,9 +313,16 @@ export function AdminCourseEdit() {
             </div>
           ) : (
             /* Edit Form */
+            <>
+            <CourseEditorGuide steps={[
+              { id: 'course-basics', label: 'Basics', description: 'Title and sales description', complete: Boolean(title.trim() && shortDescription.trim() && description.trim()) },
+              { id: 'course-classification', label: 'Publishing', description: 'Status, catalog, and pricing', complete: Boolean(category && level && language && priceEgp && priceUsd) },
+              { id: 'course-instructor', label: 'Instructor', description: 'Approved course owner', complete: Boolean(instructorId) },
+              { id: 'course-media', label: 'Cover', description: 'One reusable course image', complete: Boolean(coverImage.trim()) },
+            ]} />
             <form id="edit-course-form" onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Info */}
-              <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+              <div id="course-basics" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-amber-600" />
                   <span>Publishing and Visibility</span>
@@ -324,7 +332,7 @@ export function AdminCourseEdit() {
                   {/* Title */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">
-                      Course <span className="text-danger-500">*</span>
+                      Course title <span className="text-danger-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -342,35 +350,7 @@ export function AdminCourseEdit() {
                     )}
                   </div>
 
-                  {/* Slug */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-bold text-primary-900">
-                        Course (Slug)
-                      </label>
-                      <button
-                        type="button"
-                        onClick={generateSlug}
-                        className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Title</span>
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      value={slug}
-                      onChange={(e) => {
-                        setSlug(e.target.value);
-                        if (errors.slug) setErrors((prev) => ({ ...prev, slug: '' }));
-                      }}
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-left transition-all text-sm font-mono"
-                    />
-                    {errors.slug && (
-                      <p className="text-xs text-danger-600 font-bold mt-1.5">{errors.slug}</p>
-                    )}
-                  </div>
+
 
                   {/* Short Description */}
                   <div>
@@ -385,7 +365,7 @@ export function AdminCourseEdit() {
 
                   {/* Description */}
                   <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Description</label>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Full course description</label>
                     <textarea
                       rows={5}
                       value={description}
@@ -397,7 +377,7 @@ export function AdminCourseEdit() {
               </div>
 
               {/* Status, Category & Pricing */}
-              <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+              <div id="course-classification" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                   <Globe className="w-5 h-5 text-amber-600" />
                   <span>Publish</span>
@@ -413,8 +393,8 @@ export function AdminCourseEdit() {
                       className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
                     >
                       <option value="draft">Draft (Draft)</option>
-                      <option value="published">Published (Published)</option>
-                      <option value="archived">Archived</option>
+                      {!isInstructor && <option value="published">Published</option>}
+                      {!isInstructor && <option value="archived">Archived</option>}
                     </select>
                   </div>
 
@@ -432,16 +412,7 @@ export function AdminCourseEdit() {
                     </select>
                   </div>
 
-                  {/* Category */}
-                  <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Category</label>
-                    <input
-                      type="text"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
-                    />
-                  </div>
+                  <CategoryField value={category} onChange={setCategory} />
 
                   {/* Level */}
                   <div>
@@ -472,75 +443,18 @@ export function AdminCourseEdit() {
                   {/* Language */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">Language</label>
-                    <input
-                      type="text"
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
-                    />
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold">{COURSE_LANGUAGES.map(item => <option key={item}>{item}</option>)}</select>
                   </div>
 
                   {/* Instructor */}
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Assigned Instructor</label>
-                    <select
-                      value={instructorId}
-                      onChange={(e) => setInstructorId(e.target.value)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium"
-                    >
-                      <option value="">-- Select --</option>
-                      {instructors.map((ins) => (
-                        <option key={ins.id} value={ins.id}>
-                          {ins.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {!isInstructor && <div id="course-instructor" className="scroll-mt-24 md:col-span-2"><InstructorPicker value={instructorId} onChange={setInstructorId} /></div>}
                 </div>
               </div>
 
-              {/* Media */}
-              <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
-                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-amber-600" />
-                  <span>Images and Media</span>
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Thumbnail */}
-                  <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Image</label>
-                    <input
-                      type="url"
-                      value={thumbnail}
-                      onChange={(e) => setThumbnail(e.target.value)}
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-left transition-all text-sm"
-                    />
-                    {thumbnail && (
-                      <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <OptimizedImage src={thumbnail} alt="Thumbnail preview" displayWidth={800} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Cover */}
-                  <div>
-                    <label className="block text-sm font-bold text-primary-900 mb-2">Link</label>
-                    <input
-                      type="url"
-                      value={coverImage}
-                      onChange={(e) => setCoverImage(e.target.value)}
-                      dir="ltr"
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-left transition-all text-sm"
-                    />
-                    {coverImage && (
-                      <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <OptimizedImage src={coverImage} alt="Cover image preview" displayWidth={1200} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {/* One canonical cover reused by catalog and sales page. */}
+              <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-600" /><span>Course cover</span></h2>
+                <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
               </div>
 
               {/* Bottom Actions */}
@@ -572,6 +486,7 @@ export function AdminCourseEdit() {
                 </Button>
               </div>
             </form>
+            </>
           )}
         </div>
       </main>
