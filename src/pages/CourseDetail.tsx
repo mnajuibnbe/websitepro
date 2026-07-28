@@ -95,7 +95,7 @@ export function CourseDetail() {
     <div className="min-h-screen bg-white flex flex-col">
       <MarketingNavbar />
 
-      <main className="flex-grow pt-24 md:pt-32 pb-32 lg:pb-24">
+      <main id="main-content" className="flex-grow pt-24 md:pt-32 pb-32 lg:pb-24">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
 
           {/* Main Grid */}
@@ -109,7 +109,7 @@ export function CourseDetail() {
               <LearningOutcomes />
               <WhoIsThisFor />
               <Requirements />
-              <CurriculumAccordion />
+              <div id="course-curriculum"><CurriculumAccordion /></div>
               <CourseInstructor />
               <CourseReviews />
             </div>

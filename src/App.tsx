@@ -1,54 +1,59 @@
-import React, { useEffect } from 'react';
-import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Suspense } from 'react';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PricingProvider } from './contexts/PricingContext';
-
-import { Home } from './pages/Home';
-import { CoursesListing } from './pages/CoursesListing';
-import { CourseDetail } from './pages/CourseDetail';
-import { CheckoutPage } from './pages/CheckoutPage';
-import { Dashboard } from './pages/Dashboard';
-import { LessonPlayer } from './pages/LessonPlayer';
-import { CourseLearnResolver } from './pages/CourseLearnResolver';
-import { LegacyLessonRedirector } from './pages/LegacyLessonRedirector';
-import { QuizPage } from './pages/Quiz';
-import { CertificatePage } from './pages/CertificatePage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { PrivacyPolicy } from './pages/PrivacyPolicy';
-import { Terms } from './pages/Terms';
-import { ContactPage } from './pages/ContactPage';
-import { About } from './pages/About';
-import { FAQ } from './pages/FAQ';
-import { UserProfile } from './pages/UserProfile';
-import { MyCourses } from './pages/MyCourses';
-import { Blog } from './pages/Blog';
-import { BlogPost } from './pages/BlogPost';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-import { AdminCourseManager } from './pages/admin/AdminCourseManager';
-import { AdminCourseCreate } from './pages/admin/AdminCourseCreate';
-import { AdminCourseEdit } from './pages/admin/AdminCourseEdit';
-import { AdminCourseBuilder } from './pages/admin/AdminCourseBuilder';
-import { AdminLessonEditor } from './pages/admin/AdminLessonEditor';
-import { CourseEditor } from './pages/admin/CourseEditor';
-import { UpdatePassword } from './pages/UpdatePassword';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { AdminUserManagement } from './pages/admin/AdminUserManagement';
-import { VideoTestPage } from './pages/VideoTestPage';
-
 import { RequireAuth } from './components/auth/RequireAuth';
-import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { PageMeta } from './components/layout/PageMeta';
+import { AppErrorBoundary } from './components/errors/AppErrorBoundary';
 import { Permission } from './types/auth';
+import { lazyNamed } from './lib/lazyNamed';
+
+const Home = lazyNamed(() => import('./pages/Home'), 'Home');
+const About = lazyNamed(() => import('./pages/About'), 'About');
+const FAQ = lazyNamed(() => import('./pages/FAQ'), 'FAQ');
+const CoursesListing = lazyNamed(() => import('./pages/CoursesListing'), 'CoursesListing');
+const CourseDetail = lazyNamed(() => import('./pages/CourseDetail'), 'CourseDetail');
+const Blog = lazyNamed(() => import('./pages/Blog'), 'Blog');
+const BlogPost = lazyNamed(() => import('./pages/BlogPost'), 'BlogPost');
+const LoginPage = lazyNamed(() => import('./pages/LoginPage'), 'LoginPage');
+const ForgotPassword = lazyNamed(() => import('./pages/ForgotPassword'), 'ForgotPassword');
+const RegisterPage = lazyNamed(() => import('./pages/RegisterPage'), 'RegisterPage');
+const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
+const PrivacyPolicy = lazyNamed(() => import('./pages/PrivacyPolicy'), 'PrivacyPolicy');
+const Terms = lazyNamed(() => import('./pages/Terms'), 'Terms');
+const UnauthorizedPage = lazyNamed(() => import('./pages/UnauthorizedPage'), 'UnauthorizedPage');
+const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPage');
+const UpdatePassword = lazyNamed(() => import('./pages/UpdatePassword'), 'UpdatePassword');
+const CheckoutPage = lazyNamed(() => import('./pages/CheckoutPage'), 'CheckoutPage');
+const Dashboard = lazyNamed(() => import('./pages/Dashboard'), 'Dashboard');
+const UserProfile = lazyNamed(() => import('./pages/UserProfile'), 'UserProfile');
+const MyCourses = lazyNamed(() => import('./pages/MyCourses'), 'MyCourses');
+const CourseLearnResolver = lazyNamed(() => import('./pages/CourseLearnResolver'), 'CourseLearnResolver');
+const LessonPlayer = lazyNamed(() => import('./pages/LessonPlayer'), 'LessonPlayer');
+const LegacyLessonRedirector = lazyNamed(() => import('./pages/LegacyLessonRedirector'), 'LegacyLessonRedirector');
+const QuizPage = lazyNamed(() => import('./pages/Quiz'), 'QuizPage');
+const CertificatePage = lazyNamed(() => import('./pages/CertificatePage'), 'CertificatePage');
+const AdminDashboard = lazyNamed(() => import('./pages/admin/AdminDashboard'), 'AdminDashboard');
+const AdminCourseManager = lazyNamed(() => import('./pages/admin/AdminCourseManager'), 'AdminCourseManager');
+const AdminCourseCreate = lazyNamed(() => import('./pages/admin/AdminCourseCreate'), 'AdminCourseCreate');
+const AdminCourseEdit = lazyNamed(() => import('./pages/admin/AdminCourseEdit'), 'AdminCourseEdit');
+const AdminCourseBuilder = lazyNamed(() => import('./pages/admin/AdminCourseBuilder'), 'AdminCourseBuilder');
+const AdminLessonEditor = lazyNamed(() => import('./pages/admin/AdminLessonEditor'), 'AdminLessonEditor');
+const AdminUserManagement = lazyNamed(() => import('./pages/admin/AdminUserManagement'), 'AdminUserManagement');
+
+function RouteFallback() {
+  return <div role="status" aria-live="polite" className="flex min-h-screen items-center justify-center bg-primary-50"><span className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-accent-600" /><span className="sr-only">Loading page</span></div>;
+}
 
 function AppContent() {
   const location = useLocation();
 
   if (location.hash.startsWith('#access_token=') || location.hash.startsWith('#recovery_token=') || location.pathname === '/update-password' || location.search.includes('type=recovery')) {
-    return <UpdatePassword />;
+    return <Suspense fallback={<RouteFallback />}><UpdatePassword /></Suspense>;
   }
 
   return (
-    <Routes>
+    <><PageMeta /><Suspense fallback={<RouteFallback />}><Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
@@ -77,7 +82,6 @@ function AppContent() {
       <Route path="/certificate" element={<RequireAuth><CertificatePage /></RequireAuth>} />
 
       {/* Admin Routes */}
-      <Route path="/test-video" element={<VideoTestPage />} />
       <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />
       <Route path="/admin/courses" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseManager /></RequireAuth>} />
       <Route path="/admin/courses/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
@@ -88,17 +92,17 @@ function AppContent() {
       <Route path="/admin/courses/edit" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/admin/users" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminUserManagement /></RequireAuth>} />
 
-      <Route path="*" element={<Home />} />
-    </Routes>
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes></Suspense></>
   );
 }
 
 export default function App() {
   return (
-    <HashRouter>
+    <AppErrorBoundary><HashRouter>
       <AuthProvider>
         <PricingProvider><AppContent /></PricingProvider>
       </AuthProvider>
-    </HashRouter>
+    </HashRouter></AppErrorBoundary>
   );
 }

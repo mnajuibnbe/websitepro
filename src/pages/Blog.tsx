@@ -3,6 +3,7 @@ import { useNavigate , Link } from 'react-router-dom';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
 
 export function Blog() {
   const navigate = useNavigate();
@@ -14,26 +15,26 @@ export function Blog() {
   const posts = [
     {
       id: '1',
-      title: 'Article',
-      excerpt: 'Article.',
-      date: '20 Article 2026',
-      author: 'Article. Article',
+      title: 'Building an Evidence-Based Skincare Routine',
+      excerpt: 'A practical framework for evaluating skin needs, active ingredients, and product compatibility.',
+      date: 'July 20, 2026',
+      author: 'Tutiba Education Team',
       image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800'
     },
     {
       id: '2',
-      title: 'Article',
-      excerpt: 'Article (Humectants) Article (Emollients) Article.',
-      date: '15 Article 2026',
-      author: 'Article',
+      title: 'Humectants and Emollients: What Professionals Should Know',
+      excerpt: 'Understand how these ingredient groups support hydration and barrier care—and where their roles differ.',
+      date: 'July 15, 2026',
+      author: 'Tutiba Education Team',
       image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800'
     },
     {
       id: '3',
-      title: 'Article: Article 2026',
-      excerpt: 'Article.',
-      date: '10 Article 2026',
-      author: 'Article. Article',
+      title: 'Five Trends Shaping Cosmeceutical Practice in 2026',
+      excerpt: 'A concise review of the research, technology, and client-care trends professionals are watching.',
+      date: 'July 10, 2026',
+      author: 'Tutiba Education Team',
       image: 'https://images.unsplash.com/photo-1571781526291-c477eb311dc6?auto=format&fit=crop&q=80&w=800'
     }
   ];
@@ -42,7 +43,7 @@ export function Blog() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
 
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-primary-900 mb-4">Blog</h1>
@@ -53,9 +54,12 @@ export function Blog() {
             {posts.map(post => (
               <article key={post.id} className="bg-white rounded-2xl border border-primary-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col">
                 <div className="h-48 overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src={post.image}
                     alt={post.title}
+                    width="800"
+                    height="450"
+                    displayWidth={800}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>

@@ -1,92 +1,74 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Tag, ShieldCheck, Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
-export function OrderSummary() {
+interface OrderSummaryProps {
+  courseId?: string;
+  title: string;
+  thumbnail?: string;
+  price: string;
+  available: boolean;
+}
+
+export function OrderSummary({ courseId, title, thumbnail, price, available }: OrderSummaryProps) {
   const navigate = useNavigate();
+  const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
 
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handlePayment = () => {
-    setIsProcessing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsProcessing(false);
-      navigate('/dashboard');
-    }, 1500);
+  const handleCheckout = async () => {
+    if (!courseId || !available) return;
+    setStatus('processing');
+    setError('');
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error('Your session has expired. Please sign in again.');
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ courseId }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'We could not create your order.');
+      setStatus('success');
+    } catch (checkoutError) {
+      setError(checkoutError instanceof Error ? checkoutError.message : 'We could not create your order.');
+      setStatus('error');
+    }
   };
 
+  if (status === 'success') {
+    return (
+      <section aria-live="polite" className="rounded-2xl border border-success-200 bg-white p-8 text-center shadow-lg">
+        <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-success-500" aria-hidden="true" />
+        <h2 className="mb-2 text-2xl font-bold text-primary-900">Order received</h2>
+        <p className="mb-6 text-primary-600">Your order was created securely. You can track enrollment status from your dashboard.</p>
+        <Button variant="primary" className="w-full" onClick={() => navigate('/dashboard')}>Go to dashboard</Button>
+      </section>
+    );
+  }
+
   return (
-    <div className="bg-white border border-primary-200 rounded-2xl shadow-lg overflow-hidden lg:sticky lg:top-28">
+    <aside className="overflow-hidden rounded-2xl border border-primary-200 bg-white shadow-lg lg:sticky lg:top-28" aria-labelledby="order-summary-title">
       <div className="p-6 md:p-8">
-        <h2 className="text-xl font-bold text-primary-900 mb-6">Order</h2>
-
-        {/* Course Info */}
-        <div className="flex gap-4 mb-6 pb-6 border-b border-primary-100">
-          <img
-            src="https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=200&auto=format&fit=crop"
-            alt="Course Thumbnail"
-            className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-          />
-          <div>
-            <h3 className="font-bold text-primary-900 leading-snug mb-1">Order Information</h3>
-            <p className="text-sm text-primary-500">Order Information</p>
-          </div>
+        <h2 id="order-summary-title" className="mb-6 text-xl font-bold text-primary-900">Order summary</h2>
+        <div className="mb-6 flex gap-4 border-b border-primary-100 pb-6">
+          <OptimizedImage src={thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=200&auto=format&fit=crop'} alt="" displayWidth={200} width="80" height="80" className="h-20 w-20 flex-shrink-0 rounded-lg object-cover" />
+          <div><h3 className="mb-1 font-bold leading-snug text-primary-900">{title}</h3><p className="text-sm text-primary-500">Lifetime course access</p></div>
         </div>
-
-        {/* Pricing */}
-        <div className="space-y-4 mb-6 pb-6 border-b border-primary-100">
-          <div className="flex items-center justify-between text-primary-600">
-            <span>Price</span>
-            <span className="font-medium">$249</span>
-          </div>
-          <div className="flex items-center justify-between text-accent-600">
-            <span>Order Information (Order Information)</span>
-            <span className="font-medium">-$50</span>
-          </div>
-          <div className="flex items-center justify-between text-lg font-bold text-primary-900 pt-2 border-t border-primary-50">
-            <span>Total</span>
-            <span>$199</span>
-          </div>
-        </div>
-
-        {/* Coupon */}
-        <div className="mb-8">
-          <label className="block text-sm font-bold text-primary-700 mb-2">Discount</label>
-          <div className="flex gap-2">
-            <div className="relative flex-grow">
-              <Input type="text" placeholder="Enter details" className="w-full pl-10 text-left" dir="ltr" />
-              <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary-400" />
-            </div>
-            <Button variant="secondary" className="px-6 text-sm">Order Information</Button>
-          </div>
-        </div>
-
-        {/* Pay Button */}
-        <Button
-          variant="primary"
-          className="w-full h-14 text-lg font-bold relative"
-          onClick={handlePayment}
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <span className="flex items-center justify-center gap-2">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Loading...
-            </span>
-          ) : (
-            'Order Information - $199'
-          )}
+        <dl className="mb-6 space-y-4 border-b border-primary-100 pb-6">
+          <div className="flex justify-between text-primary-600"><dt>Course price</dt><dd className="font-medium">{price}</dd></div>
+          <div className="flex justify-between border-t border-primary-100 pt-4 text-lg font-bold text-primary-900"><dt>Total</dt><dd>{price}</dd></div>
+        </dl>
+        {status === 'error' && <p role="alert" className="mb-4 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm font-medium text-danger-600">{error}</p>}
+        <Button variant="primary" className="h-14 w-full text-lg font-bold" onClick={handleCheckout} disabled={!courseId || !available || status === 'processing'}>
+          {status === 'processing' ? <span className="flex items-center gap-2"><Loader2 className="h-5 w-5 animate-spin" />Creating secure order…</span> : available ? `Place order · ${price}` : 'Price unavailable'}
         </Button>
-
-        {/* Guarantee */}
-        <div className="flex items-center justify-center gap-2 text-xs text-primary-500 font-medium mt-6 text-center">
-          <ShieldCheck className="w-4 h-4 text-accent-600 flex-shrink-0" />
-          <span>Order Information SSL. Order Information.</span>
-        </div>
+        <div className="mt-5 flex items-start justify-center gap-2 text-center text-xs font-medium text-primary-500"><ShieldCheck className="h-4 w-4 flex-shrink-0 text-accent-600" aria-hidden="true" /><span>The server verifies course availability, currency, and price before creating the order.</span></div>
       </div>
-    </div>
+    </aside>
   );
 }

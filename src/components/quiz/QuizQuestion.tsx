@@ -52,7 +52,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-sm font-bold text-primary-500 mb-2">
-          <span>Question {currentIndex + 1} Details {totalQuestions}</span>
+          <span>Question {currentIndex + 1} of {totalQuestions}</span>
           <span>{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
@@ -64,7 +64,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
       </div>
 
       <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-primary-900 mb-8 leading-snug">
+        <h2 id="practice-question" tabIndex={-1} className="text-xl md:text-2xl font-bold text-primary-900 mb-8 leading-snug">
           {questionData.question}
         </h2>
 
@@ -105,6 +105,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
                     checked={isSelected}
                     onChange={() => setSelectedIndex(index)}
                     disabled={isChecked}
+                    aria-describedby="practice-question"
                   />
                 </div>
                 <span className={`font-medium ${isChecked && index === questionData.correctIndex ? 'text-success-900' : isChecked && isSelected ? 'text-danger-900' : 'text-primary-800'}`}>

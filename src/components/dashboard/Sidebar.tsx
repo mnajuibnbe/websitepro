@@ -39,8 +39,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 right-0 h-screen w-72 bg-white border-l border-primary-200 flex flex-col z-50 transition-transform duration-300 transform ${
-          isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+        className={`fixed lg:sticky top-0 left-0 h-screen w-72 bg-white border-r border-primary-200 flex flex-col z-50 transition-transform duration-300 transform ${
+          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Header / Logo */}
@@ -53,6 +53,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             <span className="font-bold text-xl tracking-tight text-primary-900 uppercase">Tutiba</span>
           </Link>
           <button
+            type="button"
+            aria-label="Close student navigation"
             className="lg:hidden text-primary-500 hover:text-primary-900"
             onClick={() => setIsOpen(false)}
           >
@@ -61,7 +63,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-grow py-8 px-4 flex flex-col gap-2">
+        <nav aria-label="Student navigation" className="flex-grow py-8 px-4 flex flex-col gap-2">
           {navItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = currentPath === item.href;
@@ -69,6 +71,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               <Link
                 key={index}
                 to={item.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
                   isActive
                     ? 'bg-accent-50 text-accent-700'
@@ -90,7 +93,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               <span>Admin Dashboard</span>
             </Link>
           )}
-          <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
+          <button type="button" onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>Sign Out</span>
           </button>

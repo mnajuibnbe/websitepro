@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build:check": "npm run build && node scripts/check-bundle-budget.mjs",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js dist/server.cjs",
     "lint": "tsc --noEmit",
-    "test": "tsx --test src/server/**/*.test.ts"
+    "test": "tsx --test src/server/**/*.test.ts",
+    "test:quality": "node scripts/quality-audit.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

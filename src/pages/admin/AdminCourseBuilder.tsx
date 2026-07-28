@@ -42,6 +42,8 @@ import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { LessonService } from '../../services/lesson.service';
 import { CurriculumBuilder } from '../../components/admin/curriculum/CurriculumBuilder';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { recordAdminAudit } from '../../lib/adminAudit';
 
 type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 
@@ -88,6 +90,7 @@ export function AdminCourseBuilder() {
 
   // Toasts
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<{ type: 'section' | 'lesson'; id: string; sectionId?: string | null; title: string } | null>(null);
 
   const addToast = (type: 'success' | 'error' | 'info', message: string) => {
     const id = Date.now().toString();
@@ -220,9 +223,14 @@ export function AdminCourseBuilder() {
   };
 
   const handleDeleteSection = async (sectionId: string) => {
-    if (!window.confirm('Delete')) return;
+    const section = sections.find(item => item.id === sectionId);
+    setPendingDelete({ type: 'section', id: sectionId, title: section?.title || 'Untitled section' });
+  };
+
+  const confirmDeleteSection = async (sectionId: string) => {
 
     try {
+      setIsSaving(true);
       // Delete lessons in section first
       await supabase.from('lessons').delete().eq('section_id', sectionId);
 
@@ -232,10 +240,14 @@ export function AdminCourseBuilder() {
 
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
       setLessons((prev) => prev.filter((l) => l.section_id !== sectionId));
-      addToast('success', 'Delete');
+      await recordAdminAudit('delete', 'course_section', sectionId, { courseId });
+      addToast('success', 'Section deleted.');
     } catch (err: any) {
       console.error('Error deleting section:', err);
-      addToast('error', 'Delete.');
+      addToast('error', 'The section could not be deleted.');
+    } finally {
+      setIsSaving(false);
+      setPendingDelete(null);
     }
   };
 
@@ -323,15 +335,24 @@ export function AdminCourseBuilder() {
   };
 
   const handleDeleteLesson = async (lessonId: string, sectionId?: string | null) => {
-    if (!window.confirm('Delete')) return;
+    const lesson = lessons.find(item => item.id === lessonId);
+    setPendingDelete({ type: 'lesson', id: lessonId, sectionId, title: lesson?.title || 'Untitled lesson' });
+  };
+
+  const confirmDeleteLesson = async (lessonId: string, sectionId?: string | null) => {
 
     try {
+      setIsSaving(true);
       await LessonService.deleteLesson(lessonId, sectionId || undefined);
       setLessons((prev) => prev.filter((l) => l.id !== lessonId));
-      addToast('success', 'Delete');
+      await recordAdminAudit('delete', 'lesson', lessonId, { courseId, sectionId });
+      addToast('success', 'Lesson deleted.');
     } catch (err: any) {
       console.error('Error deleting lesson:', err);
-      addToast('error', 'Delete.');
+      addToast('error', 'The lesson could not be deleted.');
+    } finally {
+      setIsSaving(false);
+      setPendingDelete(null);
     }
   };
 
@@ -454,7 +475,7 @@ export function AdminCourseBuilder() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <main className="lg:pr-72 pt-6 pb-24 transition-all duration-300">
+      <main id="main-content" className="lg:pl-72 pt-6 pb-24 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Header */}
           <div className="bg-white rounded-2xl border border-primary-200 p-5 md:p-6 shadow-2xs mb-6">
@@ -666,9 +687,7 @@ export function AdminCourseBuilder() {
                     <div className="bg-white border border-dashed border-primary-300 rounded-2xl p-12 text-center">
                       <Layers className="w-12 h-12 text-primary-300 mx-auto mb-3" />
                       <h3 className="text-base font-bold text-primary-900 mb-1">No items are available yet.</h3>
-                      <p className="text-primary-500 text-xs mb-4">
-                        Add.
-                      </p>
+                      <p className="text-primary-500 text-xs mb-4">Add the first section to begin organizing this course.</p>
                       <Button
                         onClick={() => setIsAddSectionOpen(true)}
                         className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-xl text-xs"
@@ -809,7 +828,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'up')}
                                         disabled={lIndex === 0}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="Move lesson up"
+                                        title="Move lesson up" aria-label={`Move ${lesson.title} up`}
                                       >
                                         <ArrowUp className="w-3.5 h-3.5" />
                                       </button>
@@ -819,7 +838,7 @@ export function AdminCourseBuilder() {
                                         onClick={() => handleMoveLessonOrder(section.id, lesson.id, 'down')}
                                         disabled={lIndex === sectionLessons.length - 1}
                                         className="p-1.5 text-primary-400 hover:text-primary-800 disabled:opacity-30 rounded-lg transition-colors"
-                                        title="Move lesson down"
+                                        title="Move lesson down" aria-label={`Move ${lesson.title} down`}
                                       >
                                         <ArrowDown className="w-3.5 h-3.5" />
                                       </button>
@@ -827,7 +846,8 @@ export function AdminCourseBuilder() {
                                       <Link
                                         to={`/admin/courses/${courseId}/lessons/${lesson.id}/edit`}
                                         className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
-                                        title="Edit"
+                                        title="Edit lesson"
+                                        aria-label={`Edit ${lesson.title}`}
                                       >
                                         <Edit2 className="w-4 h-4" />
                                       </Link>
@@ -836,7 +856,7 @@ export function AdminCourseBuilder() {
                                         type="button"
                                         onClick={() => handleDuplicateLesson(lesson.id)}
                                         className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
-                                        title="Lesson"
+                                        title="Duplicate lesson" aria-label={`Duplicate ${lesson.title}`}
                                       >
                                         <Copy className="w-4 h-4" />
                                       </button>
@@ -845,7 +865,8 @@ export function AdminCourseBuilder() {
                                         type="button"
                                         onClick={() => handleDeleteLesson(lesson.id, section.id)}
                                         className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
-                                        title="Delete"
+                                        title="Delete lesson"
+                                        aria-label={`Delete ${lesson.title}`}
                                       >
                                         <Trash2 className="w-4 h-4" />
                                       </button>
@@ -1207,7 +1228,7 @@ export function AdminCourseBuilder() {
 
                     <div className="p-4 bg-primary-50 rounded-xl border border-primary-200 flex items-center justify-between">
                       <span className="font-bold text-sm text-primary-900">
-                        Lessons ({lessons.length} Lessons)
+                        Lessons ({lessons.length})
                       </span>
                       {lessons.length > 0 ? (
                         <CheckCircle className="w-5 h-5 text-emerald-600" />
@@ -1238,6 +1259,7 @@ export function AdminCourseBuilder() {
       </main>
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
+      <ConfirmDialog open={Boolean(pendingDelete)} title={`Delete ${pendingDelete?.type || 'item'}?`} description={pendingDelete ? `“${pendingDelete.title}” will be removed${pendingDelete.type === 'section' ? ' together with every lesson in that section' : ''}. This action cannot be undone.` : ''} busy={isSaving} onCancel={() => setPendingDelete(null)} onConfirm={() => pendingDelete?.type === 'section' ? confirmDeleteSection(pendingDelete.id) : pendingDelete && confirmDeleteLesson(pendingDelete.id, pendingDelete.sectionId)} />
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function CurriculumAccordion() {
         { id: 302, title: 'Curriculum', duration: '20 Minute', type: 'video', isPreview: false },
         { id: 303, title: 'Curriculum', duration: '15 Minute', type: 'video', isPreview: false },
         { id: 304, title: 'Curriculum', duration: '15 Minute', type: 'video', isPreview: false },
-        { id: 305, title: 'Curriculum: Curriculum', duration: '10 Curriculum', type: 'video', isPreview: false },
+        { id: 305, title: 'Applying the Framework', duration: '10 min', type: 'video', isPreview: false },
       ]
     }
   ];

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate , Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
-import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export function ForgotPassword() {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ export function ForgotPassword() {
             </div>
             <h3 className="text-xl font-bold text-primary-900 mb-2">Check Your Email</h3>
             <p className="text-primary-600 mb-8">
-              Please ({email}) Password.
+              If an account exists for <strong>{email}</strong>, a secure reset link is on its way.
             </p>
             <Button
               onClick={() => navigate('/login')}
@@ -62,24 +62,26 @@ export function ForgotPassword() {
         ) : (
           <>
             {error && (
-              <div className="bg-danger-50 text-danger-600 px-4 py-3 rounded-xl border border-danger-200 text-sm mb-6 font-medium text-center">
+              <div role="alert" className="bg-danger-50 text-danger-600 px-4 py-3 rounded-xl border border-danger-200 text-sm mb-6 font-medium text-center">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
+                <label htmlFor="recovery-email" className="block text-sm font-bold text-primary-900 mb-2">Email Address</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary-400">
                     <Mail className="h-5 w-5" />
                   </div>
                   <input
                     type="email"
+                    id="recovery-email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="block w-full pr-11 pl-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
+                    className="block w-full pl-11 pr-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
                     placeholder="name@example.com"
                     dir="ltr"
                   />
@@ -92,7 +94,7 @@ export function ForgotPassword() {
                 className="w-full h-12 text-lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'Sending...' : 'Link'}
+                {isLoading ? 'Sending…' : 'Send reset link'}
               </Button>
             </form>
           </>
@@ -106,8 +108,8 @@ export function ForgotPassword() {
             }}
             className="inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-900 transition-colors font-medium"
           >
-            <ArrowRight className="w-4 h-4" />
-            <span>Sign In</span>
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            <span>Back to sign in</span>
           </Link>
         </div>
       </div>

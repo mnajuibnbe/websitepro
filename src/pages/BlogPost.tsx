@@ -3,6 +3,7 @@ import { useNavigate , Link } from 'react-router-dom';
 import { ArrowRight, Calendar, User, ChevronRight } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
 
 export function BlogPost() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export function BlogPost() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <MarketingNavbar />
 
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
@@ -28,7 +29,7 @@ export function BlogPost() {
 
           <article className="bg-white rounded-3xl shadow-sm border border-primary-200 overflow-hidden">
             <div className="h-64 sm:h-96 w-full relative">
-              <img
+              <OptimizedImage priority displayWidth={1200} width="1200" height="675"
                 src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=1200"
                 alt="Cosmetic skin-care products arranged for ingredient analysis"
                 className="w-full h-full object-cover"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { OptimizedImage } from '../../components/ui/OptimizedImage';
 import {
   ArrowRight,
   Save,
@@ -19,7 +20,8 @@ import { supabase } from '../../lib/supabase';
 import { Course } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 
-import { sanitizeSlug } from './AdminCourseCreate';
+import { sanitizeCourseSlug as sanitizeSlug, validateCourseForm } from '../../lib/adminCourseForm';
+import { recordAdminAudit } from '../../lib/adminAudit';
 
 export function AdminCourseEdit() {
   const navigate = useNavigate();
@@ -141,15 +143,8 @@ export function AdminCourseEdit() {
     if (!courseId || isSubmitting) return;
 
     // Validation
-    const newErrors: Record<string, string> = {};
-    if (!title.trim()) {
-      newErrors.title = 'Course';
-    }
-
+    const newErrors = validateCourseForm({ title, slug, priceEgp, priceUsd });
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
-    if (!/^\d+(\.\d{1,2})?$/.test(priceEgp)) newErrors.priceEgp = 'Egypt Price is required and cannot be negative.';
-    if (!/^\d+(\.\d{1,2})?$/.test(priceUsd)) newErrors.priceUsd = 'International Price is required and cannot be negative.';
-    if (!newErrors.priceEgp && !newErrors.priceUsd && ((Number(priceEgp) === 0) !== (Number(priceUsd) === 0))) newErrors.priceUsd = 'A free course must have both prices set to zero.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -226,7 +221,8 @@ export function AdminCourseEdit() {
         throw error;
       }
 
-      addToast('success', 'Save!');
+      await recordAdminAudit('update', 'course', courseId, { title: title.trim(), status, visibility });
+      addToast('success', 'Course changes saved.');
       loadCourse();
     } catch (err: any) {
       console.error('Error updating course:', err);
@@ -240,7 +236,7 @@ export function AdminCourseEdit() {
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
+      <main id="main-content" className="lg:pl-72 pt-8 pb-24 transition-all duration-300">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -254,7 +250,7 @@ export function AdminCourseEdit() {
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Course</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Edit course</h1>
                 <p className="text-primary-600 text-xs sm:text-sm">
                   Update.
                 </p>
@@ -523,7 +519,7 @@ export function AdminCourseEdit() {
                     />
                     {thumbnail && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={thumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                        <OptimizedImage src={thumbnail} alt="Thumbnail preview" displayWidth={800} className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -540,7 +536,7 @@ export function AdminCourseEdit() {
                     />
                     {coverImage && (
                       <div className="mt-3 rounded-xl overflow-hidden border border-primary-200 h-32 bg-black/5">
-                        <img src={coverImage} alt="Cover image preview" className="w-full h-full object-cover" />
+                        <OptimizedImage src={coverImage} alt="Cover image preview" displayWidth={1200} className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>

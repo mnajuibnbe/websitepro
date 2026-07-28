@@ -16,7 +16,7 @@ export function CoursesListing() {
     <div className="min-h-screen bg-white flex flex-col">
       <MarketingNavbar />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
           <CoursesHeader filters={filters} onChange={setFilters} />
           <SearchSortBar filters={filters} onChange={setFilters} resultCount={resultCount} filtersOpen={mobileFiltersOpen} onToggleFilters={() => setMobileFiltersOpen(open => !open)} />

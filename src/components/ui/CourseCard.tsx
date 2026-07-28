@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from './Button';
 import { Badge } from './Badge';
 import { Clock, BookOpen } from 'lucide-react';
+import { OptimizedImage } from './OptimizedImage';
 
 interface CourseCardProps {
   key?: React.Key;
@@ -27,13 +28,17 @@ export function CourseCard({
   ctaText = 'View Course',
   onEnroll
 }: CourseCardProps) {
+  const lessonsLabel = `${lessonsCount} ${lessonsCount === 1 ? 'lesson' : 'lessons'}`;
   return (
-    <div className="flex flex-col bg-white border border-primary-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+    <article className="flex flex-col bg-white border border-primary-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
       {/* Thumbnail (16:9) */}
       <div className="relative aspect-video bg-primary-100">
-        <img
+        <OptimizedImage
           src={imageUrl}
           alt={title}
+          displayWidth={600}
+          width="600"
+          height="338"
           className="w-full h-full object-cover"
         />
         <div className="absolute top-3 right-3">
@@ -55,7 +60,7 @@ export function CourseCard({
           <div className="w-1.5 h-1.5 rounded-full bg-primary-300"></div>
           <div className="flex items-center gap-1.5">
             <BookOpen className="w-4 h-4" />
-            <span>{lessonsCount} Lesson</span>
+            <span>{lessonsLabel}</span>
           </div>
         </div>
 
@@ -69,6 +74,6 @@ export function CourseCard({
           </Button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

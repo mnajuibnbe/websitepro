@@ -149,9 +149,9 @@ export function AdminDashboard() {
       <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-        <main className="lg:pr-72 pt-8 pb-24 transition-all duration-300">
+        <main id="main-content" className="lg:pl-72 pt-8 pb-24 transition-all duration-300">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-primary-900 mb-8">Administration (Manage)</h1>
+            <h1 className="text-3xl font-bold text-primary-900 mb-8">Admin overview</h1>
 
             {errorMsg && (
               <div className="mb-6 bg-danger-50 text-danger-700 px-6 py-4 rounded-xl border border-danger-200 flex items-center gap-3">

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { recordAdminAudit } from '../../lib/adminAudit';
 import {
   ArrowRight,
   Save,
@@ -99,6 +101,7 @@ export function AdminLessonEditor() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const addToast = (type: 'success' | 'error' | 'info', message: string) => {
     const id = Date.now().toString();
@@ -244,15 +247,15 @@ export function AdminLessonEditor() {
       newErrors.title = 'Lesson';
     }
     if (estimatedMinutes < 0) {
-      newErrors.estimatedMinutes = 'Duration 0 Lesson Settings';
+      newErrors.estimatedMinutes = 'Duration must be greater than zero.';
     }
 
     // URL validation if type demands URL
     if (['video'].includes(lessonType) && videoUrl.trim() && !videoUrl.trim().startsWith('http')) {
-      newErrors.videoUrl = 'Please review the information and try again. http:// Lesson Settings https://';
+      newErrors.videoUrl = 'Enter a valid URL beginning with http:// or https://.';
     }
     if (['pdf', 'audio', 'external_link'].includes(lessonType) && contentUrl.trim() && !contentUrl.trim().startsWith('http')) {
-      newErrors.contentUrl = 'Please review the information and try again. http:// Lesson Settings https://';
+      newErrors.contentUrl = 'Enter a valid URL beginning with http:// or https://.';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -342,11 +345,12 @@ export function AdminLessonEditor() {
     try {
       setIsSaving(true);
       await LessonService.deleteLesson(lessonId, sectionId);
-      addToast('success', 'Delete.');
+      await recordAdminAudit('delete', 'lesson', lessonId, { courseId, sectionId });
+      addToast('success', 'Lesson deleted.');
       navigate(`/admin/courses/${courseId}/builder`);
     } catch (err: any) {
       console.error('Error deleting lesson:', err);
-      addToast('error', 'Delete.');
+      addToast('error', 'The lesson could not be deleted.');
     } finally {
       setIsSaving(false);
       setShowDeleteConfirm(false);
@@ -373,7 +377,7 @@ export function AdminLessonEditor() {
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
-      <main className="lg:pr-72 pt-6 pb-24 transition-all duration-300">
+      <main id="main-content" className="lg:pl-72 pt-6 pb-24 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header Card */}
           <div className="bg-white rounded-2xl border border-primary-200 p-5 md:p-6 shadow-2xs mb-6">
@@ -383,7 +387,7 @@ export function AdminLessonEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (isDirty && !window.confirm('Lesson Settings')) return;
+                    if (isDirty) { setShowLeaveConfirm(true); return; }
                     navigate(`/admin/courses/${courseId}/builder`);
                   }}
                   className="p-2.5 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
@@ -417,7 +421,7 @@ export function AdminLessonEditor() {
 
                     {isDirty && (
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white animate-pulse">
-                        Lesson Settings
+                        Lesson settings
                       </span>
                     )}
                   </div>
@@ -443,7 +447,7 @@ export function AdminLessonEditor() {
                       title="Lesson"
                     >
                       <Copy className="w-4 h-4 text-primary-600" />
-                      <span className="hidden sm:inline">Lesson Settings (Duplicate)</span>
+                      <span className="hidden sm:inline">Duplicate lesson</span>
                     </button>
 
                     <button
@@ -475,9 +479,9 @@ export function AdminLessonEditor() {
             <div className="flex items-center gap-2 mt-6 pt-4 border-t border-primary-100 overflow-x-auto no-scrollbar text-sm font-bold">
               {[
                 { id: 'general', label: 'General', icon: SettingsIcon },
-                { id: 'content', label: 'Content (Content)', icon: FileText },
+                { id: 'content', label: 'Content', icon: FileText },
                 { id: 'access', label: 'Access', icon: Lock },
-                { id: 'settings', label: 'SettingsSEO (Settings)', icon: Globe },
+                { id: 'settings', label: 'Access & settings', icon: Globe },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -544,7 +548,7 @@ export function AdminLessonEditor() {
                           setIsDirty(true);
                           if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                         }}
-                        placeholder="Lesson Settings: Lesson Settings"
+                        placeholder="Enter a clear lesson title"
                         className={`w-full px-4 py-2.5 bg-white border ${
                           errors.title ? 'border-danger-500' : 'border-primary-200'
                         } rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium`}
@@ -564,7 +568,7 @@ export function AdminLessonEditor() {
                           className="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span>Lesson Settings</span>
+                          <span>Lesson settings</span>
                         </button>
                       </div>
                       <input
@@ -645,7 +649,7 @@ export function AdminLessonEditor() {
                     {/* Estimated Duration */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Duration (Lesson Settings)
+                        Duration (Lesson settings)
                       </label>
                       <input
                         type="number"
@@ -704,7 +708,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     {getLessonTypeIcon(lessonType)}
-                    <span>Lesson Settings - {lessonType.toUpperCase()}</span>
+                    <span>Content — {lessonType.toUpperCase()}</span>
                   </h3>
 
                   {/* Video Content Fields */}
@@ -730,7 +734,7 @@ export function AdminLessonEditor() {
 
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Lesson Settings (Transcript)
+                          Transcript
                         </label>
                         <textarea
                           rows={4}
@@ -739,7 +743,7 @@ export function AdminLessonEditor() {
                             setTranscript(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="Lesson SettingsSEO..."
+                          placeholder="Add a transcript or lesson notes..."
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                         />
                       </div>
@@ -764,7 +768,7 @@ export function AdminLessonEditor() {
 
                         <div>
                           <label className="block text-xs font-bold text-primary-900 mb-2">
-                            Lesson Settings
+                            Lesson settings
                           </label>
                           <input
                             type="text"
@@ -795,7 +799,7 @@ export function AdminLessonEditor() {
                             setContent(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="Lesson Settings (Lesson Settings HTML Lesson Settings Markdown)..."
+                          placeholder="Enter the lesson article content..."
                           className="w-full p-4 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-mono leading-relaxed"
                         />
                       </div>
@@ -833,7 +837,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Lesson Settings</span>
+                          <span>Lesson settings</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary-900">
@@ -846,7 +850,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Lesson Settings</span>
+                          <span>Lesson settings</span>
                         </label>
                       </div>
                     </div>
@@ -914,7 +918,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Lesson Settings (Embed HTML Code / iFrame)
+                          Embed HTML or iframe
                         </label>
                         <textarea
                           rows={6}
@@ -1055,10 +1059,10 @@ export function AdminLessonEditor() {
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold"
                       >
                         <option value="manual">Confirm</option>
-                        <option value="watch90">Lesson Settings 90% Lesson Settings</option>
+                        <option value="watch90">Watch 90% of video</option>
                         <option value="read_end">Content</option>
                         <option value="pass_quiz">Lesson</option>
-                        <option value="upload_assignment">Lesson Settings</option>
+                        <option value="upload_assignment">Lesson settings</option>
                       </select>
                     </div>
                   </div>
@@ -1070,7 +1074,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-amber-600" />
-                    <span>Search (SEO)</span>
+                    <span>Search metadata (SEO)</span>
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1093,7 +1097,7 @@ export function AdminLessonEditor() {
                     {/* SEO Title */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Search (SEO Title)
+                        SEO title
                       </label>
                       <input
                         type="text"
@@ -1110,7 +1114,7 @@ export function AdminLessonEditor() {
                     {/* SEO Description */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Search (SEO Meta Description)
+                        SEO description
                       </label>
                       <textarea
                         rows={3}
@@ -1131,38 +1135,8 @@ export function AdminLessonEditor() {
         </div>
       </main>
 
-      {/* Confirmation Dialog for Delete */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-primary-200">
-            <div className="flex items-center gap-3 text-danger-600">
-              <ShieldAlert className="w-6 h-6" />
-              <h3 className="font-bold text-lg text-primary-900">Delete</h3>
-            </div>
-            <p className="text-primary-700 text-sm leading-relaxed">
-              Delete <strong className="text-primary-900">{title}</strong>Lesson Settings.
-            </p>
-            <div className="flex items-center justify-end gap-3 pt-3">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 rounded-xl border border-primary-200 font-bold text-xs text-primary-700 hover:bg-primary-50"
-              >
-                Cancel
-              </button>
-              <Button
-                type="button"
-                onClick={handleDelete}
-                disabled={isSaving}
-                className="px-5 py-2 rounded-xl bg-danger-600 hover:bg-danger-700 text-white font-bold text-xs flex items-center gap-1.5"
-              >
-                {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>Delete</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog open={showDeleteConfirm} title="Delete lesson?" description={`“${title || 'Untitled lesson'}” will be permanently removed. This action cannot be undone.`} busy={isSaving} onCancel={() => setShowDeleteConfirm(false)} onConfirm={handleDelete} />
+      <ConfirmDialog open={showLeaveConfirm} title="Discard unsaved changes?" description="Your changes to this lesson have not been saved." confirmLabel="Discard changes" onCancel={() => setShowLeaveConfirm(false)} onConfirm={() => navigate(`/admin/courses/${courseId}/builder`)} />
     </div>
   );
 }

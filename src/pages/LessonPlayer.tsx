@@ -344,9 +344,9 @@ export function LessonPlayer() {
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">Lesson</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Invalid lesson link</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This lesson address is incomplete or invalid. Return to your courses and choose a lesson again.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -366,9 +366,9 @@ export function LessonPlayer() {
           <div className="w-16 h-16 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">Build practical skills with structured, expert-led course content.</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">Enrollment required</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            You need an active enrollment to access this course.
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
@@ -376,7 +376,7 @@ export function LessonPlayer() {
                 onClick={() => navigate(`/course/${courseId}`)}
                 className="w-full bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
               >
-                Course
+                View course details
               </button>
             )}
             <button
@@ -400,7 +400,7 @@ export function LessonPlayer() {
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Pending Approval</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            Your enrollment is awaiting confirmation. You can check its status from My Courses.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -425,8 +425,8 @@ export function LessonPlayer() {
           </h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             {accessState === 'course_not_found'
-              ? 'The requested information could not be loaded. Please try again.'
-              : 'Published.'}
+              ? 'This course could not be found or is no longer available.'
+              : 'This lesson could not be found or is not published.'}
           </p>
           <button
             onClick={() => navigate(courseId ? `/learn/${courseId}` : '/my-courses')}
@@ -445,7 +445,7 @@ export function LessonPlayer() {
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
-            The requested information could not be loaded. Please try again.
+            This course does not have any published lessons yet.
           </p>
           <button
             onClick={() => navigate('/my-courses')}
@@ -490,7 +490,7 @@ export function LessonPlayer() {
       <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           {/* Main Content Area (Left side in RTL) */}
-          <main className="lg:col-span-8 flex flex-col">
+          <main id="main-content" className="lg:col-span-8 flex flex-col">
             {/* Viewer Component */}
             {currentLesson.type === 'video' ? (
               <VideoLessonRenderer lessonId={currentLesson.id} videoUrl={currentLesson.video_url} title={currentLesson.title} />
@@ -568,6 +568,8 @@ export function LessonPlayer() {
             <div className="p-4 border-b border-primary-200 flex items-center justify-between bg-primary-50">
               <h2 className="font-bold text-primary-900 text-base">Course</h2>
               <button
+                type="button"
+                aria-label="Close course curriculum"
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="p-2 text-primary-500 hover:text-primary-900 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate , Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { Menu, Search, ChevronDown, X, FlaskConical, Droplet } from 'lucide-react';
+import { Menu, Search, X, FlaskConical, Droplet } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function MarketingNavbar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,8 +20,21 @@ export function MarketingNavbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => event.key === 'Escape' && setIsMobileMenuOpen(false);
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <nav
+    <>
+    <a href="#main-content" className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-white px-4 py-3 font-semibold text-primary-900 shadow-lg focus:not-sr-only">Skip to main content</a>
+    <nav aria-label="Primary navigation"
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled ? 'bg-white shadow-sm py-1' : 'bg-transparent py-2'
       }`}
@@ -42,16 +56,14 @@ export function MarketingNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-8">
-            <Link to="/courses" className="flex items-center gap-1 cursor-pointer text-primary-900 hover:text-accent-600 font-medium transition-colors">
-              <span>Courses</span>
-              <ChevronDown className="w-4 h-4" />
-            </Link>
-            <Link to="/about" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">About</Link>
-            <Link to="/blog" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Blog</Link>
+            <Link to="/courses" aria-current={location.pathname.startsWith('/course') ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Courses</Link>
+            <Link to="/about" aria-current={location.pathname === '/about' ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">About</Link>
+            <Link to="/blog" aria-current={location.pathname.startsWith('/blog') ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Blog</Link>
+            <Link to="/contact" aria-current={location.pathname === '/contact' ? 'page' : undefined} className="text-primary-900 hover:text-accent-600 font-medium transition-colors aria-[current=page]:text-accent-700">Contact</Link>
 
             <div className="h-6 w-px bg-primary-200 mx-2"></div>
 
-            <button className="text-primary-900 hover:text-accent-600 focus:outline-none transition-colors">
+            <button type="button" aria-label="Search courses" onClick={() => navigate('/courses')} className="text-primary-900 hover:text-accent-600 transition-colors">
               <Search className="w-5 h-5" />
             </button>
 
@@ -68,11 +80,13 @@ export function MarketingNavbar() {
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-4 lg:hidden">
-            <button className="text-primary-900 hover:text-accent-600 focus:outline-none">
+            <button type="button" aria-label="Search courses" onClick={() => navigate('/courses')} className="text-primary-900 hover:text-accent-600">
               <Search className="w-5 h-5" />
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+              aria-expanded={isMobileMenuOpen}
               className="text-primary-900 hover:text-accent-600 focus:outline-none"
             >
               <Menu className="w-6 h-6" />
@@ -91,7 +105,7 @@ export function MarketingNavbar() {
           ></div>
 
           {/* Drawer */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform">
+          <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform">
             <div className="flex items-center justify-between h-20 px-6 border-b border-primary-100">
               <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}>
                 <FlaskConical className="w-7 h-7 text-accent-600" />
@@ -99,6 +113,7 @@ export function MarketingNavbar() {
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
                 className="text-primary-500 hover:text-primary-900 focus:outline-none bg-primary-50 p-2 rounded-full"
               >
                 <X className="w-5 h-5" />
@@ -109,6 +124,7 @@ export function MarketingNavbar() {
               <Link to="/courses" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
               <Link to="/about" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
               <Link to="/blog" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Blog</Link>
+              <Link to="/contact" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
               <hr className="border-primary-100" />
               {isAuthenticated ? (
                 <Link to="/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
@@ -126,5 +142,6 @@ export function MarketingNavbar() {
         </div>
       )}
     </nav>
+    </>
   );
 }

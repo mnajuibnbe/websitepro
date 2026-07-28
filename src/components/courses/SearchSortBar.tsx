@@ -16,22 +16,23 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
 
       {/* Search Input */}
       <div className="relative w-full md:w-96">
-        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-primary-400">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary-400">
           <Search className="w-5 h-5" />
         </div>
         <input
           type="text"
-          placeholder="Course..."
+          placeholder="Search courses"
+          aria-label="Search courses"
           value={filters.search}
           onChange={(event) => onChange({ ...filters, search: event.target.value })}
-          className="w-full h-12 pr-12 pl-4 bg-white border border-primary-300 rounded-lg text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-200 shadow-sm"
+          className="w-full h-12 pl-12 pr-4 bg-white border border-primary-300 rounded-lg text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-200 shadow-sm"
         />
       </div>
 
       {/* Results Count & Sort */}
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full md:w-auto gap-4 md:gap-6">
         <span className="text-primary-600 font-medium whitespace-nowrap w-full sm:w-auto">
-          <strong className="text-primary-900 text-lg mx-1">{resultCount}</strong> Course Filter
+          <strong className="text-primary-900 text-lg me-1">{resultCount}</strong> {resultCount === 1 ? 'course' : 'courses'}
         </span>
 
         {/* Mobile Filter Button */}
@@ -43,7 +44,7 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
           className="lg:hidden flex flex-1 sm:flex-none items-center justify-center gap-2 h-12 px-4 bg-white border border-primary-300 rounded-lg text-primary-900 font-bold hover:bg-primary-50 transition-colors shadow-sm sm:w-auto"
         >
           <Filter className="w-5 h-5" />
-          <span>{filtersOpen ? 'Course Filter' : 'Course Filter'}</span>
+          <span>{filtersOpen ? 'Hide filters' : 'Show filters'}</span>
         </button>
 
         <div className="flex flex-1 items-center gap-3 sm:w-auto">
@@ -52,11 +53,12 @@ export function SearchSortBar({ filters, onChange, resultCount, filtersOpen, onT
             <select
               className="w-full sm:w-auto appearance-none bg-white border border-primary-300 rounded-lg pl-10 pr-4 py-2.5 h-12 text-sm font-bold text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-500 cursor-pointer shadow-sm"
               value={filters.sort}
+              aria-label="Sort courses"
               onChange={(event) => onChange({ ...filters, sort: event.target.value as CourseCatalogFilters['sort'] })}
             >
-              <option value="newest">Course Filter</option>
-              <option value="price-asc">Price: Course Filter</option>
-              <option value="price-desc">Price: Course Filter</option>
+              <option value="newest">Newest</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-500">
               <ChevronDown className="w-4 h-4" />

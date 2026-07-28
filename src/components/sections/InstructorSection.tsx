@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { CheckCircle2 } from 'lucide-react';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 export function InstructorSection() {
   return (
@@ -11,7 +12,7 @@ export function InstructorSection() {
           {/* Instructor Image (5 cols on Desktop) */}
           <div className="lg:col-span-5 relative order-2 lg:order-1">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-lg border border-primary-200">
-              <img
+              <OptimizedImage displayWidth={800} width="800" height="800"
                 src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=800&auto=format&fit=crop"
                 alt="Tutiba course instructor"
                 className="w-full h-full object-cover"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FlaskConical, Droplet, ChevronDown, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
+import { FlaskConical, Droplet, ChevronDown, Globe, Mail } from 'lucide-react';
 
 export function Footer() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -11,33 +11,29 @@ export function Footer() {
 
   const footerLinks = [
     { title: 'Courses', links: [
-      { label: 'All Courses', href: '#/courses' },
-      { label: 'Diploma Programs', href: '#/courses' },
-      { label: 'Specialized Courses', href: '#/courses' },
-      { label: 'Free Lessons', href: '#/courses' },
+      { label: 'All Courses', href: '/courses' },
+      { label: 'Diploma Programs', href: '/courses' },
+      { label: 'Specialized Courses', href: '/courses' },
+      { label: 'Free Lessons', href: '/courses' },
     ] },
     { title: 'Tutiba', links: [
-      { label: 'About Us', href: '#/about' },
-      { label: 'Our Learning Method', href: '#/about' },
-      { label: 'Our Instructors', href: '#/about' },
-      { label: 'Student Success', href: '#/' },
+      { label: 'About Us', href: '/about' },
+      { label: 'Our Learning Method', href: '/about' },
+      { label: 'Our Instructors', href: '/about' },
     ] },
     { title: 'Resources', links: [
-      { label: 'Blog', href: '#/blog' },
-      { label: 'Scientific Articles', href: '#/blog' },
-      { label: 'Educational Videos', href: '#/blog' },
-      { label: 'Free Resources', href: '#/blog' },
+      { label: 'Blog', href: '/blog' },
+      { label: 'Scientific Articles', href: '/blog' },
     ] },
     { title: 'Support', links: [
-      { label: 'Help Center', href: '#/faq' },
-      { label: 'Contact Us', href: '#/contact' },
-      { label: 'Frequently Asked Questions', href: '#/faq' },
-      { label: 'Technical Support', href: '#/contact' },
+      { label: 'Help Center', href: '/faq' },
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'Frequently Asked Questions', href: '/faq' },
+      { label: 'Technical Support', href: '/contact' },
     ] },
     { title: 'Legal', links: [
-      { label: 'Terms and Conditions', href: '#/terms' },
-      { label: 'Privacy Policy', href: '#/privacy' },
-      { label: 'Refund Policy', href: '#/terms' },
+      { label: 'Terms and Conditions', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
     ] },
   ];
 
@@ -61,20 +57,7 @@ export function Footer() {
             <p className="text-primary-400 leading-relaxed max-w-sm mb-8 text-sm md:text-base">
               Evidence-based learning for health professionals who want to build practical confidence in cosmeceuticals.
             </p>
-            <div className="flex items-center gap-4">
-              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Facebook">
-                <Facebook className="w-5 h-5" />
-              </Link>
-              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Instagram">
-                <Instagram className="w-5 h-5" />
-              </Link>
-              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="LinkedIn">
-                <Linkedin className="w-5 h-5" />
-              </Link>
-              <Link to="/" className="w-10 h-10 rounded-full bg-primary-800 flex items-center justify-center text-primary-400 hover:bg-accent-600 hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Twitter">
-                <Twitter className="w-5 h-5" />
-              </Link>
-            </div>
+            <Link to="/contact" className="inline-flex items-center gap-2 rounded-lg border border-primary-700 px-4 py-2.5 font-semibold text-primary-200 transition-colors hover:border-accent-500 hover:text-white"><Mail className="h-4 w-4" aria-hidden="true" />Contact support</Link>
           </div>
 
           {/* Desktop Links (Hidden on Mobile) */}
@@ -85,7 +68,7 @@ export function Footer() {
                 <ul className="space-y-4">
                   {section.links.map((link) => (
                     <li key={link.label}>
-                      <a href={link.href} className="hover:text-accent-400 transition-colors font-medium text-primary-400 block hover:-translate-x-1 duration-200 transform">{link.label}</a>
+                      <Link to={link.href} className="hover:text-accent-400 transition-colors font-medium text-primary-400 block hover:translate-x-1 duration-200 transform">{link.label}</Link>
                     </li>
                   ))}
                 </ul>
@@ -99,12 +82,16 @@ export function Footer() {
               <div key={section.title} className="border-b border-primary-800">
                 <button
                   onClick={() => toggleAccordion(section.title)}
+                  type="button"
+                  aria-expanded={openAccordion === section.title}
+                  aria-controls={`footer-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
                   className="w-full flex items-center justify-between py-4 text-white font-bold focus:outline-none focus:ring-2 focus:ring-accent-500 rounded px-2"
                 >
                   <span className="text-lg">{section.title}</span>
                   <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${openAccordion === section.title ? 'rotate-180 text-accent-400' : 'text-primary-500'}`} />
                 </button>
                 <div
+                  id={`footer-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
                   className={`overflow-hidden transition-all duration-300 ${
                     openAccordion === section.title ? 'max-h-64 mb-4 opacity-100' : 'max-h-0 opacity-0'
                   }`}
@@ -112,7 +99,7 @@ export function Footer() {
                   <ul className="space-y-3 pt-2 pb-4 px-2">
                     {section.links.map((link) => (
                       <li key={link.label}>
-                        <a href={link.href} className="text-primary-400 hover:text-accent-400 font-medium block py-2">{link.label}</a>
+                        <Link to={link.href} className="text-primary-400 hover:text-accent-400 font-medium block py-2">{link.label}</Link>
                       </li>
                     ))}
                   </ul>
@@ -126,19 +113,13 @@ export function Footer() {
         <div className="pt-8 border-t border-primary-800 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-sm text-primary-500 order-2 md:order-1 text-center md:text-left">
             <span>© {new Date().getFullYear()} Tutiba. All rights reserved.</span>
-            <div className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors bg-primary-800 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-2 bg-primary-800 px-3 py-1.5 rounded-full" aria-label="Site language: English">
               <Globe className="w-4 h-4" />
               <span className="font-medium">English</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 order-1 md:order-2 opacity-60 hover:opacity-100 transition-opacity duration-300">
-             {/* Payment Methods placeholders */}
-             <div className="h-8 w-12 bg-primary-800 rounded flex items-center justify-center text-xs font-bold text-primary-400">Visa</div>
-             <div className="h-8 w-12 bg-primary-800 rounded flex items-center justify-center text-xs font-bold text-primary-400">MC</div>
-             <div className="h-8 w-16 bg-primary-800 rounded flex items-center justify-center text-xs font-bold text-primary-400">PayPal</div>
-             <div className="h-8 w-16 bg-primary-800 rounded flex items-center justify-center text-xs font-bold text-primary-400">V-Cash</div>
-          </div>
+          <p className="order-1 text-center text-sm text-primary-400 md:order-2">Secure account and enrollment workflows</p>
         </div>
       </div>
     </footer>

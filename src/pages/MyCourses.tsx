@@ -1,12 +1,13 @@
 import { useAuth } from '../contexts/AuthContext';
 import React, { useEffect, useState } from 'react';
 import { Sidebar } from '../components/dashboard/Sidebar';
-import { PlayCircle, Clock, Award, BookOpen, Loader2, Menu } from 'lucide-react';
+import { PlayCircle, Award, BookOpen, Loader2, Menu, Search } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { isValidUUID } from '../lib/uuid';
 import { useNavigate } from 'react-router-dom';
 import { fetchCoursesProgress } from '../lib/courseProgress';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
 
 export function MyCourses() {
   const { user } = useAuth();
@@ -15,6 +16,8 @@ export function MyCourses() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorState, setErrorState] = useState<'none' | 'inconsistent' | 'error'>('none');
   const navigate = useNavigate();
+  const [filter, setFilter] = useState<'all' | 'in-progress' | 'completed'>('all');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -102,6 +105,8 @@ export function MyCourses() {
         <header className="lg:hidden h-20 bg-white border-b border-primary-200 px-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-4">
             <button
+              type="button"
+              aria-label="Open student navigation"
               className="p-2 -ml-2 text-primary-600 hover:bg-primary-50 rounded-lg"
               onClick={() => setIsSidebarOpen(true)}
             >
@@ -111,9 +116,20 @@ export function MyCourses() {
           </div>
         </header>
 
-        <main className="flex-grow p-4 sm:p-8 overflow-y-auto">
+        <main id="main-content" className="flex-grow p-4 sm:p-8 overflow-y-auto">
           <div className="max-w-6xl mx-auto space-y-8 pb-12">
             <h1 className="text-3xl font-bold text-primary-900 mb-8 hidden lg:block">My Courses</h1>
+
+            {!isLoading && errorState === 'none' && enrollments.length > 0 && (
+              <div className="flex flex-col gap-4 rounded-2xl border border-primary-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Filter courses by progress">
+                  {(['all', 'in-progress', 'completed'] as const).map(value => (
+                    <button key={value} type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} className={`rounded-lg px-4 py-2 text-sm font-semibold capitalize ${filter === value ? 'bg-accent-600 text-white' : 'bg-primary-50 text-primary-700 hover:bg-primary-100'}`}>{value.replace('-', ' ')}</button>
+                  ))}
+                </div>
+                <label className="relative block sm:w-72"><span className="sr-only">Search my courses</span><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-400" aria-hidden="true" /><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search my courses" className="w-full rounded-lg border border-primary-200 py-2.5 pl-10 pr-3" /></label>
+              </div>
+            )}
 
             {isLoading ? (
               <div className="flex justify-center py-20">
@@ -172,7 +188,11 @@ export function MyCourses() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {enrollments.map((enrollment) => {
+                {enrollments.filter(enrollment => {
+                  const progress = Number(enrollment.progress || 0);
+                  const matchesStatus = filter === 'all' || (filter === 'completed' ? progress === 100 : progress < 100);
+                  return matchesStatus && String(enrollment.courses?.title || '').toLowerCase().includes(search.trim().toLowerCase());
+                }).map((enrollment) => {
                   const course = enrollment.courses;
                   if (!course) return null;
 
@@ -182,9 +202,9 @@ export function MyCourses() {
                   const thumbnail = course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800';
 
                   return (
-                    <div key={enrollment.id} className="bg-white border border-primary-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                    <article key={enrollment.id} className="bg-white border border-primary-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
                       <div className="h-48 relative overflow-hidden">
-                        <img src={thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                        <OptimizedImage src={thumbnail} alt="" displayWidth={800} width="800" height="450" className="w-full h-full object-cover" />
                         {progress === 100 && (
                           <div className="absolute top-4 left-4 bg-success-500 text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center gap-1">
                             <Award className="w-4 h-4" /> Completed
@@ -197,32 +217,34 @@ export function MyCourses() {
                         <div className="mb-6 mt-auto">
                           <div className="flex justify-between text-sm mb-2">
                             <span className="font-medium text-primary-700">
-                              {totalLessons > 0 ? `${completedLessons} Course Information ${totalLessons} Completed` : 'Course Information'}
+                              {totalLessons > 0 ? `${completedLessons} of ${totalLessons} lessons completed` : 'Progress will appear after your first lesson'}
                             </span>
                             <span className="font-bold text-accent-600" dir="ltr">{progress}%</span>
                           </div>
                           <div className="h-2 bg-primary-100 rounded-full overflow-hidden">
                             <div
+                              role="progressbar"
+                              aria-label={`${course.title} progress`}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-valuenow={progress}
                               className={`h-full rounded-full transition-all duration-1000 ${progress === 100 ? 'bg-success-500' : 'bg-accent-500'}`}
                               style={{ width: `${progress}%` }}
                             ></div>
                           </div>
                         </div>
                         <div className="flex items-center justify-between mt-auto">
-                          <div className="flex items-center gap-2 text-sm text-primary-500">
-                            <Clock className="w-4 h-4" />
-                            <span>View Course</span>
-                          </div>
+                          {progress === 100 ? <Button variant="secondary" onClick={() => navigate('/certificate', { state: { courseId: course.id } })}>Certificate</Button> : <span className="text-sm text-primary-500">Ready when you are</span>}
                           <Button
                             variant={progress === 100 ? 'secondary' : 'primary'}
                             onClick={() => navigate(`/learn/${course.id}`)}
                             className="px-6"
                           >
-                            {progress === 100 ? 'Course' : 'Continue Learning'}
+                            {progress === 100 ? 'Review course' : progress > 0 ? 'Continue learning' : 'Start course'}
                           </Button>
                         </div>
                       </div>
-                    </div>
+                    </article>
                   );
                 })}
               </div>
@@ -233,4 +255,3 @@ export function MyCourses() {
     </div>
   );
 }
-

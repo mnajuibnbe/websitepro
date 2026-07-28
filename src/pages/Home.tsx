@@ -1,5 +1,4 @@
 import React from 'react';
-import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { HeroSection } from '../components/sections/HeroSection';
 import { StatsBar } from '../components/sections/StatsBar';
 import { FeaturedCourses } from '../components/sections/FeaturedCourses';
@@ -10,13 +9,12 @@ import { Testimonials } from '../components/sections/Testimonials';
 import { FreeContent } from '../components/sections/FreeContent';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { Newsletter } from '../components/sections/Newsletter';
-import { Footer } from '../components/layout/Footer';
+import { PublicLayout } from '../components/layout/PublicLayout';
 
 export function Home() {
   return (
-    <div className="min-h-screen bg-white">
-      <MarketingNavbar />
-      <main>
+    <PublicLayout className="bg-white">
+      <div>
         <HeroSection />
         <StatsBar />
         <FeaturedCourses />
@@ -27,8 +25,7 @@ export function Home() {
         <FreeContent />
         <FinalCTA />
         <Newsletter />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PublicLayout>
   );
 }
