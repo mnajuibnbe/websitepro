@@ -10,7 +10,7 @@ type CertificateState = 'celebration' | 'name_confirmation' | 'issued';
 
 export function CertificatePage() {
   const [step, setStep] = useState<CertificateState>('celebration');
-  const [studentName, setStudentName] = useState('Certificate Information. Certificate Information');
+  const [studentName, setStudentName] = useState('Student Name');
 
   const handleIssueCertificate = (confirmedName: string) => {
     setStudentName(confirmedName);
@@ -52,7 +52,7 @@ export function CertificatePage() {
           {step === 'issued' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 motion-reduce:animate-none motion-reduce:transform-none">
               <div className="text-center mb-10">
-                <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">Certificate Information!</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">Congratulations!</h1>
                 <p className="text-lg text-primary-600">Congratulations! Your verified certificate is ready.</p>
               </div>
 
@@ -61,10 +61,10 @@ export function CertificatePage() {
                 <div className="lg:col-span-8">
                   <CertificatePreview
                     studentName={studentName}
-                    courseName="Certificate Information"
-                    completionDate="23 Certificate Information 2026"
+                    courseName="Completed Course"
+                    completionDate="July 23, 2026"
                     certificateId="TUT-2026-98765"
-                    instructorName="Certificate Information. Certificate Information"
+                    instructorName="Course Instructor"
                   />
                 </div>
 
@@ -88,9 +88,9 @@ export function CertificatePage() {
                     <div className="flex items-start gap-3">
                       <ShieldCheck className="w-6 h-6 text-success-600 flex-shrink-0" />
                       <div>
-                        <h4 className="font-bold text-primary-900 text-sm mb-1">Certificate Information</h4>
+                        <h4 className="font-bold text-primary-900 text-sm mb-1">Verified Certificate</h4>
                         <p className="text-xs text-primary-500 leading-relaxed">
-                          Your verified certificate is ready. (ID) Certificate Information (QR Code).
+                          Your certificate includes a unique ID and QR code for verification.
                         </p>
                       </div>
                     </div>

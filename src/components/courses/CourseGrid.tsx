@@ -51,7 +51,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       setCourses(data || []);
       setCurrentPage(1);
     } catch (err) {
-      setError('Courses. Please.');
+      setError('Courses could not be loaded. Please try again.');
       console.error('Error fetching courses:', err);
     } finally {
       setIsLoading(false);
@@ -86,7 +86,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
           <p className="font-bold mb-2">No items found</p>
-          <p>Course Information.</p>
+          <p>No courses match your current filters.</p>
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     ...filters.categories.map(value => ({ label: value, clear: () => onFiltersChange({ ...filters, categories: filters.categories.filter(item => item !== value) }) })),
     ...filters.levels.map(value => ({ label: ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' } as Record<string, string>)[value] || value, clear: () => onFiltersChange({ ...filters, levels: filters.levels.filter(item => item !== value) }) })),
     ...(filters.price === 'all' ? [] : [{ label: filters.price === 'free' ? 'Free' : 'Paid', clear: () => onFiltersChange({ ...filters, price: 'all' }) }]),
-    ...filters.durations.map(value => ({ label: ({ short: 'Course Information 5 Course Information', medium: '5 - 20 Hour', long: 'Course Information 20 Hour' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
+    ...filters.durations.map(value => ({ label: ({ short: 'Under 5 hours', medium: '5–20 hours', long: 'Over 20 hours' } as Record<string, string>)[value], clear: () => onFiltersChange({ ...filters, durations: filters.durations.filter(item => item !== value) }) })),
     ...(filters.search ? [{ label: `Search: ${filters.search}`, clear: () => onFiltersChange({ ...filters, search: '' }) }] : []),
   ];
 
@@ -104,13 +104,13 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     <div className="flex-grow">
       {appliedFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          <span className="text-sm font-bold text-primary-900 ml-2">Course Information:</span>
+          <span className="text-sm font-bold text-primary-900 ml-2">Active filters:</span>
           {appliedFilters.map(item => (
             <button type="button" key={item.label} onClick={item.clear} className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
               {item.label}<X className="w-4 h-4 text-primary-400" />
             </button>
           ))}
-          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">Course Information</button>
+          <button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="text-sm font-bold text-accent-600">Clear all filters</button>
         </div>
       )}
 

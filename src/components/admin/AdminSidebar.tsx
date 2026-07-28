@@ -37,7 +37,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
-            <span>Details - Manage</span>
+            <span>Administration</span>
           </div>
         </div>
 

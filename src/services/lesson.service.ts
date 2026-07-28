@@ -216,7 +216,7 @@ export class LessonService {
   }
 
   /**
-   * Duplicate a lesson with " (Details)" appended to title and placed directly after the source lesson.
+   * Duplicate a lesson with " (Copy)" appended to title and placed directly after the source lesson.
    */
   static async duplicateLesson(lessonId: string): Promise<Lesson> {
     const original = await this.getLessonById(lessonId);
@@ -242,7 +242,7 @@ export class LessonService {
     const duplicatedData: Partial<Lesson> = {
       ...original,
       id: undefined,
-      title: `${original.title} (Details)`,
+      title: `${original.title} (Copy)`,
       slug: original.slug ? `${original.slug}-copy-${Date.now()}` : null,
       order_index: targetOrder,
       created_at: undefined,

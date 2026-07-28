@@ -80,7 +80,7 @@ export function CourseDetail() {
           <p className="text-lg text-primary-600 mb-8 max-w-md">
             {errorState === 'invalid_uuid'
               ? 'Link.'
-              : 'The requested information could not be loaded. Please try again.'}
+              : 'Course details could not be loaded. Please try again.'}
           </p>
           <Button variant="primary" onClick={() => navigate('/courses')} className="px-8">
             Courses

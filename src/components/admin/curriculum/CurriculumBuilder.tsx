@@ -216,7 +216,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
         } catch (err) {
           console.error('Failed to save section reorder:', err);
           setSections(snapshot);
-          setError('Save. Curriculum.');
+          setError('Unable to save the curriculum. Please try again.');
         } finally {
           setIsSavingOrder(false);
         }
@@ -256,7 +256,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       } catch (err) {
         console.error('Failed to save item reorder:', err);
         setSections(snapshot);
-        setError('Save. Curriculum.');
+        setError('Unable to save the curriculum. Please try again.');
       } finally {
         setIsSavingOrder(false);
       }
@@ -576,7 +576,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             {isSavingOrder && (
               <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5 animate-pulse">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span>Save...</span>
+                <span>Saving...</span>
               </span>
             )}
           </div>
@@ -740,7 +740,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <div className="max-w-md mx-auto space-y-1">
             <h3 className="font-bold text-base text-primary-900">No items are available yet.</h3>
             <p className="text-xs text-primary-500 leading-relaxed">
-              The requested information could not be loaded. Please try again.
+              The curriculum could not be loaded. Please try again.
             </p>
           </div>
           <button
@@ -837,7 +837,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   rows={3}
                   value={newSectionDesc}
                   onChange={(e) => setNewSectionDesc(e.target.value)}
-                  placeholder="Content..."
+                  placeholder="Enter the item title"
                   className="w-full text-xs p-3 bg-primary-50/50 border border-primary-200 rounded-xl outline-none resize-none"
                 />
               </div>
