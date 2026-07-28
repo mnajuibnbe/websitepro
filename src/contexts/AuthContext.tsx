@@ -10,7 +10,7 @@ export interface RegisterResult {
   requiresEmailConfirmation: boolean;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   session: Session | null;
   token: string | null;
@@ -21,7 +21,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function mapSupabaseUserToLocalUser(supabaseUser: SupabaseUser): User {
   const appRole = supabaseUser.app_metadata?.role;

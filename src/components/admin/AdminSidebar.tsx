@@ -1,7 +1,8 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useMobileDrawerLifecycle } from '../../hooks/useMobileDrawerLifecycle';
+import { MobileDrawerBackdrop } from '../layout/MobileDrawerBackdrop';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -9,9 +10,8 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
-  const { logout } = useAuth();
-  const location = useLocation();
-  const currentPath = location.pathname;
+  const { logout, user } = useAuth();
+  const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
 
   const navItems = [
     { icon: BarChart3, label: 'Admin overview', href: '/admin' },
@@ -22,30 +22,33 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   return (
     <>
       {/* Mobile Toggle */}
-      <button
+      {!isOpen && <button
         type="button"
-        aria-label={isOpen ? 'Close admin navigation' : 'Open admin navigation'}
+        aria-label="Open admin navigation"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-xl shadow-sm border border-primary-200 text-primary-600"
+        onClick={() => setIsOpen(true)}
+        className="lg:hidden fixed top-[max(1rem,env(safe-area-inset-top))] left-4 z-50 min-h-11 min-w-11 p-2 bg-white rounded-xl shadow-sm border border-primary-200 text-primary-600"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+        <Menu className="w-6 h-6" />
+      </button>}
 
       {/* Sidebar */}
-      <aside aria-label="Admin navigation" className={`fixed top-0 left-0 h-screen w-72 bg-white border-r border-primary-200 shadow-sm flex flex-col transition-transform duration-300 z-40 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside aria-label="Admin navigation" aria-hidden={!isDrawerInteractive || undefined} inert={!isDrawerInteractive || undefined} data-state={isOpen ? 'open' : 'closed'} className={`mobile-drawer-viewport fixed inset-y-0 left-0 w-[min(18rem,100vw)] min-h-0 bg-white border-r border-primary-200 shadow-sm flex flex-col transition-transform duration-300 motion-reduce:transition-none z-40 ${!isDrawerInteractive ? 'pointer-events-none lg:pointer-events-auto ' : ''}${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Header */}
-        <div className="h-16 flex items-center px-6 border-b border-primary-100">
+        <div className="min-h-16 shrink-0 flex items-center justify-between px-6 pt-[env(safe-area-inset-top)] border-b border-primary-100">
           <div className="font-bold text-xl text-primary-900 flex items-center gap-2">
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
             <span>Tutiba Admin</span>
           </div>
+          <button type="button" aria-label="Close admin navigation" onClick={close} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-primary-500 hover:bg-primary-50 hover:text-primary-900 lg:hidden">
+            <X className="h-6 w-6" />
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav aria-label="Administration" className="flex-grow py-8 px-4 flex flex-col gap-2">
+        <nav aria-label="Administration" className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-8 px-4 flex flex-col gap-2">
           {navItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = currentPath === item.href || (item.href === '/admin/courses' && currentPath.startsWith('/admin/courses/'));
@@ -54,7 +57,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 key={index}
                 to={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                onClick={() => setIsOpen(false)}
+                onClick={close}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
                   isActive
                     ? 'bg-accent-50 text-accent-700'
@@ -69,12 +72,12 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         </nav>
 
         {/* Footer / Logout */}
-        <div className="p-4 border-t border-primary-100">
-          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
+        <div className="shrink-0 border-t border-primary-100 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <Link to="/dashboard" onClick={close} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-primary-600 hover:bg-primary-50 transition-colors mb-2">
             <Home className="w-5 h-5" />
             <span>Student dashboard</span>
           </Link>
-          <button type="button" onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
+          <button type="button" onClick={() => { close(); void logout(); }} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl font-bold text-danger-600 hover:bg-danger-50 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>Sign Out</span>
           </button>
@@ -83,9 +86,9 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
 
       {/* Overlay */}
       {isOpen && (
-        <div
+        <MobileDrawerBackdrop
           className="fixed inset-0 bg-primary-900/20 backdrop-blur-sm z-30 lg:hidden"
-          onClick={() => setIsOpen(false)}
+          onDismiss={close}
         />
       )}
     </>

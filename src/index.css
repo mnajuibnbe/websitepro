@@ -42,6 +42,25 @@
 }
 
 @layer utilities {
+  .mobile-drawer-viewport {
+    height: 100vh;
+    max-height: 100vh;
+  }
+
+  @supports (height: 100dvh) {
+    .mobile-drawer-viewport {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .mobile-drawer-viewport {
+      height: 100vh;
+      max-height: none;
+    }
+  }
+
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

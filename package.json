@@ -12,6 +12,8 @@
     "clean": "rm -rf dist server.js dist/server.cjs",
     "lint": "tsc --noEmit",
     "test": "tsx --test src/server/**/*.test.ts",
+    "test:frontend": "tsx --test src/test/*.frontend.test.tsx",
+    "test:browser-smoke": "npm run build && node --test tests/browser/*.test.mjs",
     "test:quality": "node scripts/quality-audit.mjs"
   },
   "dependencies": {
