@@ -473,7 +473,7 @@ export function AdminCourseBuilder() {
                   }`}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>Review status</span>
+                  <span>Submit for review</span>
                 </Button>
               </div>
             </div>
@@ -485,7 +485,7 @@ export function AdminCourseBuilder() {
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'pricing', label: 'Pricing', icon: DollarSign },
                 { id: 'seo', label: 'Search (SEO)', icon: Globe },
-                { id: 'publish', label: 'Publish (Publish)', icon: CheckCircle },
+                { id: 'publish', label: 'Review & publish', icon: CheckCircle },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -992,7 +992,7 @@ export function AdminCourseBuilder() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-amber-600" />
-                    <span>Publish</span>
+                    <span>Submit for review</span>
                   </h2>
 
                   {courseId && <CourseReviewPanel courseId={courseId} />}

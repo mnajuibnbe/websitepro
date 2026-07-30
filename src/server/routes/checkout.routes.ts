@@ -20,6 +20,10 @@ router.post('/', async (req: Request, res: Response) => {
   const amount = String(rawAmount);
   try { amountToMinorUnits(amount); } catch { return res.status(500).json({ error: 'Course price configuration is invalid' }); }
 
+  const { data: existingEnrollment, error: enrollmentLookupError } = await admin.from('enrollments').select('id,status').eq('user_id', auth.user.id).eq('course_id', course.id).maybeSingle();
+  if (enrollmentLookupError) return res.status(500).json({ error: 'Could not verify enrollment status' });
+  if (existingEnrollment && existingEnrollment.status !== 'cancelled') return res.status(409).json({ error: existingEnrollment.status === 'active' ? 'You are already enrolled in this course.' : 'Your enrollment request is already pending.' });
+
   // Ignore all client amount/currency fields. The immutable snapshot is selected above.
   const { data: order, error: orderError } = await admin.from('course_orders').insert({
     course_id: course.id, user_id: auth.user.id, amount, currency: context.currency,
@@ -28,7 +32,11 @@ router.post('/', async (req: Request, res: Response) => {
   }).select('*').single();
   if (orderError) return res.status(500).json({ error: 'Could not create order' });
 
-  const { error: enrollmentError } = await admin.from('enrollments').upsert({ user_id: auth.user.id, course_id: course.id, status: Number(amount) === 0 ? 'active' : 'pending' }, { onConflict: 'user_id,course_id', ignoreDuplicates: true });
+  const nextEnrollmentStatus = Number(amount) === 0 ? 'active' : 'pending';
+  const enrollmentMutation = existingEnrollment
+    ? admin.from('enrollments').update({ status: nextEnrollmentStatus }).eq('id', existingEnrollment.id)
+    : admin.from('enrollments').insert({ user_id: auth.user.id, course_id: course.id, status: nextEnrollmentStatus });
+  const { error: enrollmentError } = await enrollmentMutation;
   if (enrollmentError) return res.status(500).json({ error: 'Order created but enrollment request failed', orderId: order.id });
   return res.status(201).json({ order });
 });

@@ -11,6 +11,10 @@ export function ConfirmDialog({ open, title, description, confirmLabel = 'Delete
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const onCancelRef = useRef(onCancel);
+  const busyRef = useRef(busy);
+  onCancelRef.current = onCancel;
+  busyRef.current = busy;
 
   useEffect(() => {
     if (!open) return;
@@ -19,7 +23,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel = 'Delete
     document.body.style.overflow = 'hidden';
     requestAnimationFrame(() => cancelRef.current?.focus());
     const keydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !busy) onCancel();
+      if (event.key === 'Escape' && !busyRef.current) onCancelRef.current();
       if (event.key === 'Tab' && dialogRef.current) {
         const focusable = Array.from(dialogRef.current.querySelectorAll('button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [href]')) as HTMLElement[];
         if (!focusable.length) return;
@@ -30,7 +34,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel = 'Delete
     };
     document.addEventListener('keydown', keydown);
     return () => { document.removeEventListener('keydown', keydown); document.body.style.overflow = oldOverflow; previous?.focus(); };
-  }, [open, busy, onCancel]);
+  }, [open]);
 
   if (!open) return null;
   return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-900/60 p-4" onMouseDown={event => event.target === event.currentTarget && !busy && onCancel()}>

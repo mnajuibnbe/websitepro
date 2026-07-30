@@ -123,14 +123,14 @@ export function EnrollmentCard() {
     if (isEnrolling) return <Loader2 className="w-5 h-5 animate-spin mx-auto" />;
     if (enrollmentStatus === 'active') return 'Continue learning';
     if (enrollmentStatus === 'pending') return 'Pending Approval';
-    if (enrollmentStatus === 'cancelled') return 'Enrollment unavailable';
+    if (enrollmentStatus === 'cancelled') return 'Apply again';
     return user ? 'Continue to checkout' : 'Sign in to enroll';
   };
 
   const handleButtonClick = () => {
     if (enrollmentStatus === 'active') {
       navigate(`/learn/${courseId}`);
-    } else if (enrollmentStatus === 'none') {
+    } else if (enrollmentStatus === 'none' || enrollmentStatus === 'cancelled') {
       handleEnroll();
     }
   };
@@ -212,7 +212,7 @@ export function EnrollmentCard() {
             variant="primary"
             className="w-full h-14 text-lg"
             onClick={handleButtonClick}
-            disabled={!price.available || isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
+            disabled={!price.available || isEnrolling || enrollmentStatus === 'pending'}
           >
             {renderButtonContent()}
           </Button>
@@ -238,7 +238,7 @@ export function EnrollmentCard() {
         variant="primary"
         className="flex-grow h-12 text-lg font-bold"
         onClick={handleButtonClick}
-        disabled={!price.available || isEnrolling || enrollmentStatus === 'pending' || enrollmentStatus === 'cancelled'}
+        disabled={!price.available || isEnrolling || enrollmentStatus === 'pending'}
       >
         {renderButtonContent()}
       </Button>
