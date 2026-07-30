@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Tutiba</title>
+  <path d="M24 7h16M28 7v16L15 45c-3 6 1 12 8 12h18c7 0 11-6 8-12L36 23V7" fill="none" stroke="#0D9488" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M21 43h26" fill="none" stroke="#2DD4BF" stroke-width="5" stroke-linecap="round"/>
+  <path d="M47 39c0-4 5-10 5-10s5 6 5 10a5 5 0 0 1-10 0Z" fill="#2DD4BF"/>
+</svg>

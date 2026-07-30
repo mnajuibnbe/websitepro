@@ -17,13 +17,16 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
   const { hasPermission } = useAuthorization();
   const isAdmin = hasPermission(Permission.ADMIN_ACCESS);
+  const isInstructor = hasPermission(Permission.CREATE_COURSE);
 
   const navItems = [
     { icon: Home, label: 'Dashboard', href: '/dashboard' },
     { icon: BookOpen, label: 'My Courses', href: '/my-courses' },
     { icon: Award, label: 'Certificates', href: '/certificate' },
     { icon: Settings, label: 'Settings', href: '/profile' },
-    { icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' },
+    ...(isInstructor
+      ? [{ icon: GraduationCap, label: 'Create a course', href: '/instructor/courses/new' }]
+      : [{ icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' }]),
   ];
 
   return (

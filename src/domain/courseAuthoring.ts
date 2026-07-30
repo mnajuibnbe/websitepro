@@ -4,6 +4,19 @@ export type CourseAuthoringStatus = (typeof COURSE_AUTHORING_STATUSES)[number];
 export const COURSE_REVIEW_STATUSES = ['not_submitted', 'submitted', 'changes_requested', 'approved', 'rejected'] as const;
 export type CourseReviewStatus = (typeof COURSE_REVIEW_STATUSES)[number];
 
+export type CourseWorkflowState = Readonly<{
+  authoringStatus: CourseAuthoringStatus;
+  reviewStatus: CourseReviewStatus;
+  publicationStatus: 'draft' | 'published' | 'archived';
+}>;
+
+export const COURSE_WORKFLOW_TRANSITIONS = {
+  submit: { from: ['draft:not_submitted', 'draft:changes_requested', 'draft:rejected'], to: 'in_review:submitted' },
+  request_changes: { from: ['in_review:submitted', 'approved:approved'], to: 'draft:changes_requested' },
+  reject: { from: ['in_review:submitted'], to: 'draft:rejected' },
+  approve: { from: ['in_review:submitted'], to: 'approved:approved' },
+} as const;
+
 export const COURSE_VISIBILITIES = ['public', 'unlisted', 'private'] as const;
 export type CourseVisibility = (typeof COURSE_VISIBILITIES)[number];
 
@@ -38,6 +51,18 @@ export function canTransitionReviewStatus(from: CourseReviewStatus, to: CourseRe
     rejected: ['submitted'],
   };
   return transitions[from].includes(to);
+}
+
+export function isConsistentCourseWorkflowState(state: CourseWorkflowState): boolean {
+  const pair = `${state.authoringStatus}:${state.reviewStatus}`;
+  const validPair = new Set([
+    'draft:not_submitted', 'draft:changes_requested', 'draft:rejected',
+    'in_review:submitted', 'approved:approved', 'archived:approved',
+  ]).has(pair);
+  if (!validPair) return false;
+  if (state.publicationStatus === 'published') return pair === 'approved:approved';
+  if (state.publicationStatus === 'archived') return state.authoringStatus !== 'in_review';
+  return state.authoringStatus !== 'archived';
 }
 
 export function legacyLessonTypeToCanonical(type: string | null | undefined): LessonContentType | null {

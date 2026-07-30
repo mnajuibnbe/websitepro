@@ -21,6 +21,7 @@ export interface AuthContextType {
   isLoading: boolean;
   sessionError: string | null;
   retrySession: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<RegisterResult>;
   logout: () => Promise<boolean>;
@@ -120,6 +121,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshSession = useCallback(async () => {
+    const { data, error } = await runAuthRequest(supabase.auth.refreshSession());
+    if (error || !data.session) throw new Error('Your updated account access could not be loaded. Please try again.');
+    setSession(data.session);
+    setUser(previousUser => updateLocalUser(previousUser, data.session?.user));
+  }, []);
+
   const register = async (name: string, email: string, password: string): Promise<RegisterResult> => {
     const { data, error } = await runAuthRequest(supabase.auth.signUp({
       email,
@@ -157,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const token = session?.access_token || null;
 
   return (
-    <AuthContext.Provider value={{ user, session, token, isAuthenticated: !!session, isLoading, sessionError, retrySession: loadSession, login, register, logout }}>
+    <AuthContext.Provider value={{ user, session, token, isAuthenticated: !!session, isLoading, sessionError, retrySession: loadSession, refreshSession, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

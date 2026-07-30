@@ -24,6 +24,8 @@ export interface Course {
   review_status?: CourseReviewStatus;
   author_id?: string | null;
   version?: number;
+  submitted_revision_id?: string | null;
+  approved_revision_id?: string | null;
   is_featured: boolean | null;
   home_order: number | null;
   certificate_enabled: boolean | null;
@@ -37,6 +39,16 @@ export interface Course {
   archived_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface CourseRevision {
+  id: string;
+  course_id: string;
+  revision_number: number;
+  snapshot: Record<string, unknown>;
+  content_hash: string;
+  created_by: string;
+  created_at: string;
 }
 
 export interface Enrollment {

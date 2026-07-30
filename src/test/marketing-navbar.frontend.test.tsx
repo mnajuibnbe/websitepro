@@ -12,6 +12,7 @@ const guestAuth = {
   isLoading: false,
   sessionError: null,
   retrySession: async () => undefined,
+  refreshSession: async () => undefined,
   login: async () => undefined,
   register: async () => ({ user: null, session: null, requiresEmailConfirmation: true }),
   logout: async () => true,
@@ -26,6 +27,14 @@ test('renders a consistent course active state and honest navigation actions', (
   assert.match(markup, /aria-label="Open navigation menu"/);
   assert.match(markup, /aria-controls="marketing-navigation-drawer"/);
   assert.match(markup, /motion-reduce:transition-none/);
+  assert.match(markup, /aria-label="Course prices shown in EGP"/);
+});
+
+test('desktop navigation exposes Home and keeps Login in the account action group', () => {
+  const markup = renderFrontend(<AuthContext.Provider value={guestAuth}><MarketingNavbar /></AuthContext.Provider>, { route: '/' });
+  assert.match(markup, /aria-current="page"[^>]*href="\/"[^>]*>Home<\/a>/);
+  assert.match(markup, /lg:justify-end/);
+  assert.match(markup, />Login<\/a>/);
 });
 
 test('uses a solid header away from the homepage', () => {

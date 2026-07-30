@@ -6,12 +6,20 @@ import {
   isLessonContentType,
   legacyLessonTypeToCanonical,
   LESSON_CONTENT_TYPES,
+  isConsistentCourseWorkflowState,
 } from './courseAuthoring';
 
 test('exposes only the five production lesson content types', () => {
   assert.deepEqual(LESSON_CONTENT_TYPES, ['video', 'pdf', 'external_link', 'quiz', 'assignment']);
   assert.equal(isLessonContentType('audio'), false);
   assert.equal(isLessonContentType('quiz'), true);
+});
+
+test('rejects impossible authoring, review, and publication combinations', () => {
+  assert.equal(isConsistentCourseWorkflowState({ authoringStatus: 'in_review', reviewStatus: 'submitted', publicationStatus: 'draft' }), true);
+  assert.equal(isConsistentCourseWorkflowState({ authoringStatus: 'approved', reviewStatus: 'approved', publicationStatus: 'published' }), true);
+  assert.equal(isConsistentCourseWorkflowState({ authoringStatus: 'draft', reviewStatus: 'approved', publicationStatus: 'draft' }), false);
+  assert.equal(isConsistentCourseWorkflowState({ authoringStatus: 'in_review', reviewStatus: 'submitted', publicationStatus: 'published' }), false);
 });
 
 test('selects a type-safe completion rule', () => {
