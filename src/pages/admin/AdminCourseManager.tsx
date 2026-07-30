@@ -260,17 +260,16 @@ export function AdminCourseManager() {
     try {
       setIsDeleting(true);
 
-      const { error } = await supabase
-        .from('courses')
-        .delete()
-        .eq('id', selectedCourseForDelete.id);
+      const { error } = await supabase.rpc('admin_delete_empty_course', {
+        p_course_id: selectedCourseForDelete.id,
+      });
 
       if (error) {
         console.error('Database deletion error:', error);
-        if (error.code === '23503' || error.message?.includes('foreign key constraint')) {
+        if (error.code === '23503' || error.code === '23514' || error.message?.includes('foreign key constraint')) {
           addToast(
             'error',
-            'Unable to complete this action. Please try again.. Create, review, and manage your course catalog.'
+            error.message || 'This course has student or order records and must be archived instead.'
           );
           setSelectedCourseForDelete(null);
           return;

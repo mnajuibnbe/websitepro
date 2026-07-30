@@ -99,7 +99,7 @@ export function AdminCourseCreate() {
           p_title: title.trim(), p_slug: null, p_short_description: shortDescription.trim() || null, p_description: description.trim() || null,
           p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'Arabic', p_price_egp: priceEgp,
           p_price_usd: priceUsd, p_instructor_id: instructorId || null, p_thumbnail: coverImage.trim() || null,
-          p_cover_image: coverImage.trim() || null, p_create_first_section: true,
+          p_cover_image: coverImage.trim() || null, p_create_first_section: false,
         });
 
       if (rpcError) {
