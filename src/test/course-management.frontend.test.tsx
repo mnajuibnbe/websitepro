@@ -31,11 +31,12 @@ test('unsaved changes dialog exposes both recovery choices', () => {
   assert.match(markup, /role="alertdialog"/);
 });
 
-test('guided course setup exposes progress and anchored steps', () => {
+test('guided course setup exposes progress without changing the hash route', () => {
   const markup = renderFrontend(<CourseEditorGuide steps={[{ id: 'basics', label: 'Basics', description: 'Course details', complete: true }, { id: 'cover', label: 'Cover', description: 'Course image', complete: false }]} />);
   assert.match(markup, /role="progressbar"/);
   assert.match(markup, /aria-valuenow="50"/);
-  assert.match(markup, /href="#basics"/);
+  assert.doesNotMatch(markup, /href="#basics"/);
+  assert.match(markup, /type="button"/);
   assert.match(markup, /1 of 2/);
 });
 
