@@ -1,67 +1,9 @@
-import React from 'react';
-import { Button } from '../ui/Button';
-import { Award, BookOpen, GraduationCap } from 'lucide-react';
+import { Award, GraduationCap, UserRound } from 'lucide-react';
 import { OptimizedImage } from '../ui/OptimizedImage';
 
-export function CourseInstructor() {
-  return (
-    <div className="mb-12 md:mb-16">
-      <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Instructor
-      </h2>
-      <div className="bg-white border border-primary-200 p-6 md:p-8 rounded-2xl shadow-sm">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-right">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden flex-shrink-0 border-4 border-primary-50 shadow-md">
-            <OptimizedImage displayWidth={400} width="400" height="400"
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop"
-              alt="Instructor Information. Instructor Information"
-              className="w-full h-full object-cover"
-            />
-          </div>
+export interface PublicInstructorProfile { professional_name: string; bio: string; expertise: string[]; credentials: string; avatar_url: string | null; }
 
-          <div className="flex-grow">
-            <h3 className="text-2xl font-bold text-primary-900 mb-2">Instructor Information. Instructor Information</h3>
-            <p className="text-accent-600 font-bold mb-4">Instructor Information</p>
-            <p className="text-primary-600 leading-relaxed mb-6 font-medium">
-              Instructor Information. Minute.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 text-left">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent-50 flex items-center justify-center text-accent-600 flex-shrink-0">
-                  <GraduationCap className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-primary-900">Instructor Information 10 Instructor Information</span>
-                  <span className="text-xs text-primary-500 font-medium">Instructor Information</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent-50 flex items-center justify-center text-accent-600 flex-shrink-0">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-primary-900">8 Instructor Information</span>
-                  <span className="text-xs text-primary-500 font-medium">Instructor Information</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent-50 flex items-center justify-center text-accent-600 flex-shrink-0">
-                  <Award className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-primary-900">1000+ Instructor Information</span>
-                  <span className="text-xs text-primary-500 font-medium">Instructor Information</span>
-                </div>
-              </div>
-            </div>
-
-            <Button variant="secondary" className="w-full sm:w-auto">
-              View
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+export function CourseInstructor({ instructor }: { instructor: PublicInstructorProfile | null }) {
+  if (!instructor) return null;
+  return <section className="mb-12 md:mb-16" aria-labelledby="instructor-heading"><h2 id="instructor-heading" className="mb-6 text-2xl font-bold text-primary-900 md:text-3xl">Your instructor</h2><div className="rounded-2xl border border-primary-200 bg-white p-6 shadow-sm md:p-8"><div className="flex flex-col items-center gap-6 text-center md:flex-row md:items-start md:text-left">{instructor.avatar_url ? <div className="h-32 w-32 flex-none overflow-hidden rounded-full border-4 border-primary-50 shadow-md"><OptimizedImage src={instructor.avatar_url} alt={instructor.professional_name} displayWidth={320} className="h-full w-full object-cover" /></div> : <div className="flex h-32 w-32 flex-none items-center justify-center rounded-full bg-accent-50 text-accent-700"><UserRound className="h-14 w-14" /></div>}<div className="min-w-0 flex-1"><h3 className="text-2xl font-bold text-primary-900">{instructor.professional_name}</h3><p className="mt-2 leading-relaxed text-primary-600">{instructor.bio}</p><div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">{instructor.expertise.map(item => <span key={item} className="rounded-full bg-accent-50 px-3 py-1 text-sm font-bold text-accent-800">{item}</span>)}</div><div className="mt-5 flex items-start gap-3 rounded-xl bg-primary-50 p-4 text-left"><Award className="mt-0.5 h-5 w-5 flex-none text-amber-600" /><div><p className="font-bold text-primary-900">Professional credentials</p><p className="mt-1 text-sm leading-relaxed text-primary-600">{instructor.credentials}</p></div></div><p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-success-700"><GraduationCap className="h-4 w-4" />Admin-approved instructor</p></div></div></div></section>;
 }

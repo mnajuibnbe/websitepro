@@ -4,6 +4,10 @@ import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
 
 export function CourseHero({ course }: { course?: any }) {
+  const durationSeconds = Number(course?.total_video_duration_seconds || 0);
+  const durationLabel = durationSeconds > 0
+    ? `${Math.floor(durationSeconds / 3600) > 0 ? `${Math.floor(durationSeconds / 3600)} hr ` : ''}${Math.ceil((durationSeconds % 3600) / 60)} min video`
+    : 'Self-paced learning';
   return (
     <div className="pb-8 border-b border-primary-200 mb-8 lg:mb-12">
       {/* Breadcrumb */}
@@ -46,7 +50,7 @@ export function CourseHero({ course }: { course?: any }) {
 
         <div className="flex items-center gap-2 text-primary-700 font-medium">
            <Clock className="w-5 h-5 text-primary-400" />
-           <span>80 Hour</span>
+           <span>{durationLabel}</span>
         </div>
 
         <div className="w-1.5 h-1.5 rounded-full bg-primary-300 hidden sm:block"></div>

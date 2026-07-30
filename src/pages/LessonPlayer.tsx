@@ -11,6 +11,7 @@ import { CourseSidebar } from '../components/player/CourseSidebar';
 import { VideoLessonRenderer } from '../components/player/VideoLessonRenderer';
 import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
 import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
+import { AssignmentLessonRenderer } from '../components/player/AssignmentLessonRenderer';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { LessonDetails } from '../components/player/LessonDetails';
 
@@ -492,7 +493,9 @@ export function LessonPlayer() {
           {/* Main Content Area (Left side in RTL) */}
           <main id="main-content" className="lg:col-span-8 flex flex-col">
             {/* Viewer Component */}
-            {currentLesson.type === 'video' ? (
+            {currentLesson.content_type === 'assignment' ? (
+              <AssignmentLessonRenderer lessonId={currentLesson.id} />
+            ) : currentLesson.type === 'video' ? (
               <VideoLessonRenderer lessonId={currentLesson.id} videoUrl={currentLesson.video_url} title={currentLesson.title} />
             ) : currentLesson.type === 'text' ? (
               <TextLessonRenderer content={currentLesson.content} title={currentLesson.title} />

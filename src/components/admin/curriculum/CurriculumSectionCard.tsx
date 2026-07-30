@@ -115,7 +115,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             {...attributes}
             {...listeners}
             className="p-1.5 text-primary-400 hover:text-amber-600 cursor-grab active:cursor-grabbing rounded-xl hover:bg-primary-100/80 transition-colors flex-shrink-0 mt-0.5 sm:mt-0"
-            title="Section"
+            title="Drag to reorder section" aria-label={`Reorder section ${section.title}`}
           >
             <GripVertical className="w-5 h-5" />
           </div>
@@ -195,14 +195,14 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1 shadow-2xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add</span>
+              <span>Add lesson</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsEditing(true)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title="Edit"
+              title="Edit section" aria-label={`Edit section ${section.title}`}
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -211,7 +211,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => onDuplicateSection(section.id)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title="Section"
+              title="Duplicate section" aria-label={`Duplicate section ${section.title}`}
             >
               <Copy className="w-4 h-4" />
             </button>
@@ -220,7 +220,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => onDeleteSection(section.id)}
               className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-xl transition-colors"
-              title="Delete"
+              title="Delete section" aria-label={`Delete section ${section.title}`}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -229,7 +229,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               type="button"
               onClick={() => setIsCollapsed((prev) => !prev)}
               className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-              title={isCollapsed ? 'Section' : 'Section'}
+              title={isCollapsed ? 'Expand section' : 'Collapse section'} aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} section ${section.title}`}
             >
               {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
             </button>
@@ -248,14 +248,14 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             >
               <Layers className="w-6 h-6 text-primary-400" />
               <p className="text-xs font-bold text-primary-600">
-                Section. Section &quot;Add&quot;.
+                This section is empty. Add the first lesson to begin.
               </p>
               <button
                 type="button"
                 onClick={() => onAddItem(section.id, section.title)}
                 className="mt-1 text-xs text-amber-700 hover:text-amber-800 font-bold underline"
               >
-                Add
+                Add lesson
               </button>
             </div>
           ) : (
