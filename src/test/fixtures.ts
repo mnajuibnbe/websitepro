@@ -35,6 +35,7 @@ export function createTestAuthValue(
     isLoading: false,
     sessionError: null,
     retrySession: async () => {},
+    refreshSession: async () => {},
     login: async () => {},
     register: async () => ({ user: testUsers[role], session: null, requiresEmailConfirmation: false }),
     logout: async () => true,

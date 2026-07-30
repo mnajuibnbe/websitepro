@@ -1,0 +1,12 @@
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+
+export type Locale='en'|'ar';
+const messages={
+  en:{language:'العربية',welcome:'Welcome back',signInTitle:'Sign in to Tutiba',signInDescription:'Enter your details to continue your learning journey.',email:'Email address',password:'Password',forgot:'Forgot Password',signingIn:'Signing in…',signIn:'Sign in',noAccount:'Don’t have an account?',signUp:'Sign up',backHome:'Back to Tutiba home',about:'About Tutiba',evidence:'Evidence-based education',confidence:'Continue building practical confidence in cosmeceuticals.',access:'Access your courses, learning progress, and professional education in one secure place.',pace:'Learn at your own pace',secure:'Your account is protected by secure authentication',support:'Contact support',privacy:'Privacy',terms:'Terms',caps:'Caps Lock is on.'},
+  ar:{language:'English',welcome:'مرحباً بعودتك',signInTitle:'تسجيل الدخول إلى توتيبا',signInDescription:'أدخل بياناتك لمتابعة رحلتك التعليمية.',email:'البريد الإلكتروني',password:'كلمة المرور',forgot:'نسيت كلمة المرور؟',signingIn:'جارٍ تسجيل الدخول…',signIn:'تسجيل الدخول',noAccount:'ليس لديك حساب؟',signUp:'إنشاء حساب',backHome:'العودة إلى الرئيسية',about:'عن توتيبا',evidence:'تعليم قائم على الأدلة',confidence:'واصل بناء خبرتك العملية في مستحضرات التجميل الطبية.',access:'ادخل إلى دوراتك وتقدمك التعليمي من مكان واحد آمن.',pace:'تعلّم بالسرعة التي تناسبك',secure:'حسابك محمي بمصادقة آمنة',support:'الدعم',privacy:'الخصوصية',terms:'الشروط',caps:'زر الأحرف الكبيرة مفعّل.'},
+} as const;
+type MessageKey=keyof typeof messages.en;
+interface LocaleValue{locale:Locale;dir:'ltr'|'rtl';setLocale:(locale:Locale)=>void;toggleLocale:()=>void;t:(key:MessageKey)=>string}
+const Context=createContext<LocaleValue>({locale:'en',dir:'ltr',setLocale:()=>undefined,toggleLocale:()=>undefined,t:key=>messages.en[key]});
+export function LocaleProvider({children}:{children:ReactNode}){const[locale,setLocale]=useState<Locale>(()=>typeof window!=='undefined'&&window.localStorage.getItem('tutiba-locale')==='ar'?'ar':'en');const value=useMemo<LocaleValue>(()=>({locale,dir:locale==='ar'?'rtl':'ltr',setLocale,toggleLocale:()=>setLocale(current=>current==='en'?'ar':'en'),t:key=>messages[locale][key]}),[locale]);useEffect(()=>{document.documentElement.lang=locale;document.documentElement.dir=value.dir;window.localStorage.setItem('tutiba-locale',locale);},[locale,value.dir]);return <Context.Provider value={value}>{children}</Context.Provider>}
+export const useLocale=()=>useContext(Context);

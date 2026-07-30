@@ -8,6 +8,7 @@ import { PageMeta } from './components/layout/PageMeta';
 import { AppErrorBoundary } from './components/errors/AppErrorBoundary';
 import { Permission } from './types/auth';
 import { lazyNamed } from './lib/lazyNamed';
+import { LocaleProvider } from './contexts/LocaleContext';
 
 const Home = lazyNamed(() => import('./pages/Home'), 'Home');
 const About = lazyNamed(() => import('./pages/About'), 'About');
@@ -45,6 +46,7 @@ const AdminCourseEnrollments = lazyNamed(() => import('./pages/admin/AdminCourse
 const InstructorApplication = lazyNamed(() => import('./pages/InstructorApplication'), 'InstructorApplication');
 const AdminInstructorApplications = lazyNamed(() => import('./pages/admin/AdminInstructorApplications'), 'AdminInstructorApplications');
 const AdminCourseReviews = lazyNamed(() => import('./pages/admin/AdminCourseReviews'), 'AdminCourseReviews');
+const AdminCourseReviewWorkspace = lazyNamed(() => import('./pages/admin/AdminCourseReviewWorkspace'), 'AdminCourseReviewWorkspace');
 
 function RouteFallback() {
   return <div role="status" aria-live="polite" className="flex min-h-screen items-center justify-center bg-primary-50"><span className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-accent-600" /><span className="sr-only">Loading page</span></div>;
@@ -100,6 +102,7 @@ function AppContent() {
       <Route path="/admin/users" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminUserManagement /></RequireAuth>} />
       <Route path="/admin/instructors" element={<RequireAuth permission={Permission.MANAGE_INSTRUCTORS}><AdminInstructorApplications /></RequireAuth>} />
       <Route path="/admin/course-reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviews /></RequireAuth>} />
+      <Route path="/admin/course-reviews/:courseId" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviewWorkspace /></RequireAuth>} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes></Suspense></>
@@ -108,10 +111,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppErrorBoundary><HashRouter>
+    <AppErrorBoundary><HashRouter><LocaleProvider>
       <AuthProvider>
         <PricingProvider><AppContent /></PricingProvider>
       </AuthProvider>
-    </HashRouter></AppErrorBoundary>
+    </LocaleProvider></HashRouter></AppErrorBoundary>
   );
 }

@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { TutibaBrand } from './TutibaBrand';
+import { usePricingContext } from '../../contexts/PricingContext';
 
 const navigationItems = [
   { label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
@@ -20,6 +21,7 @@ export function MarketingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
+  const pricing = usePricingContext();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const hasSolidBackground = location.pathname !== '/' || isScrolled || isMobileMenuOpen;
@@ -80,15 +82,17 @@ export function MarketingNavbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6 md:h-20">
 
           {/* Logo */}
           <TutibaBrand className="flex-shrink-0" />
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex lg:items-center lg:gap-8">
-            {navigationItems.slice(1).map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="relative rounded py-2 text-primary-900 font-medium transition-colors hover:text-accent-700 aria-[current=page]:text-accent-700 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-accent-600 after:transition-transform aria-[current=page]:after:scale-x-100">{item.label}</Link>)}
-
+          <div className="hidden lg:flex lg:items-center lg:justify-center lg:gap-7">
+            {navigationItems.map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="relative rounded py-2 text-primary-900 font-medium transition-colors hover:text-accent-700 aria-[current=page]:text-accent-700 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-accent-600 after:transition-transform aria-[current=page]:after:scale-x-100">{item.label}</Link>)}
+          </div>
+          <div className="hidden lg:flex lg:items-center lg:justify-end lg:gap-4">
+            <span title={pricing.error || `Prices shown in ${pricing.currency}`} className="rounded-full border border-primary-200 bg-white/80 px-3 py-1.5 text-xs font-bold text-primary-700" aria-label={`Course prices shown in ${pricing.currency}`}>{pricing.isLoading ? 'EGP…' : pricing.currency}</span>
             {isAuthenticated ? (
               <Link to="/dashboard" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Dashboard</Link>
             ) : (
@@ -101,7 +105,7 @@ export function MarketingNavbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center lg:hidden">
+          <div className="col-start-3 flex items-center justify-end lg:hidden">
             <button
               ref={menuTriggerRef}
               type="button"
@@ -147,6 +151,7 @@ export function MarketingNavbar() {
             <div className="flex flex-col py-6 px-6 space-y-6 overflow-y-auto">
               {navigationItems.map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="rounded-lg px-3 py-2 text-lg font-medium text-primary-900 transition-colors hover:bg-primary-50 hover:text-accent-700 aria-[current=page]:bg-accent-50 aria-[current=page]:text-accent-800" onClick={() => setIsMobileMenuOpen(false)}>{item.label}</Link>)}
               <hr className="border-primary-100" />
+              <p className="px-3 text-sm font-bold text-primary-500">Course prices: {pricing.currency}</p>
               {isAuthenticated ? (
                 <Link to="/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
               ) : (
