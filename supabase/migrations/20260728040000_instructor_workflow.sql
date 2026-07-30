@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS public.instructor_public_profiles (
 
 ALTER TABLE public.instructor_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.instructor_public_profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Applicants view own instructor application" ON public.instructor_applications;
+DROP POLICY IF EXISTS "Admins view instructor applications" ON public.instructor_applications;
+DROP POLICY IF EXISTS "Public views approved instructor profiles" ON public.instructor_public_profiles;
+DROP POLICY IF EXISTS "Admins manage instructor profiles" ON public.instructor_public_profiles;
 CREATE POLICY "Applicants view own instructor application" ON public.instructor_applications FOR SELECT TO authenticated USING (user_id = auth.uid());
 CREATE POLICY "Admins view instructor applications" ON public.instructor_applications FOR SELECT TO authenticated USING (public.is_admin());
 CREATE POLICY "Public views approved instructor profiles" ON public.instructor_public_profiles FOR SELECT TO anon, authenticated USING (is_public = TRUE);
@@ -91,6 +95,11 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
   SELECT public.is_admin() OR EXISTS (SELECT 1 FROM public.courses WHERE id = p_course_id AND author_id = auth.uid() AND status = 'draft' AND authoring_status = 'draft' AND public.is_approved_instructor(auth.uid()));
 $$;
 
+DROP POLICY IF EXISTS "Approved instructors view own courses" ON public.courses;
+DROP POLICY IF EXISTS "Approved instructors update own drafts" ON public.courses;
+DROP POLICY IF EXISTS "Approved instructors manage own sections" ON public.course_sections;
+DROP POLICY IF EXISTS "Approved instructors manage own lessons" ON public.lessons;
+DROP POLICY IF EXISTS "Approved instructors upload own course covers" ON storage.objects;
 CREATE POLICY "Approved instructors view own courses" ON public.courses FOR SELECT TO authenticated USING (author_id = auth.uid() AND public.is_approved_instructor(auth.uid()));
 CREATE POLICY "Approved instructors update own drafts" ON public.courses FOR UPDATE TO authenticated USING (public.can_author_course(id)) WITH CHECK (author_id = auth.uid() AND status = 'draft');
 CREATE POLICY "Approved instructors manage own sections" ON public.course_sections FOR ALL TO authenticated USING (public.can_author_course(course_id)) WITH CHECK (public.can_author_course(course_id));
