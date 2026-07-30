@@ -312,16 +312,16 @@ export function AdminLessonEditor() {
       let savedLesson: Lesson;
       if (isEditMode && lessonId) {
         savedLesson = await LessonService.updateLesson(lessonId, payload);
-        addToast('success', 'Save!');
       } else {
         savedLesson = await LessonService.createLesson(payload);
-        addToast('success', 'Create!');
       }
 
       if (lessonType === 'video' && videoUrl.trim()) {
         const metadataToPersist: VideoMetadataResult = videoMetadata || { provider: 'unknown', durationSeconds: null, status: videoMetadataState === 'loading' ? 'pending' : 'failed' };
         await MediaService.persistVideoMetadata(savedLesson.id, videoUrl.trim(), metadataToPersist);
       }
+
+      addToast('success', isEditMode ? 'Lesson saved.' : 'Lesson created.');
 
       setIsDirty(false);
       if (!isEditMode) setTimeout(() => navigate(`/admin/courses/${courseId}/lessons/${savedLesson.id}/edit`, { replace: true }), 500);
