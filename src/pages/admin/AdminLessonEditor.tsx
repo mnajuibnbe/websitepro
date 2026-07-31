@@ -620,7 +620,7 @@ export function AdminLessonEditor() {
                         {errors.videoUrl && <p className="text-danger-600 text-xs font-bold mt-1">{errors.videoUrl}</p>}
                         {videoMetadataState === 'loading' && <p role="status" className="mt-2 flex items-center gap-2 text-xs font-bold text-primary-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />Detecting video duration…</p>}
                         {videoMetadataState === 'ready' && videoMetadata?.durationSeconds && <p className="mt-2 text-xs font-bold text-success-700">Duration detected automatically: {Math.ceil(videoMetadata.durationSeconds / 60)} min</p>}
-                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">The provider is supported, but duration is not available automatically yet.</p>}
+                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">Link format supported. Duration could not be detected, but you can still save this lesson.</p>}
                         {videoMetadataState === 'error' && <p className="mt-2 text-xs font-bold text-danger-600">This video URL could not be verified. Check the provider and URL.</p>}
                       </div>
 
