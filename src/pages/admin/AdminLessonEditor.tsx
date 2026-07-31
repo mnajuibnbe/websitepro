@@ -33,7 +33,7 @@ import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { LessonService } from '../../services/lesson.service';
 import { defaultCompletionRule, isLessonContentType, LessonContentType } from '../../domain/courseAuthoring';
-import { MediaService, VideoMetadataResult } from '../../services/media.service';
+import { MediaService, PdfMetadataResult, VideoMetadataResult } from '../../services/media.service';
 import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
 import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
 import { isGoogleDriveFileUrl } from '../../domain/videoUrl';
@@ -89,6 +89,9 @@ export function AdminLessonEditor() {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadataResult | null>(null);
   const [videoMetadataState, setVideoMetadataState] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error'>('idle');
+  const [pdfMetadata, setPdfMetadata] = useState<PdfMetadataResult | null>(null);
+  const [pdfMetadataState, setPdfMetadataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [pdfMetadataError, setPdfMetadataError] = useState<string | null>(null);
 
   const addToast = (type: 'success' | 'error' | 'info', message: string) => {
     const id = Date.now().toString();
@@ -196,25 +199,55 @@ export function AdminLessonEditor() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
+  const inspectVideoMetadata = useCallback(async () => {
+    if (lessonType !== 'video' || !videoUrl.trim()) return;
+    setVideoMetadataState('loading');
+    try {
+      const result = await MediaService.inspectVideo(videoUrl.trim());
+      setVideoMetadata(result);
+      setVideoMetadataState(result.status);
+    } catch {
+      if (isGoogleDriveFileUrl(videoUrl.trim())) {
+        setVideoMetadata({ provider: 'google_drive', durationSeconds: null, status: 'unavailable' });
+        setVideoMetadataState('unavailable');
+      } else {
+        setVideoMetadata(null);
+        setVideoMetadataState('error');
+      }
+    }
+  }, [lessonType, videoUrl]);
+
   useEffect(() => {
     if (lessonType !== 'video' || !videoUrl.trim()) { setVideoMetadata(null); setVideoMetadataState('idle'); return; }
-    const timeout = window.setTimeout(async () => {
-      setVideoMetadataState('loading');
-      try { const result = await MediaService.inspectVideo(videoUrl.trim()); setVideoMetadata(result); setVideoMetadataState(result.status); }
-      catch {
-        // Metadata inspection is optional. A temporary API/auth failure must not
-        // turn a correctly formed Drive file share link into a validation error.
-        if (isGoogleDriveFileUrl(videoUrl.trim())) {
-          setVideoMetadata({ provider: 'google_drive', durationSeconds: null, status: 'unavailable' });
-          setVideoMetadataState('unavailable');
-        } else {
-          setVideoMetadata(null);
-          setVideoMetadataState('error');
-        }
-      }
-    }, 700);
+    const timeout = window.setTimeout(() => { void inspectVideoMetadata(); }, 700);
     return () => window.clearTimeout(timeout);
-  }, [lessonType, videoUrl]);
+  }, [inspectVideoMetadata, lessonType, videoUrl]);
+
+  const inspectPdfMetadata = useCallback(async () => {
+    if (lessonType !== 'pdf' || !contentUrl.trim()) return;
+    setPdfMetadataState('loading');
+    setPdfMetadataError(null);
+    try {
+      const result = await MediaService.inspectPdf(contentUrl.trim());
+      setPdfMetadata(result);
+      setPdfMetadataState('ready');
+    } catch (cause) {
+      setPdfMetadata(null);
+      setPdfMetadataState('error');
+      setPdfMetadataError(cause instanceof Error ? cause.message : 'PDF metadata could not be loaded.');
+    }
+  }, [contentUrl, lessonType]);
+
+  useEffect(() => {
+    if (lessonType !== 'pdf' || !contentUrl.trim()) {
+      setPdfMetadata(null);
+      setPdfMetadataState('idle');
+      setPdfMetadataError(null);
+      return;
+    }
+    const timeout = window.setTimeout(() => { void inspectPdfMetadata(); }, 700);
+    return () => window.clearTimeout(timeout);
+  }, [contentUrl, inspectPdfMetadata, lessonType]);
 
   // Submit Handler
   const handleSave = async (e?: React.FormEvent) => {
@@ -232,6 +265,11 @@ export function AdminLessonEditor() {
     }
     if (['pdf', 'audio', 'external_link'].includes(lessonType) && contentUrl.trim() && !contentUrl.trim().startsWith('http')) {
       newErrors.contentUrl = 'Enter a valid URL beginning with http:// or https://.';
+    }
+    if (lessonType === 'pdf' && !contentUrl.trim()) {
+      newErrors.contentUrl = 'Add a Google Drive PDF file link.';
+    } else if (lessonType === 'pdf' && isPublished && pdfMetadataState !== 'ready') {
+      newErrors.contentUrl = 'Verify that the service account can read this PDF before publishing the lesson.';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -631,8 +669,8 @@ export function AdminLessonEditor() {
                         {errors.videoUrl && <p className="text-danger-600 text-xs font-bold mt-1">{errors.videoUrl}</p>}
                         {videoMetadataState === 'loading' && <p role="status" className="mt-2 flex items-center gap-2 text-xs font-bold text-primary-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />Detecting video duration…</p>}
                         {videoMetadataState === 'ready' && videoMetadata?.durationSeconds && <p className="mt-2 text-xs font-bold text-success-700">Duration detected automatically: {Math.ceil(videoMetadata.durationSeconds / 60)} min</p>}
-                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">Link format supported. Duration could not be detected, but you can still save this lesson.</p>}
-                        {videoMetadataState === 'error' && <p className="mt-2 text-xs font-bold text-danger-600">This video URL could not be verified. Check the provider and URL.</p>}
+                        {videoMetadataState === 'unavailable' && <div role="alert" className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"><p className="font-bold">Video duration could not be verified.</p><p className="mt-1">You can save this as a draft, but the lesson will block course review until verification succeeds. Check the sharing permissions and provider link, then retry.</p><button type="button" onClick={() => void inspectVideoMetadata()} className="mt-3 min-h-11 rounded-lg border border-amber-300 px-4 font-bold">Retry verification</button></div>}
+                        {videoMetadataState === 'error' && <div role="alert" className="mt-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-xs text-danger-700"><p className="font-bold">This video URL could not be verified. Check the provider and URL.</p><button type="button" onClick={() => void inspectVideoMetadata()} className="mt-3 min-h-11 rounded-lg border border-danger-300 px-4 font-bold">Retry verification</button></div>}
                       </div>
 
                       <div>
@@ -692,6 +730,20 @@ export function AdminLessonEditor() {
                           dir="ltr"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium text-left"
                         />
+                        {errors.contentUrl && <p role="alert" className="mt-2 text-sm font-semibold text-danger-700">{errors.contentUrl}</p>}
+                        {pdfMetadataState === 'loading' && (
+                          <p role="status" className="mt-3 flex items-center gap-2 text-sm font-semibold text-primary-600"><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Verifying service-account access…</p>
+                        )}
+                        {pdfMetadataState === 'ready' && pdfMetadata && (
+                          <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-success-700"><CheckCircle className="h-4 w-4" aria-hidden="true" /> PDF verified: {pdfMetadata.name}</p>
+                        )}
+                        {pdfMetadataState === 'error' && (
+                          <div role="alert" className="mt-3 rounded-xl border border-warning-300 bg-warning-50 p-4 text-sm text-warning-900">
+                            <p className="font-bold">PDF access could not be verified.</p>
+                            <p className="mt-1">{pdfMetadataError}</p>
+                            <button type="button" onClick={() => void inspectPdfMetadata()} className="mt-3 min-h-11 rounded-lg border border-warning-400 bg-white px-4 font-bold">Retry verification</button>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-6 pt-2">

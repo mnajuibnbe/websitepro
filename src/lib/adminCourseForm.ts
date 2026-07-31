@@ -1,6 +1,10 @@
+import { COURSE_DESCRIPTION_MIN_LENGTH, COURSE_SUMMARY_MIN_LENGTH } from '../domain/courseReadiness';
+
 export interface CourseFormValues {
   title: string;
   slug: string;
+  shortDescription: string;
+  description: string;
   priceEgp: string;
   priceUsd: string;
 }
@@ -12,6 +16,8 @@ export function sanitizeCourseSlug(input: string): string {
 export function validateCourseForm(values: CourseFormValues): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!values.title.trim()) errors.title = 'Enter a course title.';
+  if (values.shortDescription.trim().length < COURSE_SUMMARY_MIN_LENGTH) errors.shortDescription = `Enter at least ${COURSE_SUMMARY_MIN_LENGTH} characters for the course summary.`;
+  if (values.description.trim().length < COURSE_DESCRIPTION_MIN_LENGTH) errors.description = `Enter at least ${COURSE_DESCRIPTION_MIN_LENGTH} characters for the course description.`;
   const slug = values.slug.trim() ? sanitizeCourseSlug(values.slug) : '';
   if (values.slug.trim() && !slug) errors.slug = 'Enter a valid URL slug.';
   if (!/^\d+(\.\d{1,2})?$/.test(values.priceEgp)) errors.priceEgp = 'Enter a valid EGP price with no more than 2 decimal places.';

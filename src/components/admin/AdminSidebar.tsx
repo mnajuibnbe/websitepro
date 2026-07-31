@@ -13,12 +13,15 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout, user } = useAuth();
   const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
 
-  const navItems = [
+  const navItems = user?.role === 'admin' ? [
     { icon: BarChart3, label: 'Admin overview', href: '/admin' },
     { icon: BookOpen, label: 'Course management', href: '/admin/courses' },
     { icon: Users, label: 'User management', href: '/admin/users' },
     { icon: GraduationCap, label: 'Instructor applications', href: '/admin/instructors' },
     { icon: ClipboardCheck, label: 'Course reviews', href: '/admin/course-reviews' },
+  ] : [
+    { icon: BookOpen, label: 'My authored courses', href: '/instructor/courses' },
+    { icon: GraduationCap, label: 'Create course', href: '/instructor/courses/new' },
   ];
 
   return (
@@ -42,7 +45,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             <span className="w-8 h-8 rounded-lg bg-accent-600 text-white flex items-center justify-center text-sm">
               T
             </span>
-            <span>Tutiba Admin</span>
+            <span>{user?.role === 'admin' ? 'Tutiba Admin' : 'Tutiba Instructor'}</span>
           </div>
           <button type="button" aria-label="Close admin navigation" onClick={close} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-primary-500 hover:bg-primary-50 hover:text-primary-900 lg:hidden">
             <X className="h-6 w-6" />

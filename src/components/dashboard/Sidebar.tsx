@@ -25,7 +25,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { icon: Award, label: 'Certificates', href: '/certificate' },
     { icon: Settings, label: 'Settings', href: '/profile' },
     ...(isInstructor
-      ? [{ icon: GraduationCap, label: 'Create a course', href: '/instructor/courses/new' }]
+      ? [
+          { icon: GraduationCap, label: 'My authored courses', href: '/instructor/courses' },
+          { icon: GraduationCap, label: 'Create a course', href: '/instructor/courses/new' },
+        ]
       : [{ icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' }]),
   ];
 
