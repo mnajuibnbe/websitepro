@@ -36,6 +36,7 @@ import { defaultCompletionRule, isLessonContentType, LessonContentType } from '.
 import { MediaService, VideoMetadataResult } from '../../services/media.service';
 import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
 import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
+import { isGoogleDriveFileUrl } from '../../domain/videoUrl';
 
 type EditorTab = 'general' | 'content' | 'access';
 
@@ -200,7 +201,17 @@ export function AdminLessonEditor() {
     const timeout = window.setTimeout(async () => {
       setVideoMetadataState('loading');
       try { const result = await MediaService.inspectVideo(videoUrl.trim()); setVideoMetadata(result); setVideoMetadataState(result.status); }
-      catch { setVideoMetadata(null); setVideoMetadataState('error'); }
+      catch {
+        // Metadata inspection is optional. A temporary API/auth failure must not
+        // turn a correctly formed Drive file share link into a validation error.
+        if (isGoogleDriveFileUrl(videoUrl.trim())) {
+          setVideoMetadata({ provider: 'google_drive', durationSeconds: null, status: 'unavailable' });
+          setVideoMetadataState('unavailable');
+        } else {
+          setVideoMetadata(null);
+          setVideoMetadataState('error');
+        }
+      }
     }, 700);
     return () => window.clearTimeout(timeout);
   }, [lessonType, videoUrl]);
