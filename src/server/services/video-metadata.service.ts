@@ -36,7 +36,15 @@ export async function resolveVideoMetadata(input: string, options: { fetchFn?: t
   const fetchFn = options.fetchFn || fetch;
   if (source.provider === 'google_drive') {
     if (!options.driveMetadataFn) return { provider: 'google_drive', durationSeconds: null, status: 'unavailable' };
-    const metadata = await options.driveMetadataFn(source.externalId!);
+    let metadata: { mimeType?: string | null; durationMillis?: string | number | null };
+    try {
+      metadata = await options.driveMetadataFn(source.externalId!);
+    } catch {
+      // A valid Drive share link can be playable even when the metadata API is
+      // temporarily unavailable or cannot read the file. Duration detection is
+      // optional, so do not report the URL itself as invalid in that case.
+      return { provider: 'google_drive', durationSeconds: null, status: 'unavailable' };
+    }
     if (!metadata.mimeType?.startsWith('video/')) throw new Error('The Google Drive file is not a supported video.');
     const durationSeconds = Math.round(Number(metadata.durationMillis || 0) / 1000);
     return { provider: 'google_drive', durationSeconds: durationSeconds > 0 ? durationSeconds : null, status: durationSeconds > 0 ? 'ready' : 'unavailable' };

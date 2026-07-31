@@ -36,6 +36,7 @@ import { defaultCompletionRule, isLessonContentType, LessonContentType } from '.
 import { MediaService, VideoMetadataResult } from '../../services/media.service';
 import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
 import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
+import { isGoogleDriveFileUrl } from '../../domain/videoUrl';
 
 type EditorTab = 'general' | 'content' | 'access';
 
@@ -200,7 +201,17 @@ export function AdminLessonEditor() {
     const timeout = window.setTimeout(async () => {
       setVideoMetadataState('loading');
       try { const result = await MediaService.inspectVideo(videoUrl.trim()); setVideoMetadata(result); setVideoMetadataState(result.status); }
-      catch { setVideoMetadata(null); setVideoMetadataState('error'); }
+      catch {
+        // Metadata inspection is optional. A temporary API/auth failure must not
+        // turn a correctly formed Drive file share link into a validation error.
+        if (isGoogleDriveFileUrl(videoUrl.trim())) {
+          setVideoMetadata({ provider: 'google_drive', durationSeconds: null, status: 'unavailable' });
+          setVideoMetadataState('unavailable');
+        } else {
+          setVideoMetadata(null);
+          setVideoMetadataState('error');
+        }
+      }
     }, 700);
     return () => window.clearTimeout(timeout);
   }, [lessonType, videoUrl]);
@@ -620,7 +631,7 @@ export function AdminLessonEditor() {
                         {errors.videoUrl && <p className="text-danger-600 text-xs font-bold mt-1">{errors.videoUrl}</p>}
                         {videoMetadataState === 'loading' && <p role="status" className="mt-2 flex items-center gap-2 text-xs font-bold text-primary-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />Detecting video duration…</p>}
                         {videoMetadataState === 'ready' && videoMetadata?.durationSeconds && <p className="mt-2 text-xs font-bold text-success-700">Duration detected automatically: {Math.ceil(videoMetadata.durationSeconds / 60)} min</p>}
-                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">The provider is supported, but duration is not available automatically yet.</p>}
+                        {videoMetadataState === 'unavailable' && <p className="mt-2 text-xs text-primary-500">Link format supported. Duration could not be detected, but you can still save this lesson.</p>}
                         {videoMetadataState === 'error' && <p className="mt-2 text-xs font-bold text-danger-600">This video URL could not be verified. Check the provider and URL.</p>}
                       </div>
 

@@ -17,6 +17,13 @@ test('validates Google Drive file type and duration through trusted metadata', a
   await assert.rejects(() => resolveVideoMetadata('https://drive.google.com/file/d/abcdefghijklmnopqrstuvwxyz123456/view', { driveMetadataFn: async () => ({ mimeType: 'application/pdf', durationMillis: null }) }), /not a supported video/);
 });
 
+test('keeps a valid Google Drive link usable when optional metadata cannot be loaded', async () => {
+  const result = await resolveVideoMetadata('https://drive.google.com/file/d/abcdefghijklmnopqrstuvwxyz123456/view', {
+    driveMetadataFn: async () => { throw new Error('Drive metadata is unavailable'); },
+  });
+  assert.deepEqual(result, { provider: 'google_drive', durationSeconds: null, status: 'unavailable' });
+});
+
 test('extracts Vimeo and HLS durations without trusting the browser', async () => {
   const vimeoFetch = async () => new Response(JSON.stringify({ duration: 125 }), { status: 200 });
   assert.deepEqual(await resolveVideoMetadata('https://vimeo.com/12345', { fetchFn: vimeoFetch as typeof fetch }), { provider: 'vimeo', durationSeconds: 125, status: 'ready' });
