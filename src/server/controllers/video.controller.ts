@@ -3,6 +3,23 @@ import { randomUUID } from 'node:crypto';
 import { generateStreamToken, verifyStreamToken } from '../services/token.service.js';
 import { getDriveClient } from '../config/google.js';
 import { getSupabaseAdmin } from '../config/supabase.js';
+import { parseVideoSource } from '../services/video-metadata.service.js';
+
+interface DriveMetadata { fileSize: number; mimeType: string; expiresAt: number }
+const driveMetadataCache = new Map<string, DriveMetadata>();
+const DRIVE_METADATA_TTL_MS = 5 * 60 * 1000;
+
+async function getCachedDriveMetadata(fileId: string): Promise<DriveMetadata> {
+  const cached = driveMetadataCache.get(fileId);
+  if (cached && cached.expiresAt > Date.now()) return cached;
+  const response = await getDriveClient().files.get({ fileId, fields: 'size,mimeType', supportsAllDrives: true });
+  const fileSize = Number(response.data.size || 0);
+  const mimeType = response.data.mimeType || '';
+  if (!Number.isFinite(fileSize) || fileSize <= 0 || !mimeType.startsWith('video/')) throw new Error('Drive video metadata is invalid');
+  const metadata = { fileSize, mimeType, expiresAt: Date.now() + DRIVE_METADATA_TTL_MS };
+  driveMetadataCache.set(fileId, metadata);
+  return metadata;
+}
 
 interface TokenControllerDependencies {
   getSupabaseAdmin: typeof getSupabaseAdmin;
@@ -81,14 +98,14 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
       return;
     }
 
-    let fileId = lessonData.video_url;
-
-    // Extract the clean 32-character Google Drive file ID if a full URL is provided
-    if (fileId.includes('drive.google.com') || fileId.includes('docs.google.com')) {
-      const match = fileId.match(/[-\w]{25,}/);
-      if (match) {
-        fileId = match[0];
-      }
+    let fileId: string;
+    try {
+      const source = parseVideoSource(lessonData.video_url);
+      if (source.provider !== 'google_drive' || !source.externalId) throw new Error('Lesson is not a Google Drive video file');
+      fileId = source.externalId;
+    } catch (cause) {
+      res.status(422).json({ error: cause instanceof Error ? cause.message : 'Invalid Google Drive video link.' });
+      return;
     }
 
     // 6. Generate Signed Streaming Token
@@ -133,20 +150,11 @@ export const inspectVideo = async (req: Request, res: Response): Promise<void> =
   if (!fileId) return;
 
   try {
-    const metadataResponse = await getDriveClient().files.get({
-      fileId,
-      fields: 'size, mimeType',
-      supportsAllDrives: true,
-    });
-    const fileSize = parseInt(metadataResponse.data.size || '0', 10);
-    if (!Number.isFinite(fileSize) || fileSize <= 0) {
-      res.status(502).end();
-      return;
-    }
+    const { fileSize, mimeType } = await getCachedDriveMetadata(fileId);
 
     res.status(200).set({
       'Content-Length': String(fileSize),
-      'Content-Type': metadataResponse.data.mimeType || 'video/mp4',
+      'Content-Type': mimeType,
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'no-store',
     }).end();
@@ -174,24 +182,7 @@ export const streamVideo = async (req: Request, res: Response): Promise<void> =>
   try {
     const drive = getDriveClient();
 
-    // Get File Metadata
-    const metadataResponse = await drive.files.get(
-      {
-        fileId,
-        fields: 'size, mimeType',
-        supportsAllDrives: true,
-      },
-      { signal: abortController.signal as any }
-    );
-
-    const fileSize = parseInt(metadataResponse.data.size || '0', 10);
-    const mimeType = metadataResponse.data.mimeType || 'video/mp4';
-
-    if (isNaN(fileSize) || fileSize === 0) {
-      console.error('[StreamVideo] Invalid file size returned from Google Drive');
-      res.status(500).json({ error: 'Failed to retrieve media information' });
-      return;
-    }
+    const { fileSize, mimeType } = await getCachedDriveMetadata(fileId);
 
     const range = req.headers.range;
 

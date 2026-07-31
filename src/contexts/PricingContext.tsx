@@ -16,7 +16,7 @@ export function PricingProvider({ children }: { children: React.ReactNode }) {
     setPricingLoading(true); setError(null);
     fetch('/api/pricing/context', { headers: token ? { Authorization: `Bearer ${token}` } : undefined, signal: controller.signal })
       .then(response => response.ok ? response.json() : Promise.reject(new Error('pricing context unavailable')))
-      .then(setValue).catch(error => { if (error.name !== 'AbortError') { setValue(DEFAULT_PRICING_CONTEXT); setError('Regional pricing is unavailable. Showing EGP prices.'); } })
+      .then(setValue).catch(error => { if (error.name !== 'AbortError') { setValue(DEFAULT_PRICING_CONTEXT); setError('Regional pricing is unavailable. Showing USD prices.'); } })
       .finally(() => { if (!controller.signal.aborted) setPricingLoading(false); });
     return () => controller.abort();
   }, [isLoading, token, requestVersion]);

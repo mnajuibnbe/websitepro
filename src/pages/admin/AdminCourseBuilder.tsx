@@ -45,6 +45,7 @@ import { CurriculumBuilder } from '../../components/admin/curriculum/CurriculumB
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { recordAdminAudit } from '../../lib/adminAudit';
 import { CourseReviewPanel } from '../../components/admin/course/CourseReviewPanel';
+import { generateCourseSeo } from '../../lib/courseSeo';
 
 type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 
@@ -117,8 +118,9 @@ export function AdminCourseBuilder() {
       setCourse(courseData);
 
       // Populate SEO and Pricing fields
-      setSeoTitle(courseData.seo_title || '');
-      setSeoDescription(courseData.seo_description || '');
+      const generatedSeo = generateCourseSeo({ title: courseData.title, shortDescription: courseData.short_description, description: courseData.description, category: courseData.category });
+      setSeoTitle(courseData.seo_title || generatedSeo.title);
+      setSeoDescription(courseData.seo_description || generatedSeo.description);
       setSeoKeywords(courseData.seo_keywords || '');
       setPriceEgp(courseData.price_egp == null ? '' : String(courseData.price_egp));
       setPriceUsd(courseData.price_usd == null ? '' : String(courseData.price_usd));
@@ -941,6 +943,13 @@ export function AdminCourseBuilder() {
                     <span>Search (SEO)</span>
                   </h2>
 
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-50 p-4">
+                    <p className="text-sm text-primary-600">SEO metadata is generated from the course title and description. You can still refine it before saving.</p>
+                    <Button variant="secondary" onClick={() => { const generated = generateCourseSeo({ title: course?.title, shortDescription: course?.short_description, description: course?.description, category: course?.category }); setSeoTitle(generated.title); setSeoDescription(generated.description); }}>
+                      <Sparkles className="h-4 w-4" /> Regenerate
+                    </Button>
+                  </div>
+
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-bold text-primary-900 mb-2">SEO Title</label>
@@ -950,6 +959,7 @@ export function AdminCourseBuilder() {
                         onChange={(e) => setSeoTitle(e.target.value)}
                         placeholder={course?.title || 'Course'}
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm font-medium"
+                        maxLength={60}
                       />
                     </div>
 
@@ -961,6 +971,7 @@ export function AdminCourseBuilder() {
                         onChange={(e) => setSeoDescription(e.target.value)}
                         placeholder="Search..."
                         className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm leading-relaxed"
+                        maxLength={160}
                       />
                     </div>
 

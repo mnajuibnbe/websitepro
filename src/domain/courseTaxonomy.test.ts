@@ -9,5 +9,5 @@ test('course taxonomy uses unique stable category values', () => {
 });
 
 test('course language choices are controlled', () => {
-  assert.deepEqual(COURSE_LANGUAGES, ['Arabic', 'English']);
+  assert.deepEqual(COURSE_LANGUAGES, ['English']);
 });

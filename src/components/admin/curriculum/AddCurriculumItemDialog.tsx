@@ -1,18 +1,7 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  X,
-  Video,
-  FileText,
-  FileCode,
-  Volume2,
-  Code,
-  ExternalLink,
-  Radio,
-  HelpCircle,
-  ClipboardCheck,
-  Sparkles,
-} from 'lucide-react';
+import { ClipboardCheck, ExternalLink, FileText, HelpCircle, Video, X } from 'lucide-react';
+import type { LessonContentType } from '../../../domain/courseAuthoring';
 
 interface AddCurriculumItemDialogProps {
   isOpen: boolean;
@@ -22,188 +11,63 @@ interface AddCurriculumItemDialogProps {
   sectionTitle?: string;
 }
 
-export function AddCurriculumItemDialog({
-  isOpen,
-  onClose,
-  courseId,
-  sectionId,
-  sectionTitle,
-}: AddCurriculumItemDialogProps) {
+const lessonTypes: Array<{
+  id: LessonContentType;
+  label: string;
+  description: string;
+  icon: typeof Video;
+  color: string;
+}> = [
+  { id: 'video', label: 'Video lesson', description: 'YouTube, Vimeo, Google Drive video file, MP4, or HLS.', icon: Video, color: 'border-amber-200 bg-amber-50 text-amber-700' },
+  { id: 'pdf', label: 'PDF document', description: 'Upload or link a PDF learning resource.', icon: FileText, color: 'border-red-200 bg-red-50 text-red-700' },
+  { id: 'external_link', label: 'External link', description: 'Link to an approved external learning resource.', icon: ExternalLink, color: 'border-blue-200 bg-blue-50 text-blue-700' },
+  { id: 'quiz', label: 'Quiz', description: 'Build questions, answers, passing score, and retry rules.', icon: HelpCircle, color: 'border-violet-200 bg-violet-50 text-violet-700' },
+  { id: 'assignment', label: 'Assignment', description: 'Add instructions and collect student work.', icon: ClipboardCheck, color: 'border-teal-200 bg-teal-50 text-teal-700' },
+];
+
+export function AddCurriculumItemDialog({ isOpen, onClose, courseId, sectionId, sectionTitle }: AddCurriculumItemDialogProps) {
   const navigate = useNavigate();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { onClose(); return; }
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable: HTMLElement[] = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'));
+      if (!focusable.length) return;
+      const first = focusable[0]; const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); previouslyFocused?.focus(); };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
-  const itemOptions = [
-    {
-      id: 'video',
-      label: 'Lesson',
-      description: 'Link YouTube / Vimeo / HLS',
-      icon: Video,
-      color: 'bg-amber-50 text-amber-600 border-amber-200',
-      type: 'video',
-      disabled: false,
-    },
-    {
-      id: 'article',
-      label: 'Lesson / Curriculum Item',
-      description: 'Content HTML Curriculum Item Markdown',
-      icon: FileText,
-      color: 'bg-emerald-50 text-emerald-600 border-emerald-200',
-      type: 'article',
-      disabled: false,
-    },
-    {
-      id: 'pdf',
-      label: 'PDF Document',
-      description: 'Curriculum Item',
-      icon: FileCode,
-      color: 'bg-red-50 text-red-600 border-red-200',
-      type: 'pdf',
-      disabled: false,
-    },
-    {
-      id: 'audio',
-      label: 'Curriculum Item / Curriculum Item',
-      description: 'Curriculum Item MP3 Curriculum Item',
-      icon: Volume2,
-      color: 'bg-purple-50 text-purple-600 border-purple-200',
-      type: 'audio',
-      disabled: false,
-    },
-    {
-      id: 'embed',
-      label: 'Content (Embed)',
-      description: 'Curriculum Item iFrame Curriculum Item',
-      icon: Code,
-      color: 'bg-indigo-50 text-indigo-600 border-indigo-200',
-      type: 'embed',
-      disabled: false,
-    },
-    {
-      id: 'external_link',
-      label: 'Link',
-      description: 'Link',
-      icon: ExternalLink,
-      color: 'bg-blue-50 text-blue-600 border-blue-200',
-      type: 'external_link',
-      disabled: false,
-    },
-    {
-      id: 'live',
-      label: 'Curriculum Item (Live)',
-      description: 'Curriculum Item Zoom Curriculum Item Google Meet',
-      icon: Radio,
-      color: 'bg-rose-50 text-rose-600 border-rose-200',
-      type: 'live',
-      disabled: false,
-    },
-    {
-      id: 'quiz',
-      label: 'Quiz (Quiz)',
-      description: 'Quiz',
-      icon: HelpCircle,
-      color: 'bg-amber-50 text-amber-400 border-amber-200 opacity-70',
-      type: 'quiz',
-      disabled: true,
-      badge: 'Curriculum Item',
-    },
-    {
-      id: 'assignment',
-      label: 'Curriculum Item / Curriculum Item (Assignment)',
-      description: 'Instructor',
-      icon: ClipboardCheck,
-      color: 'bg-teal-50 text-teal-400 border-teal-200 opacity-70',
-      type: 'assignment',
-      disabled: true,
-      badge: 'Curriculum Item',
-    },
-  ];
-
-  const handleSelectOption = (option: typeof itemOptions[0]) => {
-    if (option.disabled) return;
+  const selectType = (type: LessonContentType) => {
     onClose();
-    navigate(`/admin/courses/${courseId}/lessons/new?sectionId=${sectionId}&type=${option.type}`);
+    navigate(`/admin/courses/${courseId}/lessons/new?sectionId=${encodeURIComponent(sectionId)}&type=${type}`);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
-      <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-2xl w-full p-6 space-y-6 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-primary-100 pb-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>Add</span>
-              </span>
-              {sectionTitle && (
-                <span className="text-xs text-primary-500 font-medium">
-                  Section: <strong className="text-primary-800">{sectionTitle}</strong>
-                </span>
-              )}
-            </div>
-            <h3 className="text-lg font-bold text-primary-900">Select</h3>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-2 text-primary-400 hover:text-primary-800 hover:bg-primary-100 rounded-xl transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Options Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto p-1 custom-scrollbar">
-          {itemOptions.map((opt) => {
-            const Icon = opt.icon;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                disabled={opt.disabled}
-                onClick={() => handleSelectOption(opt)}
-                className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3.5 relative ${
-                  opt.disabled
-                    ? 'bg-primary-50/50 border-primary-200/80 cursor-not-allowed opacity-60'
-                    : 'bg-white hover:bg-amber-50/40 hover:border-amber-300 border-primary-200 hover:shadow-2xs cursor-pointer group'
-                }`}
-              >
-                <div className={`p-3 rounded-xl border flex-shrink-0 ${opt.color}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h4 className="font-bold text-sm text-primary-900 group-hover:text-amber-900 transition-colors">
-                      {opt.label}
-                    </h4>
-                    {opt.badge && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-200 text-primary-700">
-                        {opt.badge}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-primary-500 leading-relaxed line-clamp-2">
-                    {opt.description}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Footer */}
-        <div className="pt-3 border-t border-primary-100 flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold text-xs rounded-xl transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
+  return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-950/60 p-4 backdrop-blur-sm" onMouseDown={event => event.target === event.currentTarget && onClose()}>
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="add-lesson-title" aria-describedby="add-lesson-description" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-2xl">
+      <header className="flex items-start justify-between gap-4 border-b border-primary-100 p-5 sm:p-6">
+        <div><p className="text-sm font-bold text-amber-700">Add lesson to {sectionTitle || 'selected section'}</p><h2 id="add-lesson-title" className="mt-1 text-2xl font-bold text-primary-900">Choose a lesson type</h2><p id="add-lesson-description" className="mt-1 text-sm text-primary-600">Select the learning activity you want to create.</p></div>
+        <button ref={closeRef} type="button" onClick={onClose} aria-label="Close add lesson dialog" className="flex h-11 w-11 flex-none items-center justify-center rounded-xl text-primary-500 hover:bg-primary-100 hover:text-primary-900"><X className="h-5 w-5" /></button>
+      </header>
+      <div className="grid gap-3 overflow-y-auto p-5 sm:grid-cols-2 sm:p-6">
+        {lessonTypes.map(({ id, label, description, icon: Icon, color }) => <button key={id} type="button" onClick={() => selectType(id)} className="group flex min-h-28 items-start gap-4 rounded-2xl border border-primary-200 p-4 text-left transition hover:border-amber-300 hover:bg-amber-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+          <span className={`flex h-12 w-12 flex-none items-center justify-center rounded-xl border ${color}`}><Icon className="h-5 w-5" /></span>
+          <span><span className="block font-bold text-primary-900 group-hover:text-amber-900">{label}</span><span className="mt-1 block text-sm leading-relaxed text-primary-600">{description}</span></span>
+        </button>)}
       </div>
+      <footer className="flex justify-end border-t border-primary-100 p-4 sm:px-6"><button type="button" onClick={onClose} className="min-h-11 rounded-xl border border-primary-200 px-5 font-bold text-primary-800 hover:bg-primary-50">Cancel</button></footer>
     </div>
-  );
+  </div>;
 }

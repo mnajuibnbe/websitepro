@@ -44,7 +44,7 @@ export function AdminCourseCreate() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Skin Care');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
-  const [language, setLanguage] = useState('Arabic');
+  const [language, setLanguage] = useState('English');
   const [priceEgp, setPriceEgp] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [coverImage, setCoverImage] = useState('');
@@ -92,12 +92,12 @@ export function AdminCourseCreate() {
       const { data: rpcCourseId, error: rpcError } = isInstructor
         ? await supabase.rpc('instructor_create_course_dual', {
           p_title: title.trim(), p_short_description: shortDescription.trim() || null, p_description: description.trim() || null,
-          p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'Arabic',
+          p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'English',
           p_price_egp: priceEgp, p_price_usd: priceUsd, p_thumbnail: coverImage.trim() || null, p_cover_image: coverImage.trim() || null,
         })
         : await supabase.rpc('admin_create_course_dual', {
           p_title: title.trim(), p_slug: null, p_short_description: shortDescription.trim() || null, p_description: description.trim() || null,
-          p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'Arabic', p_price_egp: priceEgp,
+          p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'English', p_price_egp: priceEgp,
           p_price_usd: priceUsd, p_instructor_id: instructorId || null, p_thumbnail: coverImage.trim() || null,
           p_cover_image: coverImage.trim() || null, p_create_first_section: false,
         });

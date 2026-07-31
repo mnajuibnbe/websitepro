@@ -10,7 +10,7 @@ Run `npm run test:course-authoring-release`, the TypeScript and frontend suites,
 2. Instructor creates an owned draft, uploads one cover, builds sections and each supported lesson type, and cannot publish directly.
 3. Video metadata resolves duration and the public course total updates without a manual duration field.
 4. Student sees only published curriculum metadata, exhausts a quiz's configured attempts, and submits an assignment; instructor grades or requests revision.
-5. Instructor submits a ready course; admin requests changes, approves, publishes, unpublishes, and verifies the review audit history.
+5. Instructor submits a ready course; admin requests changes, receives a resubmission, and approves it; verify approval publishes atomically and records the review history.
 6. Admin searches enrollments, removes access, restores access, and confirms order, progress, quiz, and assignment history remain intact.
 
 ## Operational checks
@@ -19,4 +19,8 @@ Run `npm run test:course-authoring-release`, the TypeScript and frontend suites,
 - Confirm storage MIME/size policies and lifecycle cleanup for abandoned course covers.
 - Monitor RPC errors by SQLSTATE, media-inspection latency/failures, review queue age, and assignment/quiz submission failures.
 - Back up the production database before migration and document rollback as application rollback plus forward-fix migrations; never delete learning or financial history.
-- Verify keyboard-only use, screen-reader names, 320px mobile layout, RTL content, slow-network loading, empty, error, conflict, and retry states.
+- Verify keyboard-only use, screen-reader names, English LTR rendering, 320px mobile layout, slow-network loading, empty, error, conflict, and retry states.
+
+## Final Phase 6 gate
+
+Follow `COURSE_AUTHORING_PRODUCTION_RUNBOOK.md`. The release is complete only after `npm run test:course-authoring-production`, the database-independent postflight SQL, and every staging journey pass against the exact deployable commit.

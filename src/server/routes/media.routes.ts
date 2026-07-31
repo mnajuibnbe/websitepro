@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getSupabaseAdmin } from '../config/supabase.js';
 import { resolveVideoMetadata } from '../services/video-metadata.service.js';
+import { getDriveClient } from '../config/google.js';
 
 const router = Router();
 
@@ -17,7 +18,13 @@ router.post('/video-metadata', async (req, res) => {
   }
   if (typeof req.body?.url !== 'string' || req.body.url.length > 2048) { res.status(400).json({ error: 'A valid video URL is required.' }); return; }
   try {
-    const metadata = await resolveVideoMetadata(req.body.url, { youtubeApiKey: process.env.YOUTUBE_DATA_API_KEY });
+    const metadata = await resolveVideoMetadata(req.body.url, {
+      youtubeApiKey: process.env.YOUTUBE_DATA_API_KEY,
+      driveMetadataFn: async fileId => {
+        const response = await getDriveClient().files.get({ fileId, fields: 'mimeType,videoMediaMetadata(durationMillis)', supportsAllDrives: true });
+        return { mimeType: response.data.mimeType, durationMillis: response.data.videoMediaMetadata?.durationMillis };
+      },
+    });
     res.json(metadata);
   } catch (cause) {
     res.status(422).json({ error: cause instanceof Error ? cause.message : 'Video metadata could not be loaded.' });

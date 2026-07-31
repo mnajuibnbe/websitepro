@@ -12,7 +12,7 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ title, description, children, eyebrow = 'Tutiba account' }: AuthLayoutProps) {
-  const { t, toggleLocale, dir } = useLocale();
+  const { t, dir } = useLocale();
   return (
     <main dir={dir} className="min-h-screen min-h-dvh bg-primary-50 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(32rem,0.85fr)]" id="main-content">
       <section className="relative hidden overflow-hidden bg-primary-900 p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16" aria-label={t('about')}>
@@ -32,9 +32,9 @@ export function AuthLayout({ title, description, children, eyebrow = 'Tutiba acc
         <p className="relative z-10 text-sm text-primary-400">© {new Date().getFullYear()} Tutiba. All rights reserved.</p>
       </section>
 
-      <section className="relative flex min-h-screen min-h-dvh items-center justify-center overflow-y-auto px-4 py-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8 lg:px-12"><button type="button" onClick={toggleLocale} className="absolute end-6 top-6 hidden min-h-11 rounded-lg border bg-white px-3 text-sm font-bold lg:block">{t('language')}</button>
+      <section className="relative flex min-h-screen min-h-dvh items-center justify-center overflow-y-auto px-4 py-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-8 lg:px-12">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center justify-between lg:hidden"><TutibaBrand/><button type="button" onClick={toggleLocale} className="min-h-11 rounded-lg border bg-white px-3 text-sm font-bold">{t('language')}</button></div>
+          <div className="mb-8 lg:hidden"><TutibaBrand/></div>
           <div className="rounded-3xl border border-primary-200 bg-white p-6 shadow-sm sm:p-9">
             <header className="mb-8">
               <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-accent-700">{eyebrow}</p>

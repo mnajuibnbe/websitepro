@@ -50,7 +50,7 @@ export function AdminCourseEdit() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
-  const [language, setLanguage] = useState('Arabic');
+  const [language, setLanguage] = useState('English');
   const [priceEgp, setPriceEgp] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
@@ -112,7 +112,7 @@ export function AdminCourseEdit() {
       setDescription(course.description || '');
       setCategory(course.category || 'Uncategorized');
       setLevel((course.level as any) || 'all_levels');
-      setLanguage(course.language || 'Arabic');
+      setLanguage(course.language || 'English');
       setPriceEgp(course.price_egp == null ? '' : String(course.price_egp));
       setPriceUsd(course.price_usd == null ? '' : String(course.price_usd));
       setStatus((course.status as any) || 'draft');
@@ -176,7 +176,7 @@ export function AdminCourseEdit() {
         description: description.trim() || null,
         category: category.trim() || null,
         level: level,
-        language: language.trim() || 'Arabic',
+        language: language.trim() || 'English',
         price_egp: priceEgp,
         price_usd: priceUsd,
         status: status === 'published' || originalCourse?.status === 'published' ? originalCourse?.status : status,

@@ -45,15 +45,8 @@ export function CourseSidebar({
   const sectionLessonMap = React.useMemo(() => {
     const map: Record<string, Lesson[]> = {};
     sections.forEach((sec) => {
-      map[sec.id] = lessons.filter((l) => l.section_id === sec.id);
+      map[sec.id] = lessons.filter((l) => l.section_id === sec.id).sort((a, b) => a.order_index - b.order_index || a.id.localeCompare(b.id));
     });
-    // Uncategorized lessons fallback
-    const uncategorized = lessons.filter(
-      (l) => !l.section_id || !sections.some((s) => s.id === l.section_id)
-    );
-    if (uncategorized.length > 0 && sections.length > 0) {
-      map[sections[0].id] = [...(map[sections[0].id] || []), ...uncategorized];
-    }
     return map;
   }, [sections, lessons]);
 

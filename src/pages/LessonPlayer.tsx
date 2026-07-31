@@ -14,6 +14,7 @@ import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
 import { AssignmentLessonRenderer } from '../components/player/AssignmentLessonRenderer';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { LessonDetails } from '../components/player/LessonDetails';
+import { prefetchSecureStream } from '../components/video/SecureStreamProvider';
 
 type AccessState =
   | 'verifying'
@@ -29,7 +30,7 @@ type AccessState =
 export function LessonPlayer() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, token, isLoading: authLoading } = useAuth();
   const userId = user?.id;
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -168,12 +169,13 @@ export function LessonPlayer() {
           return;
         }
 
-        const validSections = (sectionsRes.data || []) as CourseSection[];
+        const validSections = ((sectionsRes.data || []) as CourseSection[]).sort((a, b) => a.order_index - b.order_index || a.id.localeCompare(b.id));
         const publishedSectionIds = new Set(validSections.map((s) => s.id));
         const rawLessons = (lessonsRes.data || []) as Lesson[];
-        const validLessons = rawLessons.filter(
-          (l) => !l.section_id || publishedSectionIds.has(l.section_id)
-        );
+        const sectionOrder = new Map(validSections.map((section, index) => [section.id, index]));
+        const validLessons = rawLessons
+          .filter((lesson) => Boolean(lesson.section_id && publishedSectionIds.has(lesson.section_id)))
+          .sort((a, b) => (sectionOrder.get(a.section_id!) ?? Number.MAX_SAFE_INTEGER) - (sectionOrder.get(b.section_id!) ?? Number.MAX_SAFE_INTEGER) || a.order_index - b.order_index || a.id.localeCompare(b.id));
         const validProgress = (progressRes.data || []) as LessonProgress[];
 
         if (validLessons.length === 0) {
@@ -186,6 +188,12 @@ export function LessonPlayer() {
         if (!target) {
           setAccessState('lesson_not_found');
           return;
+        }
+
+        if (target.video_url?.includes('drive.google.com')) {
+          prefetchSecureStream(target.id, token);
+          const nextVideo = validLessons.slice(validLessons.indexOf(target) + 1).find(lesson => lesson.video_url?.includes('drive.google.com'));
+          if (nextVideo) prefetchSecureStream(nextVideo.id, token);
         }
 
         // Confirm lesson section belongs to course
@@ -230,7 +238,7 @@ export function LessonPlayer() {
     }
 
     verifyAndLoadLessonData();
-  }, [courseId, lessonId, userId, authLoading]);
+  }, [courseId, lessonId, userId, authLoading, token]);
 
   // Order lessons canonically (Section order ASC -> Lesson order ASC)
   const orderedLessons = useMemo(() => {

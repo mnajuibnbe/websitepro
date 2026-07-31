@@ -11,10 +11,7 @@ import {
   Video,
   FileText,
   FileCode,
-  Volume2,
   ExternalLink,
-  Code,
-  Radio,
   HelpCircle,
   ClipboardCheck,
   CheckCircle,
@@ -24,7 +21,6 @@ import {
   Copy,
   Layers,
   Settings as SettingsIcon,
-  Globe,
   Lock,
   Download,
   ShieldAlert,
@@ -36,13 +32,12 @@ import { supabase } from '../../lib/supabase';
 import { Course, CourseSection, Lesson } from '../../types/database.types';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { LessonService } from '../../services/lesson.service';
-import { sanitizeSlug } from './AdminCourseCreate';
 import { defaultCompletionRule, isLessonContentType, LessonContentType } from '../../domain/courseAuthoring';
 import { MediaService, VideoMetadataResult } from '../../services/media.service';
 import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
 import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
 
-type EditorTab = 'general' | 'content' | 'access' | 'settings';
+type EditorTab = 'general' | 'content' | 'access';
 
 export function AdminLessonEditor() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId?: string }>();
@@ -55,7 +50,7 @@ export function AdminLessonEditor() {
   const isEditMode = Boolean(lessonId && lessonId !== 'new');
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<EditorTab>('general');
+  const [activeTab, setActiveTab] = useState<EditorTab>(() => searchParams.get('tab') === 'content' ? 'content' : 'general');
 
   // Loading & Saving
   const [isLoading, setIsLoading] = useState(true);
@@ -69,35 +64,22 @@ export function AdminLessonEditor() {
 
   // Form State
   const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [sectionId, setSectionId] = useState(initialSectionId);
   const [lessonType, setLessonType] = useState<LessonContentType>(initialType);
-  const [duration, setDuration] = useState('');
-  const [estimatedMinutes, setEstimatedMinutes] = useState<number>(0);
-  const [thumbnail, setThumbnail] = useState('');
 
   // Content specific
   const [videoUrl, setVideoUrl] = useState('');
   const [contentUrl, setContentUrl] = useState('');
-  const [content, setContent] = useState('');
   const [transcript, setTranscript] = useState('');
   const [captionsUrl, setCaptionsUrl] = useState('');
-  const [notes, setNotes] = useState('');
   const [pdfAllowDownload, setPdfAllowDownload] = useState(true);
   const [pdfWatermark, setPdfWatermark] = useState(false);
   const [openInNewTab, setOpenInNewTab] = useState(false);
-  const [embedCode, setEmbedCode] = useState('');
 
   // Access & Settings
   const [isPreview, setIsPreview] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
-  const [completionRule, setCompletionRule] = useState<
-    'manual' | 'watch90' | 'read_end' | 'pass_quiz' | 'upload_assignment'
-  >('manual');
-  const [orderIndex, setOrderIndex] = useState(0);
-  const [seoTitle, setSeoTitle] = useState('');
-  const [seoDescription, setSeoDescription] = useState('');
 
   // UI state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -167,7 +149,6 @@ export function AdminLessonEditor() {
         }
 
         setTitle(lessonData.title || '');
-        setSlug(lessonData.slug || '');
         setDescription(lessonData.description || '');
         setSectionId(lessonData.section_id || currentSectionId);
 
@@ -177,32 +158,16 @@ export function AdminLessonEditor() {
         }
         setLessonType(type);
 
-        setDuration(lessonData.duration || '');
-        setEstimatedMinutes(lessonData.estimated_minutes ?? 0);
-        setThumbnail(lessonData.thumbnail || '');
         setVideoUrl(lessonData.video_url || '');
         setContentUrl(lessonData.content_url || '');
-        setContent(lessonData.content || '');
         setTranscript(lessonData.transcript || '');
         setCaptionsUrl(lessonData.captions_url || '');
-        setNotes(lessonData.notes || '');
         setPdfAllowDownload(lessonData.pdf_allow_download ?? true);
         setPdfWatermark(lessonData.pdf_watermark ?? false);
         setOpenInNewTab(lessonData.open_in_new_tab ?? false);
-        setEmbedCode(lessonData.embed_code || '');
 
         setIsPreview(Boolean(lessonData.is_preview));
         setIsPublished(Boolean(lessonData.is_published));
-        setCompletionRule((lessonData.completion_rule as any) || 'manual');
-        setOrderIndex(lessonData.order_index ?? 0);
-        setSeoTitle(lessonData.seo_title || '');
-        setSeoDescription(lessonData.seo_description || '');
-      } else {
-        // New Lesson Defaults
-        if (currentSectionId) {
-          const sectionLessons = await LessonService.getLessonsBySection(currentSectionId);
-          setOrderIndex(sectionLessons.length > 0 ? Math.max(...sectionLessons.map((l) => l.order_index)) + 1 : 0);
-        }
       }
     } catch (err: any) {
       console.error('Error loading lesson editor data:', err);
@@ -240,15 +205,6 @@ export function AdminLessonEditor() {
     return () => window.clearTimeout(timeout);
   }, [lessonType, videoUrl]);
 
-  // Generate Slug
-  const handleGenerateSlug = () => {
-    if (!title.trim()) return;
-    const cleanSlug = sanitizeSlug(title);
-    setSlug(cleanSlug);
-    setIsDirty(true);
-    if (errors.slug) setErrors((prev) => ({ ...prev, slug: '' }));
-  };
-
   // Submit Handler
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -277,36 +233,24 @@ export function AdminLessonEditor() {
     setErrors({});
 
     try {
-      const cleanSlug = slug.trim() ? sanitizeSlug(slug) : sanitizeSlug(title);
-
       const payload: Partial<Lesson> = {
         course_id: courseId,
         section_id: sectionId || null,
         title: title.trim(),
-        slug: cleanSlug || null,
         description: description.trim() || null,
         lesson_type: lessonType,
         content_type: lessonType,
         type: lessonType === 'pdf' || lessonType === 'external_link' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
-        duration: null,
-        estimated_minutes: 0,
-        thumbnail: null,
         video_url: videoUrl.trim() || null,
         content_url: contentUrl.trim() || null,
-        content: content || null,
         transcript: transcript || null,
         captions_url: captionsUrl.trim() || null,
-        notes: notes || null,
         pdf_allow_download: pdfAllowDownload,
         pdf_watermark: pdfWatermark,
         open_in_new_tab: openInNewTab,
-        embed_code: embedCode || null,
         is_preview: isPreview,
         is_published: isPublished,
-        completion_rule: completionRule,
-        order_index: orderIndex,
-        seo_title: seoTitle.trim() || null,
-        seo_description: seoDescription.trim() || null,
+        completion_rule: defaultCompletionRule(lessonType),
       };
 
       let savedLesson: Lesson;
@@ -324,7 +268,10 @@ export function AdminLessonEditor() {
       addToast('success', isEditMode ? 'Lesson saved.' : 'Lesson created.');
 
       setIsDirty(false);
-      if (!isEditMode) setTimeout(() => navigate(`/admin/courses/${courseId}/lessons/${savedLesson.id}/edit`, { replace: true }), 500);
+      if (!isEditMode) {
+        setActiveTab('content');
+        setTimeout(() => navigate(`/admin/courses/${courseId}/lessons/${savedLesson.id}/edit?tab=content`, { replace: true }), 500);
+      }
     } catch (err: any) {
       console.error('Error saving lesson:', err);
       addToast('error', err.message || 'Save.');
@@ -372,12 +319,8 @@ export function AdminLessonEditor() {
   const getLessonTypeIcon = (type: string) => {
     switch (type) {
       case 'video': return <Video className="w-4 h-4 text-amber-600" />;
-      case 'article': return <FileText className="w-4 h-4 text-emerald-600" />;
       case 'pdf': return <FileCode className="w-4 h-4 text-red-600" />;
-      case 'audio': return <Volume2 className="w-4 h-4 text-purple-600" />;
       case 'external_link': return <ExternalLink className="w-4 h-4 text-blue-600" />;
-      case 'embed': return <Code className="w-4 h-4 text-indigo-600" />;
-      case 'live': return <Radio className="w-4 h-4 text-rose-600" />;
       case 'quiz': return <HelpCircle className="w-4 h-4 text-amber-600" />;
       case 'assignment': return <ClipboardCheck className="w-4 h-4 text-teal-600" />;
       default: return <Video className="w-4 h-4 text-amber-600" />;
@@ -412,7 +355,7 @@ export function AdminLessonEditor() {
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
                       {getLessonTypeIcon(lessonType)}
-                      <span>Lessons</span>
+                      <span>{lessonType.replaceAll('_', ' ')}</span>
                     </span>
 
                     <span
@@ -433,7 +376,7 @@ export function AdminLessonEditor() {
 
                     {isDirty && (
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white animate-pulse">
-                        Lesson settings
+                        Unsaved changes
                       </span>
                     )}
                   </div>
@@ -493,7 +436,6 @@ export function AdminLessonEditor() {
                 { id: 'general', label: 'General', icon: SettingsIcon },
                 { id: 'content', label: 'Content', icon: FileText },
                 { id: 'access', label: 'Access', icon: Lock },
-                { id: 'settings', label: 'Access & settings', icon: Globe },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -573,7 +515,7 @@ export function AdminLessonEditor() {
                     {/* Section Selector */}
                     <div>
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Section (Section)
+                        Section
                       </label>
                       <select
                         value={sectionId}
@@ -594,13 +536,13 @@ export function AdminLessonEditor() {
                     {/* Lesson Type */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Content
+                        Lesson type
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
                           { id: 'video', label: 'Video', icon: Video, color: 'text-amber-600' },
-                          { id: 'pdf', label: 'PDF Document', icon: FileCode, color: 'text-red-600' },
-                          { id: 'external_link', label: 'Link', icon: ExternalLink, color: 'text-blue-600' },
+                          { id: 'pdf', label: 'PDF document', icon: FileCode, color: 'text-red-600' },
+                          { id: 'external_link', label: 'External link', icon: ExternalLink, color: 'text-blue-600' },
                           { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-600' },
                           { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
                         ].map((typeItem) => {
@@ -613,7 +555,6 @@ export function AdminLessonEditor() {
                               onClick={() => {
                                 const nextType = typeItem.id as LessonContentType;
                                 setLessonType(nextType);
-                                setCompletionRule(defaultCompletionRule(nextType));
                                 setIsDirty(true);
                               }}
                               className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all ${
@@ -633,7 +574,7 @@ export function AdminLessonEditor() {
                     {/* Description */}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Lesson
+                        Lesson description (optional)
                       </label>
                       <textarea
                         rows={3}
@@ -642,7 +583,7 @@ export function AdminLessonEditor() {
                           setDescription(e.target.value);
                           setIsDirty(true);
                         }}
-                        placeholder="Lesson..."
+                        placeholder="Briefly explain what students will learn."
                         className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
                       />
                     </div>
@@ -655,7 +596,7 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     {getLessonTypeIcon(lessonType)}
-                    <span>Content — {lessonType.toUpperCase()}</span>
+                    <span>{lessonType.replaceAll('_', ' ')} content</span>
                   </h3>
 
                   {/* Video Content Fields */}
@@ -663,7 +604,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Link (YouTube, Vimeo, MP4, HLS) *
+                          Video link *
                         </label>
                         <input
                           type="url"
@@ -672,7 +613,7 @@ export function AdminLessonEditor() {
                             setVideoUrl(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="https://www.youtube.com/watch?v=..."
+                          placeholder="YouTube, Vimeo, Google Drive video file, MP4, or HLS URL"
                           dir="ltr"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium text-left"
                         />
@@ -702,7 +643,7 @@ export function AdminLessonEditor() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-bold text-primary-900 mb-2">
-                            Link (VTT / Captions)
+                            Captions URL (VTT)
                           </label>
                           <input
                             type="url"
@@ -717,42 +658,7 @@ export function AdminLessonEditor() {
                           />
                         </div>
 
-                        <div>
-                          <label className="block text-xs font-bold text-primary-900 mb-2">
-                            Lesson settings
-                          </label>
-                          <input
-                            type="text"
-                            value={notes}
-                            onChange={(e) => {
-                              setNotes(e.target.value);
-                              setIsDirty(true);
-                            }}
-                            placeholder="Enter details..."
-                            className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Article Content Fields */}
-                  {lessonType === 'article' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Content
-                        </label>
-                        <textarea
-                          rows={12}
-                          value={content}
-                          onChange={(e) => {
-                            setContent(e.target.value);
-                            setIsDirty(true);
-                          }}
-                          placeholder="Enter the lesson article content..."
-                          className="w-full p-4 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-mono leading-relaxed"
-                        />
                       </div>
                     </div>
                   )}
@@ -762,7 +668,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Link PDF *
+                          PDF URL *
                         </label>
                         <input
                           type="url"
@@ -788,7 +694,7 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Lesson settings</span>
+                          <span>Allow students to download this PDF</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-primary-900">
@@ -801,30 +707,8 @@ export function AdminLessonEditor() {
                             }}
                             className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                           />
-                          <span>Lesson settings</span>
+                          <span>Apply the configured PDF watermark</span>
                         </label>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Audio Content Fields */}
-                  {lessonType === 'audio' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Link (MP3, WAV, Podcast URL) *
-                        </label>
-                        <input
-                          type="url"
-                          value={contentUrl}
-                          onChange={(e) => {
-                            setContentUrl(e.target.value);
-                            setIsDirty(true);
-                          }}
-                          placeholder="https://example.com/audio.mp3"
-                          dir="ltr"
-                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium text-left"
-                        />
                       </div>
                     </div>
                   )}
@@ -834,7 +718,7 @@ export function AdminLessonEditor() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Link (External URL) *
+                          External resource URL *
                         </label>
                         <input
                           type="url"
@@ -843,7 +727,7 @@ export function AdminLessonEditor() {
                             setContentUrl(e.target.value);
                             setIsDirty(true);
                           }}
-                          placeholder="https://github.com/example/repo"
+                          placeholder="https://example.com/resource"
                           dir="ltr"
                           className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium text-left"
                         />
@@ -859,52 +743,8 @@ export function AdminLessonEditor() {
                           }}
                           className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
                         />
-                        <span>Link (New Tab)</span>
+                        <span>Open this resource in a new tab</span>
                       </label>
-                    </div>
-                  )}
-
-                  {/* Embed Content Fields */}
-                  {lessonType === 'embed' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Embed HTML or iframe
-                        </label>
-                        <textarea
-                          rows={6}
-                          value={embedCode}
-                          onChange={(e) => {
-                            setEmbedCode(e.target.value);
-                            setIsDirty(true);
-                          }}
-                          placeholder='<iframe src="https://..." width="100%" height="400"></iframe>'
-                          dir="ltr"
-                          className="w-full p-3 bg-white border border-primary-200 rounded-xl text-xs font-mono text-left"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Live Stream / Meeting Fields */}
-                  {lessonType === 'live' && (
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-primary-900 mb-2">
-                          Link (Zoom, Google Meet, YouTube Live)
-                        </label>
-                        <input
-                          type="url"
-                          value={contentUrl}
-                          onChange={(e) => {
-                            setContentUrl(e.target.value);
-                            setIsDirty(true);
-                          }}
-                          placeholder="https://zoom.us/j/123456789"
-                          dir="ltr"
-                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium text-left"
-                        />
-                      </div>
                     </div>
                   )}
 
@@ -927,16 +767,16 @@ export function AdminLessonEditor() {
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
                     <Lock className="w-5 h-5 text-amber-600" />
-                    <span>Publish</span>
+                    <span>Student access</span>
                   </h3>
 
                   <div className="space-y-6">
                     {/* Published Toggle */}
                     <div className="flex items-center justify-between p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
                       <div>
-                        <h4 className="font-bold text-primary-900 text-sm">Publish</h4>
+                        <h4 className="font-bold text-primary-900 text-sm">Available in the course</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          Publish.
+                          Students can open this lesson after the course is approved and published.
                         </p>
                       </div>
 
@@ -957,9 +797,9 @@ export function AdminLessonEditor() {
                     {/* Free Preview Toggle */}
                     <div className="flex items-center justify-between p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
                       <div>
-                        <h4 className="font-bold text-primary-900 text-sm">Free (Free Preview)</h4>
+                        <h4 className="font-bold text-primary-900 text-sm">Free preview lesson</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          The requested information could not be loaded. Please try again.
+                          Allow visitors to preview this lesson before enrollment.
                         </p>
                       </div>
 
@@ -977,91 +817,10 @@ export function AdminLessonEditor() {
                       </label>
                     </div>
 
-                    {/* Completion Rule */}
-                    <div>
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Lesson (Completion Rule)
-                      </label>
-                      <select
-                        value={completionRule}
-                        onChange={(e) => {
-                          setCompletionRule(e.target.value as any);
-                          setIsDirty(true);
-                        }}
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold"
-                      >
-                        <option value="manual">Confirm</option>
-                        <option value="watch90">Watch 90% of video</option>
-                        <option value="read_end">Content</option>
-                        <option value="pass_quiz">Lesson</option>
-                        <option value="upload_assignment">Lesson settings</option>
-                      </select>
-                    </div>
                   </div>
                 </div>
               )}
 
-              {/* TAB 4: SETTINGS */}
-              {activeTab === 'settings' && (
-                <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
-                  <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-amber-600" />
-                    <span>Search metadata (SEO)</span>
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Order Index */}
-                    <div>
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        Lesson (Order Index)
-                      </label>
-                      <input
-                        type="number"
-                        value={orderIndex}
-                        onChange={(e) => {
-                          setOrderIndex(parseInt(e.target.value) || 0);
-                          setIsDirty(true);
-                        }}
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
-                      />
-                    </div>
-
-                    {/* SEO Title */}
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        SEO title
-                      </label>
-                      <input
-                        type="text"
-                        value={seoTitle}
-                        onChange={(e) => {
-                          setSeoTitle(e.target.value);
-                          setIsDirty(true);
-                        }}
-                        placeholder="Search..."
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
-                      />
-                    </div>
-
-                    {/* SEO Description */}
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-primary-900 mb-2">
-                        SEO description
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={seoDescription}
-                        onChange={(e) => {
-                          setSeoDescription(e.target.value);
-                          setIsDirty(true);
-                        }}
-                        placeholder="Search..."
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl text-sm font-medium"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </form>
           )}
         </div>
