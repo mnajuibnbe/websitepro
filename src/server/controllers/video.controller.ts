@@ -110,7 +110,7 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
 
     // 6. Generate Signed Streaming Token
     // We include only what is necessary: fileId for streaming.
-    const streamToken = dependencies.generateStreamToken({ fileId });
+    const streamToken = dependencies.generateStreamToken({ fileId, resourceType: 'video' });
 
     res.status(200).json({ token: streamToken });
   } catch (error: any) {
@@ -137,7 +137,9 @@ function readStreamFileId(req: Request, res: Response): string | null {
   }
 
   try {
-    return verifyStreamToken(token).fileId;
+    const payload = verifyStreamToken(token);
+    if (payload.resourceType !== 'video') throw new Error('Token is not valid for video streaming');
+    return payload.fileId;
   } catch (error: any) {
     console.warn('[StreamVideo] Token verification failed:', error.message);
     res.status(401).json({ error: 'Invalid or expired streaming token' });

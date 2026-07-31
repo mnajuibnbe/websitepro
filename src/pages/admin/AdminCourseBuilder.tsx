@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import {
   ArrowRight,
@@ -52,9 +52,22 @@ type TabType = 'curriculum' | 'settings' | 'pricing' | 'seo' | 'publish';
 export function AdminCourseBuilder() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('curriculum');
+  const requestedTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<TabType>(
+    requestedTab === 'settings' || requestedTab === 'pricing' || requestedTab === 'seo' || requestedTab === 'publish' ? requestedTab : 'curriculum'
+  );
+  const selectTab = (tab: TabType) => {
+    setActiveTab(tab);
+    setSearchParams({ tab }, { replace: true });
+  };
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'curriculum' || tab === 'settings' || tab === 'pricing' || tab === 'seo' || tab === 'publish') setActiveTab(tab);
+  }, [searchParams]);
 
   // Course State
   const [course, setCourse] = useState<Course | null>(null);
@@ -467,7 +480,7 @@ export function AdminCourseBuilder() {
 
                 <Button
                   type="button"
-                  onClick={() => setActiveTab('publish')}
+                  onClick={() => selectTab('publish')}
                   className={`font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-colors ${
                     course?.status === 'published'
                       ? 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
@@ -494,7 +507,7 @@ export function AdminCourseBuilder() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as TabType)}
+                    onClick={() => selectTab(tab.id as TabType)}
                     className={`flex items-center gap-2 py-2.5 px-4 rounded-xl whitespace-nowrap transition-all ${
                       isActive
                         ? 'bg-amber-600 text-white shadow-2xs'

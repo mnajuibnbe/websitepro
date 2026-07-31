@@ -44,6 +44,7 @@ const AdminLessonEditor = lazyNamed(() => import('./pages/admin/AdminLessonEdito
 const AdminUserManagement = lazyNamed(() => import('./pages/admin/AdminUserManagement'), 'AdminUserManagement');
 const AdminCourseEnrollments = lazyNamed(() => import('./pages/admin/AdminCourseEnrollments'), 'AdminCourseEnrollments');
 const InstructorApplication = lazyNamed(() => import('./pages/InstructorApplication'), 'InstructorApplication');
+const InstructorCourses = lazyNamed(() => import('./pages/InstructorCourses'), 'InstructorCourses');
 const AdminInstructorApplications = lazyNamed(() => import('./pages/admin/AdminInstructorApplications'), 'AdminInstructorApplications');
 const AdminCourseReviews = lazyNamed(() => import('./pages/admin/AdminCourseReviews'), 'AdminCourseReviews');
 const AdminCourseReviewWorkspace = lazyNamed(() => import('./pages/admin/AdminCourseReviewWorkspace'), 'AdminCourseReviewWorkspace');
@@ -83,6 +84,7 @@ function AppContent() {
       <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
       <Route path="/instructor/apply" element={<RequireAuth><InstructorApplication /></RequireAuth>} />
       <Route path="/instructor/courses/new" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseCreate /></RequireAuth>} />
+      <Route path="/instructor/courses" element={<RequireAuth permission={Permission.CREATE_COURSE}><InstructorCourses /></RequireAuth>} />
       <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
       <Route path="/learn/:courseId" element={<RequireAuth><CourseLearnResolver /></RequireAuth>} />
       <Route path="/learn/:courseId/lesson/:lessonId" element={<RequireAuth><LessonPlayer /></RequireAuth>} />

@@ -12,6 +12,7 @@ import { VideoLessonRenderer } from '../components/player/VideoLessonRenderer';
 import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
 import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
 import { AssignmentLessonRenderer } from '../components/player/AssignmentLessonRenderer';
+import { PdfLessonRenderer } from '../components/player/PdfLessonRenderer';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { LessonDetails } from '../components/player/LessonDetails';
 import { prefetchSecureStream } from '../components/video/SecureStreamProvider';
@@ -503,6 +504,8 @@ export function LessonPlayer() {
             {/* Viewer Component */}
             {currentLesson.content_type === 'assignment' ? (
               <AssignmentLessonRenderer lessonId={currentLesson.id} />
+            ) : currentLesson.content_type === 'pdf' || currentLesson.lesson_type === 'pdf' ? (
+              <PdfLessonRenderer lessonId={currentLesson.id} title={currentLesson.title} />
             ) : currentLesson.type === 'video' ? (
               <VideoLessonRenderer lessonId={currentLesson.id} videoUrl={currentLesson.video_url} title={currentLesson.title} />
             ) : currentLesson.type === 'text' ? (

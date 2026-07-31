@@ -1,8 +1,13 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { reportClientError } from '../../lib/clientMonitoring';
 
-export class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  declare readonly props: Readonly<{ children: ReactNode }>;
+interface AppErrorBoundaryProps { children?: ReactNode }
+interface AppErrorBoundaryState { failed: boolean }
+const TypedComponent = Component as unknown as {
+  new <P, S>(props: P): { readonly props: Readonly<P>; state: S; context: unknown; setState(state: Partial<S>): void; forceUpdate(): void; render(): ReactNode };
+};
+
+export class AppErrorBoundary extends TypedComponent<AppErrorBoundaryProps, AppErrorBoundaryState> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: Error, info: ErrorInfo) { reportClientError(error, info.componentStack || 'React render'); }
