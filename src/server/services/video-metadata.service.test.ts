@@ -5,8 +5,16 @@ import { parseVideoSource, resolveVideoMetadata } from './video-metadata.service
 test('normalizes supported video providers and rejects unsafe URLs', () => {
   assert.equal(parseVideoSource('https://youtu.be/dQw4w9WgXcQ').provider, 'youtube');
   assert.equal(parseVideoSource('https://vimeo.com/12345').provider, 'vimeo');
+  assert.deepEqual(parseVideoSource('https://drive.google.com/file/d/abcdefghijklmnopqrstuvwxyz123456/view').provider, 'google_drive');
+  assert.throws(() => parseVideoSource('https://drive.google.com/drive/folders/abcdefghijklmnopqrstuvwxyz123456'), /Google Drive folder/);
   assert.throws(() => parseVideoSource('http://127.0.0.1/video.mp4'), /HTTPS/);
   assert.throws(() => parseVideoSource('https://192.168.1.10/video.mp4'), /Private network/);
+});
+
+test('validates Google Drive file type and duration through trusted metadata', async () => {
+  const result = await resolveVideoMetadata('https://drive.google.com/file/d/abcdefghijklmnopqrstuvwxyz123456/view', { driveMetadataFn: async () => ({ mimeType: 'video/mp4', durationMillis: '125000' }) });
+  assert.deepEqual(result, { provider: 'google_drive', durationSeconds: 125, status: 'ready' });
+  await assert.rejects(() => resolveVideoMetadata('https://drive.google.com/file/d/abcdefghijklmnopqrstuvwxyz123456/view', { driveMetadataFn: async () => ({ mimeType: 'application/pdf', durationMillis: null }) }), /not a supported video/);
 });
 
 test('extracts Vimeo and HLS durations without trusting the browser', async () => {

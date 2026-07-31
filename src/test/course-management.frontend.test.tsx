@@ -6,6 +6,7 @@ import { renderFrontend } from './renderFrontend';
 import { CourseEditorGuide } from '../components/admin/course/CourseEditorGuide';
 import { CategoryField } from '../components/admin/course/CategoryField';
 import { CourseInstructor } from '../components/course-detail/CourseInstructor';
+import { AddCurriculumItemDialog } from '../components/admin/curriculum/AddCurriculumItemDialog';
 
 const sections: PublicCurriculumSection[] = [{
   id: 'section-1', title: 'Getting started', description: 'Course orientation', order_index: 0,
@@ -52,4 +53,14 @@ test('sales page instructor block renders only assigned public profile data', ()
   assert.match(markup, /Cosmetic science/);
   assert.match(markup, /Admin-approved instructor/);
   assert.doesNotMatch(markup, /@|email/);
+});
+
+test('add lesson dialog exposes only the five supported MVP activities', () => {
+  const markup = renderFrontend(<AddCurriculumItemDialog isOpen onClose={() => {}} courseId="course-1" sectionId="section-1" sectionTitle="Getting started" />);
+  for (const label of ['Video lesson', 'PDF document', 'External link', 'Quiz', 'Assignment']) assert.match(markup, new RegExp(`>${label}<`));
+  for (const legacy of ['Audio', 'Embedded content', 'Live session', 'Article']) assert.doesNotMatch(markup, new RegExp(legacy, 'i'));
+  assert.equal((markup.match(/<button/g) || []).length, 7);
+  assert.doesNotMatch(markup, /disabled=""/);
+  assert.match(markup, /aria-modal="true"/);
+  assert.match(markup, /Add lesson to Getting started/);
 });

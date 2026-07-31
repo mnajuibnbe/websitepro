@@ -587,7 +587,7 @@ export function AdminCourseManager() {
                                 >
                                   <FileText className="w-4 h-4" />
                                 </button>
-                              ) : (
+                              ) : course.review_status === 'approved' ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'published')}
                                   className="p-2 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
@@ -595,6 +595,14 @@ export function AdminCourseManager() {
                                   title="Publish approved course"
                                 >
                                   <CheckCircle className="w-4 h-4" />
+                                </button>
+                              ) : course.review_status === 'submitted' ? (
+                                <button onClick={() => navigate(`/admin/course-reviews/${course.id}`)} className="p-2 text-accent-700 hover:bg-accent-50 rounded-lg transition-colors" aria-label={`Review ${course.title}`} title="Open submitted review">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <button onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" aria-label={`Finalize ${course.title}`} title="Complete readiness and finalize">
+                                  <Sparkles className="w-4 h-4" />
                                 </button>
                               )}
 

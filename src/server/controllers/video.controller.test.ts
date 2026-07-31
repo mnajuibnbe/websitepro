@@ -106,6 +106,12 @@ test('returns not found when the lesson has no video file ID', async () => {
   assert.equal(result.body.error, 'Lesson video not found');
 });
 
+test('rejects a Google Drive folder instead of signing it as a video file', async () => {
+  const result = await requestToken({ lesson: { video_url: 'https://drive.google.com/drive/folders/abcdefghijklmnopqrstuvwxyz123456', course_id: 'course-1' } });
+  assert.equal(result.status, 422);
+  assert.match(result.body.error, /Google Drive folder/);
+});
+
 test('returns a safe correlated error for server configuration failure', async () => {
   const result = await requestToken({ configurationError: new Error('secret internal configuration detail') });
   assert.equal(result.status, 500);

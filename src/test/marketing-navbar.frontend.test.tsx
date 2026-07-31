@@ -27,7 +27,7 @@ test('renders a consistent course active state and honest navigation actions', (
   assert.match(markup, /aria-label="Open navigation menu"/);
   assert.match(markup, /aria-controls="marketing-navigation-drawer"/);
   assert.match(markup, /motion-reduce:transition-none/);
-  assert.match(markup, /aria-label="Course prices shown in EGP"/);
+  assert.doesNotMatch(markup, /Course prices|Prices shown in|Course prices shown in/);
 });
 
 test('desktop navigation exposes Home and keeps Login in the account action group', () => {

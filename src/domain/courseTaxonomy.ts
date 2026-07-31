@@ -7,4 +7,4 @@ export const COURSE_CATEGORIES = [
 
 export type CourseCategory = (typeof COURSE_CATEGORIES)[number]['value'];
 
-export const COURSE_LANGUAGES = ['Arabic', 'English'] as const;
+export const COURSE_LANGUAGES = ['English'] as const;

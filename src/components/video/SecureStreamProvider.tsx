@@ -2,6 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { VideoPlayer } from './VideoPlayer';
 import { useAuth } from '../../contexts/AuthContext';
 
+const STREAM_URL_TTL_MS = 90 * 60 * 1000;
+const streamRequests = new Map<string, { promise: Promise<string>; expiresAt: number }>();
+
+async function requestStreamUrl(lessonId: string, token: string): Promise<string> {
+  const key = `${token}:${lessonId}`;
+  const cached = streamRequests.get(key);
+  if (cached && cached.expiresAt > Date.now()) return cached.promise;
+  if (cached) streamRequests.delete(key);
+  const request = fetch('/api/video/token', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ lessonId }) })
+    .then(async response => {
+      const payload = await response.json().catch(() => ({})) as { token?: string; error?: string; correlationId?: string };
+      if (!response.ok || !payload.token) throw new Error(payload.error ? `${payload.error}${payload.correlationId ? ` (Reference: ${payload.correlationId})` : ''}` : `Failed to authorize the stream (${response.status}).`);
+      return `/api/video/stream?token=${encodeURIComponent(payload.token)}`;
+    })
+    .catch(error => { streamRequests.delete(key); throw error; });
+  streamRequests.set(key, { promise: request, expiresAt: Date.now() + STREAM_URL_TTL_MS });
+  return request;
+}
+
+export function prefetchSecureStream(lessonId: string, token: string | null | undefined) {
+  if (token) void requestStreamUrl(lessonId, token).catch(() => undefined);
+}
+
 interface SecureStreamProviderProps {
   lessonId: string;
   title?: string;
@@ -13,10 +36,10 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryVersion, setRetryVersion] = useState(0);
   const { token } = useAuth();
 
   useEffect(() => {
-    console.log("[DevLog] SecureStreamProvider lessonId:", typeof lessonId, lessonId);
     let isMounted = true;
 
     const fetchToken = async () => {
@@ -24,53 +47,14 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         setLoading(true);
         setError(null);
 
-        console.log(`[DevLog] Token requested for lessonId: ${lessonId}`);
-        const response = await fetch('/api/video/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-          },
-          body: JSON.stringify({ lessonId })
-        });
-
-        if (!response.ok) {
-          let errorMessage = `Failed to get streaming token (${response.status})`;
-          try {
-            const errData = await response.json();
-            if (errData && errData.error) {
-              errorMessage = errData.correlationId
-                ? `${errData.error} (Reference: ${errData.correlationId})`
-                : errData.error;
-            }
-          } catch (jsonErr) {
-            console.warn('[DevLog] Token response was not JSON:', response.status);
-          }
-          throw new Error(errorMessage);
-        }
-
-        let data;
-        try {
-          data = await response.json();
-        } catch (jsonErr) {
-          throw new Error('Received invalid response format from server.');
-        }
-
-        if (!data || !data.token) {
-          throw new Error('Streaming token was not provided by server.');
-        }
-
-        console.log(`[DevLog] Token received successfully`);
-
+        if (!token) throw new Error('Your session expired. Sign in and try again.');
+        const url = await requestStreamUrl(lessonId, token);
         if (isMounted) {
-          // Construct stream URL
-          const url = `/api/video/stream?token=${data.token}`;
           setStreamUrl(url);
           setLoading(false);
         }
       } catch (err: any) {
         if (isMounted) {
-          console.error(`[DevLog] Stream error:`, err);
           setError(err.message || 'An unexpected error occurred');
           setLoading(false);
         }
@@ -82,7 +66,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     return () => {
       isMounted = false;
     };
-  }, [lessonId, token]);
+  }, [lessonId, token, retryVersion]);
 
   if (loading) {
     return (
@@ -107,7 +91,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => { if (token) streamRequests.delete(`${token}:${lessonId}`); setRetryVersion(value => value + 1); }}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
           >
             Try Again
@@ -117,5 +101,5 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     );
   }
 
-  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={true} />;
+  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} />;
 };

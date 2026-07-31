@@ -1,20 +1,22 @@
-# Course review production rollout
+# One-script course authoring database deployment
 
-The single file to apply is:
+## Run this file only
 
-`supabase/production/APPLY_ONCE_20260730_COMPLETE_FEATURE.sql`
+`supabase/production/DEPLOY_ONCE_COMPLETE_COURSE_AUTHORING.sql`
+
+This is the only SQL file required **because none of the phase scripts have been run**. It contains all nine July 30 database phases and its own postflight verification in one transaction.
 
 ## Required baseline
 
-The database must already contain the repository schema through migration `20260730000001_require_course_review_notes.sql`. The consolidated script checks for the baseline tables and stops before phase 1 when they are absent.
+The database must already contain the application schema through `20260730000001_require_course_review_notes.sql`. The deployment script checks the required baseline objects before making changes.
 
-## Apply
+## Exact deployment steps
 
 1. Take a Supabase database backup.
-2. Open the Supabase SQL editor for the target project.
-3. Paste the complete contents of `supabase/production/APPLY_ONCE_20260730_COMPLETE_FEATURE.sql`.
-4. Run it once. The six phases and postflight run in one transaction, so any error rolls the complete rollout back. Do not run individual migrations `20260730010000` through `20260730060000` as well.
-5. Confirm the final postflight block succeeds.
-6. Sign in as an administrator and run `select public.admin_get_workflow_health();`; every invariant-violation count should be zero except operational queues such as overdue reviews or open findings.
+2. Open the target project in **Supabase → SQL Editor → New query**.
+3. Copy the complete contents of `supabase/production/DEPLOY_ONCE_COMPLETE_COURSE_AUTHORING.sql` into the editor.
+4. Select **Run** once and wait for completion.
+5. Confirm the result says `COURSE AUTHORING DATABASE DEPLOYMENT COMPLETE`.
+6. Deploy the application commit only after that success result.
 
-If the script reports that rollout has already started, stop. Do not bypass the guard; inspect `supabase_migrations.schema_migrations` and the created objects before choosing individual recovery migrations.
+Do **not** separately run the nine source migrations, audit SQL, verification SQL, or any earlier script from this conversation. The deployment file already includes its postflight. If it reports that the rollout has already started, stop rather than removing the guard; that means the assumption that no phase script was applied is incorrect and the database needs a partial-rollout inspection.

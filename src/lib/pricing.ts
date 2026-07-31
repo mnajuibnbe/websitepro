@@ -4,9 +4,9 @@ export type PricingSource = 'profile' | 'vercel-header' | 'persisted-choice' | '
 export interface PricingContext { countryCode: string | null; countryGroup: PricingCountryGroup; currency: PricingCurrency; source: PricingSource; }
 export interface LocalizedCoursePrice extends PricingContext { amount: string | null; formatted: string; available: boolean; isFree: boolean; }
 export interface CoursePriceFields { price_egp?: number | string | null; price_usd?: number | string | null; }
-// Tutiba is Egypt-first: unknown locations consistently see EGP rather than a
-// temporary USD value while regional pricing is resolving.
-export const DEFAULT_PRICING_CONTEXT: PricingContext = { countryCode: 'EG', countryGroup: 'egypt', currency: 'EGP', source: 'default' };
+// Only positively identified Egyptian visitors receive EGP pricing. Unknown
+// locations safely use the international USD price.
+export const DEFAULT_PRICING_CONTEXT: PricingContext = { countryCode: null, countryGroup: 'international', currency: 'USD', source: 'default' };
 
 export function contextForCountry(countryCode: string | null | undefined, source: PricingSource): PricingContext {
   const normalized = countryCode?.trim().toUpperCase() || null;

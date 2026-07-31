@@ -11,11 +11,11 @@ Course authoring and catalog visibility are separate concerns.
 | `draft` | `not_submitted` | Editable work that has never been submitted. |
 | `in_review` | `submitted` | Frozen for instructor publication changes while an admin reviews it. |
 | `draft` | `changes_requested` | Returned to the owner with reviewer feedback. |
-| `approved` | `approved` | Approved content; an admin may publish it. |
+| `approved` | `approved` | Approved content; approval publishes the immutable revision automatically. |
 | `draft` | `rejected` | Rejected submission that can be revised and resubmitted. |
 | `archived` | any | Hidden from normal authoring lists without destroying learning or financial history. |
 
-Only admins publish, unpublish, approve, reject, archive, restore, or reassign a course. An approved instructor may create and edit owned drafts, preview them, and submit them for review. Students never receive authoring access. Instructor self-service remains disabled until the application and approval workflow enforces this contract at the database boundary.
+Only admins finalize admin-authored drafts, approve, reject, unpublish, archive, restore, or reassign a course. Approval and publication are one atomic decision. An approved instructor may create and edit owned drafts, preview them, and submit them for review. Students never receive authoring access.
 
 Visibility is independent: `public` appears in the catalog, `unlisted` requires a direct link, and `private` is limited to eligible enrolled learners. A published course must also be approved.
 
