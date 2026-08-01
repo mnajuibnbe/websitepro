@@ -8,14 +8,15 @@ import { supabase } from '../../lib/supabase';
 import { useParams, useNavigate } from 'react-router-dom';
 import { isValidUUID } from '../../lib/uuid';
 import { OptimizedImage } from '../ui/OptimizedImage';
+import type { CourseCatalogItem } from '../../services/courseCatalog.service';
+import { resolveCourseImageUrl } from '../../lib/courseCard';
 
-export function EnrollmentCard() {
+export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
   const { user } = useAuth();
   const pricingContext = usePricingContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [courseId, setCourseId] = useState<string | null>(null);
-  const [courseDetails, setCourseDetails] = useState<any>(null);
   const [enrollmentStatus, setEnrollmentStatus] = useState<'none' | 'pending' | 'active' | 'cancelled'>('none');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -38,20 +39,12 @@ export function EnrollmentCard() {
           return;
         }
 
-        // Verify course exists
-        const { data: course, error: courseError } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (courseError || !course) {
+        if (course.id !== id) {
           setErrorState('not_found');
           return;
         }
 
         setCourseId(id);
-        setCourseDetails(course);
 
         // Check enrollment if user is logged in
         if (user) {
@@ -74,7 +67,7 @@ export function EnrollmentCard() {
     }
 
     checkStatus();
-  }, [id, user]);
+  }, [course.id, id, user]);
 
   const handleEnroll = async () => {
     if (!courseId) return;
@@ -87,7 +80,7 @@ export function EnrollmentCard() {
         navigate('/login', { state: { from: `/course/${courseId}` } });
         return;
       }
-      navigate('/checkout', { state: { courseId, course: courseDetails } });
+      navigate('/checkout', { state: { courseId, course } });
 
     } catch (err) {
       console.error(err);
@@ -135,7 +128,7 @@ export function EnrollmentCard() {
     }
   };
 
-  const price = resolveCoursePrice(courseDetails || {}, pricingContext);
+  const price = resolveCoursePrice(course, pricingContext);
 
   return (
     <>
@@ -157,8 +150,8 @@ export function EnrollmentCard() {
         {/* Course Image */}
       <div className="relative aspect-video bg-primary-100">
         <OptimizedImage
-          src={courseDetails?.thumbnail || "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop"}
-          alt={courseDetails?.title || "Enrollment Information"}
+          src={resolveCourseImageUrl(course)}
+          alt={course.title || "Enrollment Information"}
           width="800"
           height="450"
           displayWidth={800}
@@ -184,19 +177,19 @@ export function EnrollmentCard() {
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <span className="capitalize">{courseDetails?.level?.replace('_', ' ') || 'All levels'}</span>
+            <span className="capitalize">{course.level?.replace('_', ' ') || 'All levels'}</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <BookOpen className="w-4 h-4" />
             </div>
-            <span>Structured lessons and resources</span>
+            <span>{course.lessonsCount} {course.lessonsCount === 1 ? 'lesson' : 'lessons'}</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">
               <Clock className="w-4 h-4" />
             </div>
-            <span>{courseDetails?.duration || 'Learn at your own pace'}</span>
+            <span>{course.duration || 'Learn at your own pace'}</span>
           </li>
           <li className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-primary-500 flex-shrink-0">

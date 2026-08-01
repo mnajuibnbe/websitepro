@@ -3,13 +3,11 @@ import { CourseCard } from '../ui/CourseCard';
 import { X, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from './Pagination';
-import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
-import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
-import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS, filterAndSortCourses } from '../../lib/courseCatalog';
-import type { Course } from '../../types/database.types';
+import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS } from '../../lib/courseCatalog';
 import { usePricingContext } from '../../contexts/PricingContext';
-import { resolveCoursePrice } from '../../lib/pricing';
+import { useCourseCatalog } from '../../hooks/useCourseCatalog';
+import { mapCourseToCardProps } from '../../lib/courseCard';
 
 interface CourseGridProps {
   filters: CourseCatalogFilters;
@@ -21,42 +19,21 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
   const pageSize = 9;
   const navigate = useNavigate();
   const pricingContext = usePricingContext();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const visibleCourses = filterAndSortCourses(courses, filters, pricingContext);
+  const { courses, totalCount, isLoading, error, refetch } = useCourseCatalog({
+    filters,
+    page: currentPage,
+    pageSize,
+    pricingContext,
+  });
 
   useEffect(() => {
     setCurrentPage(1);
-    onResultCountChange(visibleCourses.length);
-  }, [filters, courses, visibleCourses.length, onResultCountChange]);
+  }, [filters]);
 
-  async function fetchCourses() {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const { data, error: dbError } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('status', PUBLIC_COURSE_STATUS)
-        .order('created_at', { ascending: false });
-
-      if (dbError) throw dbError;
-      setCourses(data || []);
-      setCurrentPage(1);
-    } catch (err) {
-      setError('We could not load the course catalog. Please try again.');
-      console.error('Error fetching courses:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  useEffect(() => {
+    onResultCountChange(totalCount);
+  }, [totalCount, onResultCountChange]);
 
   if (isLoading) {
     return (
@@ -71,8 +48,8 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-danger-50 text-danger-600 px-6 py-6 rounded-xl border border-danger-200 text-center max-w-md">
-          <p className="font-bold mb-4">{error}</p>
-          <Button variant="primary" onClick={fetchCourses} className="mx-auto flex items-center gap-2">
+          <p className="font-bold mb-4">We could not load the course catalog. Please try again.</p>
+          <Button variant="primary" onClick={refetch} className="mx-auto flex items-center gap-2">
             <RefreshCw className="w-4 h-4" />
             Retry
           </Button>
@@ -81,7 +58,12 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     );
   }
 
-  if (courses.length === 0) {
+  const hasActiveFilters = Boolean(
+    filters.search || filters.categories.length || filters.levels.length ||
+    filters.price !== 'all' || filters.durations.length,
+  );
+
+  if (courses.length === 0 && !hasActiveFilters) {
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
@@ -114,33 +96,25 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
         </div>
       )}
 
-      {visibleCourses.length === 0 ? (
+      {courses.length === 0 ? (
         <div className="py-20 text-center"><p className="text-lg font-bold text-primary-900">No courses match your filters</p><button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="mt-3 font-semibold text-accent-700 hover:text-accent-800">Clear filters</button></div>
       ) : (
         <>
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
-        {visibleCourses.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(course => (
-          <CourseCard
-            key={course.id}
-            title={course.title}
-            category={course.category || course.level || 'Professional course'}
-            description={course.description || course.short_description || ''}
-            duration={course.duration || 'TBD'}
-            lessonsCount={0}
-            price={resolveCoursePrice(course, pricingContext).formatted}
-            imageUrl={course.thumbnail || 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop'}
-            ctaText="View course"
-            onEnroll={() => navigate(`/course/${course.id}`)}
-          />
+        {courses.map(course => (
+          <CourseCard key={course.id} {...mapCourseToCardProps(course, pricingContext, {
+            ctaText: 'View course',
+            onEnroll: () => navigate(`/course/${course.id}`),
+          })} />
         ))}
       </div>
 
       {/* Pagination */}
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(visibleCourses.length / pageSize)}
+        totalPages={Math.ceil(totalCount / pageSize)}
         onPageChange={(page) => {
           setCurrentPage(page);
           window.scrollTo({ top: 0, behavior: 'smooth' });

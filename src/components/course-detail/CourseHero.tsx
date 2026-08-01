@@ -2,8 +2,9 @@ import React from 'react';
 import { ChevronRight, Star, PlayCircle, Clock, Award } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
+import type { CourseCatalogItem } from '../../services/courseCatalog.service';
 
-export function CourseHero({ course }: { course?: any }) {
+export function CourseHero({ course }: { course: CourseCatalogItem }) {
   const durationSeconds = Number(course?.total_video_duration_seconds || 0);
   const durationLabel = durationSeconds > 0
     ? `${Math.floor(durationSeconds / 3600) > 0 ? `${Math.floor(durationSeconds / 3600)} hr ` : ''}${Math.ceil((durationSeconds % 3600) / 60)} min video`
@@ -36,14 +37,12 @@ export function CourseHero({ course }: { course?: any }) {
       <div className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10">
         <div className="flex items-center gap-2">
           <div className="flex items-center text-warning-500">
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
-            <Star className="w-5 h-5 fill-current" />
+            {Array.from({ length: 5 }, (_, index) => (
+              <Star key={index} className={`w-5 h-5 ${index < Math.round(course.rating) ? 'fill-current' : ''}`} />
+            ))}
           </div>
-          <span className="font-bold text-primary-900">4.9</span>
-          <span className="text-primary-500 underline decoration-primary-300">(120 Course Information)</span>
+          <span className="font-bold text-primary-900">{course.rating.toFixed(1)}</span>
+          <span className="text-primary-500 underline decoration-primary-300">({course.reviewCount} reviews)</span>
         </div>
 
         <div className="w-1.5 h-1.5 rounded-full bg-primary-300 hidden sm:block"></div>

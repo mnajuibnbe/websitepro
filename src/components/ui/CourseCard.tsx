@@ -1,18 +1,20 @@
 import React from 'react';
 import { Button } from './Button';
 import { Badge } from './Badge';
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, Star } from 'lucide-react';
 import { OptimizedImage } from './OptimizedImage';
 
-interface CourseCardProps {
+export interface CourseCardProps {
   key?: React.Key;
   title: string;
   category: string;
   description: string;
   duration: string;
   lessonsCount: number;
+  rating: number;
+  reviewCount: number;
   price: string;
-  imageUrl?: string;
+  imageUrl: string;
   ctaText?: string;
   onEnroll?: () => void;
 }
@@ -23,8 +25,10 @@ export function CourseCard({
   description,
   duration,
   lessonsCount,
+  rating,
+  reviewCount,
   price,
-  imageUrl = 'https://placehold.co/600x338/E2E8F0/64748B?text=Course',
+  imageUrl,
   ctaText = 'View Course',
   onEnroll
 }: CourseCardProps) {
@@ -62,6 +66,14 @@ export function CourseCard({
             <BookOpen className="w-4 h-4" />
             <span>{lessonsLabel}</span>
           </div>
+          {reviewCount > 0 && (
+            <>
+              <div className="w-1.5 h-1.5 rounded-full bg-primary-300"></div>
+              <span className="inline-flex items-center gap-1" aria-label={`${rating} out of 5 from ${reviewCount} reviews`}>
+                <Star className="w-4 h-4 fill-current text-warning-500" /> {rating.toFixed(1)}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Footer (Price & CTA) */}

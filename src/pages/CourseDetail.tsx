@@ -15,53 +15,53 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { isValidUUID } from '../lib/uuid';
 import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
+import { useCourseCatalog } from '../hooks/useCourseCatalog';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [course, setCourse] = useState<any>(null);
   const [curriculum, setCurriculum] = useState<PublicCurriculumSection[]>([]);
   const [instructor, setInstructor] = useState<PublicInstructorProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorState, setErrorState] = useState<'invalid_uuid' | 'not_found' | null>(null);
+  const [relatedDataLoading, setRelatedDataLoading] = useState(false);
+  const [relatedDataError, setRelatedDataError] = useState(false);
+  const validCourseId = Boolean(id && isValidUUID(id));
+  const { courses, isLoading: courseLoading, error: courseError } = useCourseCatalog({
+    enabled: validCourseId,
+    id: validCourseId ? id : undefined,
+    pageSize: 1,
+  });
+  const course = courses[0] || null;
 
   useEffect(() => {
-    async function fetchCourse() {
+    async function fetchRelatedCourseData() {
       try {
-        setIsLoading(true);
-        setErrorState(null);
+        if (!id || !validCourseId) return;
+        setRelatedDataLoading(true);
+        setRelatedDataError(false);
 
-        if (!id || !isValidUUID(id)) {
-          setErrorState('invalid_uuid');
-          return;
-        }
-
-        const [{ data, error }, curriculumResult, instructorResult] = await Promise.all([
-          supabase.from('courses').select('*').eq('id', id).single(),
+        const [curriculumResult, instructorResult] = await Promise.all([
           supabase.rpc('get_public_course_curriculum', { p_course_id: id }),
           supabase.rpc('get_public_course_instructor', { p_course_id: id }),
         ]);
-
-        if (error || !data) {
-          setErrorState('not_found');
-          return;
-        }
-
-        setCourse(data);
         if (curriculumResult.error) throw curriculumResult.error;
         setCurriculum((curriculumResult.data || []) as PublicCurriculumSection[]);
         if (instructorResult.error) throw instructorResult.error;
         setInstructor((instructorResult.data || null) as PublicInstructorProfile | null);
       } catch (err) {
         console.error('Error fetching course:', err);
-        setErrorState('not_found');
+        setRelatedDataError(true);
       } finally {
-        setIsLoading(false);
+        setRelatedDataLoading(false);
       }
     }
 
-    fetchCourse();
-  }, [id]);
+    fetchRelatedCourseData();
+  }, [id, validCourseId]);
+
+  const isLoading = validCourseId && (courseLoading || relatedDataLoading);
+  const errorState = !validCourseId
+    ? 'invalid_uuid'
+    : (!isLoading && (courseError || !course || relatedDataError) ? 'not_found' : null);
 
   if (isLoading) {
     return (
@@ -98,6 +98,8 @@ export function CourseDetail() {
     );
   }
 
+  if (!course) return null;
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <MarketingNavbar />
@@ -123,7 +125,7 @@ export function CourseDetail() {
 
             {/* Sidebar Area (4 columns on Desktop) */}
             <div className="lg:col-span-4 order-2">
-              <EnrollmentCard />
+              <EnrollmentCard course={course} />
             </div>
 
           </div>
