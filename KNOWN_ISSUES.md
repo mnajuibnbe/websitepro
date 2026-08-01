@@ -9,3 +9,9 @@ The repository does not include production credentials, a policy export, the bas
 - No real payment-provider adapter existed before this task. Paid checkout creates a pending immutable order and pending manual-approval enrollment; it does not charge a card.
 - `x-vercel-ip-country` and authenticated `app_metadata.billing_country` behavior require Vercel Preview and production Supabase runtime verification.
 - There is no pre-existing user currency selector, so no display-only local-storage override was added.
+
+## Legacy course missing approved_revision_id
+
+Course created 2026-07-25 has null approved_revision_id (pre-existing,
+zero revisions/reviews, confirmed unrelated to Phase 1/2 merge — needs
+manual review workflow triggered on it whenever convenient).
