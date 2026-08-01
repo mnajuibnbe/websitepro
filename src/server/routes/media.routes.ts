@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getSupabaseAdmin } from '../config/supabase.js';
 import { resolveVideoMetadata } from '../services/video-metadata.service.js';
 import { getDriveClient } from '../config/google.js';
+import { parseGoogleDriveFileId } from '../services/google-drive-file.service.js';
 
 const router = Router();
 
@@ -28,6 +29,37 @@ router.post('/video-metadata', async (req, res) => {
     res.json(metadata);
   } catch (cause) {
     res.status(422).json({ error: cause instanceof Error ? cause.message : 'Video metadata could not be loaded.' });
+  }
+});
+
+router.post('/document-metadata', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Authentication required.' }); return; }
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase.auth.getUser(authHeader.slice(7));
+  if (error || !data.user) { res.status(401).json({ error: 'Invalid session.' }); return; }
+  const role = data.user.app_metadata?.role;
+  if (role !== 'admin' && role !== 'instructor') {
+    const { data: profile } = await supabase.from('users').select('role').eq('id', data.user.id).maybeSingle();
+    if (profile?.role !== 'admin' && profile?.role !== 'instructor') { res.status(403).json({ error: 'Course author access required.' }); return; }
+  }
+  if (typeof req.body?.url !== 'string' || req.body.url.length > 2048) { res.status(400).json({ error: 'A valid PDF URL is required.' }); return; }
+  try {
+    const fileId = parseGoogleDriveFileId(req.body.url);
+    const response = await getDriveClient().files.get({ fileId, fields: 'name,mimeType,size', supportsAllDrives: true });
+    const size = Number(response.data.size || 0);
+    if (response.data.mimeType !== 'application/pdf' || !Number.isFinite(size) || size <= 0) {
+      res.status(422).json({ error: 'The Google Drive file is not a readable PDF.' });
+      return;
+    }
+    res.json({ status: 'ready', provider: 'google_drive', name: response.data.name || 'lesson.pdf', size });
+  } catch (cause: any) {
+    const status = cause.response?.status;
+    res.status(422).json({
+      error: status === 403 || status === 404
+        ? 'The PDF is unavailable to the configured service account. Share the file with that service account, then retry.'
+        : cause instanceof Error ? cause.message : 'PDF metadata could not be loaded.',
+    });
   }
 });
 

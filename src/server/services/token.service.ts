@@ -4,6 +4,7 @@ const TOKEN_EXPIRATION = '2h'; // 2 hours to allow pausing and seeking during a 
 
 export interface StreamTokenPayload {
   fileId: string;
+  resourceType: 'video' | 'pdf';
 }
 
 /**
@@ -15,7 +16,8 @@ export const generateStreamToken = (payload: StreamTokenPayload): string => {
     throw new Error('STREAMING_TOKEN_SECRET is not configured');
   }
 
-  // Generate token including only fileId
+  // Scope the token to one Drive file and one renderer so a document token
+  // cannot be replayed against the video endpoint (or vice versa).
   return jwt.sign(payload, secret, { expiresIn: TOKEN_EXPIRATION });
 };
 

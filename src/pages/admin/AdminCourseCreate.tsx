@@ -27,6 +27,7 @@ import { InstructorPicker } from '../../components/admin/course/InstructorPicker
 import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGuide';
 import { CategoryField } from '../../components/admin/course/CategoryField';
 import { COURSE_LANGUAGES } from '../../domain/courseTaxonomy';
+import { COURSE_DESCRIPTION_MIN_LENGTH, COURSE_SUMMARY_MIN_LENGTH } from '../../domain/courseReadiness';
 
 // Helper to sanitize slug
 export const sanitizeSlug = sanitizeCourseSlug;
@@ -77,7 +78,7 @@ export function AdminCourseCreate() {
     if (isSubmitting) return; // Prevent double click
 
     // Validation
-    const newErrors = validateCourseForm({ title, slug: '', priceEgp, priceUsd });
+    const newErrors = validateCourseForm({ title, slug: '', shortDescription, description, priceEgp, priceUsd });
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -145,7 +146,7 @@ export function AdminCourseCreate() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => navigate(isInstructor ? '/dashboard' : '/admin/courses')}
+                onClick={() => navigate(isInstructor ? '/instructor/courses' : '/admin/courses')}
                 className="p-2 bg-white rounded-xl border border-primary-200 text-primary-600 hover:text-primary-900 transition-colors"
                 title="Courses"
               >
@@ -180,7 +181,7 @@ export function AdminCourseCreate() {
           </div>
 
           <CourseEditorGuide steps={[
-            { id: 'course-basics', label: 'Basics', description: 'Title and sales description', complete: Boolean(title.trim() && shortDescription.trim() && description.trim()) },
+            { id: 'course-basics', label: 'Basics', description: 'Title and sales description', complete: Boolean(title.trim() && shortDescription.trim().length >= COURSE_SUMMARY_MIN_LENGTH && description.trim().length >= COURSE_DESCRIPTION_MIN_LENGTH) },
             { id: 'course-classification', label: 'Catalog', description: 'Category, level, and language', complete: Boolean(category && level && language) },
             { id: 'course-commerce', label: isInstructor ? 'Pricing' : 'Pricing & instructor', description: isInstructor ? 'Regional course prices' : 'Regional prices and course owner', complete: Boolean(priceEgp && priceUsd && (isInstructor || instructorId)) },
             { id: 'course-media', label: 'Cover', description: 'One reusable course image', complete: Boolean(coverImage.trim()) },
@@ -224,29 +225,37 @@ export function AdminCourseCreate() {
                 {/* Short Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Short Description
+                    Course summary <span className="text-danger-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={shortDescription}
-                    onChange={(e) => setShortDescription(e.target.value)}
+                    onChange={(e) => { setShortDescription(e.target.value); if (errors.shortDescription) setErrors((prev) => ({ ...prev, shortDescription: '' })); }}
+                    minLength={COURSE_SUMMARY_MIN_LENGTH}
+                    required
+                    aria-describedby="course-summary-help"
                     placeholder="Summarize the course for catalog cards"
-                    className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm"
+                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm ${errors.shortDescription ? 'border-danger-400' : 'border-primary-200'}`}
                   />
+                  <p id="course-summary-help" className={`mt-1.5 text-xs ${errors.shortDescription ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.shortDescription || `${shortDescription.trim().length}/${COURSE_SUMMARY_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
 
                 {/* Full Description */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">
-                    Full course description
+                    Full course description <span className="text-danger-500">*</span>
                   </label>
                   <textarea
                     rows={5}
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    onChange={(e) => { setDescription(e.target.value); if (errors.description) setErrors((prev) => ({ ...prev, description: '' })); }}
+                    minLength={COURSE_DESCRIPTION_MIN_LENGTH}
+                    required
+                    aria-describedby="course-description-help"
                     placeholder="Build practical skills with structured, expert-led course content...."
-                    className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed resize-y"
+                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed resize-y ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
                   />
+                  <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
               </div>
             </div>
