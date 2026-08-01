@@ -12,6 +12,9 @@ export interface Course {
   duration: string | null;
   total_video_duration_seconds?: number;
   category: string | null;
+  learning_outcomes: string[];
+  requirements: string[];
+  target_audience: string[];
   thumbnail: string | null;
   cover_image: string | null;
   trailer_video: string | null;
@@ -63,6 +66,54 @@ export interface CourseOrder {
   id: string; course_id: string; user_id: string; amount: string; currency: 'EGP' | 'USD';
   pricing_region: 'egypt' | 'international'; pricing_source: string;
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded'; enrollment_status: 'pending' | 'active' | 'cancelled'; created_at: string;
+}
+
+export interface CourseCategory {
+  value: string;
+  label: string;
+  description: string;
+  order_index: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseCategoryMigrationIssue {
+  course_id: string;
+  original_category: string;
+  normalized_candidate: string | null;
+  reason: string;
+  detected_at: string;
+}
+
+export interface CourseReview {
+  id: string;
+  course_id: string;
+  user_id: string;
+  rating: number;
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
+
+export interface PublicCourseWithStats {
+  course: Course;
+  lessons_count: number;
+  average_rating: number | string;
+  review_count: number;
+  enrolled_student_count: number;
+}
+
+export interface PaymentSubmission {
+  id: string;
+  order_id: string;
+  method: 'bank_transfer' | 'instapay' | 'vodafone_cash';
+  reference_note: string | null;
+  proof_image_url: string;
+  submitted_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface CourseSection {
