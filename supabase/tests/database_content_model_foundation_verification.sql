@@ -20,8 +20,8 @@ BEGIN
   END IF;
   IF EXISTS (
     SELECT 1 FROM public.courses c
-    LEFT JOIN public.course_categories cc ON cc.value = c.category
-    WHERE c.category IS NOT NULL AND cc.value IS NULL
+    LEFT JOIN public.course_categories cc ON cc.name = c.category
+    WHERE c.category IS NOT NULL AND cc.name IS NULL
   ) THEN
     RAISE EXCEPTION 'A live course category is not canonical';
   END IF;

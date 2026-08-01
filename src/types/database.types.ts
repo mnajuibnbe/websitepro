@@ -69,10 +69,11 @@ export interface CourseOrder {
 }
 
 export interface CourseCategory {
-  value: string;
-  label: string;
+  id: number;
+  name: string;
+  slug: string;
   description: string;
-  order_index: number;
+  display_order: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;

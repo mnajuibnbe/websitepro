@@ -18,7 +18,7 @@ const baseCourse: Course = {
   price_egp: 300,
   price_usd: 10,
   duration: null,
-  category: 'Skin Care',
+  category: 'Skin care',
   learning_outcomes: [],
   requirements: [],
   target_audience: [],
@@ -66,7 +66,7 @@ test('public course stats are shaped once and mapped to complete CourseCard prop
 });
 
 test('catalog cache keys de-duplicate semantically identical filter arrays', () => {
-  const first = courseCatalogCacheKey({ filters: { categories: ['Skin Care', 'Hair Care'] } });
-  const second = courseCatalogCacheKey({ filters: { categories: ['Hair Care', 'Skin Care'] } });
+  const first = courseCatalogCacheKey({ filters: { categories: ['Skin care', 'Hair care'] } });
+  const second = courseCatalogCacheKey({ filters: { categories: ['Hair care', 'Skin care'] } });
   assert.equal(first, second);
 });

@@ -33,16 +33,7 @@ const durationHours = (course: Course) => {
 };
 
 function categoryMatches(courseCategory: string | null, selectedCategory: string): boolean {
-  if (!courseCategory) return false;
-  if (courseCategory === selectedCategory) return true;
-  const legacyCategoryTerms: Record<string, string> = {
-    'Skin Care': '\u0628\u0634\u0631\u0629',
-    'Hair Care': '\u0634\u0639\u0631',
-    'Diploma Programs': '\u062f\u0628\u0644\u0648\u0645',
-    'Specialized Courses': '\u0645\u062a\u062e\u0635\u0635',
-  };
-  const legacyTerm = legacyCategoryTerms[selectedCategory];
-  return legacyTerm ? courseCategory.includes(legacyTerm) : false;
+  return Boolean(courseCategory && courseCategory.localeCompare(selectedCategory, undefined, { sensitivity: 'accent' }) === 0);
 }
 
 export function filterAndSortCourses(courses: Course[], filters: CourseCatalogFilters, context: PricingContext = DEFAULT_PRICING_CONTEXT): Course[] {

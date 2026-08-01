@@ -8,13 +8,14 @@ export interface CourseSalesTheme {
 }
 
 export function getCourseSalesTheme(category: string | null | undefined): CourseSalesTheme {
-  if (category === 'Skin Care') {
+  const normalizedCategory = category?.trim().toLowerCase();
+  if (normalizedCategory === 'skin care') {
     return { accentBorder: 'border-rose-300', badge: 'bg-rose-100 text-rose-800', icon: Sparkles, panel: 'from-rose-50 to-white' };
   }
-  if (category === 'Hair Care') {
+  if (normalizedCategory === 'hair care') {
     return { accentBorder: 'border-violet-300', badge: 'bg-violet-100 text-violet-800', icon: Scissors, panel: 'from-violet-50 to-white' };
   }
-  if (category === 'Cosmetic Science') {
+  if (normalizedCategory === 'cosmetic science') {
     return { accentBorder: 'border-cyan-300', badge: 'bg-cyan-100 text-cyan-800', icon: FlaskConical, panel: 'from-cyan-50 to-white' };
   }
   return { accentBorder: 'border-emerald-300', badge: 'bg-emerald-100 text-emerald-800', icon: Sprout, panel: 'from-emerald-50 to-white' };

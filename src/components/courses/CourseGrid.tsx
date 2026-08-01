@@ -39,7 +39,8 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <Loader2 className="w-12 h-12 text-accent-600 animate-spin mb-4" />
-        <p className="text-primary-600 font-medium">Courses...</p>
+        <p className="text-primary-700 font-bold">Loading the course catalog…</p>
+        <p className="mt-1 text-sm text-primary-500">Finding the best matches for you.</p>
       </div>
     );
   }
@@ -67,7 +68,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
     return (
       <div className="flex-grow flex flex-col items-center justify-center py-20">
         <div className="bg-primary-50 text-primary-600 px-6 py-8 rounded-xl border border-primary-200 text-center max-w-md w-full">
-          <p className="font-bold mb-2">No items found</p>
+          <p className="font-bold mb-2">No courses are available yet</p>
           <p>New courses are being prepared. Please check back soon.</p>
         </div>
       </div>
@@ -97,7 +98,7 @@ export function CourseGrid({ filters, onFiltersChange, onResultCountChange }: Co
       )}
 
       {courses.length === 0 ? (
-        <div className="py-20 text-center"><p className="text-lg font-bold text-primary-900">No courses match your filters</p><button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="mt-3 font-semibold text-accent-700 hover:text-accent-800">Clear filters</button></div>
+        <div className="py-20 text-center"><p className="text-lg font-bold text-primary-900">No courses match these filters</p><p className="mt-1 text-primary-500">Try broadening your search or clearing the selected filters.</p><button type="button" onClick={() => onFiltersChange(EMPTY_CATALOG_FILTERS)} className="mt-3 font-semibold text-accent-700 hover:text-accent-800">Clear filters</button></div>
       ) : (
         <>
 

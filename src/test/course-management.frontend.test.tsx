@@ -64,9 +64,9 @@ test('guided course setup exposes progress without changing the hash route', () 
   assert.match(markup, /1 of 2/);
 });
 
-test('category field explains the selected governed category', () => {
-  const markup = renderFrontend(<CategoryField value="Skin Care" onChange={() => {}} />);
-  assert.match(markup, /Skin health, products, routines/);
+test('category field loads governed categories from the catalog source', () => {
+  const markup = renderFrontend(<CategoryField value="Skin care" onChange={() => {}} />);
+  assert.match(markup, /Loading categories/);
   assert.doesNotMatch(markup, /type="text"/);
 });
 

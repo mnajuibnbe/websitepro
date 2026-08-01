@@ -44,7 +44,7 @@ export function AdminCourseCreate() {
   const [title, setTitle] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Skin Care');
+  const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
   const [language, setLanguage] = useState('English');
   const [priceEgp, setPriceEgp] = useState('');

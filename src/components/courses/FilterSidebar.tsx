@@ -2,15 +2,17 @@ import React from 'react';
 import { Button } from '../ui/Button';
 import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS } from '../../lib/courseCatalog';
 import { X } from 'lucide-react';
+import type { CourseCategory } from '../../services/courseCategories.service';
 
 interface FilterSidebarProps {
   filters: CourseCatalogFilters;
   onChange: (filters: CourseCatalogFilters) => void;
   mobileOpen: boolean;
   onClose: () => void;
+  categories: CourseCategory[];
+  categoriesError?: boolean;
 }
 
-const categories = ['Skin Care', 'Hair Care', 'Diploma Programs', 'Specialized Courses'];
 const levels = [
   { label: 'Beginner', value: 'beginner' },
   { label: 'Intermediate', value: 'intermediate' },
@@ -22,7 +24,7 @@ const durations = [
   { label: 'Over 20 Hours', value: 'long' },
 ] as const;
 
-export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: FilterSidebarProps) {
+export function FilterSidebar({ filters, onChange, mobileOpen, onClose, categories, categoriesError = false }: FilterSidebarProps) {
   const toggle = (key: 'categories' | 'levels' | 'durations', value: string) => {
     const values = filters[key] as string[];
     onChange({ ...filters, [key]: values.includes(value) ? values.filter(item => item !== value) : [...values, value] });
@@ -45,13 +47,13 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose }: Filter
       <div className="mb-8">
         <h3 className="font-bold text-primary-900 mb-4">Category</h3>
         <div className="flex flex-col gap-3">
-          {categories.map((item) => (
-            <label key={item} className="flex items-center gap-3 cursor-pointer group">
+          {categoriesError ? <p className="text-sm text-danger-600">Categories are temporarily unavailable.</p> : categories.map((item) => (
+            <label key={item.id} className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center justify-center w-5 h-5 border border-primary-300 rounded group-hover:border-accent-500 transition-colors">
-                <input type="checkbox" checked={filters.categories.includes(item)} onChange={() => toggle('categories', item)} className="peer sr-only" />
+                <input type="checkbox" checked={filters.categories.includes(item.name)} onChange={() => toggle('categories', item.name)} className="peer sr-only" />
                 <div className="w-3 h-3 bg-accent-600 rounded-sm opacity-0 peer-checked:opacity-100 transition-opacity"></div>
               </div>
-              <span className="text-primary-700 font-medium group-hover:text-primary-900 transition-colors">{item}</span>
+              <span className="text-primary-700 font-medium group-hover:text-primary-900 transition-colors">{item.name}</span>
             </label>
           ))}
         </div>

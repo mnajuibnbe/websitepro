@@ -2,20 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { CourseCatalogFilters } from '../../lib/courseCatalog';
+import type { CourseCategory } from '../../services/courseCategories.service';
 
 interface CoursesHeaderProps {
   filters: CourseCatalogFilters;
   onChange: (filters: CourseCatalogFilters) => void;
+  categories: CourseCategory[];
 }
 
-export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
-  const categories = [
-    'Course Catalog',
-    'Course Catalog',
-    'Course Catalog',
-    'Course Catalog',
-    'Course Catalog',
-    'Free'
+export function CoursesHeader({ filters, onChange, categories }: CoursesHeaderProps) {
+  const shortcuts = [
+    { key: 'all', label: 'All courses', category: null, price: 'all' as const },
+    ...categories.map(category => ({ key: category.slug, label: category.name, category: category.name, price: 'all' as const })),
+    { key: 'free', label: 'Free', category: null, price: 'free' as const },
   ];
 
   return (
@@ -37,21 +36,21 @@ export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
 
       {/* Category Shortcuts */}
       <div className="flex overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 gap-3">
-        {categories.map((category, index) => {
-          const isFree = category === 'Free';
-          const isAll = category === 'Course Catalog';
+        {shortcuts.map((shortcut) => {
+          const isFree = shortcut.key === 'free';
+          const isAll = shortcut.key === 'all';
           const isActive = isAll
             ? filters.categories.length === 0 && filters.price === 'all'
             : isFree
               ? filters.price === 'free'
-              : filters.categories.length === 1 && filters.categories[0] === category;
+              : filters.price === 'all' && filters.categories.length === 1 && filters.categories[0] === shortcut.category;
           return (
             <button
-              key={index}
+              key={shortcut.key}
               aria-pressed={isActive}
               onClick={() => onChange({
                 ...filters,
-                categories: isAll || isFree ? [] : [category],
+                categories: shortcut.category ? [shortcut.category] : [],
                 price: isFree ? 'free' : 'all',
               })}
               className={`flex-none px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
@@ -60,7 +59,7 @@ export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
                   : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200'
               }`}
             >
-              {category}
+              {shortcut.label}
             </button>
           );
         })}

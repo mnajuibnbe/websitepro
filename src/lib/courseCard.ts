@@ -3,7 +3,7 @@ import type { PricingContext } from './pricing';
 import { resolveCoursePrice } from './pricing';
 import type { CourseCatalogItem } from '../services/courseCatalog.service';
 
-export const COURSE_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=800&auto=format&fit=crop';
+export const COURSE_IMAGE_FALLBACK = '/course-placeholder.svg';
 
 export function resolveCourseImageUrl(course: Pick<CourseCatalogItem, 'thumbnail' | 'cover_image'>): string {
   return course.thumbnail || course.cover_image || COURSE_IMAGE_FALLBACK;

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck } from 'lucide-react';
+import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck, Tags } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMobileDrawerLifecycle } from '../../hooks/useMobileDrawerLifecycle';
 import { MobileDrawerBackdrop } from '../layout/MobileDrawerBackdrop';
@@ -16,6 +16,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const navItems = user?.role === 'admin' ? [
     { icon: BarChart3, label: 'Admin overview', href: '/admin' },
     { icon: BookOpen, label: 'Course management', href: '/admin/courses' },
+    { icon: Tags, label: 'Course categories', href: '/admin/course-categories' },
     { icon: Users, label: 'User management', href: '/admin/users' },
     { icon: GraduationCap, label: 'Instructor applications', href: '/admin/instructors' },
     { icon: ClipboardCheck, label: 'Course reviews', href: '/admin/course-reviews' },

@@ -31,13 +31,6 @@ export interface CourseCatalogResult {
 const DEFAULT_PAGE_SIZE = 9;
 const MAX_PAGE_SIZE = 50;
 
-const legacyCategoryTerms: Record<string, string> = {
-  'Skin Care': '\u0628\u0634\u0631\u0629',
-  'Hair Care': '\u0634\u0639\u0631',
-  'Diploma Programs': '\u062f\u0628\u0644\u0648\u0645',
-  'Specialized Courses': '\u0645\u062a\u062e\u0635\u0635',
-};
-
 function quotedFilterValue(value: string): string {
   return `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`;
 }
@@ -109,13 +102,7 @@ export async function fetchCourseCatalog(options: CourseCatalogQuery = {}): Prom
   }
 
   if (queryOptions.categories.length) {
-    const conditions = queryOptions.categories.flatMap((category) => {
-      const exact = `course->>category.eq.${quotedFilterValue(category)}`;
-      const legacyTerm = legacyCategoryTerms[category];
-      return legacyTerm
-        ? [exact, `course->>category.ilike.${quotedFilterValue(`%${legacyTerm}%`)}`]
-        : [exact];
-    });
+    const conditions = queryOptions.categories.map(category => `course->>category.eq.${quotedFilterValue(category)}`);
     query = query.or(conditions.join(','));
   }
 

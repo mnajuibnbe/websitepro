@@ -37,6 +37,7 @@ const QuizPage = lazyNamed(() => import('./pages/Quiz'), 'QuizPage');
 const CertificatePage = lazyNamed(() => import('./pages/CertificatePage'), 'CertificatePage');
 const AdminDashboard = lazyNamed(() => import('./pages/admin/AdminDashboard'), 'AdminDashboard');
 const AdminCourseManager = lazyNamed(() => import('./pages/admin/AdminCourseManager'), 'AdminCourseManager');
+const AdminCourseCategories = lazyNamed(() => import('./pages/admin/AdminCourseCategories'), 'AdminCourseCategories');
 const AdminCourseCreate = lazyNamed(() => import('./pages/admin/AdminCourseCreate'), 'AdminCourseCreate');
 const AdminCourseEdit = lazyNamed(() => import('./pages/admin/AdminCourseEdit'), 'AdminCourseEdit');
 const AdminCourseBuilder = lazyNamed(() => import('./pages/admin/AdminCourseBuilder'), 'AdminCourseBuilder');
@@ -96,6 +97,7 @@ function AppContent() {
       {/* Admin Routes */}
       <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />
       <Route path="/admin/courses" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseManager /></RequireAuth>} />
+      <Route path="/admin/course-categories" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCategories /></RequireAuth>} />
       <Route path="/admin/courses/new" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/admin/courses/:courseId/edit" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseEdit /></RequireAuth>} />
       <Route path="/admin/courses/:courseId/builder" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseBuilder /></RequireAuth>} />
