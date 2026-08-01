@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { Menu, X } from 'lucide-react';
+import { BookOpen, Home, Info, LayoutDashboard, LogIn, Mail, Menu, Newspaper, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { TutibaBrand } from './TutibaBrand';
 import { PageContainer } from './PageContainer';
 
 const navigationItems = [
-  { label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
-  { label: 'Courses', to: '/courses', matches: (pathname: string) => pathname.startsWith('/course') },
-  { label: 'About', to: '/about', matches: (pathname: string) => pathname === '/about' },
-  { label: 'Blog', to: '/blog', matches: (pathname: string) => pathname.startsWith('/blog') },
-  { label: 'Contact', to: '/contact', matches: (pathname: string) => pathname === '/contact' },
+  { icon: Home, label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
+  { icon: BookOpen, label: 'Courses', to: '/courses', matches: (pathname: string) => pathname.startsWith('/course') },
+  { icon: Info, label: 'About', to: '/about', matches: (pathname: string) => pathname === '/about' },
+  { icon: Newspaper, label: 'Blog', to: '/blog', matches: (pathname: string) => pathname.startsWith('/blog') },
+  { icon: Mail, label: 'Contact', to: '/contact', matches: (pathname: string) => pathname === '/contact' },
 ] as const;
 
 export function MarketingNavbar() {
@@ -119,10 +119,9 @@ export function MarketingNavbar() {
         </div>
       </PageContainer>
 
-      {/* Mobile Drawer */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
+      {/* Mobile Drawer — anchored to the same right edge as its trigger. */}
+        <div className={`fixed inset-0 z-50 lg:hidden ${isMobileMenuOpen ? '' : 'pointer-events-none'}`}>
+          {isMobileMenuOpen && (
           <button
             type="button"
             aria-label="Close navigation menu"
@@ -130,29 +129,46 @@ export function MarketingNavbar() {
             className="fixed inset-0 bg-primary-900/50 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
+          )}
 
           {/* Drawer */}
-          <div id="marketing-navigation-drawer" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Navigation menu" className="mobile-drawer-viewport fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col transition-transform transform motion-reduce:transition-none">
-            <div className="flex items-center justify-between h-20 px-6 border-b border-primary-100">
+          <div
+            id="marketing-navigation-drawer"
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+            aria-hidden={!isMobileMenuOpen || undefined}
+            inert={!isMobileMenuOpen || undefined}
+            data-state={isMobileMenuOpen ? 'open' : 'closed'}
+            className={`mobile-drawer-viewport fixed inset-y-0 right-0 flex w-[min(18rem,100vw)] min-h-0 flex-col border-l border-primary-200 bg-white shadow-xl transition-transform duration-300 motion-reduce:transition-none ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            <div className="min-h-20 shrink-0 flex items-center justify-between px-6 pt-[env(safe-area-inset-top)] border-b border-primary-100">
               <TutibaBrand compact onClick={() => setIsMobileMenuOpen(false)} />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 data-drawer-close
                 type="button"
                 aria-label="Close navigation menu"
-                className="text-primary-500 hover:text-primary-900 focus:outline-none bg-primary-50 p-2 rounded-full"
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-primary-500 hover:bg-primary-50 hover:text-primary-900"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="flex flex-col py-6 px-6 space-y-6 overflow-y-auto">
-              {navigationItems.map(item => <Link key={item.to} to={item.to} aria-current={item.matches(location.pathname) ? 'page' : undefined} className="rounded-lg px-3 py-2 text-lg font-medium text-primary-900 transition-colors hover:bg-primary-50 hover:text-accent-700 aria-[current=page]:bg-accent-50 aria-[current=page]:text-accent-800" onClick={() => setIsMobileMenuOpen(false)}>{item.label}</Link>)}
-              <hr className="border-primary-100" />
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-8 px-4 flex flex-col gap-2">
+              {navigationItems.map(item => {
+                const Icon = item.icon;
+                const isActive = item.matches(location.pathname);
+                return <Link key={item.to} to={item.to} aria-current={isActive ? 'page' : undefined} className={`flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all ${isActive ? 'bg-accent-50 text-accent-700' : 'text-primary-600 hover:bg-primary-50 hover:text-primary-900'}`} onClick={() => setIsMobileMenuOpen(false)}><Icon className={`h-5 w-5 ${isActive ? 'text-accent-600' : 'text-primary-400'}`} /><span>{item.label}</span></Link>;
+              })}
+            </div>
+
+            <div className="shrink-0 border-t border-primary-100 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
               {isAuthenticated ? (
-                <Link to="/dashboard" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+                <Link to="/dashboard" className="mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-900" onClick={() => setIsMobileMenuOpen(false)}><LayoutDashboard className="h-5 w-5 text-primary-400" /> Dashboard</Link>
               ) : (
-                <Link to="/login" className="text-lg font-medium text-primary-900 hover:text-accent-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+                <Link to="/login" className="mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-900" onClick={() => setIsMobileMenuOpen(false)}><LogIn className="h-5 w-5 text-primary-400" /> Login</Link>
               )}
               <Button variant="primary" className="w-full" onClick={() => {
                 navigate('/courses');
@@ -163,7 +179,6 @@ export function MarketingNavbar() {
             </div>
           </div>
         </div>
-      )}
     </nav>
     </>
   );

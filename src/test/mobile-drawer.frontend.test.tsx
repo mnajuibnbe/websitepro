@@ -3,6 +3,7 @@ import test from 'node:test';
 import type { ReactElement } from 'react';
 import { AdminSidebar } from '../components/admin/AdminSidebar';
 import { Sidebar } from '../components/dashboard/Sidebar';
+import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { AuthContext } from '../contexts/AuthContext';
 import { DESKTOP_NAVIGATION_QUERY, lockScroll, shouldCloseDrawerForKey, shouldDismissFromBackdrop } from '../lib/mobileDrawer';
 import { createTestAuthValue } from './fixtures';
@@ -71,4 +72,15 @@ test('drawer primitives preserve close and scroll restoration contracts', () => 
   assert.equal(target.style.overflow, 'hidden');
   restoreSecondOwner();
   assert.equal(target.style.overflow, 'auto');
+});
+
+test('marketing drawer is anchored to the right and uses the portal navigation treatment', () => {
+  const markup = renderWithAuth(<MarketingNavbar />);
+
+  assert.match(markup, /aria-label="Navigation menu"/);
+  assert.match(markup, /right-0/);
+  assert.match(markup, /translate-x-full/);
+  assert.match(markup, /w-\[min\(18rem,100vw\)\]/);
+  assert.match(markup, /rounded-xl px-4 py-3 font-bold/);
+  assert.doesNotMatch(markup, /inset-y-0 left-0 w-full max-w-sm/);
 });

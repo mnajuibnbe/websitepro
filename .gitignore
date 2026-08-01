@@ -7,5 +7,9 @@ coverage/
 .env*
 !.env.example
 
+# This project uses npm. Ignore pnpm artifacts if tooling regenerates them.
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
 .vercel
 .env*

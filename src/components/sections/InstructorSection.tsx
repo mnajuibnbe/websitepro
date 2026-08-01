@@ -10,13 +10,13 @@ export function InstructorSection() {
       <PageContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-          {/* Instructor Image (5 cols on Desktop) */}
+          {/* Instructor brand (5 cols on Desktop) */}
           <div className="lg:col-span-5 relative order-2 lg:order-1">
-            <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-lg border border-primary-200">
-              <OptimizedImage displayWidth={800} width="800" height="800"
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=800&auto=format&fit=crop"
-                alt="Tutiba course instructor"
-                className="w-full h-full object-cover"
+            <div className="aspect-square overflow-hidden rounded-[2rem] border border-primary-200 bg-gradient-to-br from-white via-[#fff8eb] to-accent-50 p-5 shadow-lg sm:p-8">
+              <OptimizedImage displayWidth={800} width="1600" height="1600"
+                src="/images/tutiba-instructor-logo.png"
+                alt="Dr. Aya Elbrashy — Skin, Hair and Beauty Nutrition"
+                className="h-full w-full rounded-full object-contain drop-shadow-sm"
               />
             </div>
             <div className="absolute -bottom-6 -right-6 bg-white p-5 rounded-2xl shadow-md border border-primary-100 hidden md:block">

@@ -1,13 +1,11 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+import { BadgeCheck, Loader2, MessageSquareText, RefreshCw, Star } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
+import { useHomepageTestimonials } from '../../hooks/useHomepageMarketing';
 
 export function Testimonials() {
-  const testimonials = [
-    { id: 1, quote: "The scientific depth helped me evaluate ingredients with much more confidence in my daily practice.", name: "Sarah Ahmed", profession: "Pharmacist", rating: 5 },
-    { id: 2, quote: "The lessons are clear, well organized, and easy to apply when advising clients.", name: "Nora Mohammed", profession: "Dermatologist", rating: 5 },
-    { id: 3, quote: "The diploma was an excellent investment in my professional development.", name: "Hind Abdullah", profession: "Cosmetic Pharmacist", rating: 5 },
-  ];
+  const { data: testimonials, error, isLoading, refetch } = useHomepageTestimonials();
+  const isLegacyCollection = testimonials.length > 0 && testimonials.every(testimonial => testimonial.source === 'legacy_import');
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -21,33 +19,74 @@ export function Testimonials() {
           </p>
         </div>
 
-        {/* Mobile Horizontal Scroll / Desktop Grid */}
-        <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 lg:gap-8 snap-x snap-mandatory hide-scrollbar">
+        {isLoading && (
+          <div role="status" className="flex min-h-56 items-center justify-center text-primary-500">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="sr-only">Loading student reviews</span>
+          </div>
+        )}
+
+        {!isLoading && error && (
+          <div role="alert" className="mx-auto max-w-xl rounded-2xl border border-primary-200 bg-primary-50 p-8 text-center">
+            <MessageSquareText className="mx-auto h-10 w-10 text-primary-300" />
+            <h3 className="mt-4 text-xl font-bold text-primary-900">Reviews are temporarily unavailable</h3>
+            <p className="mt-2 text-primary-600">Please try again in a moment.</p>
+            <button type="button" onClick={refetch} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary-300 px-4 font-bold text-primary-800 hover:bg-white">
+              <RefreshCw className="h-4 w-4" /> Retry
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !error && testimonials.length === 0 && (
+          <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-8 text-center md:p-10">
+            <MessageSquareText className="mx-auto h-10 w-10 text-accent-500" />
+            <h3 className="mt-4 text-xl font-bold text-primary-900">Student reviews are coming soon</h3>
+            <p className="mt-2 text-primary-600">Approved learner experiences will appear here as our community shares them.</p>
+          </div>
+        )}
+
+        {!isLoading && !error && testimonials.length > 0 && <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 lg:gap-8 snap-x snap-mandatory hide-scrollbar">
           {testimonials.map((testimonial) => (
             <div
-              key={testimonial.id}
+              key={testimonial.review_id}
               className="flex-none w-[85%] sm:w-[70%] md:w-auto snap-center bg-primary-50 p-8 lg:p-10 rounded-2xl border border-primary-100 flex flex-col h-full"
             >
-              <div className="flex items-center gap-1 mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-warning-500 text-warning-500" />
-                ))}
-              </div>
-              <p className="text-lg text-primary-800 flex-grow mb-8 leading-relaxed font-medium">
-                "{testimonial.quote}"
+              {testimonial.source === 'platform' && testimonial.rating !== null ? (
+                <div className="flex items-center gap-1 mb-6" aria-label={`${testimonial.rating} out of 5 stars`}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star key={star} className={`w-5 h-5 ${star <= testimonial.rating! ? 'fill-warning-500 text-warning-500' : 'text-primary-200'}`} />
+                  ))}
+                </div>
+              ) : (
+                <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-accent-200 bg-white px-3 py-1.5 text-xs font-bold text-accent-800">
+                  <BadgeCheck className="h-4 w-4 text-accent-600" /> Legacy testimonial
+                </div>
+              )}
+              <p dir="auto" className="text-lg text-primary-800 flex-grow mb-8 leading-relaxed font-medium">
+                “{testimonial.comment}”
               </p>
               <div className="mt-auto flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary-200 flex items-center justify-center text-primary-700 font-bold text-lg">
-                  {testimonial.name.charAt(0)}
+                  {testimonial.reviewer_name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div className="font-bold text-primary-900">{testimonial.name}</div>
-                  <div className="text-sm text-primary-600 font-medium">{testimonial.profession}</div>
+                  <div className="font-bold text-primary-900">{testimonial.reviewer_name}</div>
+                  <div className="text-sm text-primary-600 font-medium">
+                    {testimonial.source === 'platform'
+                      ? 'Verified learner review'
+                      : 'Verified — collected from Tutiba’s original course platform'}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-        </div>
+        </div>}
+
+        {!isLoading && !error && isLegacyCollection && (
+          <p className="mx-auto mt-2 max-w-3xl text-center text-sm leading-relaxed text-primary-500">
+            These genuine testimonials were collected before Tutiba’s current review-submission and moderation system. New approved platform reviews will take their place here automatically.
+          </p>
+        )}
       </PageContainer>
     </section>
   );
