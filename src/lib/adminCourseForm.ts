@@ -7,6 +7,9 @@ export interface CourseFormValues {
   description: string;
   priceEgp: string;
   priceUsd: string;
+  learningOutcomes?: string[];
+  requirements?: string[];
+  targetAudience?: string[];
 }
 
 export function sanitizeCourseSlug(input: string): string {
@@ -23,5 +26,8 @@ export function validateCourseForm(values: CourseFormValues): Record<string, str
   if (!/^\d+(\.\d{1,2})?$/.test(values.priceEgp)) errors.priceEgp = 'Enter a valid EGP price with no more than 2 decimal places.';
   if (!/^\d+(\.\d{1,2})?$/.test(values.priceUsd)) errors.priceUsd = 'Enter a valid USD price with no more than 2 decimal places.';
   if (!errors.priceEgp && !errors.priceUsd && ((Number(values.priceEgp) === 0) !== (Number(values.priceUsd) === 0))) errors.priceUsd = 'Free courses must use zero for both currencies.';
+  if (values.learningOutcomes?.some(item => !item.trim())) errors.learningOutcomes = 'Remove or complete every empty learning outcome.';
+  if (values.requirements?.some(item => !item.trim())) errors.requirements = 'Remove or complete every empty requirement.';
+  if (values.targetAudience?.some(item => !item.trim())) errors.targetAudience = 'Remove or complete every empty audience item.';
   return errors;
 }

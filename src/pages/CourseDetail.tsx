@@ -115,9 +115,9 @@ export function CourseDetail() {
               <CourseHero course={course} />
 
               {/* Additional content sections */}
-              <LearningOutcomes />
-              <WhoIsThisFor />
-              <Requirements />
+              <LearningOutcomes outcomes={course.learning_outcomes || []} />
+              <WhoIsThisFor audiences={course.target_audience || []} />
+              <Requirements requirements={course.requirements || []} />
               <div id="course-curriculum"><CurriculumAccordion sections={curriculum} /></div>
               <CourseInstructor instructor={instructor} />
               <CourseReviews />

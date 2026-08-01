@@ -30,6 +30,7 @@ import { CategoryField } from '../../components/admin/course/CategoryField';
 import { COURSE_LANGUAGES } from '../../domain/courseTaxonomy';
 import { useAuth } from '../../contexts/AuthContext';
 import { COURSE_DESCRIPTION_MIN_LENGTH, COURSE_SUMMARY_MIN_LENGTH } from '../../domain/courseReadiness';
+import { DynamicListEditor } from '../../components/admin/course/DynamicListEditor';
 
 export function AdminCourseEdit() {
   const navigate = useNavigate();
@@ -59,6 +60,9 @@ export function AdminCourseEdit() {
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
   const [coverImage, setCoverImage] = useState('');
   const [instructorId, setInstructorId] = useState('');
+  const [learningOutcomes, setLearningOutcomes] = useState<string[]>([]);
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [targetAudience, setTargetAudience] = useState<string[]>([]);
 
 
   // Validation & Toasts
@@ -121,6 +125,9 @@ export function AdminCourseEdit() {
       setVisibility((course.visibility as any) || 'public');
       setCoverImage(course.cover_image || course.thumbnail || '');
       setInstructorId(course.instructor_id || '');
+      setLearningOutcomes(Array.isArray(course.learning_outcomes) ? course.learning_outcomes : []);
+      setRequirements(Array.isArray(course.requirements) ? course.requirements : []);
+      setTargetAudience(Array.isArray(course.target_audience) ? course.target_audience : []);
     } catch (err: any) {
       console.error('Error fetching course details:', err);
       setErrorMessage(err.message || 'Build practical skills with structured, expert-led course content..');
@@ -141,7 +148,7 @@ export function AdminCourseEdit() {
     if (!courseId || isSubmitting) return;
 
     // Validation
-    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd });
+    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd, learningOutcomes, requirements, targetAudience });
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
@@ -186,6 +193,9 @@ export function AdminCourseEdit() {
         thumbnail: coverImage.trim() || null,
         cover_image: coverImage.trim() || null,
         instructor_id: instructorId || null,
+        learning_outcomes: learningOutcomes.map(item => item.trim()),
+        requirements: requirements.map(item => item.trim()),
+        target_audience: targetAudience.map(item => item.trim()),
         updated_at: new Date().toISOString(),
       };
 
@@ -383,6 +393,12 @@ export function AdminCourseEdit() {
                       className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
                     />
                     <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
+                  </div>
+
+                  <div className="grid gap-5">
+                    <DynamicListEditor id="course-learning-outcomes" label="Learning outcomes" description="What learners will be able to do after completing this course. Items appear in this order on the course page." value={learningOutcomes} onChange={(items) => { setLearningOutcomes(items); if (errors.learningOutcomes) setErrors(current => ({ ...current, learningOutcomes: '' })); }} error={errors.learningOutcomes} />
+                    <DynamicListEditor id="course-requirements" label="Requirements" description="Knowledge, materials, or experience learners should have before starting." value={requirements} onChange={(items) => { setRequirements(items); if (errors.requirements) setErrors(current => ({ ...current, requirements: '' })); }} error={errors.requirements} />
+                    <DynamicListEditor id="course-target-audience" label="Target audience" description="The learners this course is designed for." value={targetAudience} onChange={(items) => { setTargetAudience(items); if (errors.targetAudience) setErrors(current => ({ ...current, targetAudience: '' })); }} error={errors.targetAudience} />
                   </div>
                 </div>
               </div>

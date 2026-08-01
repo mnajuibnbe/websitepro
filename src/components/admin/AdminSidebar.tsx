@@ -19,6 +19,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     { icon: Users, label: 'User management', href: '/admin/users' },
     { icon: GraduationCap, label: 'Instructor applications', href: '/admin/instructors' },
     { icon: ClipboardCheck, label: 'Course reviews', href: '/admin/course-reviews' },
+    { icon: ClipboardCheck, label: 'Learner reviews', href: '/admin/reviews' },
   ] : [
     { icon: BookOpen, label: 'My authored courses', href: '/instructor/courses' },
     { icon: GraduationCap, label: 'Create course', href: '/instructor/courses/new' },

@@ -1,23 +1,17 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-export function LearningOutcomes() {
-  const outcomes = [
-    'Learning Outcome.',
-    'Learning Outcome.',
-    'Learning Outcome.',
-    'Learning Outcome (INCI) Learning Outcome.',
-    'Learning Outcome.',
-    'Minute.'
-  ];
+export function LearningOutcomes({ outcomes }: { outcomes: string[] }) {
+  const visibleOutcomes = outcomes.map(item => item.trim()).filter(Boolean);
+  if (visibleOutcomes.length === 0) return null;
 
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Learning Outcome
+        Learning outcomes
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-        {outcomes.map((outcome, index) => (
+        {visibleOutcomes.map((outcome, index) => (
           <div key={index} className="flex items-start gap-3">
             <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-accent-50 flex items-center justify-center">
               <Check className="w-4 h-4 text-accent-600" />

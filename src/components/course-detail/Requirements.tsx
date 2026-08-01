@@ -1,33 +1,17 @@
 import React from 'react';
-import { Info } from 'lucide-react';
 
-export function Requirements() {
+export function Requirements({ requirements }: { requirements: string[] }) {
+  const visibleRequirements = requirements.map(item => item.trim()).filter(Boolean);
+  if (visibleRequirements.length === 0) return null;
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Requirement
+        Requirements
       </h2>
       <div className="bg-white border border-primary-200 rounded-xl p-6 shadow-sm">
         <ul className="space-y-3 text-primary-700 font-medium">
-          <li className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-accent-500"></div>
-            <span>The requested information could not be loaded. Please try again.</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-accent-500"></div>
-            <span>Requirement.</span>
-          </li>
-          <li className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-accent-500"></div>
-            <span>Lessons.</span>
-          </li>
+          {visibleRequirements.map((requirement, index) => <li key={index} className="flex items-start gap-3"><div className="mt-2 h-2 w-2 flex-none rounded-full bg-accent-500" /><span>{requirement}</span></li>)}
         </ul>
-        <div className="mt-6 flex items-start gap-3 bg-info-100 text-info-700 p-4 rounded-lg text-sm font-medium">
-          <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <p>
-            Level. Requirement.
-          </p>
-        </div>
       </div>
     </div>
   );

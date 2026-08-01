@@ -94,6 +94,9 @@ export interface CourseReview {
   comment: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
+  moderation_note: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
 }
 
 export interface PublicCourseWithStats {

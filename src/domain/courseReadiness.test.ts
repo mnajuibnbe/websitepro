@@ -22,3 +22,16 @@ test('readiness targets deep-link to the correct authoring surface', () => {
   assert.equal(readinessTargetHref('course-id', 'pricing'), '/admin/courses/course-id/builder?tab=pricing');
   assert.equal(readinessTargetHref('course-id', 'curriculum'), '/admin/courses/course-id/builder?tab=curriculum');
 });
+
+test('authoring validation rejects blank dynamic-list items', () => {
+  const errors = validateCourseForm({
+    title: 'Course', slug: 'course',
+    shortDescription: 'S'.repeat(COURSE_SUMMARY_MIN_LENGTH),
+    description: 'D'.repeat(COURSE_DESCRIPTION_MIN_LENGTH),
+    priceEgp: '0', priceUsd: '0',
+    learningOutcomes: ['Useful outcome', '  '], requirements: [''], targetAudience: ['Professionals'],
+  });
+  assert.ok(errors.learningOutcomes);
+  assert.ok(errors.requirements);
+  assert.equal(errors.targetAudience, undefined);
+});

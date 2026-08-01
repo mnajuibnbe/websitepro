@@ -7,6 +7,26 @@ import { CourseEditorGuide } from '../components/admin/course/CourseEditorGuide'
 import { CategoryField } from '../components/admin/course/CategoryField';
 import { CourseInstructor } from '../components/course-detail/CourseInstructor';
 import { AddCurriculumItemDialog } from '../components/admin/curriculum/AddCurriculumItemDialog';
+import { DynamicListEditor } from '../components/admin/course/DynamicListEditor';
+import { LearningOutcomes } from '../components/course-detail/LearningOutcomes';
+import { Requirements } from '../components/course-detail/Requirements';
+import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
+import { AdminStudentReviews } from '../pages/admin/AdminStudentReviews';
+import { AuthContext, AuthContextType } from '../contexts/AuthContext';
+
+const adminAuthContext: AuthContextType = {
+  user: { id: 'admin-1', name: 'Admin', email: 'admin@example.com', role: 'admin', joinedAt: '2026-01-01' },
+  session: null,
+  token: null,
+  isAuthenticated: true,
+  isLoading: false,
+  sessionError: null,
+  retrySession: async () => {},
+  refreshSession: async () => {},
+  login: async () => {},
+  register: async () => ({ user: null, session: null, requiresEmailConfirmation: false }),
+  logout: async () => true,
+};
 
 const sections: PublicCurriculumSection[] = [{
   id: 'section-1', title: 'Getting started', description: 'Course orientation', order_index: 0,
@@ -48,11 +68,47 @@ test('category field explains the selected governed category', () => {
 });
 
 test('sales page instructor block renders only assigned public profile data', () => {
-  const markup = renderFrontend(<CourseInstructor instructor={{ professional_name: 'Dr. Samira', bio: 'Evidence-based educator with extensive professional experience.', expertise: ['Cosmetic science'], credentials: 'Board-certified professional educator', avatar_url: null }} />);
+  const markup = renderFrontend(<CourseInstructor instructor={{ professional_name: 'Dr. Samira', bio: 'Evidence-based educator with extensive professional experience across clinical teaching and cosmetic science.', expertise: ['Cosmetic science'], credentials: 'Board-certified professional educator', avatar_url: null }} />);
   assert.match(markup, /Dr\. Samira/);
   assert.match(markup, /Cosmetic science/);
   assert.match(markup, /Admin-approved instructor/);
   assert.doesNotMatch(markup, /@|email/);
+});
+
+test('sales page instructor block replaces incomplete profile copy with a public empty state', () => {
+  const markup = renderFrontend(<CourseInstructor instructor={{ professional_name: 'Instructor', bio: 'Add at least one expertise area, an 80-character biography, and 20 characters of credentials.', expertise: ['Skin care', 'Cosmetic science'], credentials: 'Add at least one expertise area, an 80-character biography, and 20 characters of credentials.', avatar_url: null }} />);
+  assert.match(markup, /Instructor bio coming soon/);
+  assert.doesNotMatch(markup, /80-character biography|expertise area|20 characters of credentials/);
+});
+
+test('sales page instructor block renders its empty state when no public profile is assigned', () => {
+  const markup = renderFrontend(<CourseInstructor instructor={null} />);
+  assert.match(markup, /Instructor bio coming soon/);
+});
+
+test('course detail sections render persisted list content and ignore blank legacy items', () => {
+  const markup = renderFrontend(<><LearningOutcomes outcomes={['  Assess a formulation  ', '']} /><Requirements requirements={['Patch-test products']} /><WhoIsThisFor audiences={['Skin-care professionals']} /></>);
+  assert.match(markup, /Learning outcomes/);
+  assert.match(markup, /Assess a formulation/);
+  assert.match(markup, /Requirements/);
+  assert.match(markup, /Who this course is for/);
+  assert.doesNotMatch(markup, />\s{2,}Assess a formulation\s{2,}</);
+});
+
+test('course content list editor exposes add, remove, and reorder controls', () => {
+  const markup = renderFrontend(<DynamicListEditor id="outcomes" label="Learning outcomes" description="Ordered outcomes" value={['First outcome', 'Second outcome']} onChange={() => {}} />);
+  assert.match(markup, /Add item/);
+  assert.match(markup, /Move Learning outcomes item 2 up/);
+  assert.match(markup, /Move Learning outcomes item 1 down/);
+  assert.match(markup, /Remove Learning outcomes item 1/);
+});
+
+test('learner review moderation page exposes filtering and both decisions', () => {
+  const markup = renderFrontend(<AuthContext.Provider value={adminAuthContext}><AdminStudentReviews /></AuthContext.Provider>);
+  assert.match(markup, /Learner review moderation/);
+  assert.match(markup, /Filter by course/);
+  assert.match(markup, /Approve/);
+  assert.match(markup, /reject/);
 });
 
 test('add lesson dialog exposes only the five supported MVP activities', () => {

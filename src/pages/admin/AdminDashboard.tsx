@@ -183,7 +183,7 @@ export function AdminDashboard() {
                 ['Instructor role drift', workflowHealth.approved_instructor_role_drift],
                 ['Inactive instructor profiles', workflowHealth.inactive_instructor_public_profiles],
               ].map(([label, value]) => <div key={String(label)} className={`rounded-xl border p-4 ${Number(value) > 0 ? 'border-amber-200 bg-amber-50' : 'border-success-200 bg-success-100'}`}><p className="text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-primary-700">{label}</p></div>)}</div> : <p role="status" className="mt-4 text-sm text-primary-500">Loading workflow health…</p>}
-              {workflowHealth && <p className="mt-3 text-xs text-primary-500">Last checked {new Date(workflowHealth.checked_at).toLocaleString()}</p>}
+              {workflowHealth && <p className="mt-3 text-xs text-primary-500">Last checked {new Date(workflowHealth.checked_at).toLocaleString('en')}</p>}
             </section>
 
             {errorMsg && (
@@ -236,7 +236,7 @@ export function AdminDashboard() {
                         const studentName = enrollment.users?.full_name || 'Not Found';
                         const studentEmail = enrollment.users?.email || '';
                         const courseTitle = enrollment.courses?.title || 'Not Found';
-                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('ar-EG') : 'Not available';
+                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('en', { dateStyle: 'medium' }) : 'Not available';
 
                         return (
                           <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
