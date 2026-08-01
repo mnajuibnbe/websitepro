@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, Star, PlayCircle, Clock, Award } from 'lucide-react';
+import { ChevronRight, Star, PlayCircle, Clock, Award } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
 
@@ -13,9 +13,9 @@ export function CourseHero({ course }: { course?: any }) {
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8 overflow-x-auto whitespace-nowrap hide-scrollbar">
         <Link to="/" className="hover:text-accent-600 transition-colors">Home</Link>
-        <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 flex-shrink-0" />
         <Link to="/courses" className="hover:text-accent-600 transition-colors">Courses</Link>
-        <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+        <ChevronRight className="w-4 h-4 flex-shrink-0" />
         <span className="text-primary-900 font-bold">{course?.title || 'Course Information'}</span>
       </nav>
 

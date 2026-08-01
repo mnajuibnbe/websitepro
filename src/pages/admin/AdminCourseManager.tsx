@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { OptimizedImage } from '../../components/ui/OptimizedImage';
+import { PageContainer } from '../../components/layout/PageContainer';
 import {
   Plus,
   Edit,
@@ -294,7 +295,7 @@ export function AdminCourseManager() {
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
@@ -464,7 +465,7 @@ export function AdminCourseManager() {
                                     {course.category || 'Uncategorized'}
                                   </span>
                                   {course.level && (
-                                    <span className="text-[11px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-md font-semibold">
+                                    <span className="rounded-md bg-primary-100 px-2 py-0.5 text-caption font-semibold text-primary-700">
                                       {course.level === 'beginner'
                                         ? 'Beginner'
                                         : course.level === 'intermediate'
@@ -516,10 +517,10 @@ export function AdminCourseManager() {
                               >
                                 {isPublished ? 'Published' : isArchived ? 'Archived' : 'Draft'}
                               </span>
-                              <span className="text-[11px] text-primary-500 font-medium">
+                              <span className="text-caption font-medium text-primary-500">
                                 Visibility: {course.visibility === 'private' ? 'Private' : course.visibility === 'unlisted' ? 'Unlisted' : 'Public'}
                               </span>
-                              <span className="text-[11px] font-bold text-primary-600">Review: {(course.review_status || 'not_submitted').replace('_', ' ')}</span>
+                              <span className="text-caption font-bold text-primary-600">Review: {(course.review_status || 'not_submitted').replace('_', ' ')}</span>
                             </div>
                           </td>
 
@@ -638,7 +639,7 @@ export function AdminCourseManager() {
               </>
             )}
           </div>
-        </div>
+        </PageContainer>
       </main>
 
       {/* Delete / Safety Modal */}

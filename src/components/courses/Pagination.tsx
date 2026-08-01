@@ -18,8 +18,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         onClick={() => onPageChange(currentPage - 1)}
         className="w-10 h-10 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
       >
-        {/* In RTL, previous page points to the right */}
-        <ChevronRight className="w-5 h-5" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
 
       {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
@@ -44,8 +43,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         onClick={() => onPageChange(currentPage + 1)}
         className="w-10 h-10 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
       >
-        {/* In RTL, next page points to the left */}
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronRight className="w-5 h-5" />
       </button>
     </div>
   );

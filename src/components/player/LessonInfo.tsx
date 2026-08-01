@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { CheckCircle2, ChevronLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ChevronRight } from 'lucide-react';
 import { saveProgress } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -79,7 +79,7 @@ export function LessonInfo() {
           className="w-full sm:w-auto h-12 px-6 font-bold flex items-center justify-center gap-2"
         >
           <span>Next</span>
-          <ChevronLeft className="w-4 h-4" /> {/* In RTL, next points left */}
+          <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
     </div>

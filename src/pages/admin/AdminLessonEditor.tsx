@@ -4,7 +4,7 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { recordAdminAudit } from '../../lib/adminAudit';
 import {
-  ArrowRight,
+  ArrowLeft,
   Save,
   Loader2,
   AlertCircle,
@@ -27,6 +27,7 @@ import {
   Sparkles,
   Link2,
 } from 'lucide-react';
+import { PageContainer } from '../../components/layout/PageContainer';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { Course, CourseSection, Lesson } from '../../types/database.types';
@@ -344,7 +345,7 @@ export function AdminLessonEditor() {
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
 
       <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           {/* Header Card */}
           <div className="bg-white rounded-2xl border border-primary-200 p-5 md:p-6 shadow-2xs mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -359,7 +360,7 @@ export function AdminLessonEditor() {
                   className="p-2.5 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
                   title="Back Course Builder"
                 >
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5" />
                 </button>
 
                 <div>
@@ -801,7 +802,7 @@ export function AdminLessonEditor() {
                           }}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                       </label>
                     </div>
 
@@ -824,7 +825,7 @@ export function AdminLessonEditor() {
                           }}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
 
@@ -834,7 +835,7 @@ export function AdminLessonEditor() {
 
             </form>
           )}
-        </div>
+        </PageContainer>
       </main>
 
       <ConfirmDialog open={showDeleteConfirm} title="Delete lesson?" description={`“${title || 'Untitled lesson'}” will be permanently removed. This action cannot be undone.`} busy={isSaving} onCancel={() => setShowDeleteConfirm(false)} onConfirm={handleDelete} />

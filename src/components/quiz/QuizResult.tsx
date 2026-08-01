@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../ui/Button';
-import { Award, RefreshCcw, BookOpen, ChevronLeft } from 'lucide-react';
+import { Award, RefreshCcw, BookOpen, ChevronRight } from 'lucide-react';
 
 interface QuizResultProps {
   score: number;
@@ -59,7 +59,7 @@ export function QuizResult({ score, totalQuestions, passMark, onRetry, onContinu
               variant="primary"
               className="w-full sm:w-auto h-14 px-8 text-lg font-bold bg-success-600 hover:bg-success-500 border-none shadow-lg shadow-success-600/20"
               onClick={onContinue}
-              icon={<ChevronLeft className="w-5 h-5" />} // Left pointing arrow in RTL
+              icon={<ChevronRight className="w-5 h-5" />}
             >
               Continue Learning
             </Button>

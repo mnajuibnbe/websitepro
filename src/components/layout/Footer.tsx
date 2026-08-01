@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Globe, Mail } from 'lucide-react';
 import { TutibaBrand } from './TutibaBrand';
+import { PageContainer } from './PageContainer';
 
 export function Footer() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export function Footer() {
 
   return (
     <footer className="bg-primary-900 text-primary-300 pt-16 md:pt-24 pb-8 border-t-4 border-accent-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
 
           {/* Logo & Brand Message */}
@@ -113,7 +114,7 @@ export function Footer() {
 
           <p className="order-1 text-center text-sm text-primary-400 md:order-2">Secure account and enrollment workflows</p>
         </div>
-      </div>
+      </PageContainer>
     </footer>
   );
 }

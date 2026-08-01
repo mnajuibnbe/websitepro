@@ -9,6 +9,7 @@ import { DailyReview } from '../components/dashboard/DailyReview';
 import { Menu, Loader2, BookOpen } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -77,8 +78,8 @@ export function Dashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <main id="main-content" className="flex-grow p-4 sm:p-8 overflow-y-auto">
-          <div className="max-w-6xl mx-auto space-y-8 pb-12">
+        <main id="main-content" className="flex-grow overflow-y-auto py-4 sm:py-8">
+          <PageContainer className="space-y-8 pb-12">
 
             {/* Mobile Greeting */}
             <h1 className="text-2xl font-bold text-primary-900 sm:hidden mb-6">Welcome! 👋</h1>
@@ -139,7 +140,7 @@ export function Dashboard() {
                 </div>
               </>
             )}
-          </div>
+          </PageContainer>
         </main>
       </div>
     </div>

@@ -163,7 +163,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             </h5>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-primary-500 mt-0.5 flex-wrap">
+          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-caption text-primary-500">
             <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
               {getItemTypeLabel(item.itemType)}
             </span>
@@ -176,13 +176,13 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             )}
 
             {item.isPreview && (
-              <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
+              <span className="rounded bg-blue-100 px-1.5 py-0.5 text-micro font-bold text-blue-800">
                 Free
               </span>
             )}
 
             <span
-              className={`px-1.5 py-0.2 rounded font-bold text-[10px] ${
+              className={`rounded px-1.5 py-0.5 text-micro font-bold ${
                 item.isPublished
                   ? 'bg-emerald-100 text-emerald-800'
                   : 'bg-amber-100 text-amber-800'

@@ -51,7 +51,6 @@ export function UserProfile() {
 
   return (
     <PortalLayout
-      maxWidth="max-w-4xl"
       sidebar={<Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
       mobileNavigationTrigger={
         <button

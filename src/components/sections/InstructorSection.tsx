@@ -2,11 +2,12 @@ import React from 'react';
 import { Button } from '../ui/Button';
 import { CheckCircle2 } from 'lucide-react';
 import { OptimizedImage } from '../ui/OptimizedImage';
+import { PageContainer } from '../layout/PageContainer';
 
 export function InstructorSection() {
   return (
     <section className="py-16 md:py-24 bg-primary-50 border-t border-primary-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
           {/* Instructor Image (5 cols on Desktop) */}
@@ -59,7 +60,7 @@ export function InstructorSection() {
           </div>
 
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

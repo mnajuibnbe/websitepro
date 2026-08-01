@@ -2,11 +2,12 @@ import React from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Mail } from 'lucide-react';
+import { PageContainer } from '../layout/PageContainer';
 
 export function Newsletter() {
   return (
     <section className="py-16 md:py-24 bg-accent-50 border-t border-accent-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-sm border border-accent-100 flex flex-col lg:flex-row items-center justify-between gap-12 hover:shadow-md transition-shadow duration-300">
           <div className="lg:w-1/2 text-center lg:text-right">
             <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6 mx-auto lg:mx-0">
@@ -36,7 +37,7 @@ export function Newsletter() {
             </form>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

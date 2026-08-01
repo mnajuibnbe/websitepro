@@ -37,7 +37,7 @@ export function AuthLayout({ title, description, children, eyebrow = 'Tutiba acc
           <div className="mb-8 lg:hidden"><TutibaBrand/></div>
           <div className="rounded-3xl border border-primary-200 bg-white p-6 shadow-sm sm:p-9">
             <header className="mb-8">
-              <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-accent-700">{eyebrow}</p>
+              <p className="mb-2 text-sm font-bold uppercase tracking-eyebrow text-accent-700">{eyebrow}</p>
               <h1 className="text-3xl font-bold tracking-tight text-primary-900">{title}</h1>
               <p className="mt-3 leading-relaxed text-primary-600">{description}</p>
             </header>

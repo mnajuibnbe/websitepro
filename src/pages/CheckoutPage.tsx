@@ -7,6 +7,7 @@ import { PaymentMethod } from '../components/checkout/PaymentMethod';
 import { OrderSummary } from '../components/checkout/OrderSummary';
 import { resolveCoursePrice } from '../lib/pricing';
 import { usePricingContext } from '../contexts/PricingContext';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function CheckoutPage() {
   const location = useLocation();
@@ -21,7 +22,7 @@ export function CheckoutPage() {
       <MarketingNavbar />
 
       <main id="main-content" className="flex-grow pt-24 md:pt-32 pb-24">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
+        <PageContainer>
 
           <div className="mb-8 lg:mb-12">
             <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-4">
@@ -51,7 +52,7 @@ export function CheckoutPage() {
 
           </div>
 
-        </div>
+        </PageContainer>
       </main>
 
       <Footer />

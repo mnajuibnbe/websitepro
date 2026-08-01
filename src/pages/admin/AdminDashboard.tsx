@@ -5,6 +5,7 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { CheckCircle, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatCourseAmount } from '../../lib/pricing';
+import { PageContainer } from '../../components/layout/PageContainer';
 
 interface PendingEnrollment {
   id: string;
@@ -150,7 +151,7 @@ export function AdminDashboard() {
         <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
         <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PageContainer>
             <h1 className="text-3xl font-bold text-primary-900 mb-8">Admin overview</h1>
 
             {errorMsg && (
@@ -260,7 +261,7 @@ export function AdminDashboard() {
                 </table>
               </div>
             </div>
-          </div>
+          </PageContainer>
         </main>
       </div>
     </>

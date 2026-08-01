@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate , Link } from 'react-router-dom';
-import { ArrowRight, Calendar, User, ChevronRight } from 'lucide-react';
+import { Calendar, User, ChevronRight } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function BlogPost() {
   const navigate = useNavigate();
@@ -17,7 +18,8 @@ export function BlogPost() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
             <Link to="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-accent-600 transition-colors">Home</Link>
@@ -77,7 +79,8 @@ export function BlogPost() {
               </div>
             </div>
           </article>
-        </div>
+          </div>
+        </PageContainer>
       </main>
 
       <Footer />

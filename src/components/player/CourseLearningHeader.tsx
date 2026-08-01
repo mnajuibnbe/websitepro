@@ -1,6 +1,7 @@
 import React from 'react';
-import { ArrowRight, Menu } from 'lucide-react';
+import { ArrowLeft, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PageContainer } from '../layout/PageContainer';
 
 interface CourseLearningHeaderProps {
   courseTitle: string;
@@ -21,7 +22,7 @@ export function CourseLearningHeader({
 
   return (
     <header className="bg-white border-b border-primary-200 sticky top-0 z-30 shadow-xs" dir="ltr">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+      <PageContainer className="flex items-center justify-between gap-4 py-3.5">
         {/* Right side: Back button & Course title */}
         <div className="flex items-center gap-3 min-w-0">
           <button
@@ -30,7 +31,7 @@ export function CourseLearningHeader({
             title="My Courses"
             aria-label="My Courses"
           >
-            <ArrowRight className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="min-w-0">
             <h1 className="text-base sm:text-lg font-bold text-primary-900 truncate max-w-xs sm:max-w-md lg:max-w-xl">
@@ -64,7 +65,7 @@ export function CourseLearningHeader({
             <span>Course</span>
           </button>
         </div>
-      </div>
+      </PageContainer>
     </header>
   );
 }

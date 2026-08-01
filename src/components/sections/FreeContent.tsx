@@ -3,6 +3,7 @@ import { Button } from '../ui/Button';
 import { PlayCircle, FileText, Play } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { OptimizedImage } from '../ui/OptimizedImage';
+import { PageContainer } from '../layout/PageContainer';
 
 export function FreeContent() {
   const contents = [
@@ -37,7 +38,7 @@ export function FreeContent() {
 
   return (
     <section className="py-16 md:py-24 bg-primary-50 border-t border-primary-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
             Explore Free Learning Resources
@@ -94,7 +95,7 @@ export function FreeContent() {
             View All Free Resources
           </Button>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

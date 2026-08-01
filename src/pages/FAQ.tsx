@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function FAQ() {
   useEffect(() => {
@@ -32,7 +33,8 @@ export function FAQ() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <HelpCircle className="w-8 h-8 text-accent-600" />
@@ -54,7 +56,8 @@ export function FAQ() {
               </details>
             ))}
           </div>
-        </div>
+          </div>
+        </PageContainer>
       </main>
 
       <Footer />

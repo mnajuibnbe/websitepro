@@ -14,6 +14,7 @@ import { supabase } from '../lib/supabase';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { isValidUUID } from '../lib/uuid';
 import { Button } from '../components/ui/Button';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -102,7 +103,7 @@ export function CourseDetail() {
       <MarketingNavbar />
 
       <main id="main-content" className="flex-grow pt-24 md:pt-32 pb-32 lg:pb-24">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
+        <PageContainer>
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative items-start">
@@ -126,7 +127,7 @@ export function CourseDetail() {
             </div>
 
           </div>
-        </div>
+        </PageContainer>
       </main>
       <Footer />
     </div>

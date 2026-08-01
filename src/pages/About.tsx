@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { ArrowRight, Info, Award, Users, BookOpen } from 'lucide-react';
+import { Info, Award, Users, BookOpen } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function About() {
   useEffect(() => {
@@ -13,7 +14,7 @@ export function About() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-primary-900 mb-6">About Us</h1>
             <p className="text-xl text-primary-600 max-w-3xl mx-auto leading-relaxed">
@@ -52,7 +53,7 @@ export function About() {
               </div>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </main>
 
       <Footer />

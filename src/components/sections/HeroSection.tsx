@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { CheckCircle2, BookOpen, Award, Play } from 'lucide-react';
 import { OptimizedImage } from '../ui/OptimizedImage';
+import { PageContainer } from '../layout/PageContainer';
 
 export function HeroSection() {
   const navigate = useNavigate();
 
   return (
     <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden bg-primary-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
           {/* Text Content */}
@@ -18,7 +19,7 @@ export function HeroSection() {
               Professional Cosmeceutical Education
             </span>
 
-            <h1 className="text-4xl md:text-[48px] leading-[1.2] font-bold text-primary-900 mb-6 font-sans">
+            <h1 className="mb-6 font-sans text-4xl font-bold text-primary-900 md:text-display">
               Master Cosmeceuticals <br className="hidden md:block" />
               with Scientific Confidence
             </h1>
@@ -75,7 +76,7 @@ export function HeroSection() {
           </div>
 
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

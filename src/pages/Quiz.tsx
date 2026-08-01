@@ -4,6 +4,7 @@ import { ArrowLeft, X } from 'lucide-react';
 import { QuizIntro } from '../components/quiz/QuizIntro';
 import { QuizQuestion, QuestionData } from '../components/quiz/QuizQuestion';
 import { QuizResult } from '../components/quiz/QuizResult';
+import { PageContainer } from '../components/layout/PageContainer';
 
 const mockQuestions: QuestionData[] = [
   {
@@ -100,7 +101,8 @@ export function QuizPage() {
   return (
     <div className="min-h-screen bg-primary-50 flex flex-col">
       {/* Focused Header */}
-      <header className="h-16 bg-white border-b border-primary-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      <header className="sticky top-0 z-30 border-b border-primary-200 bg-white">
+        <PageContainer className="flex h-16 items-center justify-between">
         <Link to="/my-courses" className="flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors group min-h-[44px]">
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform motion-reduce:transition-none motion-reduce:transform-none" />
           <span className="font-bold text-sm hidden sm:block">My Courses</span>
@@ -111,11 +113,12 @@ export function QuizPage() {
         <button type="button" aria-label="Close quiz" onClick={() => navigate('/my-courses')} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-primary-50 text-primary-500 hover:text-primary-900 transition-colors">
           <X className="w-5 h-5" />
         </button>
+        </PageContainer>
       </header>
 
       {/* Quiz Area */}
-      <main id="main-content" className="flex-grow py-12 px-4 sm:px-8 flex items-center justify-center">
-        <div className="w-full max-w-[1200px] mx-auto">
+      <main id="main-content" className="flex flex-grow items-center justify-center py-12">
+        <PageContainer>
 
           {quizState === 'intro' && (
             <QuizIntro
@@ -147,7 +150,7 @@ export function QuizPage() {
             />
           )}
 
-        </div>
+        </PageContainer>
       </main>
     </div>
   );

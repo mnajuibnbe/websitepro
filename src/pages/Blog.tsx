@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, User } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function Blog() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export function Blog() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-primary-900 mb-4">Blog</h1>
             <p className="text-xl text-primary-600">Insights, research, and practical guidance for cosmeceutical professionals.</p>
@@ -86,7 +87,7 @@ export function Blog() {
               </article>
             ))}
           </div>
-        </div>
+        </PageContainer>
       </main>
 
       <Footer />

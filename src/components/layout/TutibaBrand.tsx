@@ -22,7 +22,7 @@ export function TutibaBrand({ compact = false, inverted = false, className = '',
       <OptimizedImage priority displayWidth={36} src="/tutiba-mark.svg" alt="" width={compact?28:36} height={compact?28:36} className={compact?'h-7 w-7':'h-9 w-9'} />
       <span className="flex flex-col text-left">
         <span className={`font-sans font-bold uppercase leading-none tracking-tight ${titleColor} ${compact ? 'text-lg' : 'text-2xl'}`}>Tutiba</span>
-        {!compact && <span className={`mt-1 text-[10px] font-medium uppercase tracking-[0.18em] ${subtitleColor}`}>Cosmeceutical Education</span>}
+        {!compact && <span className={`mt-1 text-micro font-medium uppercase tracking-brand ${subtitleColor}`}>Cosmeceutical Education</span>}
       </span>
     </Link>
   );

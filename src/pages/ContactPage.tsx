@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Mail, MessageSquare, Phone, MapPin } from 'lucide-react';
+import { Mail, MessageSquare, Phone, MapPin } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +30,7 @@ export function ContactPage() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-start">
 
             {/* Contact Info */}
@@ -143,7 +144,7 @@ export function ContactPage() {
             </div>
 
           </div>
-        </div>
+        </PageContainer>
       </main>
 
       <Footer />

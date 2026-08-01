@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { OptimizedImage } from '../../components/ui/OptimizedImage';
 import {
-  ArrowRight,
+  ArrowLeft,
   Save,
   Image as ImageIcon,
   Loader2,
@@ -16,6 +16,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { PageContainer } from '../../components/layout/PageContainer';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
@@ -137,7 +138,8 @@ export function AdminCourseCreate() {
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl">
           {/* Top Bar */}
           <div className="flex items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
@@ -147,7 +149,7 @@ export function AdminCourseCreate() {
                 className="p-2 bg-white rounded-xl border border-primary-200 text-primary-600 hover:text-primary-900 transition-colors"
                 title="Courses"
               >
-                <ArrowRight className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-primary-900">Create course</h1>
@@ -336,7 +338,8 @@ export function AdminCourseCreate() {
               </Button>
             </div>
           </form>
-        </div>
+          </div>
+        </PageContainer>
       </main>
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

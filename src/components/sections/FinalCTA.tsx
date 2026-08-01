@@ -1,10 +1,12 @@
 import React from 'react';
 import { Button } from '../ui/Button';
+import { PageContainer } from '../layout/PageContainer';
 
 export function FinalCTA() {
   return (
     <section className="py-20 md:py-32 bg-primary-900 text-white text-center">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
+        <div className="mx-auto max-w-4xl">
         <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
           Ready to Advance Your Cosmeceutical Career?
         </h2>
@@ -19,7 +21,8 @@ export function FinalCTA() {
             Watch a Free Lesson
           </Button>
         </div>
-      </div>
+        </div>
+      </PageContainer>
     </section>
   );
 }

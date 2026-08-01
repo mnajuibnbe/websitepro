@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { TutibaBrand } from './TutibaBrand';
+import { PageContainer } from './PageContainer';
 
 const navigationItems = [
   { label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
@@ -79,7 +80,7 @@ export function MarketingNavbar() {
         hasSolidBackground ? 'bg-white/95 shadow-sm backdrop-blur-md py-1' : 'bg-transparent py-2'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6 md:h-20">
 
           {/* Logo */}
@@ -116,7 +117,7 @@ export function MarketingNavbar() {
             </button>
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (

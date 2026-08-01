@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import {
-  ArrowRight,
+  ArrowLeft,
   Eye,
   Settings,
   CheckCircle,
@@ -36,6 +36,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from 'lucide-react';
+import { PageContainer } from '../../components/layout/PageContainer';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { Course, CourseSection, Lesson } from '../../types/database.types';
@@ -401,7 +402,7 @@ export function AdminCourseBuilder() {
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           {/* Top Header */}
           <div className="bg-white rounded-2xl border border-primary-200 p-5 md:p-6 shadow-2xs mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -413,7 +414,7 @@ export function AdminCourseBuilder() {
                   className="p-2 bg-primary-50 hover:bg-primary-100 rounded-xl border border-primary-200 text-primary-600 transition-colors"
                   title="Courses"
                 >
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5" />
                 </button>
 
                 <div>
@@ -715,7 +716,7 @@ export function AdminCourseBuilder() {
                                           </h5>
                                         </div>
 
-                                        <div className="flex items-center gap-2.5 text-[11px] text-primary-500 mt-0.5 flex-wrap">
+                                        <div className="mt-0.5 flex flex-wrap items-center gap-2.5 text-caption text-primary-500">
                                           <span className="font-medium bg-primary-100 text-primary-700 px-1.5 py-0.2 rounded">
                                             {lesson.lesson_type || lesson.type || 'Lesson'}
                                           </span>
@@ -728,13 +729,13 @@ export function AdminCourseBuilder() {
                                           )}
 
                                           {lesson.is_preview && (
-                                            <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-bold text-[10px]">
+                                            <span className="rounded bg-blue-100 px-1.5 py-0.5 text-micro font-bold text-blue-800">
                                               Free
                                             </span>
                                           )}
 
                                           <span
-                                            className={`px-1.5 py-0.2 rounded font-bold text-[10px] ${
+                                            className={`rounded px-1.5 py-0.5 text-micro font-bold ${
                                               lesson.is_published
                                                 ? 'bg-emerald-100 text-emerald-800'
                                                 : 'bg-amber-100 text-amber-800'
@@ -1011,7 +1012,7 @@ export function AdminCourseBuilder() {
               )}
             </>
           )}
-        </div>
+        </PageContainer>
       </main>
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

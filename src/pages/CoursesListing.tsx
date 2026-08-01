@@ -6,6 +6,7 @@ import { SearchSortBar } from '../components/courses/SearchSortBar';
 import { FilterSidebar } from '../components/courses/FilterSidebar';
 import { CourseGrid } from '../components/courses/CourseGrid';
 import { CourseCatalogFilters, EMPTY_CATALOG_FILTERS } from '../lib/courseCatalog';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function CoursesListing() {
   const [filters, setFilters] = useState<CourseCatalogFilters>(EMPTY_CATALOG_FILTERS);
@@ -17,7 +18,7 @@ export function CoursesListing() {
       <MarketingNavbar />
 
       <main id="main-content" className="flex-grow">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
+        <PageContainer>
           <CoursesHeader filters={filters} onChange={setFilters} />
           <SearchSortBar filters={filters} onChange={setFilters} resultCount={resultCount} filtersOpen={mobileFiltersOpen} onToggleFilters={() => setMobileFiltersOpen(open => !open)} />
 
@@ -33,7 +34,7 @@ export function CoursesListing() {
               <CourseGrid filters={filters} onFiltersChange={setFilters} onResultCountChange={setResultCount} />
             </div>
           </div>
-        </div>
+        </PageContainer>
       </main>
 
       <Footer />

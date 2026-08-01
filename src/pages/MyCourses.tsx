@@ -8,6 +8,7 @@ import { isValidUUID } from '../lib/uuid';
 import { useNavigate } from 'react-router-dom';
 import { fetchCoursesProgress } from '../lib/courseProgress';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function MyCourses() {
   const { user } = useAuth();
@@ -116,8 +117,8 @@ export function MyCourses() {
           </div>
         </header>
 
-        <main id="main-content" className="flex-grow p-4 sm:p-8 overflow-y-auto">
-          <div className="max-w-6xl mx-auto space-y-8 pb-12">
+        <main id="main-content" className="flex-grow overflow-y-auto py-4 sm:py-8">
+          <PageContainer className="space-y-8 pb-12">
             <h1 className="text-3xl font-bold text-primary-900 mb-8 hidden lg:block">My Courses</h1>
 
             {!isLoading && errorState === 'none' && enrollments.length > 0 && (
@@ -249,7 +250,7 @@ export function MyCourses() {
                 })}
               </div>
             )}
-          </div>
+          </PageContainer>
         </main>
       </div>
     </div>

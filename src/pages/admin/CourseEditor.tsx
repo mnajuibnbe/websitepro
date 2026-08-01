@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { Save, Image as ImageIcon, Video, Plus, Trash2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { PageContainer } from '../../components/layout/PageContainer';
 
 export function CourseEditor() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -24,7 +25,8 @@ export function CourseEditor() {
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-primary-900">Add/Edit</h1>
             <Button variant="primary" className="flex items-center gap-2">
@@ -110,7 +112,8 @@ export function CourseEditor() {
             </div>
 
           </div>
-        </div>
+          </div>
+        </PageContainer>
       </main>
     </div>
   );

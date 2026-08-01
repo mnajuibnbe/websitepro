@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { VideoProviderResolver } from '../components/video/VideoProviderResolver';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export const VideoTestPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'mp4' | 'youtube' | 'vimeo' | 'google_drive'>('mp4');
@@ -59,7 +60,7 @@ export const VideoTestPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-8 pt-20">
+    <PageContainer className="py-20">
       <div className="mb-8 border-b border-gray-200 pb-5">
         <h1 className="text-3xl font-bold text-gray-900">Video Player Test Harness</h1>
         <p className="mt-2 text-sm text-gray-500">
@@ -98,6 +99,6 @@ export const VideoTestPage: React.FC = () => {
           <li>None of these components are currently tied into LessonPlayer, maintaining Phase 4A strict isolation.</li>
         </ul>
       </div>
-    </div>
+    </PageContainer>
   );
 };

@@ -25,7 +25,6 @@ export function LessonNavigation({
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-primary-200 mt-6" dir="ltr">
-      {/* Right side in RTL: Previous Lesson */}
       <button
         onClick={() => prevLesson && onNavigate(prevLesson)}
         disabled={!prevLesson}
@@ -35,7 +34,7 @@ export function LessonNavigation({
             : 'bg-primary-50 border border-primary-100 text-primary-300 cursor-not-allowed opacity-60'
         }`}
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronLeft className="w-4 h-4" />
         <span>Previous</span>
       </button>
 
@@ -67,7 +66,7 @@ export function LessonNavigation({
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm transition-all shadow-xs min-h-[48px]"
             >
               <span>Next</span>
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -92,7 +91,6 @@ export function LessonNavigation({
         </button>
       )}
 
-      {/* Left side in RTL: Next Lesson */}
       <button
         onClick={() => nextLesson && onNavigate(nextLesson)}
         disabled={!nextLesson}
@@ -103,9 +101,8 @@ export function LessonNavigation({
         }`}
       >
         <span>Next</span>
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" />
       </button>
     </div>
   );
 }
-

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, BookOpen, Clock, ListChecks } from 'lucide-react';
+import { PageContainer } from '../layout/PageContainer';
 
 export function StatsBar() {
   const stats = [
@@ -11,7 +12,7 @@ export function StatsBar() {
 
   return (
     <section className="bg-white border-y border-primary-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
         <div className="grid grid-cols-2 md:grid-cols-4 py-8 md:py-12 gap-y-8 md:gap-y-0 md:divide-x md:divide-x-reverse divide-primary-100">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
@@ -31,7 +32,7 @@ export function StatsBar() {
             );
           })}
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

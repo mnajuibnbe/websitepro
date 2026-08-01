@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { CourseCatalogFilters } from '../../lib/courseCatalog';
 
 interface CoursesHeaderProps {
@@ -23,7 +23,7 @@ export function CoursesHeader({ filters, onChange }: CoursesHeaderProps) {
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
         <Link to="/" className="hover:text-accent-600 transition-colors">Home</Link>
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" />
         <span className="text-primary-900 font-bold">Courses</span>
       </nav>
 

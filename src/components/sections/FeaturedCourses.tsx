@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { PUBLIC_COURSE_STATUS } from '../../lib/courseVisibility';
 import { usePricingContext } from '../../contexts/PricingContext';
+import { PageContainer } from '../layout/PageContainer';
 import { resolveCoursePrice } from '../../lib/pricing';
 
 export function FeaturedCourses() {
@@ -67,7 +68,7 @@ export function FeaturedCourses() {
 
   return (
     <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PageContainer>
 
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
@@ -103,7 +104,7 @@ export function FeaturedCourses() {
             Courses
           </Button>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

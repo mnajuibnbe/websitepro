@@ -13,6 +13,7 @@ import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
 import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
 import { AssignmentLessonRenderer } from '../components/player/AssignmentLessonRenderer';
 import { LessonNavigation } from '../components/player/LessonNavigation';
+import { PageContainer } from '../components/layout/PageContainer';
 import { LessonDetails } from '../components/player/LessonDetails';
 import { prefetchSecureStream } from '../components/video/SecureStreamProvider';
 
@@ -496,9 +497,9 @@ export function LessonPlayer() {
       />
 
       {/* Main Workspace Layout */}
-      <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <PageContainer className="flex-grow py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          {/* Main Content Area (Left side in RTL) */}
+          {/* Main lesson content */}
           <main id="main-content" className="lg:col-span-8 flex flex-col">
             {/* Viewer Component */}
             {currentLesson.content_type === 'assignment' ? (
@@ -557,7 +558,7 @@ export function LessonPlayer() {
             />
           </main>
 
-          {/* Desktop Curriculum Sidebar (Right side in RTL) */}
+          {/* Desktop curriculum sidebar */}
           <aside className="hidden lg:block lg:col-span-4 sticky top-20">
             <CourseSidebar
               sections={sections}
@@ -570,7 +571,7 @@ export function LessonPlayer() {
             />
           </aside>
         </div>
-      </div>
+      </PageContainer>
 
       {/* Mobile Curriculum Slide-over Drawer */}
       {isMobileSidebarOpen && (

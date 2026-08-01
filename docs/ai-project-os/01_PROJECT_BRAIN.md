@@ -1,7 +1,7 @@
 # Project Brain
 
 ## Overview
-An e-learning platform focusing on medical and skincare courses (e.g., "دبلومة العناية بالبشرة الشاملة"). Designed primarily for Arabic-speaking users with RTL layout.
+An English, strictly LTR e-learning platform focusing on medical and skincare courses. Arabic may appear only in user-generated course content or titles and never changes the application layout direction.
 
 ## Tech Stack
 - Frontend: React 19, TypeScript, Vite

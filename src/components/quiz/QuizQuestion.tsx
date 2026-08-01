@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { CheckCircle2, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { AIExplanation } from './AIExplanation';
 import { MemoryCoach } from './MemoryCoach';
 import { WrongAnswersAction } from './WrongAnswers';
@@ -158,7 +158,7 @@ export function QuizQuestion({ questionData, currentIndex, totalQuestions, onNex
             variant="primary"
             className="h-14 sm:h-12 w-full sm:w-auto px-8 font-bold text-lg sm:text-base"
             onClick={handleNext}
-            icon={<ArrowLeft className="w-5 h-5" />} // Points left in RTL
+            icon={<ArrowRight className="w-5 h-5" />}
           >
             {currentIndex === totalQuestions - 1 ? 'Quiz' : 'Next'}
           </Button>

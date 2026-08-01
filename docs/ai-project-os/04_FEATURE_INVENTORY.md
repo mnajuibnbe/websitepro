@@ -2,7 +2,7 @@
 
 ## Fully Implemented
 - **Supabase Authentication**: Login, Register, Forgot Password, Update Password, Protected Routes.
-- **RTL Support**: The UI natively supports Arabic (Right-to-Left) layouts.
+- **Locale direction**: The application UI is permanently English and LTR. Arabic is permitted only in user-generated course content or titles and does not change layout or icon direction.
 - **Global Auth Context**: Manages user session state globally.
 
 ## Partially Implemented

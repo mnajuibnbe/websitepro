@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate , Link } from 'react-router-dom';
-import { ArrowRight, Shield } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function PrivacyPolicy() {
   const navigate = useNavigate();
@@ -16,7 +17,8 @@ export function PrivacyPolicy() {
       <MarketingNavbar />
 
       <main id="main-content" className="pt-32 pb-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
+          <div className="mx-auto max-w-4xl">
           <div className="bg-white rounded-3xl shadow-sm border border-primary-200 p-8 md:p-12">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center">
@@ -77,12 +79,13 @@ export function PrivacyPolicy() {
                 }}
                 className="inline-flex items-center gap-2 text-primary-600 hover:text-accent-600 transition-colors font-bold"
               >
-                <ArrowRight className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
                 Home
               </Link>
             </div>
           </div>
-        </div>
+          </div>
+        </PageContainer>
       </main>
 
       <Footer />
