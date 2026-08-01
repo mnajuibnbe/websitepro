@@ -33,9 +33,9 @@ export function VideoLessonRenderer({ lessonId, videoUrl, title, publicPreview =
         <div className="w-16 h-16 bg-primary-900/80 rounded-full flex items-center justify-center text-primary-400 mb-3 border border-primary-800">
           <VideoOff className="w-8 h-8" />
         </div>
-        <h3 className="text-lg font-bold mb-1 text-primary-100">Lesson</h3>
+        <h3 className="text-lg font-bold mb-1 text-primary-100">Video unavailable</h3>
         <p className="text-sm text-primary-400 max-w-md">
-          Lesson. Details.
+          This lesson does not have a playable video yet.
         </p>
       </div>
     );

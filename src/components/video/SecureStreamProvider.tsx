@@ -4,17 +4,18 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const STREAM_URL_TTL_MS = 90 * 60 * 1000;
 const streamRequests = new Map<string, { promise: Promise<string>; expiresAt: number }>();
+const API_BASE_URL = String(import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 async function requestStreamUrl(lessonId: string, token?: string | null): Promise<string> {
   const key = `${token || 'public'}:${lessonId}`;
   const cached = streamRequests.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
   if (cached) streamRequests.delete(key);
-  const request = fetch('/api/video/token', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ lessonId }) })
+  const request = fetch(`${API_BASE_URL}/api/video/token`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ lessonId }) })
     .then(async response => {
       const payload = await response.json().catch(() => ({})) as { token?: string; error?: string; correlationId?: string };
       if (!response.ok || !payload.token) throw new Error(payload.error ? `${payload.error}${payload.correlationId ? ` (Reference: ${payload.correlationId})` : ''}` : `Failed to authorize the stream (${response.status}).`);
-      return `/api/video/stream?token=${encodeURIComponent(payload.token)}`;
+      return `${API_BASE_URL}/api/video/stream?token=${encodeURIComponent(payload.token)}`;
     })
     .catch(error => { streamRequests.delete(key); throw error; });
   streamRequests.set(key, { promise: request, expiresAt: Date.now() + STREAM_URL_TTL_MS });

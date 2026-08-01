@@ -48,6 +48,15 @@ export function LessonPlayer() {
   const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
+    if (!isMobileSidebarOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setIsMobileSidebarOpen(false); };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', closeOnEscape); };
+  }, [isMobileSidebarOpen]);
+
+  useEffect(() => {
     async function verifyAndLoadLessonData() {
       // 1. Validate route params
       if (!courseId || !lessonId || !isValidUUID(courseId) || !isValidUUID(lessonId)) {
@@ -432,7 +441,7 @@ export function LessonPlayer() {
             <AlertTriangle className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-bold text-primary-900 mb-2">
-            {accessState === 'course_not_found' ? 'Course' : 'Lesson'}
+            {accessState === 'course_not_found' ? 'Course not found' : 'Lesson not found'}
           </h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             {accessState === 'course_not_found'
@@ -443,7 +452,7 @@ export function LessonPlayer() {
             onClick={() => navigate(courseId ? `/learn/${courseId}` : '/my-courses')}
             className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
           >
-            Course
+            Back to course
           </button>
         </div>
       </div>
@@ -454,7 +463,7 @@ export function LessonPlayer() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-white p-8 rounded-2xl border border-primary-200 shadow-md text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold text-primary-900 mb-2">Lessons</h2>
+          <h2 className="text-2xl font-bold text-primary-900 mb-2">No lessons available</h2>
           <p className="text-primary-600 mb-6 leading-relaxed">
             This course does not have any published lessons yet.
           </p>
@@ -473,8 +482,8 @@ export function LessonPlayer() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-danger-50 text-danger-700 p-8 rounded-2xl border border-danger-200 text-center max-w-md w-full">
-          <h2 className="font-bold text-xl mb-2">Error</h2>
-          <p className="mb-6">{errorMessage || 'Lesson.'}</p>
+          <h2 className="font-bold text-xl mb-2">Lesson unavailable</h2>
+          <p className="mb-6">{errorMessage || 'This lesson could not be loaded. Please try again.'}</p>
           <button
             onClick={() => navigate('/my-courses')}
             className="w-full bg-danger-600 hover:bg-danger-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
@@ -541,8 +550,8 @@ export function LessonPlayer() {
               />
             ) : (
               <div className="bg-white border border-primary-200 rounded-2xl p-8 text-center text-primary-600 shadow-sm" dir="ltr">
-                <h3 className="text-xl font-bold text-primary-900 mb-2">Lesson</h3>
-                <p className="text-primary-500 text-sm">Content.</p>
+                <h3 className="text-xl font-bold text-primary-900 mb-2">Content unavailable</h3>
+                <p className="text-primary-500 text-sm">This lesson type is not supported yet.</p>
               </div>
             )}
 
@@ -578,10 +587,10 @@ export function LessonPlayer() {
 
       {/* Mobile Curriculum Slide-over Drawer */}
       {isMobileSidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/60 backdrop-blur-xs transition-opacity">
-          <div className="w-full max-w-sm bg-white h-full flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-300">
+        <div role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsMobileSidebarOpen(false); }} className="fixed inset-0 z-50 lg:hidden flex justify-end bg-black/60 backdrop-blur-xs transition-opacity">
+          <div role="dialog" aria-modal="true" aria-labelledby="course-curriculum-title" className="w-full max-w-sm bg-white h-[100dvh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-300">
             <div className="p-4 border-b border-primary-200 flex items-center justify-between bg-primary-50">
-              <h2 className="font-bold text-primary-900 text-base">Course</h2>
+              <h2 id="course-curriculum-title" className="font-bold text-primary-900 text-base">Course curriculum</h2>
               <button
                 type="button"
                 aria-label="Close course curriculum"

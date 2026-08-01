@@ -50,8 +50,8 @@ class VideoPlayerErrorBoundary extends Component<{ children: ReactNode }, { hasE
       return (
         <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 border border-red-900/30 rounded-2xl">
           <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-xl font-bold text-red-400 mb-2">Unable to complete this action</h3>
-          <p className="text-red-200 text-center max-w-md">Error. Link.</p>
+          <h3 className="text-xl font-bold text-red-400 mb-2">Video player unavailable</h3>
+          <p className="text-red-200 text-center max-w-md">Reload the page or try again in a moment.</p>
         </div>
       );
     }
@@ -96,7 +96,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <VideoPlayerErrorBoundary>
-      <div className="w-full h-full bg-black rounded-lg overflow-hidden group">
+      <div className="w-full h-full bg-black rounded-xl overflow-hidden group">
         <MediaPlayer
           ref={playerRef}
           src={src}

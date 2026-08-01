@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ChevronDown, FileText, HelpCircle, Link as LinkIcon, Lock, PlayCircle, Video, ClipboardCheck, X } from 'lucide-react';
 import type { LessonContentType } from '../../domain/courseAuthoring';
 
@@ -38,7 +38,28 @@ const minutesLabel = (minutes: number) => minutes > 0 ? `${minutes} min` : null;
 export function CurriculumAccordion({ sections }: { sections: PublicCurriculumSection[] }) {
   const [openSection, setOpenSection] = useState<string | null>(sections[0]?.id || null);
   const [previewLesson, setPreviewLesson] = useState<PublicCurriculumLesson | null>(null);
+  const previewDialogRef = useRef<HTMLDivElement>(null);
+  const previewCloseRef = useRef<HTMLButtonElement>(null);
   useEffect(() => { if (!openSection && sections[0]) setOpenSection(sections[0].id); }, [openSection, sections]);
+  useEffect(() => {
+    if (!previewLesson) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    previewCloseRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setPreviewLesson(null); return; }
+      if (event.key !== 'Tab' || !previewDialogRef.current) return;
+      const focusable: HTMLElement[] = Array.from(previewDialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href], video, [tabindex]:not([tabindex="-1"])'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => { window.removeEventListener('keydown', onKeyDown); document.body.style.overflow = previousOverflow; previouslyFocused?.focus(); };
+  }, [previewLesson]);
   const lessonCount = sections.reduce((total, section) => total + Number(section.lesson_count || 0), 0);
   const totalMinutes = sections.reduce((total, section) => total + Number(section.total_minutes || 0), 0);
 
@@ -66,10 +87,11 @@ export function CurriculumAccordion({ sections }: { sections: PublicCurriculumSe
           </div>;
         })}
       </div>}
-    {previewLesson && <div role="dialog" aria-modal="true" aria-labelledby="preview-lesson-title" className="fixed inset-0 z-50 flex items-center justify-center bg-primary-950/80 p-4" onClick={() => setPreviewLesson(null)}>
-      <div className="w-full max-w-4xl rounded-2xl bg-white p-4 shadow-2xl md:p-6" onClick={event => event.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-wider text-accent-700">Free preview lesson</p><h2 id="preview-lesson-title" className="text-xl font-bold text-primary-900">{previewLesson.title}</h2></div><button type="button" onClick={() => setPreviewLesson(null)} aria-label="Close preview" className="flex h-11 w-11 items-center justify-center rounded-full text-primary-500 hover:bg-primary-100 focus:ring-2 focus:ring-accent-500"><X className="h-5 w-5" /></button></div>
-        <Suspense fallback={<div className="flex aspect-video items-center justify-center rounded-2xl bg-primary-950 text-white">Loading preview…</div>}><PreviewVideoRenderer lessonId={previewLesson.id} videoUrl={previewLesson.video_url || null} title={previewLesson.title} publicPreview /></Suspense>
+    {previewLesson && <div className="fixed inset-0 z-[100] flex items-end justify-center bg-primary-950/85 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={event => event.target === event.currentTarget && setPreviewLesson(null)}>
+      <div ref={previewDialogRef} role="dialog" aria-modal="true" aria-labelledby="preview-lesson-title" aria-describedby="preview-lesson-description" className="flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-primary-200 bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-4xl sm:rounded-3xl" onMouseDown={event => event.stopPropagation()}>
+        <header className="flex flex-none items-start justify-between gap-3 border-b border-primary-100 px-4 py-3 sm:px-6 sm:py-5"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wider text-accent-700">Free preview</p><h2 id="preview-lesson-title" className="truncate text-lg font-bold text-primary-900 sm:text-xl">{previewLesson.title}</h2><p id="preview-lesson-description" className="mt-1 text-sm text-primary-500">Watch this lesson before enrolling.</p></div><button ref={previewCloseRef} type="button" onClick={() => setPreviewLesson(null)} aria-label="Close video preview" className="flex h-11 w-11 flex-none items-center justify-center rounded-full text-primary-500 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-accent-500"><X className="h-5 w-5" /></button></header>
+        <div className="min-h-0 overflow-y-auto bg-primary-950 p-0 sm:bg-white sm:p-6"><Suspense fallback={<div className="flex aspect-video items-center justify-center bg-primary-950 text-sm font-medium text-white sm:rounded-2xl">Loading video preview…</div>}><PreviewVideoRenderer lessonId={previewLesson.id} videoUrl={previewLesson.video_url || null} title={previewLesson.title} publicPreview /></Suspense></div>
+        <footer className="flex flex-none justify-end border-t border-primary-100 bg-white p-3 sm:hidden"><button type="button" onClick={() => setPreviewLesson(null)} className="min-h-11 w-full rounded-xl bg-primary-100 px-5 font-bold text-primary-900">Close preview</button></footer>
       </div>
     </div>}
   </section>;

@@ -26,10 +26,11 @@ export function CourseLearningHeader({
         {/* Right side: Back button & Course title */}
         <div className="flex items-center gap-3 min-w-0">
           <button
+            type="button"
             onClick={() => navigate('/my-courses')}
             className="p-2 text-primary-600 hover:text-primary-900 hover:bg-primary-50 rounded-xl transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
-            title="My Courses"
-            aria-label="My Courses"
+            title="Back to my courses"
+            aria-label="Back to my courses"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -38,7 +39,7 @@ export function CourseLearningHeader({
               {courseTitle}
             </h1>
             <p className="text-xs text-primary-500 font-medium hidden sm:block">
-              {completedCount} Details {totalCount} Completed — {progressPercentage}%
+              {completedCount} of {totalCount} lessons complete — {progressPercentage}%
             </p>
           </div>
         </div>
@@ -47,7 +48,7 @@ export function CourseLearningHeader({
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="hidden md:flex flex-col items-end gap-1 min-w-[140px]">
             <span className="text-xs font-bold text-primary-700">
-              Details: {progressPercentage}%
+              Course progress: {progressPercentage}%
             </span>
             <div className="w-36 h-2 bg-primary-100 rounded-full overflow-hidden">
               <div
@@ -58,11 +59,14 @@ export function CourseLearningHeader({
           </div>
 
           <button
+            type="button"
             onClick={onToggleMobileSidebar}
-            className="md:hidden flex items-center gap-2 bg-primary-100 hover:bg-primary-200 text-primary-900 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-colors min-h-[44px]"
+            aria-label="Open course curriculum"
+            aria-haspopup="dialog"
+            className="lg:hidden flex items-center gap-2 bg-primary-100 hover:bg-primary-200 text-primary-900 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-colors min-h-[44px]"
           >
             <Menu className="w-4 h-4" />
-            <span>Course</span>
+            <span className="hidden min-[360px]:inline">Curriculum</span>
           </button>
         </div>
       </PageContainer>

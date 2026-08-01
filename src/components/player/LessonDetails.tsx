@@ -21,12 +21,12 @@ export function LessonDetails({ lesson, section }: LessonDetailsProps) {
           {lesson.type === 'video' ? (
             <>
               <MonitorPlay className="w-3.5 h-3.5" />
-              <span>Lesson</span>
+              <span>Video lesson</span>
             </>
           ) : (
             <>
               <FileText className="w-3.5 h-3.5" />
-              <span>Lesson</span>
+              <span>{lesson.type === 'quiz' ? 'Quiz' : lesson.content_type === 'assignment' ? 'Assignment' : lesson.content_type === 'pdf' || lesson.lesson_type === 'pdf' ? 'PDF lesson' : 'Reading lesson'}</span>
             </>
           )}
         </span>

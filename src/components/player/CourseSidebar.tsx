@@ -57,7 +57,7 @@ export function CourseSidebar({
     <div className="bg-white border border-primary-200 rounded-2xl flex flex-col h-full max-h-[800px] shadow-sm text-left" dir="ltr">
       {/* Header */}
       <div className="p-4 md:p-5 border-b border-primary-200 bg-primary-50/50 rounded-t-2xl">
-        <h2 className="font-bold text-primary-900 mb-2 text-base">Course</h2>
+        <h2 className="font-bold text-primary-900 mb-2 text-base">Course curriculum</h2>
         <div className="w-full h-2 bg-primary-100 rounded-full overflow-hidden">
           <div
             className="h-full bg-accent-600 transition-all duration-500 rounded-full"
@@ -67,7 +67,7 @@ export function CourseSidebar({
         <p className="text-xs text-primary-600 font-semibold mt-2.5 flex items-center justify-between">
           <span>Course Progress</span>
           <span>
-            {completedCount} Details {totalLessons} Lessons ({progressPercentage}%)
+            {completedCount} of {totalLessons} lessons ({progressPercentage}%)
           </span>
         </p>
       </div>
@@ -76,7 +76,7 @@ export function CourseSidebar({
       <div className="overflow-y-auto flex-grow divide-y divide-primary-100">
         {sections.length === 0 ? (
           <div className="p-6 text-center text-primary-500 text-sm">
-            No items are available yet..
+            No lessons are available yet.
           </div>
         ) : (
           sections.map((section) => {
@@ -89,7 +89,10 @@ export function CourseSidebar({
             return (
               <div key={section.id} className="transition-colors">
                 <button
+                  type="button"
                   onClick={() => toggleSection(section.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={`player-section-${section.id}`}
                   className="w-full flex items-center justify-between p-4 min-h-[48px] hover:bg-primary-50/80 transition-colors focus:outline-none text-left"
                 >
                   <div className="flex flex-col items-start gap-1 text-left max-w-[85%]">
@@ -108,9 +111,9 @@ export function CourseSidebar({
                 </button>
 
                 {isOpen && (
-                  <div className="bg-primary-50/40 pb-2 border-t border-primary-100">
+                  <div id={`player-section-${section.id}`} className="bg-primary-50/40 pb-2 border-t border-primary-100">
                     {sectionLessons.length === 0 ? (
-                      <div className="p-3 px-4 text-xs text-primary-400">No items are available yet..</div>
+                      <div className="p-3 px-4 text-xs text-primary-400">No lessons are available in this section.</div>
                     ) : (
                       sectionLessons.map((lesson) => {
                         const isCurrent = lesson.id === currentLessonId;
@@ -118,6 +121,7 @@ export function CourseSidebar({
 
                         return (
                           <button
+                            type="button"
                             key={lesson.id}
                             onClick={() => onLessonSelect(lesson)}
                             className={`w-full flex items-start gap-3 p-3 px-4 min-h-[48px] transition-all text-left group ${

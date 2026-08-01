@@ -24,8 +24,9 @@ export function LessonNavigation({
   const isQuiz = currentLessonType === 'quiz';
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-primary-200 mt-6" dir="ltr">
+    <nav aria-label="Lesson navigation" className="grid grid-cols-1 gap-3 border-t border-primary-200 pt-6 mt-6 sm:grid-cols-3 sm:items-center" dir="ltr">
       <button
+        type="button"
         onClick={() => prevLesson && onNavigate(prevLesson)}
         disabled={!prevLesson}
         className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-[48px] ${
@@ -35,7 +36,7 @@ export function LessonNavigation({
         }`}
       >
         <ChevronLeft className="w-4 h-4" />
-        <span>Previous</span>
+        <span>Previous lesson</span>
       </button>
 
       {/* Center: Completion Status / Action */}
@@ -44,34 +45,25 @@ export function LessonNavigation({
           {isCurrentCompleted ? (
             <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
               <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
-              <span>Quiz (Completed)</span>
+              <span>Quiz complete</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 font-bold text-sm min-h-[48px]">
               <HelpCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-              <span>Review the quiz information and continue when you are ready.</span>
+              <span>Complete the quiz to continue</span>
             </div>
           )}
         </div>
       ) : isCurrentCompleted ? (
-        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3">
-          <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
+        <div className="w-full flex items-center justify-center">
+          <div className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
             <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
-            <span>Lesson</span>
+            <span>Lesson complete</span>
           </div>
-
-          {nextLesson && (
-            <button
-              onClick={() => onNavigate(nextLesson)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-bold text-sm transition-all shadow-xs min-h-[48px]"
-            >
-              <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          )}
         </div>
       ) : (
         <button
+          type="button"
           onClick={onCompleteAndContinue}
           disabled={isCompleting}
           className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-xs min-h-[48px] bg-accent-600 hover:bg-accent-700 text-white"
@@ -83,15 +75,16 @@ export function LessonNavigation({
           )}
           <span>
             {isCompleting
-              ? 'Save...'
+              ? 'Saving completion…'
               : nextLesson
-              ? 'Lesson'
-              : 'Lesson'}
+              ? 'Mark complete & continue'
+              : 'Mark lesson complete'}
           </span>
         </button>
       )}
 
       <button
+        type="button"
         onClick={() => nextLesson && onNavigate(nextLesson)}
         disabled={!nextLesson}
         className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-[48px] ${
@@ -100,9 +93,9 @@ export function LessonNavigation({
             : 'bg-primary-50 border border-primary-100 text-primary-300 cursor-not-allowed opacity-60'
         }`}
       >
-        <span>Next</span>
+        <span>{nextLesson ? 'Next lesson' : 'Final lesson'}</span>
         <ChevronRight className="w-4 h-4" />
       </button>
-    </div>
+    </nav>
   );
 }
