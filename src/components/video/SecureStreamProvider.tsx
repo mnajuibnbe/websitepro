@@ -5,12 +5,12 @@ import { useAuth } from '../../contexts/AuthContext';
 const STREAM_URL_TTL_MS = 90 * 60 * 1000;
 const streamRequests = new Map<string, { promise: Promise<string>; expiresAt: number }>();
 
-async function requestStreamUrl(lessonId: string, token: string): Promise<string> {
-  const key = `${token}:${lessonId}`;
+async function requestStreamUrl(lessonId: string, token?: string | null): Promise<string> {
+  const key = `${token || 'public'}:${lessonId}`;
   const cached = streamRequests.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
   if (cached) streamRequests.delete(key);
-  const request = fetch('/api/video/token', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ lessonId }) })
+  const request = fetch('/api/video/token', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ lessonId }) })
     .then(async response => {
       const payload = await response.json().catch(() => ({})) as { token?: string; error?: string; correlationId?: string };
       if (!response.ok || !payload.token) throw new Error(payload.error ? `${payload.error}${payload.correlationId ? ` (Reference: ${payload.correlationId})` : ''}` : `Failed to authorize the stream (${response.status}).`);
@@ -30,9 +30,10 @@ interface SecureStreamProviderProps {
   title?: string;
   poster?: string;
   onEnded?: () => void;
+  publicPreview?: boolean;
 }
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, title, poster, onEnded }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, title, poster, onEnded, publicPreview = false }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         setLoading(true);
         setError(null);
 
-        if (!token) throw new Error('Your session expired. Sign in and try again.');
+        if (!token && !publicPreview) throw new Error('Your session expired. Sign in and try again.');
         const url = await requestStreamUrl(lessonId, token);
         if (isMounted) {
           setStreamUrl(url);
@@ -66,7 +67,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     return () => {
       isMounted = false;
     };
-  }, [lessonId, token, retryVersion]);
+  }, [lessonId, publicPreview, token, retryVersion]);
 
   if (loading) {
     return (
@@ -91,7 +92,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
-            onClick={() => { if (token) streamRequests.delete(`${token}:${lessonId}`); setRetryVersion(value => value + 1); }}
+            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId}`); setRetryVersion(value => value + 1); }}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
           >
             Try Again

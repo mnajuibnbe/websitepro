@@ -46,51 +46,56 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
       return;
     }
 
-    // 1. Verify Authentication
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({ error: 'Unauthorized: Missing or invalid Authorization header' });
-      return;
-    }
-    const token = authHeader.split(' ')[1];
-
-    // 2. Setup Supabase Admin Client
+    // 1. Fetch the lesson and its public-course context before deciding whether
+    // enrollment is required. Free previews are deliberately accessible to visitors.
     const supabase = dependencies.getSupabaseAdmin();
-
-    // 3. Verify User JWT
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-
-    if (userError || !userData?.user) {
-      console.warn('[VideoController] Invalid or expired user token');
-      res.status(401).json({ error: 'Unauthorized: Invalid token' });
-      return;
-    }
-
-    // 4. Fetch the lesson and its owning course.
     const { data: lessonData, error: lessonError } = await supabase
       .from('lessons')
-      .select('video_url, course_id')
+      .select('video_url, course_id, section_id, is_preview, is_published, deleted_at')
       .eq('id', lessonId)
       .single();
 
-    if (lessonError || !lessonData) {
+    if (lessonError || !lessonData || lessonData.deleted_at || !lessonData.is_published) {
       res.status(404).json({ error: 'Lesson not found' });
       return;
     }
 
-    // 5. Authorize access to this lesson's course, not merely any course.
-    const { data: enrollment, error: enrollError } = await supabase
-      .from('enrollments')
-      .select('id')
-      .eq('user_id', userData.user.id)
-      .eq('course_id', lessonData.course_id)
-      .eq('status', 'active')
-      .maybeSingle();
+    let isPublicPreview = false;
+    if (lessonData.is_preview) {
+      const [{ data: course }, { data: section }] = await Promise.all([
+        supabase.from('courses').select('id').eq('id', lessonData.course_id).eq('status', 'published').eq('visibility', 'public').maybeSingle(),
+        supabase.from('course_sections').select('id').eq('id', lessonData.section_id).eq('course_id', lessonData.course_id).eq('is_published', true).is('deleted_at', null).maybeSingle(),
+      ]);
+      isPublicPreview = Boolean(course && section);
+    }
 
-    if (enrollError || !enrollment) {
-      console.warn('[VideoController] Course access denied', { correlationId, userId: userData.user.id });
-      res.status(403).json({ error: 'Forbidden: You do not have access to this content.' });
-      return;
+    if (!isPublicPreview) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Unauthorized: Missing or invalid Authorization header' });
+        return;
+      }
+      const token = authHeader.split(' ')[1];
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData?.user) {
+        console.warn('[VideoController] Invalid or expired user token');
+        res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        return;
+      }
+
+      const { data: enrollment, error: enrollError } = await supabase
+        .from('enrollments')
+        .select('id')
+        .eq('user_id', userData.user.id)
+        .eq('course_id', lessonData.course_id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (enrollError || !enrollment) {
+        console.warn('[VideoController] Course access denied', { correlationId, userId: userData.user.id });
+        res.status(403).json({ error: 'Forbidden: You do not have access to this content.' });
+        return;
+      }
     }
 
     if (!lessonData.video_url) {
@@ -108,7 +113,7 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
       return;
     }
 
-    // 6. Generate Signed Streaming Token
+    // Generate a short-lived token after either public-preview or enrollment authorization.
     // We include only what is necessary: fileId for streaming.
     const streamToken = dependencies.generateStreamToken({ fileId, resourceType: 'video' });
 

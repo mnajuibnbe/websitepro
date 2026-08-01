@@ -8,7 +8,7 @@ import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
 import { Requirements } from '../components/course-detail/Requirements';
 import { CurriculumAccordion, PublicCurriculumSection } from '../components/course-detail/CurriculumAccordion';
 import { CourseInstructor, PublicInstructorProfile } from '../components/course-detail/CourseInstructor';
-import { CourseReviews } from '../components/course-detail/CourseReviews';
+import { CourseReviews, PublicCourseReview } from '../components/course-detail/CourseReviews';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -22,6 +22,7 @@ export function CourseDetail() {
   const navigate = useNavigate();
   const [curriculum, setCurriculum] = useState<PublicCurriculumSection[]>([]);
   const [instructor, setInstructor] = useState<PublicInstructorProfile | null>(null);
+  const [reviews, setReviews] = useState<PublicCourseReview[]>([]);
   const [relatedDataLoading, setRelatedDataLoading] = useState(false);
   const [relatedDataError, setRelatedDataError] = useState(false);
   const validCourseId = Boolean(id && isValidUUID(id));
@@ -39,14 +40,17 @@ export function CourseDetail() {
         setRelatedDataLoading(true);
         setRelatedDataError(false);
 
-        const [curriculumResult, instructorResult] = await Promise.all([
+        const [curriculumResult, instructorResult, reviewsResult] = await Promise.all([
           supabase.rpc('get_public_course_curriculum', { p_course_id: id }),
           supabase.rpc('get_public_course_instructor', { p_course_id: id }),
+          supabase.rpc('get_public_course_reviews', { p_course_id: id, p_limit: 12 }),
         ]);
         if (curriculumResult.error) throw curriculumResult.error;
         setCurriculum((curriculumResult.data || []) as PublicCurriculumSection[]);
         if (instructorResult.error) throw instructorResult.error;
         setInstructor((instructorResult.data || null) as PublicInstructorProfile | null);
+        if (reviewsResult.error) throw reviewsResult.error;
+        setReviews((reviewsResult.data || []) as PublicCourseReview[]);
       } catch (err) {
         console.error('Error fetching course:', err);
         setRelatedDataError(true);
@@ -67,9 +71,9 @@ export function CourseDetail() {
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <MarketingNavbar />
-        <div className="flex-grow flex items-center justify-center">
+        <main id="main-content" className="flex-grow flex items-center justify-center">
           <Loader2 className="w-12 h-12 text-accent-600 animate-spin" />
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -79,20 +83,20 @@ export function CourseDetail() {
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <MarketingNavbar />
-        <div className="flex-grow flex flex-col items-center justify-center p-8 text-center">
+        <main id="main-content" className="flex-grow flex flex-col items-center justify-center p-8 text-center">
           <AlertCircle className="w-16 h-16 text-danger-500 mb-6" />
           <h1 className="text-3xl font-bold text-primary-900 mb-4">
-            {errorState === 'invalid_uuid' ? 'Course' : 'Course'}
+            {errorState === 'invalid_uuid' ? 'Invalid course link' : 'Course not found'}
           </h1>
           <p className="text-lg text-primary-600 mb-8 max-w-md">
             {errorState === 'invalid_uuid'
-              ? 'Link.'
+              ? 'This course link is invalid. Browse the course catalog to find the right course.'
               : 'The requested information could not be loaded. Please try again.'}
           </p>
           <Button variant="primary" onClick={() => navigate('/courses')} className="px-8">
             Courses
           </Button>
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -120,7 +124,7 @@ export function CourseDetail() {
               <Requirements requirements={course.requirements || []} />
               <div id="course-curriculum"><CurriculumAccordion sections={curriculum} /></div>
               <CourseInstructor instructor={instructor} />
-              <CourseReviews />
+              <CourseReviews reviews={reviews} />
             </div>
 
             {/* Sidebar Area (4 columns on Desktop) */}

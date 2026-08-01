@@ -1,16 +1,21 @@
 import React from 'react';
-import { ChevronRight, Star, PlayCircle, Clock, Award } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { ChevronRight, Star, Clock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { CourseCatalogItem } from '../../services/courseCatalog.service';
+import { getCourseSalesTheme } from '../../domain/courseSalesTheme';
+import { CourseTrailer } from './CourseTrailer';
+
+const levelLabel = (level: string | null | undefined) => ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', all_levels: 'All levels' }[level || ''] || level || 'All levels');
 
 export function CourseHero({ course }: { course: CourseCatalogItem }) {
+  const theme = getCourseSalesTheme(course.category);
+  const CategoryIcon = theme.icon;
   const durationSeconds = Number(course?.total_video_duration_seconds || 0);
   const durationLabel = durationSeconds > 0
     ? `${Math.floor(durationSeconds / 3600) > 0 ? `${Math.floor(durationSeconds / 3600)} hr ` : ''}${Math.ceil((durationSeconds % 3600) / 60)} min video`
     : 'Self-paced learning';
   return (
-    <div className="pb-8 border-b border-primary-200 mb-8 lg:mb-12">
+    <div className={`mb-8 rounded-3xl border-t-4 bg-gradient-to-br ${theme.accentBorder} ${theme.panel} px-5 pb-8 pt-5 shadow-sm lg:mb-12 md:px-8`}>
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8 overflow-x-auto whitespace-nowrap hide-scrollbar">
         <Link to="/" className="hover:text-accent-600 transition-colors">Home</Link>
@@ -21,8 +26,8 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
       </nav>
 
       {/* Title & Subtitle */}
-      <span className="inline-block py-1 px-3 rounded-full bg-accent-100 text-accent-800 text-xs font-bold mb-4 uppercase tracking-wider">
-        Diploma
+      <span className={`mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${theme.badge}`}>
+        <CategoryIcon className="h-4 w-4" aria-hidden="true" /> {course.category || 'Professional course'} · {levelLabel(course.level)}
       </span>
 
       <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-900 mb-6 leading-snug">
@@ -56,14 +61,11 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
 
         <div className="flex items-center gap-2 text-primary-700 font-medium">
            <Award className="w-5 h-5 text-primary-400" />
-           <span>Course Information</span>
+           <span>{levelLabel(course.level)}</span>
         </div>
       </div>
 
-      {/* Trailer Button */}
-      <Button variant="secondary" icon={<PlayCircle className="w-5 h-5" />} className="h-12 px-6">
-        Course Information
-      </Button>
+      <CourseTrailer title={course.title} trailerUrl={course.trailer_video} poster={course.cover_image || course.thumbnail} />
     </div>
   );
 }

@@ -9,6 +9,7 @@ interface VideoProviderResolverProps {
   title?: string;
   poster?: string;
   onEnded?: () => void;
+  publicPreview?: boolean;
 }
 
 function getYoutubeEmbedUrl(url: string): string {
@@ -34,6 +35,7 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
   title,
   poster,
   onEnded,
+  publicPreview = false,
 }) => {
   console.log(`[DevLog] Provider detected: ${provider} for lessonId: ${lessonId}`);
 
@@ -45,6 +47,7 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
         title={title}
         poster={poster}
         onEnded={onEnded}
+        publicPreview={publicPreview}
       />
     );
   }
@@ -89,4 +92,3 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
     />
   );
 };
-

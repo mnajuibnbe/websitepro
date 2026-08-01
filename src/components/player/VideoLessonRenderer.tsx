@@ -6,6 +6,7 @@ interface VideoLessonRendererProps {
   lessonId: string;
   videoUrl: string | null;
   title: string;
+  publicPreview?: boolean;
 }
 
 function detectProvider(url: string | null): string {
@@ -23,7 +24,7 @@ function detectProvider(url: string | null): string {
   return 'mp4';
 }
 
-export function VideoLessonRenderer({ lessonId, videoUrl, title }: VideoLessonRendererProps) {
+export function VideoLessonRenderer({ lessonId, videoUrl, title, publicPreview = false }: VideoLessonRendererProps) {
   const provider = detectProvider(videoUrl);
 
   if (provider === 'none' || !videoUrl) {
@@ -46,6 +47,7 @@ export function VideoLessonRenderer({ lessonId, videoUrl, title }: VideoLessonRe
       videoUrl={videoUrl}
       provider={provider}
       title={title}
+      publicPreview={publicPreview}
     />
   );
 }

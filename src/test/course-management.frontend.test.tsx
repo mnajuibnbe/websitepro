@@ -12,6 +12,7 @@ import { LearningOutcomes } from '../components/course-detail/LearningOutcomes';
 import { Requirements } from '../components/course-detail/Requirements';
 import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
 import { AdminStudentReviews } from '../pages/admin/AdminStudentReviews';
+import { CourseReviews } from '../components/course-detail/CourseReviews';
 import { AuthContext, AuthContextType } from '../contexts/AuthContext';
 
 const adminAuthContext: AuthContextType = {
@@ -32,17 +33,19 @@ const sections: PublicCurriculumSection[] = [{
   id: 'section-1', title: 'Getting started', description: 'Course orientation', order_index: 0,
   lesson_count: 2, total_minutes: 25,
   lessons: [
-    { id: 'lesson-1', title: 'Welcome video', content_type: 'video', estimated_minutes: 25, is_preview: true, order_index: 0 },
+    { id: 'lesson-1', title: 'Welcome video', content_type: 'video', estimated_minutes: 25, is_preview: true, video_url: 'https://youtu.be/12345678901', order_index: 0 },
     { id: 'lesson-2', title: 'Course guide', content_type: 'pdf', estimated_minutes: null, is_preview: false, order_index: 1 },
   ],
 }];
 
-test('renders authored public curriculum metadata without protected content URLs', () => {
+test('renders authored curriculum descriptions and an actionable free preview', () => {
   const markup = renderFrontend(<CurriculumAccordion sections={sections} />);
   assert.match(markup, /Getting started/);
   assert.match(markup, /Welcome video/);
   assert.match(markup, /2 lessons · 25 min of video/);
-  assert.doesNotMatch(markup, /video_url|content_url/);
+  assert.match(markup, /Course orientation/);
+  assert.match(markup, /Free preview/);
+  assert.doesNotMatch(markup, /12345678901|content_url/);
 });
 
 test('unsaved changes dialog exposes both recovery choices', () => {
@@ -93,6 +96,20 @@ test('course detail sections render persisted list content and ignore blank lega
   assert.match(markup, /Requirements/);
   assert.match(markup, /Who this course is for/);
   assert.doesNotMatch(markup, />\s{2,}Assess a formulation\s{2,}</);
+});
+
+test('course detail sections render clear empty states instead of placeholders', () => {
+  const markup = renderFrontend(<><LearningOutcomes outcomes={[]} /><Requirements requirements={[]} /><WhoIsThisFor audiences={[]} /></>);
+  assert.match(markup, /Learning outcomes have not been published/);
+  assert.match(markup, /No course requirements have been published/);
+  assert.match(markup, /Target audience details have not been published/);
+});
+
+test('public reviews render only provided moderated review data without a duplicate aggregate', () => {
+  const markup = renderFrontend(<CourseReviews reviews={[{ review_id: 'review-1', reviewer_name: 'Mona', rating: 4, comment: 'Practical and clear.', created_at: '2026-08-01T00:00:00Z' }]} />);
+  assert.match(markup, /Mona/);
+  assert.match(markup, /Practical and clear/);
+  assert.doesNotMatch(markup, />4\.9<|120 Course Review/);
 });
 
 test('course content list editor exposes add, remove, and reorder controls', () => {
