@@ -59,7 +59,7 @@ export function Dashboard() {
       <div className="flex-grow flex flex-col min-h-screen overflow-hidden">
 
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-primary-200 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
+        <header className="sticky top-0 z-30 flex h-20 flex-row-reverse items-center justify-between border-b border-primary-200 bg-white px-4 sm:px-8 lg:flex-row">
           <div className="flex items-center gap-4">
             <button
               type="button"

@@ -16,7 +16,7 @@ export function Footer() {
       { label: 'All Courses', href: '/courses' },
       { label: 'Diploma Programs', href: '/courses' },
       { label: 'Specialized Courses', href: '/courses' },
-      { label: 'Free Lessons', href: '/courses' },
+      { label: 'Free Lessons', href: '/courses?price=free' },
     ] },
     { title: 'Tutiba', links: [
       { label: 'About Us', href: '/about' },

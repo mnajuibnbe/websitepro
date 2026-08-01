@@ -48,10 +48,10 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         aria-hidden={!isDrawerInteractive || undefined}
         inert={!isDrawerInteractive || undefined}
         data-state={isOpen ? 'open' : 'closed'}
-        className={`mobile-drawer-viewport fixed lg:sticky inset-y-0 left-0 w-[min(18rem,100vw)] bg-white border-r border-primary-200 flex min-h-0 flex-col z-50 transition-transform duration-300 motion-reduce:transition-none transform ${
+        className={`mobile-drawer-viewport fixed inset-y-0 right-0 w-[min(18rem,100vw)] border-l border-primary-200 bg-white flex min-h-0 flex-col z-50 transition-transform duration-300 motion-reduce:transition-none transform lg:sticky lg:left-0 lg:right-auto lg:border-l-0 lg:border-r ${
           !isDrawerInteractive ? 'pointer-events-none lg:pointer-events-auto ' : ''
         }${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Header / Logo */}

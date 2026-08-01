@@ -6,7 +6,6 @@ import { WhyChooseUs } from '../components/sections/WhyChooseUs';
 import { LearningMethod } from '../components/sections/LearningMethod';
 import { InstructorSection } from '../components/sections/InstructorSection';
 import { Testimonials } from '../components/sections/Testimonials';
-import { FreeContent } from '../components/sections/FreeContent';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { Newsletter } from '../components/sections/Newsletter';
 import { PublicLayout } from '../components/layout/PublicLayout';
@@ -22,7 +21,6 @@ export function Home() {
         <LearningMethod />
         <InstructorSection />
         <Testimonials />
-        <FreeContent />
         <FinalCTA />
         <Newsletter />
       </div>

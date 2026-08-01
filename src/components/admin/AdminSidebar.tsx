@@ -34,13 +34,13 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         aria-label="Open admin navigation"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-[max(1rem,env(safe-area-inset-top))] left-4 z-50 min-h-11 min-w-11 p-2 bg-white rounded-xl shadow-sm border border-primary-200 text-primary-600"
+        className="fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-50 min-h-11 min-w-11 rounded-xl border border-primary-200 bg-white p-2 text-primary-600 shadow-sm lg:hidden"
       >
         <Menu className="w-6 h-6" />
       </button>}
 
       {/* Sidebar */}
-      <aside aria-label="Admin navigation" aria-hidden={!isDrawerInteractive || undefined} inert={!isDrawerInteractive || undefined} data-state={isOpen ? 'open' : 'closed'} className={`mobile-drawer-viewport fixed inset-y-0 left-0 w-[min(18rem,100vw)] min-h-0 bg-white border-r border-primary-200 shadow-sm flex flex-col transition-transform duration-300 motion-reduce:transition-none z-40 ${!isDrawerInteractive ? 'pointer-events-none lg:pointer-events-auto ' : ''}${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside aria-label="Admin navigation" aria-hidden={!isDrawerInteractive || undefined} inert={!isDrawerInteractive || undefined} data-state={isOpen ? 'open' : 'closed'} className={`mobile-drawer-viewport fixed inset-y-0 right-0 w-[min(18rem,100vw)] min-h-0 bg-white border-l border-primary-200 shadow-sm flex flex-col transition-transform duration-300 motion-reduce:transition-none z-40 lg:left-0 lg:right-auto lg:border-l-0 lg:border-r ${!isDrawerInteractive ? 'pointer-events-none lg:pointer-events-auto ' : ''}${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
         {/* Header */}
         <div className="min-h-16 shrink-0 flex items-center justify-between px-6 pt-[env(safe-area-inset-top)] border-b border-primary-100">
           <div className="font-bold text-xl text-primary-900 flex items-center gap-2">

@@ -58,7 +58,7 @@ export function UserProfile() {
           aria-label="Open student navigation"
           aria-expanded={isSidebarOpen}
           onClick={() => setIsSidebarOpen(true)}
-          className="fixed left-4 top-[max(1rem,env(safe-area-inset-top))] z-40 flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-primary-200 bg-white text-primary-600 shadow-sm lg:hidden"
+          className="fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-40 flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-primary-200 bg-white text-primary-600 shadow-sm lg:hidden"
         >
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>

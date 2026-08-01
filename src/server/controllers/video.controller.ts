@@ -8,6 +8,7 @@ import { parseVideoSource } from '../services/video-metadata.service.js';
 interface DriveMetadata { fileSize: number; mimeType: string; expiresAt: number }
 const driveMetadataCache = new Map<string, DriveMetadata>();
 const DRIVE_METADATA_TTL_MS = 5 * 60 * 1000;
+export const HOMEPAGE_INTRO_FILE_ID = '1Dbt6IIl0vLQYlXcuKE4_Vkkja-JYB9EC';
 
 async function getCachedDriveMetadata(fileId: string): Promise<DriveMetadata> {
   const cached = driveMetadataCache.get(fileId);
@@ -39,10 +40,16 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
   res.setHeader('X-Correlation-ID', correlationId);
 
   try {
-    const { lessonId } = req.body;
+    const { lessonId, asset } = req.body;
+
+    if (asset === 'homepage-intro') {
+      const streamToken = dependencies.generateStreamToken({ fileId: HOMEPAGE_INTRO_FILE_ID, resourceType: 'video' });
+      res.status(200).json({ token: streamToken });
+      return;
+    }
 
     if (!lessonId) {
-      res.status(400).json({ error: 'Lesson ID is required' });
+      res.status(400).json({ error: 'A valid video target is required' });
       return;
     }
 

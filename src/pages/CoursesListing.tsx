@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { CoursesHeader } from '../components/courses/CoursesHeader';
@@ -10,10 +11,20 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { useCourseCategories } from '../hooks/useCourseCategories';
 
 export function CoursesListing() {
-  const [filters, setFilters] = useState<CourseCatalogFilters>(EMPTY_CATALOG_FILTERS);
+  const [searchParams] = useSearchParams();
+  const priceParam = searchParams.get('price');
+  const [filters, setFilters] = useState<CourseCatalogFilters>(() => ({
+    ...EMPTY_CATALOG_FILTERS,
+    price: priceParam === 'free' || priceParam === 'paid' ? priceParam : 'all',
+  }));
   const [resultCount, setResultCount] = useState(0);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const { categories, error: categoriesError } = useCourseCategories();
+
+  useEffect(() => {
+    const nextPrice = priceParam === 'free' || priceParam === 'paid' ? priceParam : 'all';
+    setFilters((current) => current.price === nextPrice ? current : { ...current, price: nextPrice });
+  }, [priceParam]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">

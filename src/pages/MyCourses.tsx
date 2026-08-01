@@ -104,16 +104,16 @@ export function MyCourses() {
 
       <div className="flex-grow flex flex-col min-h-screen overflow-hidden">
         <header className="lg:hidden h-20 bg-white border-b border-primary-200 px-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-4">
+          <div className="flex w-full items-center justify-between gap-4">
+            <h1 className="text-xl font-bold text-primary-900">My Courses</h1>
             <button
               type="button"
               aria-label="Open student navigation"
-              className="p-2 -ml-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+              className="rounded-lg p-2 text-primary-600 hover:bg-primary-50"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-xl font-bold text-primary-900">My Courses</h1>
           </div>
         </header>
 

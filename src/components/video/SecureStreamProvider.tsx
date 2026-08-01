@@ -6,12 +6,17 @@ const STREAM_URL_TTL_MS = 90 * 60 * 1000;
 const streamRequests = new Map<string, { promise: Promise<string>; expiresAt: number }>();
 const API_BASE_URL = String(import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
-async function requestStreamUrl(lessonId: string, token?: string | null): Promise<string> {
-  const key = `${token || 'public'}:${lessonId}`;
+export type SecureVideoRequest =
+  | { lessonId: string; asset?: never }
+  | { lessonId?: never; asset: 'homepage-intro' };
+
+async function requestStreamUrl(requestTarget: SecureVideoRequest, token?: string | null): Promise<string> {
+  const targetKey = requestTarget.lessonId || requestTarget.asset;
+  const key = `${token || 'public'}:${targetKey}`;
   const cached = streamRequests.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
   if (cached) streamRequests.delete(key);
-  const request = fetch(`${API_BASE_URL}/api/video/token`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ lessonId }) })
+  const request = fetch(`${API_BASE_URL}/api/video/token`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(requestTarget) })
     .then(async response => {
       const payload = await response.json().catch(() => ({})) as { token?: string; error?: string; correlationId?: string };
       if (!response.ok || !payload.token) throw new Error(payload.error ? `${payload.error}${payload.correlationId ? ` (Reference: ${payload.correlationId})` : ''}` : `Failed to authorize the stream (${response.status}).`);
@@ -23,18 +28,18 @@ async function requestStreamUrl(lessonId: string, token?: string | null): Promis
 }
 
 export function prefetchSecureStream(lessonId: string, token: string | null | undefined) {
-  if (token) void requestStreamUrl(lessonId, token).catch(() => undefined);
+  if (token) void requestStreamUrl({ lessonId }, token).catch(() => undefined);
 }
 
-interface SecureStreamProviderProps {
-  lessonId: string;
+type SecureStreamProviderProps = SecureVideoRequest & {
   title?: string;
   poster?: string;
   onEnded?: () => void;
   publicPreview?: boolean;
-}
+  autoPlay?: boolean;
+};
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, title, poster, onEnded, publicPreview = false }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, title, poster, onEnded, publicPreview = false, autoPlay = false }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +55,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         setError(null);
 
         if (!token && !publicPreview) throw new Error('Your session expired. Sign in and try again.');
-        const url = await requestStreamUrl(lessonId, token);
+        const url = await requestStreamUrl(lessonId ? { lessonId } : { asset: asset! }, token);
         if (isMounted) {
           setStreamUrl(url);
           setLoading(false);
@@ -68,7 +73,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     return () => {
       isMounted = false;
     };
-  }, [lessonId, publicPreview, token, retryVersion]);
+  }, [asset, lessonId, publicPreview, token, retryVersion]);
 
   if (loading) {
     return (
@@ -93,7 +98,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
-            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId}`); setRetryVersion(value => value + 1); }}
+            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId || asset}`); setRetryVersion(value => value + 1); }}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
           >
             Try Again
@@ -103,5 +108,5 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     );
   }
 
-  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} />;
+  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={autoPlay} />;
 };

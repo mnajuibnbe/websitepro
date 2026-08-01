@@ -28,6 +28,8 @@ test('student drawer exposes scrollable navigation and safe-area account actions
   assert.match(markup, />Sign Out</);
   assert.match(markup, /aria-hidden="true"/);
   assert.match(markup, /data-state="open"/);
+  assert.match(markup, /right-0/);
+  assert.doesNotMatch(markup, /-translate-x-full/);
 });
 
 test('admin drawer exposes its role routes, fixed footer, and open backdrop', () => {
@@ -39,6 +41,7 @@ test('admin drawer exposes its role routes, fixed footer, and open backdrop', ()
   assert.match(markup, />User management</);
   assert.match(markup, /shrink-0 border-t/);
   assert.match(markup, /aria-hidden="true"/);
+  assert.match(markup, /right-0/);
 });
 
 test('closed drawers omit their backdrops', () => {
@@ -52,6 +55,8 @@ test('closed drawers omit their backdrops', () => {
   assert.match(adminMarkup, /inert=""/);
   assert.match(studentMarkup, /data-state="closed"/);
   assert.match(adminMarkup, /pointer-events-none/);
+  assert.match(studentMarkup, /translate-x-full/);
+  assert.match(adminMarkup, /translate-x-full/);
 });
 
 test('drawer primitives preserve close and scroll restoration contracts', () => {

@@ -84,6 +84,18 @@ async function requestToken(scenario: Scenario = {}, authorization = 'Bearer use
   return state;
 }
 
+test('returns a public streaming token for the homepage introduction video', async () => {
+  const { response, state } = createResponse();
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => { throw new Error('Homepage video must not query lesson access'); },
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'homepage-intro' }, headers: {} } as Request, response);
+  assert.equal(state.status, 200);
+  assert.equal(state.body.token, 'signed:1Dbt6IIl0vLQYlXcuKE4_Vkkja-JYB9EC');
+});
+
 test('returns a streaming token for an authenticated enrolled user', async () => {
   const result = await requestToken();
   assert.equal(result.status, 200);

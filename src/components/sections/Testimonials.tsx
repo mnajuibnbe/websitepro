@@ -59,7 +59,7 @@ export function Testimonials() {
                 </div>
               ) : (
                 <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-accent-200 bg-white px-3 py-1.5 text-xs font-bold text-accent-800">
-                  <BadgeCheck className="h-4 w-4 text-accent-600" /> Legacy testimonial
+                  <BadgeCheck className="h-4 w-4 text-accent-600" /> Verified on our original platform
                 </div>
               )}
               <p dir="auto" className="text-lg text-primary-800 flex-grow mb-8 leading-relaxed font-medium">

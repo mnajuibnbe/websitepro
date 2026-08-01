@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { FormEvent, useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Mail } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
+import { supabase } from '../../lib/supabase';
+
+type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
 
 export function Newsletter() {
+  const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
+  const [submissionState, setSubmissionState] = useState<SubmissionState>('idle');
+  const [message, setMessage] = useState('');
+
+  const subscribe = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (website) return;
+    const normalizedEmail = email.trim().toLocaleLowerCase();
+    setSubmissionState('submitting');
+    setMessage('');
+
+    const { error } = await supabase
+      .from('newsletter_subscriptions')
+      .insert({ email: normalizedEmail, source: 'homepage' });
+
+    if (!error || error.code === '23505') {
+      setSubmissionState('success');
+      setMessage(error ? 'You are already subscribed with this email address.' : 'Thank you — you are now subscribed to Tutiba updates.');
+      setEmail('');
+      return;
+    }
+
+    console.error('[Newsletter] Subscription failed', { code: error.code });
+    setSubmissionState('error');
+    setMessage('We could not save your subscription. Please try again in a moment.');
+  };
+
   return (
     <section className="py-16 md:py-24 bg-accent-50 border-t border-accent-100">
       <PageContainer>
@@ -21,19 +52,36 @@ export function Newsletter() {
             </p>
           </div>
           <div className="lg:w-1/2 w-full max-w-md">
-            <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="flex-grow">
+            <form className="flex flex-col gap-4" onSubmit={subscribe}>
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="newsletter-website">Website</label>
+                <input id="newsletter-website" name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} />
+              </div>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex-grow">
                 <Input
+                  id="newsletter-email"
                   type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="Enter your email address"
                   className="w-full h-14 text-lg bg-primary-50 border-primary-200 focus:bg-white"
                   required
+                  maxLength={320}
+                  autoComplete="email"
                   aria-label="Email Address"
                 />
+                </div>
+                <Button type="submit" variant="primary" isLoading={submissionState === 'submitting'} disabled={submissionState === 'submitting'} className="h-14 px-8 text-lg whitespace-nowrap">
+                  {submissionState === 'submitting' ? 'Subscribing' : 'Subscribe'}
+                </Button>
               </div>
-              <Button variant="primary" className="h-14 px-8 text-lg whitespace-nowrap">
-                Subscribe
-              </Button>
+              {message && (
+                <p role="status" aria-live="polite" className={`rounded-xl border px-4 py-3 text-sm font-semibold ${submissionState === 'error' ? 'border-danger-200 bg-danger-50 text-danger-700' : 'border-success-200 bg-success-50 text-success-800'}`}>
+                  {message}
+                </p>
+              )}
+              <p className="text-xs leading-relaxed text-primary-500">By subscribing, you agree to receive occasional Tutiba learning updates. You can unsubscribe at any time.</p>
             </form>
           </div>
         </div>
