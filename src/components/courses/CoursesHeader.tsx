@@ -30,7 +30,7 @@ export function CoursesHeader({ filters, onChange, categories }: CoursesHeaderPr
       <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">
         Explore Tutiba Course Catalog
       </h1>
-      <p className="text-lg text-primary-600 max-w-3xl mb-10 leading-relaxed">
+      <p className="text-lg text-primary-600 max-w-3xl mb-14 md:mb-10 leading-relaxed">
         Course Catalog.
       </p>
 
