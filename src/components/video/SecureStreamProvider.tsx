@@ -81,10 +81,10 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (loading) {
     return (
-      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-slate-900`}>
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-primary-950`}>
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-white text-sm font-medium">Authorizing secure stream...</p>
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-accent-300/30 bg-primary-900 shadow-xl"><div className="h-7 w-7 animate-spin rounded-full border-[3px] border-accent-200 border-t-accent-600" /></div>
+          <p className="mt-4 text-sm font-semibold text-primary-100">Preparing your video…</p>
         </div>
       </div>
     );

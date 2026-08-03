@@ -18,7 +18,7 @@ export function CoursesHeader({ filters, onChange, categories }: CoursesHeaderPr
   ];
 
   return (
-    <div className="pt-24 md:pt-32 pb-8">
+    <div className="pb-8 pt-24 md:pt-32">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
         <Link to="/" className="hover:text-accent-600 transition-colors">Home</Link>
@@ -30,12 +30,12 @@ export function CoursesHeader({ filters, onChange, categories }: CoursesHeaderPr
       <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4 leading-snug">
         Explore Tutiba Course Catalog
       </h1>
-      <p className="text-lg text-primary-600 max-w-3xl mb-14 md:mb-10 leading-relaxed">
+      <p className="max-w-3xl text-lg leading-relaxed text-primary-600">
         Course Catalog.
       </p>
 
       {/* Category Shortcuts */}
-      <div className="flex overflow-x-auto hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 gap-3">
+      <div className="-mx-4 mt-14 flex gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:mt-10 md:px-0">
         {shortcuts.map((shortcut) => {
           const isFree = shortcut.key === 'free';
           const isAll = shortcut.key === 'all';

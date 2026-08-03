@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useLayoutEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PricingProvider } from './contexts/PricingContext';
@@ -59,6 +59,12 @@ function RouteFallback() {
 
 function AppContent() {
   const location = useLocation();
+
+  useLayoutEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.key]);
 
   const browserSearch = window.location.search;
   const browserHash = window.location.hash;
