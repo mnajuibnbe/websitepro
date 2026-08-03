@@ -6,6 +6,7 @@ interface IntroVideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   lessonId?: string;
+  asset?: 'homepage-intro';
   eyebrow?: string;
   title?: string;
   description?: string;
@@ -15,6 +16,7 @@ export function IntroVideoModal({
   isOpen,
   onClose,
   lessonId,
+  asset,
   eyebrow = 'Welcome to Tutiba',
   title = 'Discover the Tutiba learning experience',
   description = 'Meet our diploma pathway and hear directly from Tutiba students.',
@@ -72,8 +74,10 @@ export function IntroVideoModal({
           </button>
         </header>
         <div className="min-h-0 overflow-y-auto bg-primary-950 p-0 sm:bg-white sm:p-6">
-          {lessonId
-            ? <SecureStreamProvider lessonId={lessonId} publicPreview autoPlay title={title} />
+          {lessonId || asset
+            ? asset
+              ? <SecureStreamProvider asset={asset} publicPreview autoPlay title={title} />
+              : <SecureStreamProvider lessonId={lessonId!} publicPreview autoPlay title={title} />
             : <div className="flex aspect-video items-center justify-center bg-primary-950 p-8 text-center text-primary-200">A free preview lesson is not available yet.</div>}
         </div>
         <footer className="flex flex-none justify-end border-t border-primary-100 bg-white p-3 sm:hidden">

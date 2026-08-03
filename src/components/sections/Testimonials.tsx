@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Loader2, MessageSquareText, RefreshCw, Star } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { useHomepageTestimonials } from '../../hooks/useHomepageMarketing';
@@ -6,6 +6,22 @@ import { useHomepageTestimonials } from '../../hooks/useHomepageMarketing';
 export function Testimonials() {
   const { data: testimonials, error, isLoading, refetch } = useHomepageTestimonials();
   const isLegacyCollection = testimonials.length > 0 && testimonials.every(testimonial => testimonial.source === 'legacy_import');
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const updateActiveIndex = () => {
+    const container = carouselRef.current;
+    if (!container) return;
+    const cards = [...container.children] as HTMLElement[];
+    const center = container.scrollLeft + container.clientWidth / 2;
+    let nearest = 0;
+    let distance = Number.POSITIVE_INFINITY;
+    cards.forEach((card, index) => {
+      const nextDistance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+      if (nextDistance < distance) { nearest = index; distance = nextDistance; }
+    });
+    setActiveIndex(nearest);
+  };
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -45,7 +61,7 @@ export function Testimonials() {
           </div>
         )}
 
-        {!isLoading && !error && testimonials.length > 0 && <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-6 lg:gap-8 snap-x snap-mandatory hide-scrollbar">
+        {!isLoading && !error && testimonials.length > 0 && <><div ref={carouselRef} onScroll={updateActiveIndex} className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:gap-8 hide-scrollbar">
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.review_id}
@@ -67,12 +83,12 @@ export function Testimonials() {
                 </div>
                 <div>
                   <div className="font-bold text-primary-900">{testimonial.reviewer_name}</div>
-                  {testimonial.source === 'platform' && <div className="text-sm text-primary-600 font-medium">Verified learner review</div>}
+                  <div className="text-sm font-medium text-primary-600">{testimonial.title}</div>
                 </div>
               </div>
             </div>
           ))}
-        </div>}
+        </div><div className="flex justify-center gap-2 md:hidden" aria-label="Testimonial slides">{testimonials.map((testimonial, index) => <button key={testimonial.review_id} type="button" aria-label={`Go to testimonial ${index + 1}`} aria-current={activeIndex === index ? 'true' : undefined} onClick={() => { const card = carouselRef.current?.children[index] as HTMLElement | undefined; card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }} className={`h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-7 bg-accent-600' : 'w-2.5 bg-primary-200'}`} />)}</div></>}
 
         {!isLoading && !error && isLegacyCollection && (
           <p className="mx-auto mt-2 max-w-3xl text-center text-sm leading-relaxed text-primary-500">

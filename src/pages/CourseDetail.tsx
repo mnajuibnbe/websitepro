@@ -16,6 +16,7 @@ import { isValidUUID } from '../lib/uuid';
 import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useCourseCatalog } from '../hooks/useCourseCatalog';
+import type { CoursePreviewLesson } from '../components/course-detail/CourseMediaLightbox';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,7 @@ export function CourseDetail() {
   const [curriculum, setCurriculum] = useState<PublicCurriculumSection[]>([]);
   const [instructor, setInstructor] = useState<PublicInstructorProfile | null>(null);
   const [reviews, setReviews] = useState<PublicCourseReview[]>([]);
+  const [previewLesson, setPreviewLesson] = useState<CoursePreviewLesson | null>(null);
   const [relatedDataLoading, setRelatedDataLoading] = useState(false);
   const [relatedDataError, setRelatedDataError] = useState(false);
   const validCourseId = Boolean(id && isValidUUID(id));
@@ -40,10 +42,11 @@ export function CourseDetail() {
         setRelatedDataLoading(true);
         setRelatedDataError(false);
 
-        const [curriculumResult, instructorResult, reviewsResult] = await Promise.all([
+        const [curriculumResult, instructorResult, reviewsResult, previewResult] = await Promise.all([
           supabase.rpc('get_public_course_curriculum', { p_course_id: id }),
           supabase.rpc('get_public_course_instructor', { p_course_id: id }),
           supabase.rpc('get_public_course_reviews', { p_course_id: id, p_limit: 12 }),
+          supabase.rpc('get_public_course_preview', { p_course_id: id }),
         ]);
         if (curriculumResult.error) throw curriculumResult.error;
         setCurriculum((curriculumResult.data || []) as PublicCurriculumSection[]);
@@ -51,6 +54,8 @@ export function CourseDetail() {
         setInstructor((instructorResult.data || null) as PublicInstructorProfile | null);
         if (reviewsResult.error) throw reviewsResult.error;
         setReviews((reviewsResult.data || []) as PublicCourseReview[]);
+        if (previewResult.error) throw previewResult.error;
+        setPreviewLesson(((previewResult.data || [])[0] || null) as CoursePreviewLesson | null);
       } catch (err) {
         console.error('Error fetching course:', err);
         setRelatedDataError(true);
@@ -129,7 +134,7 @@ export function CourseDetail() {
 
             {/* Sidebar Area (4 columns on Desktop) */}
             <div className="lg:col-span-4 order-2">
-              <EnrollmentCard course={course} />
+              <EnrollmentCard course={course} previewLesson={previewLesson} />
             </div>
 
           </div>

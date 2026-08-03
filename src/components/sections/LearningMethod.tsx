@@ -26,13 +26,13 @@ export function LearningMethod() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-white py-14 md:py-20">
+    <section className="bg-white py-16 md:py-24">
       <PageContainer>
         <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-4">
-            <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Inside Part 1</p>
-            <h2 className="mt-3 text-3xl font-bold text-primary-900 md:text-4xl">Picture What You Will Actually Study</h2>
-            <p className="mt-5 leading-relaxed text-primary-600">Six published lessons move from skin anatomy into hyaluronic-acid science and product-level application.</p>
+            <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
+            <h2 className="mt-3 text-3xl font-bold text-primary-900 md:text-4xl">Inside This Featured Course</h2>
+            <p className="mt-5 leading-relaxed text-primary-600">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
             <Button variant="secondary" className="mt-7 px-6" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)}>
               {PRIMARY_DIPLOMA_CTA} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>

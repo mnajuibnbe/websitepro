@@ -9,6 +9,7 @@ const platformReview: HomepageTestimonial = {
   comment: 'Organic review',
   created_at: '2026-08-01T00:00:00Z',
   source: 'platform',
+  title: 'Verified Tutiba Student',
 };
 
 const legacyTestimonial: HomepageTestimonial = {
@@ -18,6 +19,7 @@ const legacyTestimonial: HomepageTestimonial = {
   comment: 'Legacy testimonial',
   created_at: null,
   source: 'legacy_import',
+  title: 'Tutiba Student',
 };
 
 test('organic platform reviews always take priority over legacy testimonials', () => {

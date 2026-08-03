@@ -21,6 +21,7 @@ export interface HomepageTestimonial {
   comment: string;
   created_at: string | null;
   source: 'platform' | 'legacy_import';
+  title: string;
 }
 
 export function chooseHomepageTestimonials(

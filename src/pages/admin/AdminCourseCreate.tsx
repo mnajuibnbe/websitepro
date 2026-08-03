@@ -50,6 +50,7 @@ export function AdminCourseCreate() {
   const [priceEgp, setPriceEgp] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [coverImage, setCoverImage] = useState('');
+  const [trailerVideo, setTrailerVideo] = useState('');
   const [instructorId, setInstructorId] = useState('');
 
   // Instructors list for dropdown
@@ -120,6 +121,11 @@ export function AdminCourseCreate() {
         addToast('error', 'Build practical skills with structured, expert-led course content..');
         setIsSubmitting(false);
         return;
+      }
+
+      if (trailerVideo.trim()) {
+        const { error: trailerError } = await supabase.from('courses').update({ trailer_video: trailerVideo.trim() }).eq('id', rpcCourseId);
+        if (trailerError) throw trailerError;
       }
 
       await recordAdminAudit('create', 'course', String(rpcCourseId), { title: title.trim() });
@@ -312,10 +318,11 @@ export function AdminCourseCreate() {
             <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-amber-600" />
-                <span>Course cover</span>
+                <span>Course media</span>
               </h2>
 
               <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
+              <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="new-course-trailer" className="mb-2 block text-sm font-bold text-primary-900">Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="new-course-trailer" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500" /><p className="mt-2 text-xs text-primary-500">If empty, the sales page will use a published preview lesson when one is available.</p></div>
             </div>
 
             {/* Bottom Form Action */}

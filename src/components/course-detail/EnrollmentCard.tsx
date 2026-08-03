@@ -10,8 +10,9 @@ import { isValidUUID } from '../../lib/uuid';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import type { CourseCatalogItem } from '../../services/courseCatalog.service';
 import { resolveCourseImageUrl } from '../../lib/courseCard';
+import { CourseMediaLightbox, type CoursePreviewLesson } from './CourseMediaLightbox';
 
-export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
+export function EnrollmentCard({ course, previewLesson }: { course: CourseCatalogItem; previewLesson: CoursePreviewLesson | null }) {
   const { user } = useAuth();
   const pricingContext = usePricingContext();
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [errorState, setErrorState] = useState<'invalid_uuid' | 'not_found' | 'already_enrolled' | null>(null);
+  const [mediaOpen, setMediaOpen] = useState(false);
 
   useEffect(() => {
     async function checkStatus() {
@@ -129,6 +131,7 @@ export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
   };
 
   const price = resolveCoursePrice(course, pricingContext);
+  const hasPreviewMedia = Boolean(course.trailer_video?.trim() || previewLesson);
 
   return (
     <>
@@ -157,10 +160,10 @@ export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
           displayWidth={800}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center">
-          <button type="button" aria-label="Preview course" className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
+        <div className={`absolute inset-0 flex items-center justify-center ${hasPreviewMedia ? 'bg-primary-900/20' : 'bg-primary-900/5'}`}>
+          {hasPreviewMedia && <button type="button" aria-label={course.trailer_video ? 'Play course trailer' : 'Play free preview lesson'} onClick={() => setMediaOpen(true)} className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-accent-600 hover:scale-105 hover:bg-white transition-all shadow-xl">
             <Play className="w-6 h-6 fill-current ms-1" />
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -236,6 +239,7 @@ export function EnrollmentCard({ course }: { course: CourseCatalogItem }) {
         {renderButtonContent()}
       </Button>
     </div>
+    <CourseMediaLightbox open={mediaOpen} onClose={() => setMediaOpen(false)} courseId={course.id} courseTitle={course.title} trailerUrl={course.trailer_video} previewLesson={previewLesson} poster={resolveCourseImageUrl(course)} />
     </>
   );
 }

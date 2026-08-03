@@ -1,116 +1,43 @@
-import React, { Component, ReactNode } from 'react';
-import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from '@vidstack/react';
-import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
-import { AlertCircle } from 'lucide-react';
-import '@vidstack/react/player/styles/default/theme.css';
-import '@vidstack/react/player/styles/default/layouts/video.css';
-
-// WORKAROUND: Vidstack has a bug where it attempts to `JSON.stringify()` DOM Events
-// (like media 'error' events) which contain circular references (target -> FiberNode -> stateNode).
-// This causes a fatal "Converting circular structure to JSON" TypeError.
-// By providing a `toJSON` method on Event, we prevent the circular reference crash.
-if (typeof Event !== 'undefined' && !('toJSON' in Event.prototype)) {
-  Object.defineProperty(Event.prototype, 'toJSON', {
-    value: function () {
-      return { type: this.type, isTrusted: this.isTrusted };
-    },
-    configurable: true,
-    writable: true,
-  });
-}
+import { useEffect, useRef, useState } from 'react';
+import { Maximize, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
 export interface VideoPlayerProps {
-  src: string;
-  poster?: string;
-  title?: string;
-  onEnded?: () => void;
-  onTimeUpdate?: (time: number) => void;
-  autoPlay?: boolean;
+  src: string; poster?: string; title?: string; onEnded?: () => void;
+  onTimeUpdate?: (time: number) => void; autoPlay?: boolean;
 }
 
-class VideoPlayerErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  declare props: Readonly<{ children: ReactNode }>;
-  declare state: Readonly<{ hasError: boolean }>;
-
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(_: Error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[VideoPlayerErrorBoundary] Caught error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 border border-red-900/30 rounded-2xl">
-          <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-          <h3 className="text-xl font-bold text-red-400 mb-2">Video player unavailable</h3>
-          <p className="text-red-200 text-center max-w-md">Reload the page or try again in a moment.</p>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
+function formatTime(value: number) {
+  if (!Number.isFinite(value)) return '0:00';
+  return `${Math.floor(value / 60)}:${Math.floor(value % 60).toString().padStart(2, '0')}`;
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({
-  src,
-  poster,
-  title,
-  onEnded,
-  onTimeUpdate,
-  autoPlay = false,
-}) => {
-  const playerRef = React.useRef<MediaPlayerInstance>(null);
+export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPlay = false }: VideoPlayerProps) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [error, setError] = useState(false);
 
-  // Temporary developer log for stream start
-  React.useEffect(() => {
-    if (src) {
-      console.log(`[DevLog] Stream started: ${src}`);
-    }
-  }, [src]);
+  useEffect(() => { setPlaying(false); setCurrentTime(0); setDuration(0); setError(false); }, [src]);
+  const togglePlayback = async () => { const video = videoRef.current; if (!video) return; if (video.paused) await video.play(); else video.pause(); };
+  const toggleFullscreen = async () => { if (!frameRef.current) return; if (document.fullscreenElement) await document.exitFullscreen(); else await frameRef.current.requestFullscreen(); };
 
-  const handleTimeUpdate = (time: number) => {
-    // console.log("[DevLog] handleTimeUpdate:", typeof time, time);
-    if (onTimeUpdate) {
-      onTimeUpdate(time);
-    }
-  };
+  if (error) return <div role="alert" className="flex aspect-video w-full items-center justify-center rounded-xl bg-primary-950 p-8 text-center text-primary-100">This video could not be played. Please try again.</div>;
 
-  const handleEnded = () => {
-    console.log('[DevLog] Stream ended');
-    if (onEnded) {
-      onEnded();
-    }
-  };
-
-  const handleError = (e: any) => {
-    console.error('[DevLog] MediaPlayer encountered an error', e?.message || e?.detail?.message || e?.target?.error?.code || 'Unknown player error');
-  };
-
-  return (
-    <VideoPlayerErrorBoundary>
-      <div className="w-full h-full bg-black rounded-xl overflow-hidden group">
-        <MediaPlayer
-          ref={playerRef}
-          src={src}
-          title={title}
-          autoPlay={autoPlay}
-          onTimeUpdate={(e) => handleTimeUpdate(e.currentTime)}
-          onEnd={handleEnded}
-          onError={handleError}
-          className="w-full aspect-video"
-        >
-          <MediaProvider />
-          <DefaultVideoLayout icons={defaultLayoutIcons} />
-        </MediaPlayer>
+  return <div ref={frameRef} className="group relative aspect-video w-full overflow-hidden rounded-xl bg-black shadow-lg">
+    <video ref={videoRef} src={src} poster={poster} title={title} aria-label={title || 'Tutiba video'} autoPlay={autoPlay} playsInline preload="metadata" controls={false} controlsList="nodownload noplaybackrate noremoteplayback" disablePictureInPicture onClick={() => void togglePlayback()} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedMetadata={event => setDuration(event.currentTarget.duration || 0)} onDurationChange={event => setDuration(event.currentTarget.duration || 0)} onTimeUpdate={event => { setCurrentTime(event.currentTarget.currentTime); onTimeUpdate?.(event.currentTarget.currentTime); }} onVolumeChange={event => setVolume(event.currentTarget.muted ? 0 : event.currentTarget.volume)} onEnded={() => { setPlaying(false); onEnded?.(); }} onError={() => setError(true)} className="h-full w-full object-contain" />
+    {!playing && <button type="button" onClick={() => void togglePlayback()} aria-label="Play video" className="absolute inset-0 m-auto flex h-20 w-20 items-center justify-center rounded-full bg-accent-600/95 text-white shadow-2xl transition hover:scale-105 hover:bg-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-300/60"><Play className="h-8 w-8 fill-current ms-1" /></button>}
+    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary-950 via-primary-950/90 to-transparent px-3 pb-3 pt-10 text-white md:px-5 md:pb-4">
+      <label className="block"><span className="sr-only">Seek video</span><input type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={event => { const next = Number(event.target.value); if (videoRef.current) videoRef.current.currentTime = next; setCurrentTime(next); }} className="h-1.5 w-full cursor-pointer accent-accent-500" /></label>
+      <div className="mt-2 flex items-center gap-2">
+        <button type="button" onClick={() => void togglePlayback()} aria-label={playing ? 'Pause video' : 'Play video'} className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-white/10">{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current" />}</button>
+        <button type="button" onClick={() => { if (!videoRef.current) return; videoRef.current.muted = !videoRef.current.muted; setVolume(videoRef.current.muted ? 0 : videoRef.current.volume); }} aria-label={volume === 0 ? 'Unmute video' : 'Mute video'} className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-white/10">{volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
+        <label className="hidden sm:block"><span className="sr-only">Volume</span><input type="range" min="0" max="1" step="0.05" value={volume} onChange={event => { const next = Number(event.target.value); if (videoRef.current) { videoRef.current.muted = false; videoRef.current.volume = next; } setVolume(next); }} className="w-24 accent-accent-500" /></label>
+        <span className="ml-1 text-xs font-semibold tabular-nums text-primary-100">{formatTime(currentTime)} / {formatTime(duration)}</span>
+        <button type="button" onClick={() => void toggleFullscreen()} aria-label="Enter fullscreen" className="ml-auto flex h-11 w-11 items-center justify-center rounded-lg hover:bg-white/10"><Maximize className="h-5 w-5" /></button>
       </div>
-    </VideoPlayerErrorBoundary>
-  );
-};
+    </div>
+  </div>;
+}

@@ -33,7 +33,7 @@ export function InstructorSection() {
               Your Instructor
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-primary-900 mb-6">
-              Learn with Dr. Aya Elbrashy
+              Featured Instructor
             </h2>
             <p className="text-lg text-primary-600 mb-8 leading-relaxed max-w-2xl">
               Build your skin, hair, and beauty-nutrition knowledge with an educator who has spent more than a decade translating scientific concepts into practical professional decisions.

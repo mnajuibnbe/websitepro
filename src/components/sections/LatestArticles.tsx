@@ -1,0 +1,13 @@
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, BookOpen, Loader2 } from 'lucide-react';
+import { fetchPublishedBlogPosts, type BlogPost } from '../../services/blogPosts.service';
+import { PageContainer } from '../layout/PageContainer';
+import { OptimizedImage } from '../ui/OptimizedImage';
+
+export function LatestArticles() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { let active = true; fetchPublishedBlogPosts().then(data => { if (active) setPosts(data); }).catch(() => undefined).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
+  if (!loading && posts.length === 0) return null;
+  return <section className="bg-primary-50 py-16 md:py-24"><PageContainer><div className="mb-12 text-center md:mb-16"><h2 className="text-3xl font-bold text-primary-900 md:text-4xl">Latest Articles &amp; Insights</h2><p className="mx-auto mt-4 max-w-2xl text-lg text-primary-600">Practical perspectives for continued professional learning.</p></div>{loading ? <div role="status" className="flex min-h-40 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent-600" /><span className="sr-only">Loading articles</span></div> : <div className="grid gap-8 md:grid-cols-3">{posts.map(post => <article key={post.id} className="overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm"><div className="aspect-[16/10] bg-primary-100">{post.cover_image_url ? <OptimizedImage src={post.cover_image_url} alt="" width="800" height="500" displayWidth={800} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-accent-600"><BookOpen className="h-12 w-12" /></div>}</div><div className="p-6"><p className="text-xs font-bold uppercase tracking-eyebrow text-accent-700">Tutiba insight</p><h3 className="mt-3 text-xl font-bold text-primary-900">{post.title}</h3><p className="mt-3 line-clamp-3 leading-relaxed text-primary-600">{post.excerpt}</p><div className="mt-6 flex items-center gap-2 text-sm font-bold text-primary-400" aria-label="Full article coming in a future release">Article preview <ArrowUpRight className="h-4 w-4" /></div></div></article>)}</div>}</PageContainer></section>;
+}

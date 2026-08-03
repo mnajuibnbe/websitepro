@@ -9,6 +9,7 @@ import { Testimonials } from '../components/sections/Testimonials';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { Newsletter } from '../components/sections/Newsletter';
 import { PublicLayout } from '../components/layout/PublicLayout';
+import { LatestArticles } from '../components/sections/LatestArticles';
 
 export function Home() {
   return (
@@ -16,11 +17,12 @@ export function Home() {
       <div>
         <HeroSection />
         <StatsBar />
+        <WhyChooseUs />
         <FeaturedCourses />
         <InstructorSection />
-        <WhyChooseUs />
         <LearningMethod />
         <Testimonials />
+        <LatestArticles />
         <FinalCTA />
         <Newsletter />
       </div>

@@ -19,6 +19,7 @@ interface LegacyTestimonialRow {
   reviewer_name: string;
   quote: string;
   source: 'legacy_import';
+  title: string;
 }
 
 export async function fetchHomepageTestimonials(
@@ -34,13 +35,14 @@ export async function fetchHomepageTestimonials(
   const platformReviews = ((data || []) as PlatformReviewRow[]).map(review => ({
     ...review,
     source: 'platform' as const,
+    title: 'Verified Tutiba Student',
   }));
 
   if (platformReviews.length > 0) return chooseHomepageTestimonials(platformReviews, []);
 
   const { data: legacyData, error: legacyError } = await supabase
     .from('legacy_testimonials')
-    .select('id, reviewer_name, quote, source')
+    .select('id, reviewer_name, quote, source, title')
     .eq('is_published', true)
     .order('display_order', { ascending: true })
     .limit(legacyLimit);
@@ -53,6 +55,7 @@ export async function fetchHomepageTestimonials(
     comment: testimonial.quote,
     created_at: null,
     source: testimonial.source,
+    title: testimonial.title || 'Tutiba Student',
   }));
 
   return chooseHomepageTestimonials(platformReviews, legacyTestimonials);

@@ -14,6 +14,7 @@ import {
   Eye,
   RotateCcw,
   Sparkle,
+  Video,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/layout/PageContainer';
@@ -59,6 +60,7 @@ export function AdminCourseEdit() {
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'unlisted'>('public');
   const [coverImage, setCoverImage] = useState('');
+  const [trailerVideo, setTrailerVideo] = useState('');
   const [instructorId, setInstructorId] = useState('');
   const [learningOutcomes, setLearningOutcomes] = useState<string[]>([]);
   const [requirements, setRequirements] = useState<string[]>([]);
@@ -124,6 +126,7 @@ export function AdminCourseEdit() {
       setStatus((course.status as any) || 'draft');
       setVisibility((course.visibility as any) || 'public');
       setCoverImage(course.cover_image || course.thumbnail || '');
+      setTrailerVideo(course.trailer_video || '');
       setInstructorId(course.instructor_id || '');
       setLearningOutcomes(Array.isArray(course.learning_outcomes) ? course.learning_outcomes : []);
       setRequirements(Array.isArray(course.requirements) ? course.requirements : []);
@@ -192,6 +195,7 @@ export function AdminCourseEdit() {
         visibility: visibility,
         thumbnail: coverImage.trim() || null,
         cover_image: coverImage.trim() || null,
+        trailer_video: trailerVideo.trim() || null,
         instructor_id: instructorId || null,
         learning_outcomes: learningOutcomes.map(item => item.trim()),
         requirements: requirements.map(item => item.trim()),
@@ -480,8 +484,9 @@ export function AdminCourseEdit() {
 
               {/* One canonical cover reused by catalog and sales page. */}
               <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
-                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-600" /><span>Course cover</span></h2>
+                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-600" /><span>Course media</span></h2>
                 <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
+                <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="course-trailer-video" className="mb-2 flex items-center gap-2 text-sm font-bold text-primary-900"><Video className="h-4 w-4 text-amber-600" />Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="course-trailer-video" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500" /><p className="mt-2 text-xs leading-relaxed text-primary-500">When empty, the sales page uses the published preview lesson. If neither is available, the cover remains a static image.</p></div>
               </div>
 
               {/* Bottom Actions */}
