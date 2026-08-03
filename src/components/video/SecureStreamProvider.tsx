@@ -41,9 +41,10 @@ type SecureStreamProviderProps = SecureVideoRequest & {
   publicPreview?: boolean;
   autoPlay?: boolean;
   fill?: boolean;
+  controls?: 'full' | 'playback-only';
 };
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false, controls }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,5 +113,5 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     );
   }
 
-  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={autoPlay} fill={fill} />;
+  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={autoPlay} fill={fill} controls={controls ?? 'full'} />;
 };

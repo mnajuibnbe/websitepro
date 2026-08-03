@@ -62,8 +62,7 @@ function AppContent() {
 
   useLayoutEffect(() => {
     if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.key]);
 
   const browserSearch = window.location.search;

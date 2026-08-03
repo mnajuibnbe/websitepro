@@ -4,6 +4,7 @@ import type { CourseSection, Lesson } from '../types/database.types';
 import { CourseLearningHeader } from '../components/player/CourseLearningHeader';
 import { CourseSidebar } from '../components/player/CourseSidebar';
 import { LessonNavigation } from '../components/player/LessonNavigation';
+import { VideoPlayer } from '../components/video/VideoPlayer';
 import { renderFrontend } from './renderFrontend';
 
 const lesson = { id: 'lesson-1', title: 'Welcome', type: 'video', content_type: 'video', section_id: 'section-1', order_index: 0 } as Lesson;
@@ -37,4 +38,11 @@ test('course sidebar exposes clear progress and expandable curriculum labels', (
   assert.match(markup, /aria-expanded="(?:true|false)"/);
   assert.match(markup, /aria-controls="player-section-section-1"/);
   assert.doesNotMatch(markup, /Details|available yet\.\./);
+});
+
+test('playback-only video controls omit seeking, volume, and fullscreen actions', () => {
+  const markup = renderFrontend(<VideoPlayer src="/welcome.mp4" title="Welcome" controls="playback-only" />);
+  assert.match(markup, /aria-label="Play video"/);
+  assert.doesNotMatch(markup, /type="range"/);
+  assert.doesNotMatch(markup, /Mute video|Unmute video|fullscreen/);
 });

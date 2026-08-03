@@ -35,7 +35,7 @@ export function CoursesHeader({ filters, onChange, categories }: CoursesHeaderPr
       </p>
 
       {/* Category Shortcuts */}
-      <div className="-mx-4 mt-14 flex gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:mt-10 md:px-0">
+      <div className="-mx-4 mt-14 flex gap-3 overflow-x-auto px-4 pb-2 pt-1 md:mx-0 md:mt-10 md:px-0">
         {shortcuts.map((shortcut) => {
           const isFree = shortcut.key === 'free';
           const isAll = shortcut.key === 'all';
