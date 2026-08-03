@@ -1,96 +1,17 @@
-import React, { useEffect } from 'react';
-import { useNavigate , Link } from 'react-router-dom';
-import { ArrowRight, Calendar, User } from 'lucide-react';
-import { MarketingNavbar } from '../components/layout/MarketingNavbar';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Calendar, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Footer } from '../components/layout/Footer';
-import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { PageContainer } from '../components/layout/PageContainer';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { fetchPublishedBlogPosts, type BlogPost } from '../services/blogPosts.service';
 
 export function Blog() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const posts = [
-    {
-      id: '1',
-      title: 'Building an Evidence-Based Skincare Routine',
-      excerpt: 'A practical framework for evaluating skin needs, active ingredients, and product compatibility.',
-      date: 'July 20, 2026',
-      author: 'Tutiba Education Team',
-      image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: '2',
-      title: 'Humectants and Emollients: What Professionals Should Know',
-      excerpt: 'Understand how these ingredient groups support hydration and barrier care—and where their roles differ.',
-      date: 'July 15, 2026',
-      author: 'Tutiba Education Team',
-      image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      id: '3',
-      title: 'Five Trends Shaping Cosmeceutical Practice in 2026',
-      excerpt: 'A concise review of the research, technology, and client-care trends professionals are watching.',
-      date: 'July 10, 2026',
-      author: 'Tutiba Education Team',
-      image: 'https://images.unsplash.com/photo-1571781526291-c477eb311dc6?auto=format&fit=crop&q=80&w=800'
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
-      <MarketingNavbar />
-
-      <main id="main-content" className="pt-32 pb-24">
-        <PageContainer>
-          <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-primary-900 mb-4">Blog</h1>
-            <p className="text-xl text-primary-600">Insights, research, and practical guidance for cosmeceutical professionals.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map(post => (
-              <article key={post.id} className="bg-white rounded-2xl border border-primary-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col">
-                <div className="h-48 overflow-hidden">
-                  <OptimizedImage
-                    src={post.image}
-                    alt={post.title}
-                    width="800"
-                    height="450"
-                    displayWidth={800}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex items-center gap-4 text-xs text-primary-500 mb-4">
-                    <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {post.date}</span>
-                    <span className="flex items-center gap-1"><User className="w-4 h-4" /> {post.author}</span>
-                  </div>
-                  <h2 className="text-xl font-bold text-primary-900 mb-3 leading-tight group-hover:text-accent-600 transition-colors">
-                    <Link to="/blog-post" onClick={(e) => { e.preventDefault(); navigate('/blog-post'); }}>
-                      {post.title}
-                    </Link>
-                  </h2>
-                  <p className="text-primary-600 text-sm leading-relaxed mb-6 flex-1">
-                    {post.excerpt}
-                  </p>
-                  <Link to="/blog-post"
-                    onClick={(e) => { e.preventDefault(); navigate('/blog-post'); }}
-                    className="inline-flex items-center gap-2 text-accent-600 font-bold hover:text-accent-700 transition-colors"
-                  >
-                    Read More <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </PageContainer>
-      </main>
-
-      <Footer />
-    </div>
-  );
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { window.scrollTo(0, 0); let active = true; fetchPublishedBlogPosts(50).then(data => { if (active) setPosts(data); }).catch(() => undefined).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
+  return <div className="min-h-screen bg-primary-50 font-sans" dir="ltr"><MarketingNavbar /><main id="main-content" className="pb-24 pt-32"><PageContainer><div className="mb-16 text-center"><h1 className="mb-4 text-4xl font-bold text-primary-900">Blog</h1><p className="text-xl text-primary-600">Insights, research, and practical guidance for cosmeceutical professionals.</p></div>
+    {loading ? <div role="status" className="flex min-h-72 items-center justify-center"><Loader2 className="h-9 w-9 animate-spin text-accent-600" /><span className="sr-only">Loading articles</span></div> : <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">{posts.map(post => <article key={post.id} className="group flex flex-col overflow-hidden rounded-2xl border border-primary-200 bg-white shadow-sm transition-shadow hover:shadow-md"><Link to={`/blog/${post.slug}`} className="flex h-full flex-col">{post.cover_image_url && <div className="h-48 overflow-hidden"><OptimizedImage src={post.cover_image_url} alt={post.title} width="800" height="450" displayWidth={800} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /></div>}<div className="flex flex-1 flex-col p-6">{post.published_at && <span className="mb-4 flex items-center gap-1 text-xs text-primary-500"><Calendar className="h-4 w-4" />{new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(post.published_at))}</span>}<h2 className="mb-3 text-xl font-bold leading-tight text-primary-900 transition-colors group-hover:text-accent-600">{post.title}</h2><p className="mb-6 flex-1 text-sm leading-relaxed text-primary-600">{post.excerpt}</p><span className="inline-flex items-center gap-2 font-bold text-accent-600">Read More <ArrowRight className="h-4 w-4" /></span></div></Link></article>)}</div>}
+  </PageContainer></main><Footer /></div>;
 }

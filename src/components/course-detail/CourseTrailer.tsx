@@ -1,4 +1,4 @@
-import { PlayCircle, VideoOff } from 'lucide-react';
+import { PlayCircle } from 'lucide-react';
 import { VideoPlayer } from '../video/VideoPlayer';
 import { SecureStreamProvider } from '../video/SecureStreamProvider';
 
@@ -17,12 +17,12 @@ export function CourseTrailer({ courseId, title, trailerUrl, poster }: { courseI
   const isDriveVideo = /https:\/\/(?:drive|docs)\.google\.com\//i.test(url);
   const embedUrl = url ? youtubeEmbedUrl(url) || vimeoEmbedUrl(url) : null;
 
+  if (!url) return poster ? <img src={poster} alt={`${title} course cover`} className="mt-8 aspect-video w-full rounded-2xl object-cover" /> : null;
+
   return <section className="mt-8" aria-labelledby="course-trailer-heading">
     <h2 id="course-trailer-heading" className="mb-4 flex items-center gap-2 text-xl font-bold text-primary-900">
       <PlayCircle className="h-5 w-5 text-accent-600" /> Course trailer
     </h2>
-    {!url ? <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-6 text-center" style={poster ? { backgroundImage: `linear-gradient(rgba(15,23,42,.78),rgba(15,23,42,.78)),url(${poster})`, backgroundPosition: 'center', backgroundSize: 'cover' } : undefined}>
-      <div className={poster ? 'text-white' : 'text-primary-600'}><VideoOff className="mx-auto mb-3 h-9 w-9 opacity-70" /><p className="font-bold">Trailer coming soon</p><p className="mt-1 text-sm opacity-80">Explore the curriculum below for full course details.</p></div>
-    </div> : isDriveVideo ? <SecureStreamProvider asset="course-trailer" courseId={courseId} publicPreview title={`${title} course trailer`} poster={poster || undefined} /> : embedUrl ? <div className="aspect-video overflow-hidden rounded-2xl border border-primary-900 bg-black shadow-lg"><iframe src={embedUrl} title={`${title} course trailer`} className="h-full w-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div> : <VideoPlayer src={url} title={`${title} course trailer`} poster={poster || undefined} />}
+    {isDriveVideo ? <SecureStreamProvider asset="course-trailer" courseId={courseId} publicPreview title={`${title} course trailer`} poster={poster || undefined} /> : embedUrl ? <div className="aspect-video overflow-hidden rounded-2xl border border-primary-900 bg-black shadow-lg"><iframe src={embedUrl} title={`${title} course trailer`} className="h-full w-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div> : <VideoPlayer src={url} title={`${title} course trailer`} poster={poster || undefined} />}
   </section>;
 }

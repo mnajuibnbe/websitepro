@@ -1,89 +1,33 @@
-import React, { useEffect } from 'react';
-import { useNavigate , Link } from 'react-router-dom';
-import { Calendar, User, ChevronRight } from 'lucide-react';
-import { MarketingNavbar } from '../components/layout/MarketingNavbar';
+import { useEffect, useState } from 'react';
+import { Calendar, ChevronRight, Loader2, User } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 import { Footer } from '../components/layout/Footer';
-import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { PageContainer } from '../components/layout/PageContainer';
+import { OptimizedImage } from '../components/ui/OptimizedImage';
+import { fetchPublishedBlogPost, type BlogPost as BlogPostData } from '../services/blogPosts.service';
 
 export function BlogPost() {
-  const navigate = useNavigate();
+  const { slug = '' } = useParams();
+  const [post, setPost] = useState<BlogPostData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    let active = true;
+    setLoading(true);
+    setError(false);
+    fetchPublishedBlogPost(slug).then(data => { if (active) { setPost(data); setError(!data); } }).catch(() => { if (active) setError(true); }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [slug]);
 
-  return (
-    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
-      <MarketingNavbar />
-
-      <main id="main-content" className="pt-32 pb-24">
-        <PageContainer>
-          <div className="mx-auto max-w-4xl">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-primary-500 font-medium mb-8">
-            <Link to="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-accent-600 transition-colors">Home</Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to="/blog" onClick={(e) => { e.preventDefault(); navigate('/blog'); }} className="hover:text-accent-600 transition-colors">Blog</Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-primary-900 font-bold truncate">Understanding Active Ingredients</span>
-          </nav>
-
-          <article className="bg-white rounded-3xl shadow-sm border border-primary-200 overflow-hidden">
-            <div className="h-64 sm:h-96 w-full relative">
-              <OptimizedImage priority displayWidth={1200} width="1200" height="675"
-                src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=1200"
-                alt="Cosmetic skin-care products arranged for ingredient analysis"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="p-8 md:p-12">
-              <div className="flex items-center gap-6 text-sm text-primary-500 mb-6 border-b border-primary-100 pb-6">
-                <span className="flex items-center gap-2"><Calendar className="w-5 h-5" /> July 20, 2026</span>
-                <span className="flex items-center gap-2"><User className="w-5 h-5" /> Tutiba Education Team</span>
-              </div>
-
-              <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-8 leading-tight">
-                Understanding Active Ingredients in Skin Care
-              </h1>
-
-              <div className="prose prose-lg prose-primary max-w-none text-primary-800 space-y-6">
-                <p className="leading-relaxed text-xl">
-                  Active ingredients are the components of a formulation selected to deliver a specific skin-care benefit. Understanding their role helps professionals evaluate products more confidently.
-                </p>
-
-                <h2 className="text-2xl font-bold text-primary-900 mt-10 mb-4">What Makes an Ingredient Active?</h2>
-                <p className="leading-relaxed">
-                  An active ingredient targets a defined concern, while supporting ingredients contribute to texture, stability, preservation, and delivery. A strong formulation depends on both groups working together.
-                </p>
-
-                <h2 className="text-2xl font-bold text-primary-900 mt-10 mb-4">Common Examples</h2>
-                <ul className="list-disc list-inside space-y-3 leading-relaxed bg-primary-50 p-6 rounded-2xl border border-primary-100">
-                  <li><strong>Vitamin C:</strong> Often used in antioxidant and brightening formulations.</li>
-                  <li><strong>Retinol:</strong> Commonly selected to support skin renewal and improve visible texture.</li>
-                  <li><strong>Alpha hydroxy acids (AHAs):</strong> Used to exfoliate the skin's surface.</li>
-                  <li><strong>Niacinamide:</strong> A versatile ingredient used to support the skin barrier and even-looking tone.</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold text-primary-900 mt-10 mb-4">Concentration Is Only Part of the Picture</h2>
-                <p className="leading-relaxed">
-                  A higher percentage does not automatically make a product more effective. Ingredient form, formulation stability, pH, delivery system, and appropriate use all influence performance and tolerability.
-                </p>
-
-                <div className="bg-accent-50 border-r-4 border-accent-600 p-6 rounded-l-2xl my-8">
-                  <p className="text-accent-900 font-medium italic">
-                    "Professional tip: evaluate the complete INCI list and product directions rather than judging a formula by one highlighted ingredient."
-                  </p>
-                </div>
-              </div>
-            </div>
-          </article>
-          </div>
-        </PageContainer>
-      </main>
-
-      <Footer />
-    </div>
-  );
+  const date = post?.published_at ? new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(post.published_at)) : null;
+  return <div className="min-h-screen bg-primary-50 font-sans" dir="ltr"><MarketingNavbar /><main id="main-content" className="pb-24 pt-32"><PageContainer><div className="mx-auto max-w-4xl">
+    <nav className="mb-8 flex items-center gap-2 text-sm font-medium text-primary-500" aria-label="Breadcrumb"><Link to="/" className="transition-colors hover:text-accent-600">Home</Link><ChevronRight className="h-4 w-4" /><Link to="/blog" className="transition-colors hover:text-accent-600">Blog</Link>{post && <><ChevronRight className="h-4 w-4" /><span className="truncate font-bold text-primary-900">{post.title}</span></>}</nav>
+    {loading ? <div role="status" className="flex min-h-96 items-center justify-center"><Loader2 className="h-9 w-9 animate-spin text-accent-600" /><span className="sr-only">Loading article</span></div> : error || !post ? <div className="rounded-3xl border border-primary-200 bg-white p-10 text-center"><h1 className="text-3xl font-bold text-primary-900">Article not found</h1><p className="mt-3 text-primary-600">This article may have moved or is not published.</p><Link to="/blog" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-accent-600 px-5 font-bold text-white hover:bg-accent-700">Browse all articles</Link></div> : <article className="overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-sm">
+      {post.cover_image_url && <div className="h-64 w-full sm:h-96"><OptimizedImage priority displayWidth={1200} width="1200" height="675" src={post.cover_image_url} alt={post.title} className="h-full w-full object-cover" /></div>}
+      <div className="p-8 md:p-12"><div className="mb-6 flex flex-wrap items-center gap-6 border-b border-primary-100 pb-6 text-sm text-primary-500">{date && <span className="flex items-center gap-2"><Calendar className="h-5 w-5" />{date}</span>}<span className="flex items-center gap-2"><User className="h-5 w-5" />Tutiba Education Team</span></div><h1 className="mb-8 text-3xl font-bold leading-tight text-primary-900 md:text-4xl">{post.title}</h1><p className="mb-8 text-xl leading-relaxed text-primary-700">{post.excerpt}</p><div className="space-y-6 text-lg leading-relaxed text-primary-800">{post.content.split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div></div>
+    </article>}
+  </div></PageContainer></main><Footer /></div>;
 }

@@ -40,9 +40,10 @@ type SecureStreamProviderProps = SecureVideoRequest & {
   onEnded?: () => void;
   publicPreview?: boolean;
   autoPlay?: boolean;
+  fill?: boolean;
 };
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +81,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (loading) {
     return (
-      <div className="w-full aspect-video bg-slate-900 rounded-lg flex items-center justify-center">
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-slate-900`}>
         <div className="flex flex-col items-center">
           <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-white text-sm font-medium">Authorizing secure stream...</p>
@@ -91,7 +92,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (error || !streamUrl) {
     return (
-      <div className="w-full aspect-video bg-slate-900 rounded-lg flex items-center justify-center p-6 text-center">
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-slate-900 p-6 text-center`}>
         <div className="max-w-md">
           <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,5 +112,5 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     );
   }
 
-  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={autoPlay} />;
+  return <VideoPlayer src={streamUrl} title={title} poster={poster} onEnded={onEnded} autoPlay={autoPlay} fill={fill} />;
 };

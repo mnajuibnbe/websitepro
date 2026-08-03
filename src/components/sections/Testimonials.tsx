@@ -1,7 +1,16 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Loader2, MessageSquareText, RefreshCw, Star } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { useHomepageTestimonials } from '../../hooks/useHomepageMarketing';
+import type { HomepageTestimonial } from '../../lib/homepageMarketing';
+
+function TestimonialCard({ testimonial, mobile = false }: { testimonial: HomepageTestimonial; mobile?: boolean }) {
+  return <div className={`${mobile ? 'w-[85%] flex-none snap-center sm:w-[70%]' : ''} flex h-full flex-col rounded-2xl border border-primary-100 bg-primary-50 p-8 lg:p-10`}>
+    {testimonial.source === 'platform' && testimonial.rating !== null ? <div className="mb-6 flex items-center gap-1" aria-label={`${testimonial.rating} out of 5 stars`}>{[1, 2, 3, 4, 5].map(star => <Star key={star} className={`h-5 w-5 ${star <= testimonial.rating! ? 'fill-warning-500 text-warning-500' : 'text-primary-200'}`} />)}</div> : null}
+    <p dir="auto" className="mb-8 flex-grow text-lg font-medium leading-relaxed text-primary-800">“{testimonial.comment}”</p>
+    <div className="mt-auto flex items-center gap-4"><div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-200 text-lg font-bold text-primary-700">{testimonial.reviewer_name.charAt(0).toUpperCase()}</div><div><div className="font-bold text-primary-900">{testimonial.reviewer_name}</div><div className="text-sm font-medium text-primary-600">{testimonial.title}</div></div></div>
+  </div>;
+}
 
 export function Testimonials() {
   const { data: testimonials, error, isLoading, refetch } = useHomepageTestimonials();
@@ -23,79 +32,12 @@ export function Testimonials() {
     setActiveIndex(nearest);
   };
 
-  return (
-    <section className="py-16 md:py-24 bg-white">
-      <PageContainer>
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            What Our Students Say
-          </h2>
-          <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            Real experiences from health professionals who developed their skills with Tutiba.
-          </p>
-        </div>
-
-        {isLoading && (
-          <div role="status" className="flex min-h-56 items-center justify-center text-primary-500">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="sr-only">Loading student reviews</span>
-          </div>
-        )}
-
-        {!isLoading && error && (
-          <div role="alert" className="mx-auto max-w-xl rounded-2xl border border-primary-200 bg-primary-50 p-8 text-center">
-            <MessageSquareText className="mx-auto h-10 w-10 text-primary-300" />
-            <h3 className="mt-4 text-xl font-bold text-primary-900">Reviews are temporarily unavailable</h3>
-            <p className="mt-2 text-primary-600">Please try again in a moment.</p>
-            <button type="button" onClick={refetch} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary-300 px-4 font-bold text-primary-800 hover:bg-white">
-              <RefreshCw className="h-4 w-4" /> Retry
-            </button>
-          </div>
-        )}
-
-        {!isLoading && !error && testimonials.length === 0 && (
-          <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-8 text-center md:p-10">
-            <MessageSquareText className="mx-auto h-10 w-10 text-accent-500" />
-            <h3 className="mt-4 text-xl font-bold text-primary-900">Student reviews are coming soon</h3>
-            <p className="mt-2 text-primary-600">Approved learner experiences will appear here as our community shares them.</p>
-          </div>
-        )}
-
-        {!isLoading && !error && testimonials.length > 0 && <><div ref={carouselRef} onScroll={updateActiveIndex} className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:gap-8 hide-scrollbar">
-          {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.review_id}
-              className="flex-none w-[85%] sm:w-[70%] md:w-auto snap-center bg-primary-50 p-8 lg:p-10 rounded-2xl border border-primary-100 flex flex-col h-full"
-            >
-              {testimonial.source === 'platform' && testimonial.rating !== null ? (
-                <div className="flex items-center gap-1 mb-6" aria-label={`${testimonial.rating} out of 5 stars`}>
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <Star key={star} className={`w-5 h-5 ${star <= testimonial.rating! ? 'fill-warning-500 text-warning-500' : 'text-primary-200'}`} />
-                  ))}
-                </div>
-              ) : null}
-              <p dir="auto" className="text-lg text-primary-800 flex-grow mb-8 leading-relaxed font-medium">
-                “{testimonial.comment}”
-              </p>
-              <div className="mt-auto flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary-200 flex items-center justify-center text-primary-700 font-bold text-lg">
-                  {testimonial.reviewer_name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div className="font-bold text-primary-900">{testimonial.reviewer_name}</div>
-                  <div className="text-sm font-medium text-primary-600">{testimonial.title}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div><div className="flex justify-center gap-2 md:hidden" aria-label="Testimonial slides">{testimonials.map((testimonial, index) => <button key={testimonial.review_id} type="button" aria-label={`Go to testimonial ${index + 1}`} aria-current={activeIndex === index ? 'true' : undefined} onClick={() => { const card = carouselRef.current?.children[index] as HTMLElement | undefined; card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }} className={`h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-7 bg-accent-600' : 'w-2.5 bg-primary-200'}`} />)}</div></>}
-
-        {!isLoading && !error && isLegacyCollection && (
-          <p className="mx-auto mt-2 max-w-3xl text-center text-sm leading-relaxed text-primary-500">
-            These genuine testimonials were collected before Tutiba’s current review-submission and moderation system. New approved platform reviews will take their place here automatically.
-          </p>
-        )}
-      </PageContainer>
-    </section>
-  );
+  return <section className="bg-white py-16 md:py-24"><PageContainer>
+    <div className="mb-12 text-center md:mb-16"><h2 className="mb-4 text-3xl font-bold text-primary-900 md:text-4xl">What Our Students Say</h2><p className="mx-auto max-w-2xl text-lg text-primary-600">Real experiences from health professionals who developed their skills with Tutiba.</p></div>
+    {isLoading && <div role="status" className="flex min-h-56 items-center justify-center text-primary-500"><Loader2 className="h-8 w-8 animate-spin" /><span className="sr-only">Loading student reviews</span></div>}
+    {!isLoading && error && <div role="alert" className="mx-auto max-w-xl rounded-2xl border border-primary-200 bg-primary-50 p-8 text-center"><MessageSquareText className="mx-auto h-10 w-10 text-primary-300" /><h3 className="mt-4 text-xl font-bold text-primary-900">Reviews are temporarily unavailable</h3><p className="mt-2 text-primary-600">Please try again in a moment.</p><button type="button" onClick={refetch} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl border border-primary-300 px-4 font-bold text-primary-800 hover:bg-white"><RefreshCw className="h-4 w-4" /> Retry</button></div>}
+    {!isLoading && !error && testimonials.length === 0 && <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-8 text-center md:p-10"><MessageSquareText className="mx-auto h-10 w-10 text-accent-500" /><h3 className="mt-4 text-xl font-bold text-primary-900">Student reviews are coming soon</h3><p className="mt-2 text-primary-600">Approved learner experiences will appear here as our community shares them.</p></div>}
+    {!isLoading && !error && testimonials.length > 0 && <><div ref={carouselRef} onScroll={updateActiveIndex} className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 md:hidden hide-scrollbar">{testimonials.map(testimonial => <TestimonialCard key={testimonial.review_id} testimonial={testimonial} mobile />)}</div><div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 lg:gap-8">{testimonials.map(testimonial => <TestimonialCard key={testimonial.review_id} testimonial={testimonial} />)}</div><div className="flex justify-center gap-2 md:hidden" aria-label="Testimonial slides">{testimonials.map((testimonial, index) => <button key={testimonial.review_id} type="button" aria-label={`Go to testimonial ${index + 1}`} aria-current={activeIndex === index ? 'true' : undefined} onClick={() => { const card = carouselRef.current?.children[index] as HTMLElement | undefined; card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }} className={`h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-7 bg-accent-600' : 'w-2.5 bg-primary-200'}`} />)}</div></>}
+    {!isLoading && !error && isLegacyCollection && <p className="mx-auto mt-2 max-w-3xl text-center text-sm leading-relaxed text-primary-500">These genuine testimonials were collected before Tutiba’s current review-submission and moderation system. New approved platform reviews will take their place here automatically.</p>}
+  </PageContainer></section>;
 }

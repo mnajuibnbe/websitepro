@@ -7,7 +7,7 @@ const metadata: Array<{ match: RegExp; title: string; description: string; robot
   { match: /^\/course\//, title: 'Course Details', description: 'Review the curriculum, instructor, outcomes, and enrollment details.' },
   { match: /^\/about/, title: 'About Tutiba', description: 'Learn about Tutiba’s mission and approach to professional education.' },
   { match: /^\/faq/, title: 'Frequently Asked Questions', description: 'Find answers about Tutiba courses, enrollment, payments, and certificates.' },
-  { match: /^\/blog-post/, title: 'Cosmeceutical Insights', description: 'Read evidence-based insights for cosmeceutical professionals.' },
+  { match: /^\/blog\//, title: 'Cosmeceutical Insights', description: 'Read evidence-based insights for cosmeceutical professionals.' },
   { match: /^\/blog/, title: 'Tutiba Blog', description: 'Research and practical guidance for cosmeceutical professionals.' },
   { match: /^\/contact/, title: 'Contact Tutiba', description: 'Contact the Tutiba support team for course and account assistance.' },
   { match: /^\/privacy/, title: 'Privacy Policy', description: 'Learn how Tutiba handles and protects personal information.' },

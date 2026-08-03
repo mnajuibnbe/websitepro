@@ -75,7 +75,7 @@ function AppContent() {
       <Route path="/courses" element={<CoursesListing />} />
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/blog" element={<Blog />} />
-      <Route path="/blog-post" element={<BlogPost />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/login" element={<RequireGuest><LoginPage /></RequireGuest>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/register" element={<RequireGuest><RegisterPage /></RequireGuest>} />
