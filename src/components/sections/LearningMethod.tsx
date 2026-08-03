@@ -1,60 +1,55 @@
-import React from 'react';
+import { ArrowRight, BookOpenCheck, FlaskConical, ScanSearch } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { PRIMARY_DIPLOMA_CTA, PRIMARY_DIPLOMA_PATH } from '../../lib/homepageMarketing';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 
+const curriculum = [
+  {
+    title: 'Skin layers and product targets',
+    description: 'See how products intended for the dermis and hypodermis are evaluated against skin structure.',
+    icon: ScanSearch,
+  },
+  {
+    title: 'Hyaluronic acid by molecular size',
+    description: 'Understand how molecular size changes penetration, effect, and the claims a formula can reasonably make.',
+    icon: FlaskConical,
+  },
+  {
+    title: 'From ingredient science to product comparison',
+    description: 'Use the scientific foundation to compare finished products instead of relying on marketing categories alone.',
+    icon: BookOpenCheck,
+  },
+];
+
 export function LearningMethod() {
-  const steps = [
-    { id: 1, number: '01', title: 'Learn', description: 'Follow structured, accessible scientific lessons.' },
-    { id: 2, number: '02', title: 'Apply', description: 'Work through practical cases from the market.' },
-    { id: 3, number: '03', title: 'Assess', description: 'Check your understanding with focused questions.' },
-    { id: 4, number: '04', title: 'Understand', description: 'Use detailed explanations to close knowledge gaps.' },
-    { id: 5, number: '05', title: 'Retain', description: 'Reinforce key concepts with memory tools.' },
-  ];
+  const navigate = useNavigate();
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="bg-white py-14 md:py-20">
       <PageContainer>
-        <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            How Learning Works
-          </h2>
-          <p className="text-lg text-primary-600">
-            A complete method designed to help you understand, retain, and apply what you learn.
-          </p>
-        </div>
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
+          <div className="lg:col-span-4">
+            <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Inside Part 1</p>
+            <h2 className="mt-3 text-3xl font-bold text-primary-900 md:text-4xl">Picture What You Will Actually Study</h2>
+            <p className="mt-5 leading-relaxed text-primary-600">Six published lessons move from skin anatomy into hyaluronic-acid science and product-level application.</p>
+            <Button variant="secondary" className="mt-7 px-6" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)}>
+              {PRIMARY_DIPLOMA_CTA} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
 
-        {/* Timeline Container */}
-        <div className="relative mb-16 md:mb-20">
-          {/* Connecting Line (Desktop) */}
-          <div className="hidden lg:block absolute top-6 left-[10%] right-[10%] h-0.5 bg-primary-100"></div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4 relative z-10">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex flex-row lg:flex-col items-start lg:items-center relative">
-                {/* Connecting Line (Mobile/Tablet) */}
-                {index !== steps.length - 1 && (
-                  <div className="lg:hidden absolute top-12 bottom-[-2rem] right-6 w-0.5 bg-primary-100"></div>
-                )}
-
-                {/* Number Indicator */}
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border-2 border-accent-600 flex items-center justify-center text-accent-600 font-bold text-lg mb-0 lg:mb-6 z-10 relative">
-                  {step.number}
+          <div className="grid gap-5 md:grid-cols-3 lg:col-span-8">
+            {curriculum.map(({ title, description, icon: Icon }, index) => (
+              <article key={title} className="flex h-full flex-col rounded-xl border border-primary-100 bg-primary-50 p-6 md:p-7">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-accent-700 shadow-sm"><Icon className="h-5 w-5" /></div>
+                  <span className="text-xs font-bold tracking-wider text-primary-400">0{index + 1}</span>
                 </div>
-
-                {/* Content */}
-                <div className="ms-6 lg:ms-0 lg:text-center mt-2 lg:mt-0 pb-8 lg:pb-0">
-                  <h3 className="text-xl font-bold text-primary-900 mb-2">{step.title}</h3>
-                  <p className="text-primary-600 text-sm">{step.description}</p>
-                </div>
-              </div>
+                <h3 className="mt-6 text-lg font-bold text-primary-900">{title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-primary-600">{description}</p>
+              </article>
             ))}
           </div>
-        </div>
-
-        <div className="flex justify-center">
-          <Button variant="secondary" className="px-8">
-            Explore Our Learning Method
-          </Button>
         </div>
       </PageContainer>
     </section>

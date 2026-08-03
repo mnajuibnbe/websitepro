@@ -1,11 +1,10 @@
 import {
-  aggregateHomepageStats,
   chooseHomepageTestimonials,
+  type HomepagePreviewLesson,
   type HomepageStats,
   type HomepageTestimonial,
 } from '../lib/homepageMarketing';
 import { supabase } from '../lib/supabase';
-import type { PublicCourseWithStats } from '../types/database.types';
 
 interface PlatformReviewRow {
   review_id: string;
@@ -21,8 +20,6 @@ interface LegacyTestimonialRow {
   quote: string;
   source: 'legacy_import';
 }
-
-const STATS_PAGE_SIZE = 1_000;
 
 export async function fetchHomepageTestimonials(
   platformLimit = 3,
@@ -62,21 +59,27 @@ export async function fetchHomepageTestimonials(
 }
 
 export async function fetchHomepageStats(): Promise<HomepageStats> {
-  const rows: PublicCourseWithStats[] = [];
-  let offset = 0;
+  const { data, error } = await supabase
+    .from('homepage_marketing_settings')
+    .select('students_value, courses_value, learning_hours_value')
+    .eq('id', 1)
+    .single();
 
-  while (true) {
-    const { data, error } = await supabase
-      .rpc('get_public_courses_with_stats')
-      .range(offset, offset + STATS_PAGE_SIZE - 1);
+  if (error) throw error;
+  return {
+    studentsValue: data.students_value,
+    coursesValue: data.courses_value,
+    learningHoursValue: data.learning_hours_value,
+  };
+}
 
-    if (error) throw error;
-    const page = (data || []) as unknown as PublicCourseWithStats[];
-    rows.push(...page);
-
-    if (page.length < STATS_PAGE_SIZE) break;
-    offset += STATS_PAGE_SIZE;
-  }
-
-  return aggregateHomepageStats(rows);
+export async function fetchHomepagePreviewLessons(): Promise<HomepagePreviewLesson[]> {
+  const { data, error } = await supabase.rpc('get_homepage_preview_lessons');
+  if (error) throw error;
+  return ((data || []) as Array<{ lesson_id: string; lesson_title: string; course_id: string; course_title: string }>).map(row => ({
+    lessonId: row.lesson_id,
+    lessonTitle: row.lesson_title,
+    courseId: row.course_id,
+    courseTitle: row.course_title,
+  }));
 }

@@ -14,6 +14,9 @@ export function UpdatePassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
+  const recoveryTokenHash = new URLSearchParams(window.location.search).get('token_hash');
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(Boolean(recoveryTokenHash));
+  const [isConfirming, setIsConfirming] = useState(false);
   const [hasSession, setHasSession] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -32,6 +35,10 @@ export function UpdatePassword() {
     });
 
     async function verifyRecoverySession() {
+      if (recoveryTokenHash) {
+        setIsVerifyingSession(false);
+        return;
+      }
       try {
         const { data: { session } } = await runAuthRequest(supabase.auth.getSession());
         if (!active) return;
@@ -61,7 +68,27 @@ export function UpdatePassword() {
       if (timer) clearTimeout(timer);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [recoveryTokenHash]);
+
+  const confirmRecovery = async () => {
+    if (!recoveryTokenHash) return;
+    setIsConfirming(true);
+    setError(null);
+    try {
+      const { data, error: verifyError } = await runAuthRequest(supabase.auth.verifyOtp({
+        token_hash: recoveryTokenHash,
+        type: 'recovery',
+      }));
+      if (verifyError || !data.session) throw verifyError || new Error('This password reset link is invalid or has expired.');
+      setHasSession(true);
+      setAwaitingConfirmation(false);
+      window.history.replaceState(null, '', '/#/update-password');
+    } catch (caughtError) {
+      setError(getAuthErrorMessage(caughtError, 'recovery'));
+    } finally {
+      setIsConfirming(false);
+    }
+  };
 
   const handleUpdatePassword = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -82,6 +109,7 @@ export function UpdatePassword() {
       if (!session) throw new Error('Your password reset link has expired. Request a new link to continue.');
       const { error: updateError } = await runAuthRequest(supabase.auth.updateUser({ password }));
       if (updateError) throw updateError;
+      await runAuthRequest(supabase.auth.signOut({ scope: 'local' }));
       setSuccess(true);
       setPassword('');
       setConfirmPassword('');
@@ -98,6 +126,19 @@ export function UpdatePassword() {
         <div role="status" aria-live="polite" className="py-8 text-center text-primary-600">
           <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-accent-600" aria-hidden="true" />
           Securely verifying your request…
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  if (awaitingConfirmation) {
+    return (
+      <AuthLayout title="Confirm your password reset" description="For your security, the recovery link is not used until you choose to continue.">
+        {error && <div role="alert" className="mb-5 rounded-xl border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700"><AlertCircle className="mb-2 h-6 w-6" aria-hidden="true" />{error}</div>}
+        <p className="mb-6 text-sm leading-relaxed text-primary-600">If you requested a new password, continue below. This extra step prevents email security scanners from consuming your one-time link before you open it.</p>
+        <div className="grid gap-3">
+          <Button onClick={confirmRecovery} isLoading={isConfirming} disabled={isConfirming} className="w-full">Continue password reset</Button>
+          <Button onClick={() => navigate('/login')} variant="secondary" className="w-full">Cancel</Button>
         </div>
       </AuthLayout>
     );

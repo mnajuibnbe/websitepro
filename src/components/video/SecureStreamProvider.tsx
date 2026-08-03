@@ -4,14 +4,17 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const STREAM_URL_TTL_MS = 90 * 60 * 1000;
 const streamRequests = new Map<string, { promise: Promise<string>; expiresAt: number }>();
-const API_BASE_URL = String(import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE_URL = String(
+  import.meta.env?.VITE_API_BASE_URL || (import.meta.env?.PROD ? 'https://tutiba-video-stream.tutiba.workers.dev' : ''),
+).replace(/\/$/, '');
 
 export type SecureVideoRequest =
   | { lessonId: string; asset?: never }
-  | { lessonId?: never; asset: 'homepage-intro' };
+  | { lessonId?: never; asset: 'homepage-intro'; courseId?: never }
+  | { lessonId?: never; asset: 'course-trailer'; courseId: string };
 
 async function requestStreamUrl(requestTarget: SecureVideoRequest, token?: string | null): Promise<string> {
-  const targetKey = requestTarget.lessonId || requestTarget.asset;
+  const targetKey = requestTarget.lessonId || `${requestTarget.asset}:${'courseId' in requestTarget ? requestTarget.courseId || '' : ''}`;
   const key = `${token || 'public'}:${targetKey}`;
   const cached = streamRequests.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
@@ -39,7 +42,7 @@ type SecureStreamProviderProps = SecureVideoRequest & {
   autoPlay?: boolean;
 };
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, title, poster, onEnded, publicPreview = false, autoPlay = false }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +58,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         setError(null);
 
         if (!token && !publicPreview) throw new Error('Your session expired. Sign in and try again.');
-        const url = await requestStreamUrl(lessonId ? { lessonId } : { asset: asset! }, token);
+        const url = await requestStreamUrl(lessonId ? { lessonId } : asset === 'course-trailer' ? { asset, courseId: courseId! } : { asset: 'homepage-intro' }, token);
         if (isMounted) {
           setStreamUrl(url);
           setLoading(false);
@@ -73,7 +76,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
     return () => {
       isMounted = false;
     };
-  }, [asset, lessonId, publicPreview, token, retryVersion]);
+  }, [asset, courseId, lessonId, publicPreview, token, retryVersion]);
 
   if (loading) {
     return (
@@ -98,7 +101,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
-            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId || asset}`); setRetryVersion(value => value + 1); }}
+            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId || `${asset}:${courseId || ''}`}`); setRetryVersion(value => value + 1); }}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
           >
             Try Again

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BadgeCheck, Loader2, MessageSquareText, RefreshCw, Star } from 'lucide-react';
+import { Loader2, MessageSquareText, RefreshCw, Star } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { useHomepageTestimonials } from '../../hooks/useHomepageMarketing';
 
@@ -57,11 +57,7 @@ export function Testimonials() {
                     <Star key={star} className={`w-5 h-5 ${star <= testimonial.rating! ? 'fill-warning-500 text-warning-500' : 'text-primary-200'}`} />
                   ))}
                 </div>
-              ) : (
-                <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-accent-200 bg-white px-3 py-1.5 text-xs font-bold text-accent-800">
-                  <BadgeCheck className="h-4 w-4 text-accent-600" /> Verified on our original platform
-                </div>
-              )}
+              ) : null}
               <p dir="auto" className="text-lg text-primary-800 flex-grow mb-8 leading-relaxed font-medium">
                 “{testimonial.comment}”
               </p>
@@ -71,11 +67,7 @@ export function Testimonials() {
                 </div>
                 <div>
                   <div className="font-bold text-primary-900">{testimonial.reviewer_name}</div>
-                  <div className="text-sm text-primary-600 font-medium">
-                    {testimonial.source === 'platform'
-                      ? 'Verified learner review'
-                      : 'Verified — collected from Tutiba’s original course platform'}
-                  </div>
+                  {testimonial.source === 'platform' && <div className="text-sm text-primary-600 font-medium">Verified learner review</div>}
                 </div>
               </div>
             </div>

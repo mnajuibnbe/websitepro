@@ -17,9 +17,9 @@ export function Home() {
         <HeroSection />
         <StatsBar />
         <FeaturedCourses />
+        <InstructorSection />
         <WhyChooseUs />
         <LearningMethod />
-        <InstructorSection />
         <Testimonials />
         <FinalCTA />
         <Newsletter />

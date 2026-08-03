@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 import { Badge } from './Badge';
-import { Clock, BookOpen, Star } from 'lucide-react';
+import { CheckCircle2, Clock, BookOpen, Star } from 'lucide-react';
 import { OptimizedImage } from './OptimizedImage';
 
 export interface CourseCardProps {
@@ -15,6 +15,7 @@ export interface CourseCardProps {
   reviewCount: number;
   price: string;
   imageUrl: string;
+  curriculumHighlights?: string[];
   ctaText?: string;
   onEnroll?: () => void;
 }
@@ -29,6 +30,7 @@ export function CourseCard({
   reviewCount,
   price,
   imageUrl,
+  curriculumHighlights = [],
   ctaText = 'View Course',
   onEnroll
 }: CourseCardProps) {
@@ -53,10 +55,21 @@ export function CourseCard({
       {/* Content */}
       <div className="flex flex-col flex-grow p-6">
         <h3 className="text-xl font-bold text-primary-900 mb-2">{title}</h3>
-        <p className="text-sm text-primary-600 mb-4 line-clamp-2 flex-grow">{description}</p>
+        <p className="text-sm text-primary-600 mb-4 line-clamp-2">{description}</p>
+
+        {curriculumHighlights.length > 0 && (
+          <ul className="mb-5 space-y-2 text-sm leading-snug text-primary-700" aria-label="Curriculum highlights">
+            {curriculumHighlights.slice(0, 2).map((highlight) => (
+              <li key={highlight} className="flex items-start gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-accent-600" aria-hidden="true" />
+                <span className="line-clamp-2">{highlight.replace(/^(Lecture|Section)\s*\d*\s*:\s*/i, '')}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* Metadata */}
-        <div className="flex items-center gap-4 text-sm text-primary-500 mb-6">
+        <div className="mt-auto flex flex-wrap items-center gap-3 text-sm text-primary-500 mb-6">
           <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
             <span>{duration}</span>

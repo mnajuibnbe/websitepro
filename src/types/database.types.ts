@@ -106,6 +106,7 @@ export interface PublicCourseWithStats {
   average_rating: number | string;
   review_count: number;
   enrolled_student_count: number;
+  curriculum_highlights?: string[];
 }
 
 export interface PaymentSubmission {

@@ -50,6 +50,7 @@ const AdminInstructorApplications = lazyNamed(() => import('./pages/admin/AdminI
 const AdminCourseReviews = lazyNamed(() => import('./pages/admin/AdminCourseReviews'), 'AdminCourseReviews');
 const AdminCourseReviewWorkspace = lazyNamed(() => import('./pages/admin/AdminCourseReviewWorkspace'), 'AdminCourseReviewWorkspace');
 const AdminStudentReviews = lazyNamed(() => import('./pages/admin/AdminStudentReviews'), 'AdminStudentReviews');
+const AdminHomepageSettings = lazyNamed(() => import('./pages/admin/AdminHomepageSettings'), 'AdminHomepageSettings');
 
 function RouteFallback() {
   return <div role="status" aria-live="polite" className="flex min-h-screen items-center justify-center bg-primary-50"><span className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-accent-600" /><span className="sr-only">Loading page</span></div>;
@@ -58,7 +59,9 @@ function RouteFallback() {
 function AppContent() {
   const location = useLocation();
 
-  if (location.hash.startsWith('#access_token=') || location.hash.startsWith('#recovery_token=') || location.pathname === '/update-password' || location.search.includes('type=recovery')) {
+  const browserSearch = window.location.search;
+  const browserHash = window.location.hash;
+  if (browserHash.startsWith('#access_token=') || browserHash.startsWith('#recovery_token=') || location.pathname === '/update-password' || browserSearch.includes('type=recovery') || browserSearch.includes('token_hash=')) {
     return <Suspense fallback={<RouteFallback />}><UpdatePassword /></Suspense>;
   }
 
@@ -109,6 +112,7 @@ function AppContent() {
       <Route path="/admin/course-reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviews /></RequireAuth>} />
       <Route path="/admin/course-reviews/:courseId" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviewWorkspace /></RequireAuth>} />
       <Route path="/admin/reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminStudentReviews /></RequireAuth>} />
+      <Route path="/admin/homepage" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminHomepageSettings /></RequireAuth>} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes></Suspense></>

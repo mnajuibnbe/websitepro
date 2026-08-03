@@ -44,7 +44,7 @@ export function UserProfile() {
   const sendPasswordReset = async () => {
     if (!user?.email) return;
     setStatus('saving'); setMessage('');
-    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: `${window.location.origin}${window.location.pathname}#/update-password` });
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, { redirectTo: `${window.location.origin}/?type=recovery` });
     setStatus(error ? 'error' : 'saved');
     setMessage(error ? error.message : 'A secure password reset link was sent to your email address.');
   };

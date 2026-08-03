@@ -14,8 +14,6 @@ export function Footer() {
   const footerLinks = [
     { title: 'Courses', links: [
       { label: 'All Courses', href: '/courses' },
-      { label: 'Diploma Programs', href: '/courses' },
-      { label: 'Specialized Courses', href: '/courses' },
       { label: 'Free Lessons', href: '/courses?price=free' },
     ] },
     { title: 'Tutiba', links: [

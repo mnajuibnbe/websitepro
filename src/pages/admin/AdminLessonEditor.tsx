@@ -863,7 +863,7 @@ export function AdminLessonEditor() {
                       <div>
                         <h4 className="font-bold text-primary-900 text-sm">Free preview lesson</h4>
                         <p className="text-primary-500 text-xs mt-0.5">
-                          Allow visitors to preview this lesson before enrollment.
+                          Surface this lesson automatically anywhere Tutiba offers a free preview, including the homepage and course page.
                         </p>
                       </div>
 

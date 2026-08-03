@@ -20,7 +20,7 @@ export function ForgotPassword() {
     setError(null);
     try {
       const { error: resetError } = await runAuthRequest(supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}${window.location.pathname}#/update-password`,
+        redirectTo: `${window.location.origin}/?type=recovery`,
       }));
       if (resetError) throw resetError;
       setSuccess(true);

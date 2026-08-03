@@ -1,13 +1,13 @@
 import React from 'react';
-import { Microscope, Layers, Clock, Award } from 'lucide-react';
+import { Microscope, Layers, ScanSearch, Award } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 
 export function WhyChooseUs() {
   const features = [
-    { id: 1, title: 'Scientific Foundation', description: 'Understand ingredients and scientific principles instead of memorizing product names.', icon: Microscope },
-    { id: 2, title: 'Practical Application', description: 'Use examples and case studies to evaluate products and make informed decisions.', icon: Layers },
-    { id: 3, title: 'Flexible Learning', description: 'Study at your own pace, revisit lessons, and learn from any device.', icon: Clock },
-    { id: 4, title: 'Structured Achievement', description: 'Track your progress, complete assessments, and earn a verified certificate.', icon: Award },
+    { id: 1, title: 'From Skin Structure to Product Choice', description: 'Connect the dermis and hypodermis to the claims, delivery limits, and intended action of cosmeceutical products.', icon: Microscope },
+    { id: 2, title: 'Hyaluronic Acid in Real Depth', description: 'Compare molecular sizes, intrinsic skin effects, and why formulation differences change product performance.', icon: Layers },
+    { id: 3, title: 'Read Products with More Confidence', description: 'Move beyond category labels by evaluating ingredients, target layers, and the evidence behind product positioning.', icon: ScanSearch },
+    { id: 4, title: 'A Diploma Path You Can Verify', description: 'See the lesson count, curriculum topics, free preview, assessment path, and EGP price before you enroll.', icon: Award },
   ];
 
   return (
@@ -15,7 +15,7 @@ export function WhyChooseUs() {
       <PageContainer>
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900">
-            Why Learn with Tutiba?
+            What Makes the Curriculum Different?
           </h2>
         </div>
 

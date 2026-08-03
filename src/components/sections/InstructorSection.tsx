@@ -32,25 +32,25 @@ export function InstructorSection() {
             <span className="inline-block py-1.5 px-4 rounded-full bg-accent-100 text-accent-800 text-sm font-bold mb-6 uppercase tracking-wider">
               Your Instructor
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-6">
-              Learn from an Experienced Cosmeceutical Educator
+            <h2 className="text-4xl md:text-5xl font-bold text-primary-900 mb-6">
+              Learn with Dr. Aya Elbrashy
             </h2>
             <p className="text-lg text-primary-600 mb-8 leading-relaxed max-w-2xl">
-              Gain practical, evidence-based guidance from an instructor experienced in translating scientific research into professional practice.
+              Build your skin, hair, and beauty-nutrition knowledge with an educator who has spent more than a decade translating scientific concepts into practical professional decisions.
             </p>
 
             <ul className="space-y-4 mb-10 text-primary-800 font-medium">
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Evidence-based course content</span>
+                <span className="text-lg">Skin structure linked directly to cosmeceutical action</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Practical case-based instruction</span>
+                <span className="text-lg">Ingredient and product comparisons you can apply</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
-                <span className="text-lg">Clear guidance for professional practice</span>
+                <span className="text-lg">Structured diploma stages with visible progress</span>
               </li>
             </ul>
 

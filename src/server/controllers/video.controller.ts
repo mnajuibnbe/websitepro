@@ -40,11 +40,38 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
   res.setHeader('X-Correlation-ID', correlationId);
 
   try {
-    const { lessonId, asset } = req.body;
+    const { lessonId, asset, courseId } = req.body;
 
     if (asset === 'homepage-intro') {
       const streamToken = dependencies.generateStreamToken({ fileId: HOMEPAGE_INTRO_FILE_ID, resourceType: 'video' });
       res.status(200).json({ token: streamToken });
+      return;
+    }
+
+    if (asset === 'course-trailer') {
+      if (!courseId) {
+        res.status(400).json({ error: 'A course is required for this trailer' });
+        return;
+      }
+      const supabase = dependencies.getSupabaseAdmin();
+      const { data: course, error: courseError } = await supabase
+        .from('courses')
+        .select('trailer_video')
+        .eq('id', courseId)
+        .eq('status', 'published')
+        .eq('visibility', 'public')
+        .maybeSingle();
+      if (courseError || !course?.trailer_video) {
+        res.status(404).json({ error: 'Course trailer not found' });
+        return;
+      }
+      try {
+        const source = parseVideoSource(course.trailer_video);
+        if (source.provider !== 'google_drive' || !source.externalId) throw new Error('Course trailer is not a Google Drive video file');
+        res.status(200).json({ token: dependencies.generateStreamToken({ fileId: source.externalId, resourceType: 'video' }) });
+      } catch (cause) {
+        res.status(422).json({ error: cause instanceof Error ? cause.message : 'Invalid Google Drive video link.' });
+      }
       return;
     }
 

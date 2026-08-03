@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { HomepageStats, HomepageTestimonial } from '../lib/homepageMarketing';
+import type { HomepagePreviewLesson, HomepageStats, HomepageTestimonial } from '../lib/homepageMarketing';
 import {
   fetchHomepageTestimonials,
   fetchHomepageStats,
+  fetchHomepagePreviewLessons,
 } from '../services/homepageMarketing.service';
 
 interface AsyncHomepageData<T> {
@@ -45,10 +46,9 @@ function useHomepageData<T>(loader: () => Promise<T>, initialData: T): AsyncHome
 }
 
 const EMPTY_STATS: HomepageStats = {
-  publishedCourseCount: 0,
-  activeEnrollmentCount: 0,
-  averageRating: 0,
-  approvedReviewCount: 0,
+  studentsValue: '1,000+',
+  coursesValue: '8+',
+  learningHoursValue: '200+',
 };
 
 const loadHomepageTestimonials = () => fetchHomepageTestimonials(3, 8);
@@ -59,4 +59,8 @@ export function useHomepageTestimonials() {
 
 export function useHomepageStats() {
   return useHomepageData<HomepageStats>(fetchHomepageStats, EMPTY_STATS);
+}
+
+export function useHomepagePreviewLessons() {
+  return useHomepageData<HomepagePreviewLesson[]>(fetchHomepagePreviewLessons, []);
 }

@@ -11,7 +11,7 @@ interface Scenario {
   enrollment?: { id: string } | null;
   enrollmentError?: unknown;
   configurationError?: Error;
-  course?: { id: string } | null;
+  course?: { id?: string; trailer_video?: string | null } | null;
   section?: { id: string } | null;
 }
 
@@ -94,6 +94,18 @@ test('returns a public streaming token for the homepage introduction video', asy
   await handler({ body: { asset: 'homepage-intro' }, headers: {} } as Request, response);
   assert.equal(state.status, 200);
   assert.equal(state.body.token, 'signed:1Dbt6IIl0vLQYlXcuKE4_Vkkja-JYB9EC');
+});
+
+test('routes a public Google Drive course trailer through the secure stream', async () => {
+  const { response, state } = createResponse();
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => createSupabase({ course: { trailer_video: 'https://drive.google.com/file/d/courseTrailerFileIdentifier123/view' } }) as any,
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'course-trailer', courseId: 'course-1' }, headers: {} } as Request, response);
+  assert.equal(state.status, 200);
+  assert.equal(state.body.token, 'signed:courseTrailerFileIdentifier123');
 });
 
 test('returns a streaming token for an authenticated enrolled user', async () => {

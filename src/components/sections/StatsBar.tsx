@@ -1,14 +1,14 @@
 import React from 'react';
-import { BookOpen, Loader2, RefreshCw, Star, UsersRound } from 'lucide-react';
+import { BookOpen, Clock3, Loader2, RefreshCw, UsersRound } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { useHomepageStats } from '../../hooks/useHomepageMarketing';
 
 export function StatsBar() {
   const { data, error, isLoading, refetch } = useHomepageStats();
   const stats = [
-    { id: 'courses', value: data.publishedCourseCount.toLocaleString(), label: 'Published courses', icon: BookOpen },
-    { id: 'enrollments', value: data.activeEnrollmentCount.toLocaleString(), label: 'Active enrollments', icon: UsersRound },
-    { id: 'rating', value: data.averageRating.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 2 }), label: `Average rating · ${data.approvedReviewCount.toLocaleString()} approved reviews`, icon: Star },
+    { id: 'students', value: data.studentsValue, label: 'Students taught', icon: UsersRound },
+    { id: 'courses', value: data.coursesValue, label: 'Courses delivered', icon: BookOpen },
+    { id: 'hours', value: data.learningHoursValue, label: 'Hours of learning', icon: Clock3 },
   ];
 
   return (
@@ -27,8 +27,8 @@ export function StatsBar() {
                 <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-accent-100 bg-accent-50 transition-colors group-hover:bg-accent-100">
                   <Icon className="h-5 w-5 text-accent-700" />
                 </div>
-                <div>
-                  <span className="block text-3xl font-bold leading-none tracking-tight text-primary-900 md:text-4xl">{stat.value}</span>
+                <div className="min-w-0 sm:min-w-32">
+                  <span className="block whitespace-nowrap text-3xl font-bold leading-none tracking-tight text-primary-900 md:text-4xl">{stat.value}</span>
                   <span className="mt-2 block max-w-xs text-xs font-bold uppercase leading-relaxed tracking-wider text-primary-500 sm:text-sm sm:normal-case sm:tracking-normal">{stat.label}</span>
                 </div>
               </div>

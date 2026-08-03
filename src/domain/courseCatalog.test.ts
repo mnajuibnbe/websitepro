@@ -52,6 +52,7 @@ test('public course stats are shaped once and mapped to complete CourseCard prop
     average_rating: '4.75',
     review_count: 12,
     enrolled_student_count: 42,
+    curriculum_highlights: ['Hyaluronic acid by molecular size'],
   };
 
   const course = shapePublicCourse(row);
@@ -61,6 +62,7 @@ test('public course stats are shaped once and mapped to complete CourseCard prop
   assert.equal(props.lessonsCount, 7);
   assert.equal(props.rating, 4.75);
   assert.equal(props.reviewCount, 12);
+  assert.deepEqual(props.curriculumHighlights, ['Hyaluronic acid by molecular size']);
   assert.equal(props.imageUrl, COURSE_IMAGE_FALLBACK);
   assert.equal(props.price, 'USD 10');
 });

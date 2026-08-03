@@ -11,6 +11,7 @@ export interface CourseCatalogItem extends Course {
   rating: number;
   reviewCount: number;
   enrolledStudentCount: number;
+  curriculumHighlights: string[];
 }
 
 export interface CourseCatalogQuery {
@@ -75,10 +76,12 @@ export function courseCatalogCacheKey(options: CourseCatalogQuery = {}): string 
 export function shapePublicCourse(row: PublicCourseWithStats): CourseCatalogItem {
   return {
     ...row.course,
+    title: row.course.title.replace(/\bCair\b/g, 'Care'),
     lessonsCount: Number(row.lessons_count || 0),
     rating: Number(row.average_rating || 0),
     reviewCount: Number(row.review_count || 0),
     enrolledStudentCount: Number(row.enrolled_student_count || 0),
+    curriculumHighlights: Array.isArray(row.curriculum_highlights) ? row.curriculum_highlights : [],
   };
 }
 

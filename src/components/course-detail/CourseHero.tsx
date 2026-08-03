@@ -40,7 +40,7 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
 
       {/* Meta Info */}
       <div className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10">
-        <div className="flex items-center gap-2">
+        {course.reviewCount > 0 && <div className="flex items-center gap-2">
           <div className="flex items-center text-warning-500">
             {Array.from({ length: 5 }, (_, index) => (
               <Star key={index} className={`w-5 h-5 ${index < Math.round(course.rating) ? 'fill-current' : ''}`} />
@@ -48,9 +48,9 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
           </div>
           <span className="font-bold text-primary-900">{course.rating.toFixed(1)}</span>
           <span className="text-primary-500 underline decoration-primary-300">({course.reviewCount} reviews)</span>
-        </div>
+        </div>}
 
-        <div className="w-1.5 h-1.5 rounded-full bg-primary-300 hidden sm:block"></div>
+        {course.reviewCount > 0 && <div className="w-1.5 h-1.5 rounded-full bg-primary-300 hidden sm:block"></div>}
 
         <div className="flex items-center gap-2 text-primary-700 font-medium">
            <Clock className="w-5 h-5 text-primary-400" />
@@ -65,7 +65,7 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
         </div>
       </div>
 
-      <CourseTrailer title={course.title} trailerUrl={course.trailer_video} poster={course.cover_image || course.thumbnail} />
+      <CourseTrailer courseId={course.id} title={course.title} trailerUrl={course.trailer_video} poster={course.cover_image || course.thumbnail} />
     </div>
   );
 }

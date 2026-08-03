@@ -44,16 +44,16 @@ export function FeaturedCourses() {
 
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            Featured Courses
+          <h2 className="text-4xl md:text-5xl font-bold text-primary-900 mb-4">
+            Start the Skin &amp; Hair Care Diploma
           </h2>
           <p className="text-lg text-primary-600">
-            Choose a course that matches your professional goals and start learning today.
+            Compare the curriculum, lesson depth, and price before choosing your next stage.
           </p>
         </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className={`grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 ${courses.length < 3 ? 'mx-auto max-w-5xl' : 'lg:grid-cols-3'}`}>
           {courses.map(course => (
             <CourseCard key={course.id} {...mapCourseToCardProps(course, pricingContext, {
               ctaText: 'View Course',
@@ -65,7 +65,7 @@ export function FeaturedCourses() {
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
-            Courses
+            View all courses
           </Button>
         </div>
       </PageContainer>

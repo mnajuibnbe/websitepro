@@ -22,6 +22,10 @@ export function CoursesListing() {
   const { categories, error: categoriesError } = useCourseCategories();
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
+  useEffect(() => {
     const nextPrice = priceParam === 'free' || priceParam === 'paid' ? priceParam : 'all';
     setFilters((current) => current.price === nextPrice ? current : { ...current, price: nextPrice });
   }, [priceParam]);

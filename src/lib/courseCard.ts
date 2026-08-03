@@ -24,6 +24,7 @@ export function mapCourseToCardProps(
     reviewCount: course.reviewCount,
     price: resolveCoursePrice(course, pricingContext).formatted,
     imageUrl: resolveCourseImageUrl(course),
+    curriculumHighlights: course.curriculumHighlights,
     ctaText: overrides.ctaText,
     onEnroll: overrides.onEnroll,
   };
