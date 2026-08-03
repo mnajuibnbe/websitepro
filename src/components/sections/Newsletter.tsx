@@ -51,8 +51,8 @@ export function Newsletter() {
     <section dir="ltr" className="py-16 md:py-24 bg-accent-50 border-t border-accent-100">
       <PageContainer>
         <div className="bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-sm border border-accent-100 flex flex-col lg:flex-row items-center justify-between gap-12 hover:shadow-md transition-shadow duration-300">
-          <div className="lg:w-1/2 text-center lg:text-left">
-            <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6 mx-auto lg:mx-0">
+          <div className="lg:w-1/2 text-center">
+            <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6 mx-auto">
               <Mail className="w-8 h-8 text-accent-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-4">
@@ -68,7 +68,7 @@ export function Newsletter() {
                 <label htmlFor="newsletter-website">Website</label>
                 <input id="newsletter-website" name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} />
               </div>
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex flex-col gap-4">
                 <div className="flex-grow">
                 <Input
                   id="newsletter-email"
@@ -83,7 +83,7 @@ export function Newsletter() {
                   aria-label="Email Address"
                 />
                 </div>
-                <Button type="submit" variant="primary" isLoading={submissionState === 'submitting'} disabled={submissionState === 'submitting'} className="h-14 px-8 text-lg whitespace-nowrap">
+                <Button type="submit" variant="primary" isLoading={submissionState === 'submitting'} disabled={submissionState === 'submitting'} className="h-14 w-full px-8 text-lg whitespace-nowrap">
                   {submissionState === 'submitting' ? 'Subscribing' : 'Subscribe'}
                 </Button>
               </div>

@@ -18,6 +18,7 @@ export interface CourseCardProps {
   curriculumHighlights?: string[];
   ctaText?: string;
   onEnroll?: () => void;
+  fullWidthCta?: boolean;
 }
 
 export function CourseCard({
@@ -32,7 +33,8 @@ export function CourseCard({
   imageUrl,
   curriculumHighlights = [],
   ctaText = 'View Course',
-  onEnroll
+  onEnroll,
+  fullWidthCta = false,
 }: CourseCardProps) {
   const lessonsLabel = `${lessonsCount} ${lessonsCount === 1 ? 'lesson' : 'lessons'}`;
   return (
@@ -90,11 +92,11 @@ export function CourseCard({
         </div>
 
         {/* Footer (Price & CTA) */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-primary-100">
+        <div className={`mt-auto border-t border-primary-100 pt-4 ${fullWidthCta ? 'flex flex-col gap-3' : 'flex items-center justify-between'}`}>
           <div className="text-xl font-bold text-primary-900">
             {price}
           </div>
-          <Button variant="primary" onClick={onEnroll}>
+          <Button variant="primary" onClick={onEnroll} className={fullWidthCta ? 'w-full' : ''}>
             {ctaText}
           </Button>
         </div>

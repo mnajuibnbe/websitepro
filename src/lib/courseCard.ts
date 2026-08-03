@@ -12,7 +12,7 @@ export function resolveCourseImageUrl(course: Pick<CourseCatalogItem, 'thumbnail
 export function mapCourseToCardProps(
   course: CourseCatalogItem,
   pricingContext: PricingContext,
-  overrides: Pick<CourseCardProps, 'ctaText' | 'onEnroll'> = {},
+  overrides: Pick<CourseCardProps, 'ctaText' | 'onEnroll' | 'fullWidthCta'> = {},
 ): CourseCardProps {
   return {
     title: course.title,
@@ -27,5 +27,6 @@ export function mapCourseToCardProps(
     curriculumHighlights: course.curriculumHighlights,
     ctaText: overrides.ctaText,
     onEnroll: overrides.onEnroll,
+    fullWidthCta: overrides.fullWidthCta,
   };
 }

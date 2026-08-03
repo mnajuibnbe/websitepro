@@ -28,7 +28,7 @@ export function InstructorSection() {
           </div>
 
           {/* Instructor Content (7 cols on Desktop) */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left order-1 lg:order-2">
+          <div className="lg:col-span-7 flex flex-col items-center text-center order-1 lg:order-2">
             <span className="inline-block py-1.5 px-4 rounded-full bg-accent-100 text-accent-800 text-sm font-bold mb-6 uppercase tracking-wider">
               Your Instructor
             </span>
@@ -39,22 +39,22 @@ export function InstructorSection() {
               Build your skin, hair, and beauty-nutrition knowledge with an educator who has spent more than a decade translating scientific concepts into practical professional decisions.
             </p>
 
-            <ul className="space-y-4 mb-10 text-primary-800 font-medium">
-              <li className="flex items-center gap-3">
+            <ul className="w-full space-y-4 mb-10 text-primary-800 font-medium">
+              <li className="flex items-center justify-center gap-3 text-center">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
                 <span className="text-lg">Skin structure linked directly to cosmeceutical action</span>
               </li>
-              <li className="flex items-center gap-3">
+              <li className="flex items-center justify-center gap-3 text-center">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
                 <span className="text-lg">Ingredient and product comparisons you can apply</span>
               </li>
-              <li className="flex items-center gap-3">
+              <li className="flex items-center justify-center gap-3 text-center">
                 <CheckCircle2 className="w-6 h-6 text-accent-600 flex-shrink-0" />
                 <span className="text-lg">Structured diploma stages with visible progress</span>
               </li>
             </ul>
 
-            <Button variant="secondary" className="px-8 text-lg h-12">
+            <Button variant="secondary" className="h-12 w-full px-8 text-lg">
               Meet Your Instructor
             </Button>
           </div>

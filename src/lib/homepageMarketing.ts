@@ -12,7 +12,12 @@ export interface HomepagePreviewLesson {
 }
 
 export const PRIMARY_DIPLOMA_PATH = '/course/e2b9b9dd-693c-48d4-a3e9-8c1b2cfe80d0';
-export const PRIMARY_DIPLOMA_CTA = 'Start Part 1 — EGP 300';
+export const PRIMARY_DIPLOMA_CTA = 'Enroll in Part 1 — EGP 300';
+
+export function formatHomepageCourseCta(courseTitle: string, price: string) {
+  const partName = courseTitle.match(/\bPart\s+\d+\b/i)?.[0] || courseTitle;
+  return `Enroll in ${partName} — ${price}`;
+}
 
 export interface HomepageTestimonial {
   review_id: string;

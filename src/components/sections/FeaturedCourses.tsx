@@ -7,6 +7,7 @@ import { usePricingContext } from '../../contexts/PricingContext';
 import { PageContainer } from '../layout/PageContainer';
 import { useCourseCatalog } from '../../hooks/useCourseCatalog';
 import { mapCourseToCardProps } from '../../lib/courseCard';
+import { formatHomepageCourseCta } from '../../lib/homepageMarketing';
 
 export function FeaturedCourses() {
   const navigate = useNavigate();
@@ -54,12 +55,10 @@ export function FeaturedCourses() {
 
         {/* Courses Grid */}
         <div className={`grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 ${courses.length < 3 ? 'mx-auto max-w-5xl' : 'lg:grid-cols-3'}`}>
-          {courses.map(course => (
-            <CourseCard key={course.id} {...mapCourseToCardProps(course, pricingContext, {
-              ctaText: 'View Course',
-              onEnroll: () => navigate(`/course/${course.id}`),
-            })} />
-          ))}
+          {courses.map(course => {
+            const cardProps = mapCourseToCardProps(course, pricingContext);
+            return <CourseCard key={course.id} {...cardProps} ctaText={formatHomepageCourseCta(course.title, cardProps.price)} fullWidthCta onEnroll={() => navigate(`/course/${course.id}`)} />;
+          })}
         </div>
 
         {/* Bottom CTA */}

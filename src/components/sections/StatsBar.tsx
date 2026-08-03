@@ -22,7 +22,7 @@ export function StatsBar() {
             return (
               <div
                 key={stat.id}
-                className={`group flex items-center gap-5 px-4 py-6 text-left sm:flex-col sm:justify-center sm:gap-3 sm:px-6 sm:text-center ${index > 0 ? 'border-t border-primary-100 sm:border-t-0' : ''}`}
+                className={`group flex flex-col items-center justify-center gap-3 px-4 py-6 text-center sm:px-6 ${index > 0 ? 'border-t border-primary-100 sm:border-t-0' : ''}`}
               >
                 <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-accent-100 bg-accent-50 transition-colors group-hover:bg-accent-100">
                   <Icon className="h-5 w-5 text-accent-700" />
