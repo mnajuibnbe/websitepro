@@ -5,6 +5,10 @@ import {
   fetchHomepageStats,
   fetchHomepagePreviewLessons,
 } from '../services/homepageMarketing.service';
+import { useCourseCatalog } from './useCourseCatalog';
+import { usePricingContext } from '../contexts/PricingContext';
+import { mapCourseToCardProps } from '../lib/courseCard';
+import { formatHomepageCourseCta, PRIMARY_DIPLOMA_COURSE_ID, PRIMARY_DIPLOMA_CTA_FALLBACK, PRIMARY_DIPLOMA_PATH } from '../lib/homepageMarketing';
 
 interface AsyncHomepageData<T> {
   data: T;
@@ -63,4 +67,16 @@ export function useHomepageStats() {
 
 export function useHomepagePreviewLessons() {
   return useHomepageData<HomepagePreviewLesson[]>(fetchHomepagePreviewLessons, []);
+}
+
+/** The primary diploma's enrollment CTA, priced through the same dual-currency resolver as the course catalog. */
+export function usePrimaryDiplomaOffer() {
+  const pricingContext = usePricingContext();
+  const { courses, isLoading } = useCourseCatalog({ id: PRIMARY_DIPLOMA_COURSE_ID, pageSize: 1, pricingContext });
+  const course = courses[0];
+  const ctaText = course
+    ? formatHomepageCourseCta(course.title, mapCourseToCardProps(course, pricingContext).price)
+    : PRIMARY_DIPLOMA_CTA_FALLBACK;
+
+  return { ctaText, coursePath: PRIMARY_DIPLOMA_PATH, isLoading };
 }

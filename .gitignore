@@ -13,3 +13,4 @@ pnpm-workspace.yaml
 
 .vercel
 .env*
+.claude/settings.local.json
