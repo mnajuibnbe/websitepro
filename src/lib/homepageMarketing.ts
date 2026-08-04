@@ -11,8 +11,10 @@ export interface HomepagePreviewLesson {
   courseTitle: string;
 }
 
-export const PRIMARY_DIPLOMA_PATH = '/course/e2b9b9dd-693c-48d4-a3e9-8c1b2cfe80d0';
-export const PRIMARY_DIPLOMA_CTA = 'Enroll in Part 1 — EGP 300';
+export const PRIMARY_DIPLOMA_COURSE_ID = 'e2b9b9dd-693c-48d4-a3e9-8c1b2cfe80d0';
+export const PRIMARY_DIPLOMA_PATH = `/course/${PRIMARY_DIPLOMA_COURSE_ID}`;
+/** Fallback only, shown before the real dual-currency price resolves. Never a final display value. */
+export const PRIMARY_DIPLOMA_CTA_FALLBACK = 'Enroll in Part 1';
 
 export function formatHomepageCourseCta(courseTitle: string, price: string) {
   const partName = courseTitle.match(/\bPart\s+\d+\b/i)?.[0] || courseTitle;

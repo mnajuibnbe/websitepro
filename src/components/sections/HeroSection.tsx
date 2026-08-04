@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Award, BookOpen, CheckCircle2, Play, X } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { Button } from '../ui/Button';
 import { Reveal } from '../ui/Reveal';
-import { SecureStreamProvider } from '../video/SecureStreamProvider';
+import { SecureStreamProvider, prefetchHomepageIntroStream } from '../video/SecureStreamProvider';
 
 export function HeroSection() {
   const navigate = useNavigate();
   const [isPlayingIntro, setIsPlayingIntro] = useState(false);
+
+  // Request the streaming token/URL as soon as the hero is visible, well before
+  // the visitor clicks Play, so the click starts playback immediately instead of
+  // waiting on the network round trip (which also breaks unmuted autoplay once
+  // the click's user-activation window has expired).
+  useEffect(() => { prefetchHomepageIntroStream(); }, []);
 
   return (
     <section className="relative overflow-hidden bg-primary-50 pb-16 pt-32 md:pb-20 md:pt-40">

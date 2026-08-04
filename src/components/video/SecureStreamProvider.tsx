@@ -34,6 +34,10 @@ export function prefetchSecureStream(lessonId: string, token: string | null | un
   if (token) void requestStreamUrl({ lessonId }, token).catch(() => undefined);
 }
 
+export function prefetchHomepageIntroStream() {
+  void requestStreamUrl({ asset: 'homepage-intro' }, null).catch(() => undefined);
+}
+
 type SecureStreamProviderProps = SecureVideoRequest & {
   title?: string;
   poster?: string;

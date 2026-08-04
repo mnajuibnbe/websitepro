@@ -4,8 +4,8 @@
     {
       "name": "tutiba-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--port", "3000", "--strictPort"],
-      "port": 3000
+      "runtimeArgs": ["vite"],
+      "port": 5173
     }
   ]
 }

@@ -5,13 +5,13 @@ import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { IntroVideoModal } from '../video/IntroVideoModal';
 import { Reveal } from '../ui/Reveal';
-import { useHomepagePreviewLessons } from '../../hooks/useHomepageMarketing';
-import { PRIMARY_DIPLOMA_CTA, PRIMARY_DIPLOMA_PATH } from '../../lib/homepageMarketing';
+import { useHomepagePreviewLessons, usePrimaryDiplomaOffer } from '../../hooks/useHomepageMarketing';
 
 export function FinalCTA() {
   const navigate = useNavigate();
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const { data: previewLessons } = useHomepagePreviewLessons();
+  const { ctaText, coursePath } = usePrimaryDiplomaOffer();
   const previewLesson = previewLessons[0];
   const closeIntro = useCallback(() => setIsIntroOpen(false), []);
   return (
@@ -43,8 +43,8 @@ export function FinalCTA() {
           </Reveal>
           <Reveal delay={0.14}>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button variant="primary" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)} className="h-14 border-none bg-accent-500 px-8 text-lg text-primary-900 shadow-lg shadow-accent-500/20 transition-all duration-300 hover:bg-accent-400 hover:shadow-xl">
-                {PRIMARY_DIPLOMA_CTA}
+              <Button variant="primary" onClick={() => navigate(coursePath)} className="h-14 border-none bg-accent-500 px-8 text-lg text-primary-900 shadow-lg shadow-accent-500/20 transition-all duration-300 hover:bg-accent-400 hover:shadow-xl">
+                {ctaText}
               </Button>
               <Button variant="secondary" disabled={!previewLesson} onClick={() => previewLesson && setIsIntroOpen(true)} className="h-14 border-primary-600 px-8 text-lg text-white transition-all duration-300 hover:border-primary-500 hover:bg-primary-800">
                 Watch a Free Lesson

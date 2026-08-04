@@ -1,6 +1,6 @@
 import { ArrowRight, BookOpenCheck, FlaskConical, ScanSearch } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PRIMARY_DIPLOMA_CTA, PRIMARY_DIPLOMA_PATH } from '../../lib/homepageMarketing';
+import { usePrimaryDiplomaOffer } from '../../hooks/useHomepageMarketing';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { Reveal } from '../ui/Reveal';
@@ -25,6 +25,7 @@ const curriculum = [
 
 export function LearningMethod() {
   const navigate = useNavigate();
+  const { ctaText, coursePath } = usePrimaryDiplomaOffer();
 
   return (
     <section className="bg-white py-20 md:py-28">
@@ -35,8 +36,8 @@ export function LearningMethod() {
               <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
               <h2 className="mt-3 font-display text-3xl font-semibold text-primary-900 md:text-4xl">Inside this featured course</h2>
               <p className="mx-auto mt-5 max-w-sm leading-relaxed text-primary-600 lg:mx-0">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
-              <Button variant="secondary" className="mt-7 w-full px-6 sm:w-auto" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)}>
-                {PRIMARY_DIPLOMA_CTA} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Button variant="secondary" className="mt-7 w-full px-6 sm:w-auto" onClick={() => navigate(coursePath)}>
+                {ctaText} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             </Reveal>
           </div>

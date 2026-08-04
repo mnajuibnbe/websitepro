@@ -1,5 +1,52 @@
 # Implementation Log
 
+## 2026-08-04 — Homepage intro video required two presses; homepage price inconsistency
+
+### Proven root cause (video)
+
+`HeroSection` only mounted `SecureStreamProvider` (and therefore the `<video>` element)
+after the visitor clicked "Play welcome video." `SecureStreamProvider` then made a
+`POST /api/video/token` round trip (~5s) before it had a `src` to render. By the time
+the `<video autoPlay>` element existed, the browser's user-activation window from the
+original click had expired, so unmuted autoplay was silently blocked — the visitor saw
+a loading spinner, then nothing, and had to press the play button that appeared. Lesson
+videos in `VideoLessonRenderer`/`VideoProviderResolver` don't autoplay, so they weren't
+affected by this specific bug, but they pay the same token round trip on first load.
+
+### Fix
+
+- Added `prefetchHomepageIntroStream()` (`src/components/video/SecureStreamProvider.tsx`),
+  reusing the existing `requestStreamUrl` cache.
+- `HeroSection` now calls it on mount, so the token/stream URL is typically already
+  resolved by the time the visitor clicks Play — the click and the `<video autoPlay>`
+  mount happen close enough together that the browser honors the autoplay.
+- Not fixed: the underlying per-play Google Drive proxy fetch (`Cache-Control: no-store`,
+  live `files.get` call in `worker/src/index.ts` / `src/server/controllers/video.controller.ts`)
+  is the dominant cost in the reported "~5 second load," and is architectural — no
+  client-side change removes it. Reducing it would mean caching video bytes at the edge
+  or moving off Google Drive as the source, which is a hosting decision, not a bug fix.
+
+### Proven root cause (price inconsistency)
+
+`src/lib/homepageMarketing.ts` exported a hardcoded `PRIMARY_DIPLOMA_CTA = 'Enroll in
+Part 1 — EGP 300'`, used verbatim by both `LearningMethod` and `FinalCTA`. It was never
+wired to the dual-currency resolver (`usePricingContext` / `resolveCoursePrice`) that
+`FeaturedCourses` already used correctly, so the same course showed "USD 30" in the
+course grid and "EGP 300" a few sections later on the same page — visible on every
+homepage load regardless of visitor region.
+
+### Fix
+
+- Added `usePrimaryDiplomaOffer()` (`src/hooks/useHomepageMarketing.ts`): resolves the
+  primary diploma course through `useCourseCatalog({ id, pricingContext })` and formats
+  its CTA with the existing `formatHomepageCourseCta`, the same helper `FeaturedCourses`
+  uses.
+- `LearningMethod` and `FinalCTA` now consume this hook instead of the hardcoded string.
+  `PRIMARY_DIPLOMA_CTA` was removed in favor of `PRIMARY_DIPLOMA_CTA_FALLBACK` (used only
+  before the price resolves).
+- Verified live at 390/768/1440px: both sections now read "Enroll in Part 1 — USD 30",
+  matching Featured Courses.
+
 ## 2026-07-26 — VIDEO-STREAM-DIAG-001
 
 ### Proven root cause
