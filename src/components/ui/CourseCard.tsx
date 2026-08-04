@@ -38,26 +38,32 @@ export function CourseCard({
 }: CourseCardProps) {
   const lessonsLabel = `${lessonsCount} ${lessonsCount === 1 ? 'lesson' : 'lessons'}`;
   return (
-    <article className="flex flex-col bg-white border border-primary-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-primary-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:shadow-xl hover:shadow-primary-900/10">
       {/* Thumbnail (16:9) */}
-      <div className="relative aspect-video bg-primary-100">
+      <div className="relative aspect-video overflow-hidden bg-primary-100">
         <OptimizedImage
           src={imageUrl}
           alt={title}
           displayWidth={600}
           width="600"
           height="338"
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
-        <div className="absolute top-3 right-3">
-          <Badge variant="accent">{category}</Badge>
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+          <Badge variant="accent" className="shadow-sm">{category}</Badge>
+          {reviewCount > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-primary-900 shadow-sm backdrop-blur" aria-label={`${rating} out of 5 from ${reviewCount} reviews`}>
+              <Star className="h-3.5 w-3.5 fill-current text-warning-500" /> {rating.toFixed(1)}
+              <span className="font-medium text-primary-500">({reviewCount})</span>
+            </span>
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-grow p-6">
-        <h3 className="text-xl font-bold text-primary-900 mb-2">{title}</h3>
-        <p className="text-sm text-primary-600 mb-4 line-clamp-2">{description}</p>
+      <div className="flex flex-grow flex-col p-6 lg:p-7">
+        <h3 className="mb-2 text-xl font-bold text-primary-900">{title}</h3>
+        <p className="mb-4 line-clamp-2 text-sm text-primary-600">{description}</p>
 
         {curriculumHighlights.length > 0 && (
           <ul className="mb-5 space-y-2 text-sm leading-snug text-primary-700" aria-label="Curriculum highlights">
@@ -71,7 +77,7 @@ export function CourseCard({
         )}
 
         {/* Metadata */}
-        <div className="mt-auto flex flex-wrap items-center gap-3 text-sm text-primary-500 mb-6">
+        <div className="mb-6 mt-auto flex flex-wrap items-center gap-3 text-sm text-primary-500">
           <div className="flex items-center gap-1.5">
             <Clock className="w-4 h-4" />
             <span>{duration}</span>
@@ -81,14 +87,6 @@ export function CourseCard({
             <BookOpen className="w-4 h-4" />
             <span>{lessonsLabel}</span>
           </div>
-          {reviewCount > 0 && (
-            <>
-              <div className="w-1.5 h-1.5 rounded-full bg-primary-300"></div>
-              <span className="inline-flex items-center gap-1" aria-label={`${rating} out of 5 from ${reviewCount} reviews`}>
-                <Star className="w-4 h-4 fill-current text-warning-500" /> {rating.toFixed(1)}
-              </span>
-            </>
-          )}
         </div>
 
         {/* Footer (Price & CTA) */}

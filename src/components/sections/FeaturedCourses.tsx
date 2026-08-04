@@ -2,12 +2,13 @@ import React from 'react';
 import { CourseCard } from '../ui/CourseCard';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { ArrowRight, Loader2, RefreshCw } from 'lucide-react';
 import { usePricingContext } from '../../contexts/PricingContext';
 import { PageContainer } from '../layout/PageContainer';
 import { useCourseCatalog } from '../../hooks/useCourseCatalog';
 import { mapCourseToCardProps } from '../../lib/courseCard';
 import { formatHomepageCourseCta } from '../../lib/homepageMarketing';
+import { Reveal } from '../ui/Reveal';
 
 export function FeaturedCourses() {
   const navigate = useNavigate();
@@ -40,31 +41,38 @@ export function FeaturedCourses() {
   if (courses.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="bg-white py-20 md:py-28">
       <PageContainer>
 
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-primary-900 mb-4">
-            Featured Courses
+        <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
+          <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured Courses</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold text-primary-900 md:text-5xl">
+            Start with our <span className="italic text-accent-700">most trusted</span> courses.
           </h2>
-          <p className="text-lg text-primary-600">
+          <p className="mt-5 text-lg text-primary-600">
             Compare the curriculum, lesson depth, and price before choosing your next stage.
           </p>
-        </div>
+        </Reveal>
 
         {/* Courses Grid */}
-        <div className={`grid grid-cols-1 gap-8 mb-12 md:grid-cols-2 ${courses.length < 3 ? 'mx-auto max-w-5xl' : 'lg:grid-cols-3'}`}>
-          {courses.map(course => {
+        <div className={`mb-14 grid grid-cols-1 gap-8 md:grid-cols-2 ${courses.length < 3 ? 'mx-auto max-w-5xl' : 'lg:grid-cols-3'}`}>
+          {courses.map((course, index) => {
             const cardProps = mapCourseToCardProps(course, pricingContext);
-            return <CourseCard key={course.id} {...cardProps} ctaText={formatHomepageCourseCta(course.title, cardProps.price)} fullWidthCta onEnroll={() => navigate(`/course/${course.id}`)} />;
+            return (
+              <React.Fragment key={course.id}>
+                <Reveal delay={index * 0.08}>
+                  <CourseCard {...cardProps} ctaText={formatHomepageCourseCta(course.title, cardProps.price)} fullWidthCta onEnroll={() => navigate(`/course/${course.id}`)} />
+                </Reveal>
+              </React.Fragment>
+            );
           })}
         </div>
 
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
-            View all courses
+            View all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </PageContainer>

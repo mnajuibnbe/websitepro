@@ -4,6 +4,7 @@ import { Input } from '../ui/Input';
 import { Mail } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { supabase } from '../../lib/supabase';
+import { Reveal } from '../ui/Reveal';
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'duplicate' | 'error';
 
@@ -48,15 +49,15 @@ export function Newsletter() {
   };
 
   return (
-    <section dir="ltr" className="py-16 md:py-24 bg-accent-50 border-t border-accent-100">
+    <section dir="ltr" className="border-t border-accent-100 bg-accent-50 py-20 md:py-28">
       <PageContainer>
-        <div className="bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-sm border border-accent-100 flex flex-col lg:flex-row items-center justify-between gap-12 hover:shadow-md transition-shadow duration-300">
-          <div className="lg:w-1/2 text-center">
-            <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+        <Reveal className="flex flex-col items-center justify-between gap-12 rounded-3xl border border-accent-100 bg-white p-8 shadow-sm transition-shadow duration-300 hover:shadow-md md:p-12 lg:flex-row lg:p-16">
+          <div className="lg:w-1/2 text-center lg:text-left">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 lg:mx-0">
               <Mail className="w-8 h-8 text-accent-600" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-4">
-              Stay Current with Cosmeceutical Insights
+            <h2 className="mb-4 font-display text-2xl font-semibold text-primary-900 md:text-3xl">
+              Stay current with cosmeceutical insights
             </h2>
             <p className="text-primary-600 text-lg leading-relaxed">
               Receive new articles, course announcements, and practical learning resources directly in your inbox.
@@ -95,7 +96,7 @@ export function Newsletter() {
               <p className="text-xs leading-relaxed text-primary-500">By subscribing, you agree to receive occasional Tutiba learning updates. You can unsubscribe at any time.</p>
             </form>
           </div>
-        </div>
+        </Reveal>
       </PageContainer>
     </section>
   );

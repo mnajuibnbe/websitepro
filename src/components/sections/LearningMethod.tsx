@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PRIMARY_DIPLOMA_CTA, PRIMARY_DIPLOMA_PATH } from '../../lib/homepageMarketing';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
+import { Reveal } from '../ui/Reveal';
 
 const curriculum = [
   {
@@ -26,29 +27,34 @@ export function LearningMethod() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className="bg-white py-20 md:py-28">
       <PageContainer>
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
-          <div className="text-center lg:col-span-4">
-            <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
-            <h2 className="mt-3 text-3xl font-bold text-primary-900 md:text-4xl">Inside This Featured Course</h2>
-            <p className="mt-5 leading-relaxed text-primary-600">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
-            <Button variant="secondary" className="mt-7 w-full px-6" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)}>
-              {PRIMARY_DIPLOMA_CTA} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Button>
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-16">
+          <div className="text-center lg:col-span-4 lg:text-left">
+            <Reveal>
+              <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-primary-900 md:text-4xl">Inside this featured course</h2>
+              <p className="mx-auto mt-5 max-w-sm leading-relaxed text-primary-600 lg:mx-0">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
+              <Button variant="secondary" className="mt-7 w-full px-6 sm:w-auto" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)}>
+                {PRIMARY_DIPLOMA_CTA} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </Reveal>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3 lg:col-span-8">
-            {curriculum.map(({ title, description, icon: Icon }, index) => (
-              <article key={title} className="flex h-full flex-col items-center rounded-xl border border-primary-100 bg-primary-50 p-6 text-center md:p-7">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-accent-700 shadow-sm"><Icon className="h-5 w-5" /></div>
-                  <span className="text-xs font-bold tracking-wider text-primary-400">0{index + 1}</span>
-                </div>
-                <h3 className="mt-5 text-lg font-bold text-primary-900">{title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-primary-600">{description}</p>
-              </article>
-            ))}
+          <div className="relative lg:col-span-8">
+            <div aria-hidden="true" className="absolute left-[7%] right-[7%] top-[2.75rem] hidden h-px bg-primary-100 md:block" />
+            <div className="grid gap-8 md:grid-cols-3 md:gap-6">
+              {curriculum.map(({ title, description, icon: Icon }, index) => (
+                <Reveal key={title} delay={index * 0.1} className="relative flex flex-col items-center text-center">
+                  <div className="relative z-10 flex h-[3.5rem] w-[3.5rem] items-center justify-center rounded-2xl border border-accent-100 bg-white text-accent-700 shadow-sm">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <span className="mt-4 font-display text-4xl font-semibold text-primary-200" aria-hidden="true">0{index + 1}</span>
+                  <h3 className="mt-2 text-lg font-bold text-primary-900">{title}</h3>
+                  <p className="mt-3 leading-relaxed text-primary-600">{description}</p>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
       </PageContainer>
