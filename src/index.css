@@ -64,6 +64,7 @@
   --color-info-700: #1D4ED8;
 
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
   --text-display: 3rem;
   --text-display--line-height: 1.2;
   --text-micro: 0.625rem;

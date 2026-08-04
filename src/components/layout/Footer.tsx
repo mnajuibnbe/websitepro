@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Globe, Mail } from 'lucide-react';
+import { Award, ChevronDown, Globe, Mail, Microscope, ShieldCheck } from 'lucide-react';
 import { TutibaBrand } from './TutibaBrand';
 import { PageContainer } from './PageContainer';
+
+const trustLine = [
+  { label: 'Evidence-based curriculum', icon: Microscope },
+  { label: 'Certificate on completion', icon: Award },
+  { label: 'Secure checkout', icon: ShieldCheck },
+];
 
 export function Footer() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -38,9 +44,9 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-primary-900 text-primary-300 pt-16 md:pt-24 pb-8 border-t-4 border-accent-600">
+    <footer className="bg-primary-900 text-primary-300 pt-20 md:pt-28 pb-8 border-t-4 border-accent-600">
       <PageContainer>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-14">
 
           {/* Logo & Brand Message */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -100,17 +106,24 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Trust line */}
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-primary-800 py-8 lg:justify-start">
+          {trustLine.map(({ label, icon: Icon }) => (
+            <div key={label} className="flex items-center gap-2 text-sm font-semibold text-primary-300">
+              <Icon className="h-4 w-4 text-accent-400" aria-hidden="true" />
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+
         {/* Bottom Footer */}
         <div className="pt-8 border-t border-primary-800 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-sm text-primary-500 order-2 md:order-1 text-center md:text-left">
-            <span>© {new Date().getFullYear()} Tutiba. All rights reserved.</span>
-            <div className="flex items-center gap-2 bg-primary-800 px-3 py-1.5 rounded-full" aria-label="Site language: English">
-              <Globe className="w-4 h-4" />
-              <span className="font-medium">English</span>
-            </div>
-          </div>
+          <span className="order-2 text-center text-sm text-primary-500 md:order-1 md:text-left">© {new Date().getFullYear()} Tutiba. All rights reserved.</span>
 
-          <p className="order-1 text-center text-sm text-primary-400 md:order-2">Secure account and enrollment workflows</p>
+          <div className="order-1 flex items-center gap-2 rounded-full bg-primary-800 px-3 py-1.5 md:order-2" aria-label="Site language: English">
+            <Globe className="w-4 h-4" />
+            <span className="text-sm font-medium">English</span>
+          </div>
         </div>
       </PageContainer>
     </footer>

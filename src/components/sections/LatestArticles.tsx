@@ -1,14 +1,30 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpRight, Loader2 } from 'lucide-react';
+import { ArrowUpRight, Clock3, Loader2 } from 'lucide-react';
 import { fetchPublishedBlogPosts, type BlogPost } from '../../services/blogPosts.service';
 import { PageContainer } from '../layout/PageContainer';
 import { BlogCoverImage } from '../blog/BlogCoverImage';
 import { Link } from 'react-router-dom';
+import { Reveal } from '../ui/Reveal';
+
+const WORDS_PER_MINUTE = 200;
+
+function estimateReadingTime(content: string): string {
+  const words = content.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+  return `${minutes} min read`;
+}
 
 export function LatestArticles() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => { let active = true; fetchPublishedBlogPosts().then(data => { if (active) setPosts(data); }).catch(() => undefined).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
   if (!loading && posts.length === 0) return null;
-  return <section className="bg-primary-50 py-16 md:py-24"><PageContainer><div className="mb-12 text-center md:mb-16"><h2 className="text-3xl font-bold text-primary-900 md:text-4xl">Latest Articles &amp; Insights</h2><p className="mx-auto mt-4 max-w-2xl text-lg text-primary-600">Practical perspectives for continued professional learning.</p></div>{loading ? <div role="status" className="flex min-h-40 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent-600" /><span className="sr-only">Loading articles</span></div> : <div className="grid gap-8 md:grid-cols-3">{posts.map(post => <article key={post.id} className="group overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"><Link to={`/blog/${post.slug}`} className="block h-full"><div className="aspect-[16/10] overflow-hidden bg-primary-100"><BlogCoverImage src={post.cover_image_url} alt={post.title} displayWidth={800} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></div><div className="p-6"><p className="text-xs font-bold uppercase tracking-eyebrow text-accent-700">Tutiba insight</p><h3 className="mt-3 text-xl font-bold text-primary-900">{post.title}</h3><p className="mt-3 line-clamp-3 leading-relaxed text-primary-600">{post.excerpt}</p><div className="mt-6 flex items-center gap-2 text-sm font-bold text-accent-700">Read article <ArrowUpRight className="h-4 w-4" /></div></div></Link></article>)}</div>}</PageContainer></section>;
+  return <section className="bg-primary-50 py-20 md:py-28"><PageContainer>
+    <Reveal className="mb-14 text-center md:mb-16">
+      <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Tutiba Insight</p>
+      <h2 className="mt-3 font-display text-4xl font-semibold text-primary-900 md:text-5xl">Latest articles &amp; insights</h2>
+      <p className="mx-auto mt-5 max-w-2xl text-lg text-primary-600">Practical perspectives for continued professional learning.</p>
+    </Reveal>
+    {loading ? <div role="status" className="flex min-h-40 items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent-600" /><span className="sr-only">Loading articles</span></div> : <div className="grid gap-8 md:grid-cols-3">{posts.map((post, index) => <Reveal key={post.id} delay={index * 0.08}><article className="group h-full overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-900/10"><Link to={`/blog/${post.slug}`} className="flex h-full flex-col"><div className="aspect-[16/10] overflow-hidden bg-primary-100"><BlogCoverImage src={post.cover_image_url} alt={post.title} displayWidth={800} className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" /></div><div className="flex flex-1 flex-col p-6"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-eyebrow text-accent-700"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{estimateReadingTime(post.content)}</div><h3 className="mt-3 text-xl font-bold text-primary-900">{post.title}</h3><p className="mt-3 line-clamp-3 flex-1 leading-relaxed text-primary-600">{post.excerpt}</p><div className="mt-6 flex items-center gap-2 text-sm font-bold text-accent-700">Read article <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></div></div></Link></article></Reveal>)}</div>}
+  </PageContainer></section>;
 }
