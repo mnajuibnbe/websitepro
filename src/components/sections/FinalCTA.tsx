@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { IntroVideoModal } from '../video/IntroVideoModal';
-import { useHomepagePreviewLessons } from '../../hooks/useHomepageMarketing';
-import { PRIMARY_DIPLOMA_CTA, PRIMARY_DIPLOMA_PATH } from '../../lib/homepageMarketing';
+import { useHomepagePreviewLessons, usePrimaryDiplomaOffer } from '../../hooks/useHomepageMarketing';
 
 export function FinalCTA() {
   const navigate = useNavigate();
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const { data: previewLessons } = useHomepagePreviewLessons();
+  const { ctaText, coursePath } = usePrimaryDiplomaOffer();
   const previewLesson = previewLessons[0];
   const closeIntro = useCallback(() => setIsIntroOpen(false), []);
   return (
@@ -23,8 +23,8 @@ export function FinalCTA() {
           Begin Part 1 with six published lessons covering skin structure, hyaluronic acid, and real product evaluation.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button variant="primary" onClick={() => navigate(PRIMARY_DIPLOMA_PATH)} className="text-lg h-14 px-8 bg-accent-500 hover:bg-accent-400 text-primary-900 border-none hover:shadow-lg transition-all duration-300">
-            {PRIMARY_DIPLOMA_CTA}
+          <Button variant="primary" onClick={() => navigate(coursePath)} className="text-lg h-14 px-8 bg-accent-500 hover:bg-accent-400 text-primary-900 border-none hover:shadow-lg transition-all duration-300">
+            {ctaText}
           </Button>
           <Button variant="secondary" disabled={!previewLesson} onClick={() => previewLesson && setIsIntroOpen(true)} className="text-lg h-14 px-8 border-primary-600 text-white hover:bg-primary-800 hover:border-primary-500 transition-all duration-300">
             Watch a Free Lesson
