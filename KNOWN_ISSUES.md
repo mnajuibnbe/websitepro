@@ -39,6 +39,62 @@ of a manual re-approval. Not a silent/automatic fix; needs a scheduled maintenan
 window, explicitly opted into. `admin_get_workflow_health()` will keep flagging 1 course
 under `published_without_approved_revision` until that window happens — that's expected,
 not a regression.
+
+RESOLVED (2026-08-05, Phase B-4): `get_course_readiness()` for this course returned
+`ready: false` (see the separate readiness-gap entry below), so the
+`admin_finalize_course_for_review` path would have hard-failed on unrelated content
+gaps. Applied a targeted backfill instead: `create_course_revision()` snapshotted the
+course's current, unchanged, live state, and `submitted_revision_id`/
+`approved_revision_id` were both set to that revision directly (no content, structure,
+cover, or instructor changes). `admin_get_workflow_health().published_without_approved_revision`
+is now `0`.
+
+CORRECTION to the root-cause claim above: this revision-id backfill alone did **not**
+fix the "Lesson not found" symptom. Re-verified directly against the DB after the
+backfill — `LessonPlayer.tsx` never reads `approved_revision_id`/`submitted_revision_id`
+at all; it loads a lesson only if the lesson's parent `course_sections` row also has
+`is_published=true`. The real cause was the section/lesson publish-state mismatch
+described as gap #4 below (3 of 6 lessons sat in a section that was `is_published=false`).
+
+RESOLVED (2026-08-05): published section `a6809254-a198-43bc-ac18-8dd0df22edd4`
+("Section 1: The Scientific Foundation of Cosmeceutics"), aligning it with the
+lesson-level `is_published=true` flags its 3 lessons already had. Re-ran the same
+live-query verification (simulating `LessonPlayer.tsx`'s section+lesson published join)
+for all 6 lessons in the course — all 6 now resolve as reachable, not just the 3 in the
+already-published Section 2. Confirmed legacy test/example data with no business stakes;
+full content review (cover, instructor, video metadata — see gap #4's siblings below)
+remains deferred to a dedicated pre-launch phase.
+## Legacy course readiness gaps on 'Skin and Hair Cair Diploma Part 1' (found 2026-08-05, Phase B-4)
+Discovered while attempting the documented `admin_finalize_course_for_review` repair
+path for the `approved_revision_id` issue above: `get_course_readiness()` returns
+`ready: false` for `e2b9b9dd-693c-48d4-a3e9-8c1b2cfe80d0` for four reasons unrelated to
+the revision-id bug. None of these were fixed (out of scope for the Phase B-4 data
+cleanup — fixing them means picking a real instructor and cover asset, or changing live
+content exposure, which are separate decisions):
+
+1. **No managed cover.** `cover_image`/`thumbnail` point to a static asset
+   (`/backgrounds/1.png`), not an image uploaded through the managed `course-covers`
+   storage bucket. Also shows up in `admin_get_workflow_health().missing_managed_covers`.
+2. **No approved instructor.** `author_id`/`instructor_id` is an admin account
+   (`ac842aa4-c3f1-425b-b06a-ef20be93c91f`) with no `approved` row in
+   `instructor_applications` and no public instructor profile.
+3. **Unverified video metadata.** All 5 video lessons have
+   `video_metadata_status='not_applicable'` — never verified, a residue of predating
+   the revision-lifecycle migration.
+4. **RESOLVED 2026-08-05 — was a live access-control inconsistency, not just a
+   data-quality gap.** Section `a6809254-a198-43bc-ac18-8dd0df22edd4` ("Section 1: The
+   Scientific Foundation of Cosmeceutics") was `is_published=false`, while its 3 lessons
+   (`eb6ab00d…` "Lecture 1: Introduction", `5add5557…` "PDF 1", `ede3707c…` "Lecture 2")
+   were individually marked `is_published=true`. The `lessons`/`course_sections` RLS
+   policies only check the lesson's own `is_published` flag, not the parent section's, so
+   these 3 lessons were readable at the RLS layer despite living in an "unpublished"
+   section. This exact mismatch was also the confirmed root cause of the "Lesson not
+   found" bug tracked in the entry above. Fixed by publishing the section (aligning it
+   with the lesson-level flags already marking the content ready, rather than
+   unpublishing already-live content); confirmed no business stakes since this is legacy
+   test/example data. All 6 lessons in the course are now verified reachable through
+   `LessonPlayer.tsx`'s actual join logic.
+
 ## Course visibility (COURSE-VISIBILITY-FIX-001) — partially verified 2026-08-04
 Production schema, courses/enrollments rows, and RLS (`rls_enabled=true` on every
 table) are confirmed present and in place via the Supabase MCP connection — the
