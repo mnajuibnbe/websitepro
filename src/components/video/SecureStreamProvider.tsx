@@ -9,7 +9,7 @@ const API_BASE_URL = String(
 ).replace(/\/$/, '');
 
 export type SecureVideoRequest =
-  | { lessonId: string; asset?: never }
+  | { lessonId: string; asset?: never; courseId?: never }
   | { lessonId?: never; asset: 'homepage-intro'; courseId?: never }
   | { lessonId?: never; asset: 'course-trailer'; courseId: string };
 
