@@ -120,3 +120,14 @@ Baseline snapshot (2026-08-05, before Phase B-1):
 - lesson_progress: 50
 Revisit before real launch: upgrade to Pro and enable daily backups + PITR
 before any real user/payment data exists.
+
+## Admin-check inconsistency between tables (2026-08-05, discovered during Phase B-5 verification)
+`enrollments` RLS checks admin status via the `users.role` DB column
+(EXISTS query). `course_orders` RLS checks admin status via
+`auth.jwt() -> app_metadata ->> role` instead. Both work correctly today,
+but they're two different sources of truth — if a user's `users.role` is
+changed without also updating their JWT app_metadata (which only refreshes
+on next login), the two tables could disagree about the same user's admin
+status. Not an active bug; worth unifying on one approach (recommend
+DB-column-based, matching enrollments) during a future RLS audit — not
+in scope for Phase B-5 (performance-only, no policy logic changes).
