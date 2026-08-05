@@ -89,7 +89,7 @@ export function AdminLessonEditor() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadataResult | null>(null);
-  const [videoMetadataState, setVideoMetadataState] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error'>('idle');
+  const [videoMetadataState, setVideoMetadataState] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error' | 'pending' | 'failed'>('idle');
   const [pdfMetadata, setPdfMetadata] = useState<PdfMetadataResult | null>(null);
   const [pdfMetadataState, setPdfMetadataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [pdfMetadataError, setPdfMetadataError] = useState<string | null>(null);

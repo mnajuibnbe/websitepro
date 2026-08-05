@@ -131,3 +131,13 @@ on next login), the two tables could disagree about the same user's admin
 status. Not an active bug; worth unifying on one approach (recommend
 DB-column-based, matching enrollments) during a future RLS audit — not
 in scope for Phase B-5 (performance-only, no policy logic changes).
+
+## Multiple package manager lockfiles (2026-08-05, discovered during CI setup)
+The repo tracks both `package-lock.json` (npm, used by CI) and `bun.lock`
+(now stale relative to package.json), plus an untracked `pnpm-lock.yaml`
+used by at least one local dev environment. CI only uses npm/package-lock,
+so this is currently harmless, but different contributors/tools could
+install different dependency versions depending on which lockfile their
+package manager picks up. Recommend standardizing on one package manager
+(npm, matching CI) and removing the other lockfiles before this becomes a
+real bug source.
