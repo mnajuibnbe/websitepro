@@ -14,9 +14,23 @@ Still open, unverified from this environment (no deploy/Preview access):
 **5 active enrollments**, has `submitted_revision_id`/`approved_revision_id` both null
 despite `review_status`/`authoring_status` = `approved`. Confirmed pre-existing
 (created 2026-07-25, before the revision-lifecycle migration on 2026-07-30) and
-confirmed harmless at runtime: `approved_revision_id` is never read by any frontend or
-API code (grep confirms it's admin-workflow/audit metadata only), so the 5 enrolled
-students are unaffected.
+
+CORRECTION (2026-08-05, verified via live browser test with a real enrolled
+test account): the "harmless at runtime" claim above was WRONG. Opening any
+lesson in this course returns "Lesson not found" for an actively enrolled
+student — confirmed via direct RLS-level query (lesson row IS visible/
+returned to the enrolled user at the database layer) AND via live frontend
+test. The failure is NOT an RLS/enrollment access issue — it happens
+downstream of the DB layer, isolated by testing a healthy course (Part 2,
+non-null approved_revision_id) with the same test account, which worked
+perfectly. Root cause is very likely the frontend/API lesson-loading logic
+gating on approved_revision_id (or a related revision-lifecycle check) for
+this specific legacy course. This actively blocks the 5 real enrolled
+students from their paid content and should be reprioritized — the
+Phase B-4 fix path (admin_finalize_course_for_review →
+admin_decide_course_review('approved')) is no longer optional cleanup,
+it's a functional bug fix.
+
 The only way to backfill it is `admin_finalize_course_for_review` →
 `admin_decide_course_review('approved')`, but `admin_finalize_course_for_review`
 requires `status='draft'` first — meaning fixing this means unpublishing the course
