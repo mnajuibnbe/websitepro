@@ -132,6 +132,78 @@ status. Not an active bug; worth unifying on one approach (recommend
 DB-column-based, matching enrollments) during a future RLS audit — not
 in scope for Phase B-5 (performance-only, no policy logic changes).
 
+## Disaster-recovery gap: schema could not be rebuilt from migrations alone (found + fixed 2026-08-06)
+While setting up the `tutiba-preview` Supabase project (`wcczuiwjkrsziehkiums`,
+empty, staging-only) by replaying every file in `supabase/migrations/` against
+it, discovered that **replaying every tracked migration in order against an
+empty database did not reproduce production's schema** — meaning production's
+schema could not have been rebuilt from this repo if the project were lost.
+Two distinct classes of gap, both now closed:
+
+**1. Four base tables predate the migrations folder entirely.**
+`public.users`, `public.courses`, `public.lessons`, and `public.enrollments`
+were created directly on production (original project scaffold, before this
+`migrations/` directory existed) and no file in the repo ever created them.
+The very first tracked migration (`20260724000000_course_learning_foundation.sql`)
+already `ALTER`s `lessons` and references `courses`, so replay failed
+immediately. Fixed by reverse-engineering production's live schema
+(pg_catalog/information_schema) and subtracting every column/constraint/
+index/policy that a *later* tracked migration adds, to reconstruct exactly
+what existed immediately before `20260724000000` ran. Added as a new,
+permanent migration: `supabase/migrations/20260723000000_baseline_pre_migration_schema.sql`
+(dated to sort first). `public.newsletter_subscriptions` was initially
+suspected to be part of this same gap but turned out to be created correctly
+by `20260801215053_homepage_newsletter_subscriptions.sql` — an early
+case-sensitive `grep` pass missed its lowercase `create table` statement.
+
+**2. Untracked drift on tables that migrations DO create.** Several tables
+created correctly by tracked migrations later received direct/ad-hoc changes
+on production that were never captured as a migration — discovered by doing
+a full live replay onto the preview project and diffing column/constraint/
+index/policy/trigger counts and names against production. Fixed as a second
+new migration, `supabase/migrations/20260725010000_untracked_schema_drift_repair.sql`
+(positioned right after the migration that creates the affected tables):
+- `course_sections`/`lessons`: production has a composite FK
+  (`lessons_course_section_fkey`, `course_id, section_id → course_sections(course_id, id)`)
+  plus a supporting composite unique constraint, `lessons.section_id NOT NULL`,
+  and renamed/added indexes on both tables — none of which any migration
+  file creates.
+- `lessons`/`course_sections` RLS: 4 policies (2 per table) from the original
+  `20260724000000` migration were dropped directly on production and never
+  removed by any tracked migration; left dangling on a fresh replay.
+- `lesson_progress`: its 4 RLS policies were renamed directly on production
+  (e.g. "Users can view own lesson progress" → "Students can view own lesson
+  progress"); `20260805201717_optimize_rls_initplan_and_fk_indexes.sql`'s
+  `ALTER POLICY` statements target the renamed versions and fail against a
+  fresh replay without this fix. Also missing the `set_updated_at` trigger on
+  `course_sections` (×2, matching an existing duplicate-trigger pattern on
+  `lessons`) and `lesson_progress` (×1) — present on production, created by
+  no migration.
+
+**Verified fixed**: after both new migrations, a full replay of all 78
+migration files (76 original + 2 new) against the empty preview project
+succeeded end to end (one file,
+`20260805195536_backfill_legacy_course_revision_link.sql`, was intentionally
+skipped on preview — it's a one-time DML backfill hardcoded to a specific
+production course/admin row that doesn't exist on an empty database; this is
+expected, not a defect). Post-replay, preview and production now match
+exactly on: table count (31), index count (123), RLS policy count (78),
+trigger count (29), and every constraint/index/policy *name* checked
+individually on `users`/`courses`/`lessons`/`enrollments`/
+`newsletter_subscriptions`/`course_sections`/`lesson_progress`.
+
+**Residual, NOT fixed (recommend a dedicated follow-up schema-diff audit)**:
+the same aggregate diff also turned up `public.blog_posts` having 2 fewer
+columns on preview than production, plus one orphaned function
+(`admin_create_course` exists on production, created by no migration) and one
+migration-created function that no longer exists on production
+(`admin_delete_empty_course`, created by `20260730000000_course_admin_issue_repairs.sql`).
+These are outside the tables this investigation was scoped to and don't block
+anything (the full migration replay already succeeds without touching them) —
+flagging rather than fixing, since the pattern found above strongly suggests
+more of this exists elsewhere in the other ~24 tables that weren't part of
+this specific investigation.
+
 ## Multiple package manager lockfiles (2026-08-05, discovered during CI setup)
 The repo tracks both `package-lock.json` (npm, used by CI) and `bun.lock`
 (now stale relative to package.json), plus an untracked `pnpm-lock.yaml`
