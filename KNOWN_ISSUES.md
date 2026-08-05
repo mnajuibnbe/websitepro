@@ -37,3 +37,16 @@ per `COURSE_VISIBILITY_TEST_RESULTS.md`.
   (HaveIBeenPwned check). Password length (8) and complexity requirements
   (lowercase, uppercase, digits, symbols) are enforced instead as a
   compensating control. Revisit if upgrading to Pro before launch.
+## Backups (2026-08-05)
+No automated backups available — Supabase Free plan does not include daily
+backups or point-in-time recovery. A real restore test (as originally
+required) is not possible until upgrading to Pro.
+Interim compensating control: manual row-count snapshot recorded before any
+database-modifying phase, to detect unintended data loss.
+Baseline snapshot (2026-08-05, before Phase B-1):
+- enrollments: 16
+- course_orders: 9
+- courses: 8
+- lesson_progress: 50
+Revisit before real launch: upgrade to Pro and enable daily backups + PITR
+before any real user/payment data exists.
