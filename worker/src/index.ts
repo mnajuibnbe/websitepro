@@ -152,6 +152,12 @@ async function getDriveMetadata(env: Env, fileId: string): Promise<DriveMetadata
   return metadata;
 }
 
+const PREVIEW_ORIGIN_PATTERN = /^https:\/\/websitepro-[a-z0-9-]+-mnajuibnbes-projects\.vercel\.app$/;
+
+function isAllowedOrigin(origin: string, env: Env): boolean {
+  return origin === env.ALLOWED_ORIGIN || PREVIEW_ORIGIN_PATTERN.test(origin);
+}
+
 function corsHeaders(env: Env, request: Request): Headers {
   const headers = new Headers({
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
@@ -160,7 +166,8 @@ function corsHeaders(env: Env, request: Request): Headers {
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
   });
-  if (request.headers.get('Origin') === env.ALLOWED_ORIGIN) headers.set('Access-Control-Allow-Origin', env.ALLOWED_ORIGIN);
+  const origin = request.headers.get('Origin');
+  if (origin && isAllowedOrigin(origin, env)) headers.set('Access-Control-Allow-Origin', origin);
   return headers;
 }
 
@@ -175,7 +182,9 @@ function jsonResponse(body: unknown, status: number): Response {
 }
 
 async function proxyTokenRequest(request: Request, env: Env): Promise<Response> {
-  const issuer = env.TOKEN_ISSUER_BASE_URL.replace(/\/$/, '');
+  const origin = request.headers.get('Origin');
+  const issuerBase = origin && isAllowedOrigin(origin, env) ? origin : env.TOKEN_ISSUER_BASE_URL;
+  const issuer = issuerBase.replace(/\/$/, '');
   if (!issuer) return jsonResponse({ error: 'TOKEN_ISSUER_BASE_URL is not configured' }, 500);
   const headers = new Headers({ 'Content-Type': 'application/json' });
   const authorization = request.headers.get('Authorization');
@@ -247,7 +256,7 @@ async function streamVideo(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get('Origin');
-    if (origin && origin !== env.ALLOWED_ORIGIN) return withCors(jsonResponse({ error: 'Origin not allowed' }, 403), env, request);
+    if (origin && !isAllowedOrigin(origin, env)) return withCors(jsonResponse({ error: 'Origin not allowed' }, 403), env, request);
     if (request.method === 'OPTIONS') return withCors(new Response(null, { status: 204 }), env, request);
     const pathname = new URL(request.url).pathname.replace(/\/$/, '');
     let response: Response;
