@@ -5,6 +5,7 @@ import { Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { Badge } from '../ui/Badge';
 import { PaymentInstructions } from '../checkout/PaymentInstructions';
+import { PaymentProofUpload } from '../checkout/PaymentProofUpload';
 import { deriveOrderStatus, type SubmissionStatus } from '../../lib/orderStatus';
 import { getOrderReference } from '../../lib/orderReference';
 import type { PricingCurrency } from '../../lib/pricing';
@@ -151,6 +152,12 @@ export function OrdersStatusList() {
                 <div className="border-t border-primary-100 p-4">
                   <p className="mb-4 text-sm text-primary-600">{statusInfo.description}</p>
                   <PaymentInstructions amount={order.amount} currency={order.currency} reference={getOrderReference(order.id)} />
+                  <PaymentProofUpload
+                    orderId={order.id}
+                    currency={order.currency}
+                    hasPendingSubmission={order.latestSubmissionStatus === 'pending'}
+                    onSubmitted={() => setOrders(current => current.map(o => (o.id === order.id ? { ...o, latestSubmissionStatus: 'pending' } : o)))}
+                  />
                 </div>
               )}
             </div>

@@ -5,6 +5,7 @@ import { CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { PaymentInstructions } from './PaymentInstructions';
+import { PaymentProofUpload } from './PaymentProofUpload';
 import { getOrderReference } from '../../lib/orderReference';
 import type { PricingCurrency } from '../../lib/pricing';
 
@@ -66,6 +67,7 @@ export function OrderSummary({ courseId, title, thumbnail, price, available }: O
             {order && (
               <div className="mb-6 text-left">
                 <PaymentInstructions amount={order.amount} currency={order.currency} reference={getOrderReference(order.id)} />
+                <PaymentProofUpload orderId={order.id} currency={order.currency} hasPendingSubmission={false} />
               </div>
             )}
           </>
