@@ -20,6 +20,7 @@ interface OrderRow {
   courseTitle: string;
   courseThumbnail?: string;
   latestSubmissionStatus?: SubmissionStatus | null;
+  latestRejectionReason?: string | null;
 }
 
 export function OrdersStatusList() {
@@ -53,16 +54,18 @@ export function OrdersStatusList() {
 
         const [{ data: coursesData, error: coursesError }, { data: submissionsData, error: submissionsError }] = await Promise.all([
           supabase.from('courses').select('id, title, thumbnail').in('id', courseIds),
-          supabase.from('payment_submissions').select('order_id, status, submitted_at').in('order_id', orderIds).order('submitted_at', { ascending: false }),
+          supabase.from('payment_submissions').select('order_id, status, submitted_at, rejection_reason').in('order_id', orderIds).order('submitted_at', { ascending: false }),
         ]);
         if (coursesError) throw coursesError;
         if (submissionsError) throw submissionsError;
 
         const latestSubmissionByOrder: Record<string, SubmissionStatus> = {};
+        const latestRejectionReasonByOrder: Record<string, string | null> = {};
         (submissionsData || []).forEach(submission => {
           const orderId = String(submission.order_id);
           if (!(orderId in latestSubmissionByOrder)) {
             latestSubmissionByOrder[orderId] = submission.status as SubmissionStatus;
+            latestRejectionReasonByOrder[orderId] = submission.rejection_reason;
           }
         });
 
@@ -78,6 +81,7 @@ export function OrdersStatusList() {
             courseTitle: course?.title || 'Course',
             courseThumbnail: course?.thumbnail || undefined,
             latestSubmissionStatus: latestSubmissionByOrder[String(order.id)] ?? null,
+            latestRejectionReason: latestRejectionReasonByOrder[String(order.id)] ?? null,
           };
         });
 

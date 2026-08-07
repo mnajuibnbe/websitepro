@@ -119,6 +119,7 @@ export interface PaymentSubmission {
   reviewed_by: string | null;
   reviewed_at: string | null;
   status: 'pending' | 'approved' | 'rejected';
+  rejection_reason: string | null;
 }
 
 export interface CourseSection {

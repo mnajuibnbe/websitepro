@@ -52,6 +52,7 @@ const AdminCourseReviewWorkspace = lazyNamed(() => import('./pages/admin/AdminCo
 const AdminStudentReviews = lazyNamed(() => import('./pages/admin/AdminStudentReviews'), 'AdminStudentReviews');
 const AdminHomepageSettings = lazyNamed(() => import('./pages/admin/AdminHomepageSettings'), 'AdminHomepageSettings');
 const AdminBlogPosts = lazyNamed(() => import('./pages/admin/AdminBlogPosts'), 'AdminBlogPosts');
+const AdminPaymentReview = lazyNamed(() => import('./pages/admin/AdminPaymentReview'), 'AdminPaymentReview');
 
 function RouteFallback() {
   return <div role="status" aria-live="polite" className="flex min-h-screen items-center justify-center bg-primary-50"><span className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-accent-600" /><span className="sr-only">Loading page</span></div>;
@@ -118,6 +119,7 @@ function AppContent() {
       <Route path="/admin/course-reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviews /></RequireAuth>} />
       <Route path="/admin/course-reviews/:courseId" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminCourseReviewWorkspace /></RequireAuth>} />
       <Route path="/admin/reviews" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminStudentReviews /></RequireAuth>} />
+      <Route path="/admin/payment-proofs" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminPaymentReview /></RequireAuth>} />
       <Route path="/admin/homepage" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminHomepageSettings /></RequireAuth>} />
       <Route path="/admin/blog-posts" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminBlogPosts /></RequireAuth>} />
 
