@@ -42,3 +42,22 @@ test('maps each accepted mime type to its file extension', () => {
   assert.match(buildPaymentProofPath('u', 'image/png'), /\.png$/);
   assert.match(buildPaymentProofPath('u', 'image/webp'), /\.webp$/);
 });
+
+// Adversarial: a 0-byte or negative-size "file" cannot be a real payment
+// screenshot. validatePaymentProofFile only checks size > MAX_BYTES, so
+// these currently pass through as valid — a defect, not an assumption.
+test('rejects a zero-byte file', () => {
+  assert.notEqual(validatePaymentProofFile({ type: 'image/png', size: 0 }), null);
+});
+
+test('rejects a file reporting a negative size', () => {
+  assert.notEqual(validatePaymentProofFile({ type: 'image/jpeg', size: -1024 }), null);
+});
+
+test('rejects SVG images (script-capable) even though they are commonly mistaken for safe raster images', () => {
+  assert.match(validatePaymentProofFile({ type: 'image/svg+xml', size: 1024 }) ?? '', /JPG, PNG, or WebP/);
+});
+
+test('mime type matching is case-sensitive: an uppercase-labeled type is rejected rather than normalized', () => {
+  assert.notEqual(validatePaymentProofFile({ type: 'IMAGE/PNG', size: 1024 }), null);
+});
