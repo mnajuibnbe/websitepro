@@ -17,6 +17,7 @@ import { LessonNavigation } from '../components/player/LessonNavigation';
 import { PageContainer } from '../components/layout/PageContainer';
 import { LessonDetails } from '../components/player/LessonDetails';
 import { prefetchSecureStream } from '../components/video/SecureStreamProvider';
+import { FEATURE_FLAGS } from '../config/featureFlags';
 
 type AccessState =
   | 'verifying'
@@ -514,7 +515,7 @@ export function LessonPlayer() {
           {/* Main lesson content */}
           <main id="main-content" className="lg:col-span-8 flex flex-col">
             {/* Viewer Component */}
-            {currentLesson.content_type === 'assignment' ? (
+            {currentLesson.content_type === 'assignment' && FEATURE_FLAGS.assignments ? (
               <AssignmentLessonRenderer lessonId={currentLesson.id} />
             ) : currentLesson.content_type === 'pdf' || currentLesson.lesson_type === 'pdf' ? (
               <PdfLessonRenderer lessonId={currentLesson.id} title={currentLesson.title} />

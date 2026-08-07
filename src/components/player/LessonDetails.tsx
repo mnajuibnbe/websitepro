@@ -1,6 +1,7 @@
 import React from 'react';
 import { Lesson, CourseSection } from '../../types/database.types';
 import { Clock, MonitorPlay, FileText } from 'lucide-react';
+import { FEATURE_FLAGS } from '../../config/featureFlags';
 
 interface LessonDetailsProps {
   lesson: Lesson;
@@ -26,7 +27,7 @@ export function LessonDetails({ lesson, section }: LessonDetailsProps) {
           ) : (
             <>
               <FileText className="w-3.5 h-3.5" />
-              <span>{lesson.type === 'quiz' ? 'Quiz' : lesson.content_type === 'assignment' ? 'Assignment' : lesson.content_type === 'pdf' || lesson.lesson_type === 'pdf' ? 'PDF lesson' : 'Reading lesson'}</span>
+              <span>{lesson.type === 'quiz' ? 'Quiz' : lesson.content_type === 'assignment' && FEATURE_FLAGS.assignments ? 'Assignment' : lesson.content_type === 'pdf' || lesson.lesson_type === 'pdf' ? 'PDF lesson' : 'Reading lesson'}</span>
             </>
           )}
         </span>

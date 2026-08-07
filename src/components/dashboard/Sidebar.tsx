@@ -6,6 +6,7 @@ import { useAuthorization } from '../../hooks/useAuthorization';
 import { Permission } from '../../types/auth';
 import { useMobileDrawerLifecycle } from '../../hooks/useMobileDrawerLifecycle';
 import { MobileDrawerBackdrop } from '../layout/MobileDrawerBackdrop';
+import { FEATURE_FLAGS } from '../../config/featureFlags';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,7 +30,9 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           { icon: GraduationCap, label: 'My authored courses', href: '/instructor/courses' },
           { icon: GraduationCap, label: 'Create a course', href: '/instructor/courses/new' },
         ]
-      : [{ icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' }]),
+      : FEATURE_FLAGS.instructorProgramme
+        ? [{ icon: GraduationCap, label: 'Become an instructor', href: '/instructor/apply' }]
+        : []),
   ];
 
   return (

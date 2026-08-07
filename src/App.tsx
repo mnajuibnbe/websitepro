@@ -9,6 +9,7 @@ import { AppErrorBoundary } from './components/errors/AppErrorBoundary';
 import { Permission } from './types/auth';
 import { lazyNamed } from './lib/lazyNamed';
 import { LocaleProvider } from './contexts/LocaleContext';
+import { FEATURE_FLAGS } from './config/featureFlags';
 
 const Home = lazyNamed(() => import('./pages/Home'), 'Home');
 const About = lazyNamed(() => import('./pages/About'), 'About');
@@ -94,7 +95,7 @@ function AppContent() {
       <Route path="/checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />
-      <Route path="/instructor/apply" element={<RequireAuth><InstructorApplication /></RequireAuth>} />
+      <Route path="/instructor/apply" element={FEATURE_FLAGS.instructorProgramme ? <RequireAuth><InstructorApplication /></RequireAuth> : <NotFoundPage />} />
       <Route path="/instructor/courses/new" element={<RequireAuth permission={Permission.CREATE_COURSE}><AdminCourseCreate /></RequireAuth>} />
       <Route path="/instructor/courses" element={<RequireAuth permission={Permission.CREATE_COURSE}><InstructorCourses /></RequireAuth>} />
       <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
