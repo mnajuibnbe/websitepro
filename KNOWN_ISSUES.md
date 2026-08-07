@@ -213,3 +213,9 @@ install different dependency versions depending on which lockfile their
 package manager picks up. Recommend standardizing on one package manager
 (npm, matching CI) and removing the other lockfiles before this becomes a
 real bug source.
+
+
+## Test data in production database (2026-08-07)
+12 test orders exist in tutiba-platform (course_orders) from the B-9/B-10
+implementation and testing phases — none are real students. Will be cleaned
+up in Phase B-24.1 before launch, as planned.
