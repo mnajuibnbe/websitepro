@@ -91,12 +91,14 @@ export function CourseLearnResolver() {
             .select('*')
             .eq('course_id', cleanCourseId)
             .eq('is_published', true)
+            .is('deleted_at', null)
             .order('order_index', { ascending: true }),
           supabase
             .from('lessons')
             .select('*')
             .eq('course_id', cleanCourseId)
             .eq('is_published', true)
+            .is('deleted_at', null)
             .order('order_index', { ascending: true }),
           supabase
             .from('lesson_progress')

@@ -1,4 +1,12 @@
 import { supabase } from './supabase';
+import {
+  computeCourseProgressSummaries,
+  resolveContinueLearningTarget,
+  type ContinueLearningTarget,
+  type ProgressLesson,
+  type ProgressRow,
+  type ProgressSection,
+} from '../domain/courseProgress';
 
 export interface CourseProgress {
   courseId: string;
@@ -6,6 +14,8 @@ export interface CourseProgress {
   completedLessons: number;
   percentage: number;
 }
+
+export type { ContinueLearningTarget } from '../domain/courseProgress';
 
 /**
  * Calculates course progress for a user across one or multiple course IDs.
@@ -31,113 +41,58 @@ export async function fetchCoursesProgress(
   if (cleanCourseIds.length === 0) return {};
 
   try {
-    // 1. Fetch published sections for these courses
+    // 1. Fetch published, non-deleted sections for these courses
     const { data: sectionsData, error: sectionsErr } = await supabase
       .from('course_sections')
-      .select('id, course_id, is_published')
+      .select('id, course_id, order_index, is_published, deleted_at')
       .in('course_id', cleanCourseIds)
-      .eq('is_published', true);
+      .eq('is_published', true)
+      .is('deleted_at', null);
 
     if (sectionsErr) {
       console.error('Error fetching course_sections for progress:', sectionsErr);
       throw sectionsErr;
     }
 
-    const publishedSections = sectionsData || [];
-    const publishedSectionIdsByCourse: Record<string, Set<string>> = {};
-
-    publishedSections.forEach((sec) => {
-      if (!publishedSectionIdsByCourse[sec.course_id]) {
-        publishedSectionIdsByCourse[sec.course_id] = new Set();
-      }
-      publishedSectionIdsByCourse[sec.course_id].add(sec.id);
-    });
-
-    // 2. Fetch published lessons for these courses
+    // 2. Fetch published, non-deleted lessons for these courses
     const { data: lessonsData, error: lessonsErr } = await supabase
       .from('lessons')
-      .select('id, course_id, section_id, is_published')
+      .select('id, course_id, section_id, order_index, is_published, deleted_at')
       .in('course_id', cleanCourseIds)
-      .eq('is_published', true);
+      .eq('is_published', true)
+      .is('deleted_at', null);
 
     if (lessonsErr) {
       console.error('Error fetching lessons for progress:', lessonsErr);
       throw lessonsErr;
     }
 
-    const allLessons = lessonsData || [];
-
-    // Filter valid lessons per course (is_published AND inside a published section or section_id is null)
-    const validLessonsByCourse: Record<string, string[]> = {};
-    cleanCourseIds.forEach((id) => {
-      validLessonsByCourse[id] = [];
-    });
-
-    allLessons.forEach((lesson) => {
-      const cId = lesson.course_id;
-      if (!cId || !validLessonsByCourse[cId]) return;
-
-      if (!lesson.section_id) {
-        validLessonsByCourse[cId].push(lesson.id);
-      } else {
-        const publishedSet = publishedSectionIdsByCourse[cId];
-        if (publishedSet && publishedSet.has(lesson.section_id)) {
-          validLessonsByCourse[cId].push(lesson.id);
-        }
-      }
-    });
-
-    // 3. Fetch completed lesson_progress for this user across these courses
+    // 3. Fetch this user's lesson_progress across these courses
     const { data: progressData, error: progressErr } = await supabase
       .from('lesson_progress')
-      .select('lesson_id, course_id, is_completed')
+      .select('lesson_id, course_id, is_completed, last_accessed_at')
       .eq('user_id', userId)
-      .in('course_id', cleanCourseIds)
-      .eq('is_completed', true);
+      .in('course_id', cleanCourseIds);
 
     if (progressErr) {
       console.error('Error fetching lesson_progress:', progressErr);
       throw progressErr;
     }
 
-    const completedLessonSetByCourse: Record<string, Set<string>> = {};
-    cleanCourseIds.forEach((id) => {
-      completedLessonSetByCourse[id] = new Set();
-    });
+    const sections = (sectionsData || []) as ProgressSection[];
+    const lessons = (lessonsData || []).map((l) => ({ ...l, title: '' })) as ProgressLesson[];
+    const progressRows = (progressData || []) as ProgressRow[];
 
-    (progressData || []).forEach((row) => {
-      const cId = row.course_id;
-      if (cId && completedLessonSetByCourse[cId] && row.lesson_id) {
-        completedLessonSetByCourse[cId].add(row.lesson_id);
-      }
-    });
+    const summaries = computeCourseProgressSummaries(cleanCourseIds, lessons, sections, progressRows);
 
-    // 4. Build progress map
     const result: Record<string, CourseProgress> = {};
-
     cleanCourseIds.forEach((courseId) => {
-      const validLessonIds = validLessonsByCourse[courseId] || [];
-      const totalLessons = validLessonIds.length;
-
-      const completedSet = completedLessonSetByCourse[courseId] || new Set();
-      let completedLessons = 0;
-      validLessonIds.forEach((lId) => {
-        if (completedSet.has(lId)) {
-          completedLessons++;
-        }
-      });
-
-      let rawPercentage = 0;
-      if (totalLessons > 0) {
-        rawPercentage = Math.round((completedLessons / totalLessons) * 100);
-      }
-      const percentage = Math.min(100, Math.max(0, rawPercentage));
-
+      const summary = summaries[courseId];
       result[courseId] = {
         courseId,
-        totalLessons,
-        completedLessons,
-        percentage,
+        totalLessons: summary.totalLessons,
+        completedLessons: summary.completedLessons,
+        percentage: summary.percentage,
       };
     });
 
@@ -146,4 +101,77 @@ export async function fetchCoursesProgress(
     console.error('Unexpected error in fetchCoursesProgress:', err);
     throw err;
   }
+}
+
+/**
+ * Resolves what the dashboard "Continue learning" section should show for a user:
+ * the in-progress course to resume (with the exact lesson), a never-started
+ * enrollment to nudge, an all-completed state, or no enrollments at all.
+ */
+export async function fetchContinueLearningTarget(userId: string): Promise<ContinueLearningTarget> {
+  if (!userId) return { status: 'no_enrollments' };
+
+  const { data: enrollmentsData, error: enrollmentsErr } = await supabase
+    .from('enrollments')
+    .select('course_id, enrolled_at')
+    .eq('user_id', userId)
+    .eq('status', 'active');
+
+  if (enrollmentsErr) {
+    console.error('Error fetching enrollments for continue learning:', enrollmentsErr);
+    throw enrollmentsErr;
+  }
+
+  const enrollments = (enrollmentsData || [])
+    .filter((e) => Boolean(e.course_id))
+    .map((e) => ({ courseId: e.course_id as string, enrolledAt: e.enrolled_at as string }));
+
+  if (enrollments.length === 0) return { status: 'no_enrollments' };
+
+  const courseIds = enrollments.map((e) => e.courseId);
+
+  const [coursesRes, sectionsRes, lessonsRes, progressRes] = await Promise.all([
+    supabase.from('courses').select('id, title').in('id', courseIds),
+    supabase
+      .from('course_sections')
+      .select('id, course_id, order_index, is_published, deleted_at')
+      .in('course_id', courseIds)
+      .eq('is_published', true)
+      .is('deleted_at', null),
+    supabase
+      .from('lessons')
+      .select('id, course_id, section_id, order_index, is_published, deleted_at, title')
+      .in('course_id', courseIds)
+      .eq('is_published', true)
+      .is('deleted_at', null),
+    supabase
+      .from('lesson_progress')
+      .select('lesson_id, course_id, is_completed, last_accessed_at')
+      .eq('user_id', userId)
+      .in('course_id', courseIds),
+  ]);
+
+  if (coursesRes.error) {
+    console.error('Error fetching courses for continue learning:', coursesRes.error);
+    throw coursesRes.error;
+  }
+  if (sectionsRes.error) {
+    console.error('Error fetching course_sections for continue learning:', sectionsRes.error);
+    throw sectionsRes.error;
+  }
+  if (lessonsRes.error) {
+    console.error('Error fetching lessons for continue learning:', lessonsRes.error);
+    throw lessonsRes.error;
+  }
+  if (progressRes.error) {
+    console.error('Error fetching lesson_progress for continue learning:', progressRes.error);
+    throw progressRes.error;
+  }
+
+  const courses = (coursesRes.data || []) as { id: string; title: string }[];
+  const sections = (sectionsRes.data || []) as ProgressSection[];
+  const lessons = (lessonsRes.data || []) as ProgressLesson[];
+  const progressRows = (progressRes.data || []) as ProgressRow[];
+
+  return resolveContinueLearningTarget(enrollments, courses, lessons, sections, progressRows);
 }
