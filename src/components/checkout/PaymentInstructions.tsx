@@ -2,30 +2,66 @@ import { useState } from 'react';
 import { Landmark, Smartphone, MessageCircle, Copy, Check } from 'lucide-react';
 import { formatCourseAmount, type PricingCurrency } from '../../lib/pricing';
 
-const SUPPORT_WHATSAPP_DISPLAY = '01018333177';
-const SUPPORT_WHATSAPP_LINK = 'https://wa.me/201018333177';
+const SUPPORT_WHATSAPP_DISPLAY = '01065826509';
+const SUPPORT_WHATSAPP_LINK = 'https://wa.me/201065826509';
 
-const PAYMENT_METHODS = [
-  {
-    icon: Landmark,
-    label: 'Bank transfer',
-    lines: [
-      { text: 'Banuqe Maser' },
-      { text: 'Aya Abdelwhab Mohame' },
-      { text: '111222333444', copyable: true },
-    ],
-  },
-  {
-    icon: Smartphone,
-    label: 'InstaPay',
-    lines: [{ text: '01018333177', copyable: true }],
-  },
-  {
-    icon: Smartphone,
-    label: 'Vodafone Cash',
-    lines: [{ text: '010183331777', copyable: true }],
-  },
-];
+interface PaymentMethodLine {
+  text: string;
+  copyable?: boolean;
+}
+
+interface PaymentMethodInfo {
+  icon: typeof Landmark;
+  label: string;
+  lines: PaymentMethodLine[];
+  note?: string[];
+}
+
+function getPaymentMethods(currency: PricingCurrency): PaymentMethodInfo[] {
+  if (currency === 'USD') {
+    return [
+      {
+        icon: Landmark,
+        label: 'Bank transfer (international)',
+        lines: [
+          { text: 'Banque Misr' },
+          { text: 'Aya Abdelwahab Mohamed' },
+          { text: '8310251000001398', copyable: true },
+          { text: 'IBAN: EG830002083108310251000001398', copyable: true },
+          { text: 'Swift: BMISEGCXXXX', copyable: true },
+        ],
+        note: [
+          'Sending from outside Egypt: 1) give your bank the IBAN and Swift code above, 2) send as a Swift/international wire, 3) include your payment reference in the transfer note.',
+          'International transfers typically take 1-2 business days to arrive.',
+          'Your sending bank may charge its own transfer fee — check with them before sending.',
+        ],
+      },
+    ];
+  }
+  return [
+    {
+      icon: Landmark,
+      label: 'Bank transfer',
+      lines: [
+        { text: 'Banque Misr' },
+        { text: 'Aya Abdelwahab Mohamed' },
+        { text: '5610245000026127', copyable: true },
+        { text: 'IBAN: EG490002056105610245000026127', copyable: true },
+        { text: 'Swift: BMISEGCXXXX', copyable: true },
+      ],
+    },
+    {
+      icon: Smartphone,
+      label: 'InstaPay',
+      lines: [{ text: '01065826509', copyable: true }],
+    },
+    {
+      icon: Smartphone,
+      label: 'Vodafone Cash',
+      lines: [{ text: '01065826509', copyable: true }],
+    },
+  ];
+}
 
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
@@ -79,7 +115,7 @@ export function PaymentInstructions({ amount, currency, reference }: PaymentInst
       )}
 
       <div className="space-y-3">
-        {PAYMENT_METHODS.map(method => (
+        {getPaymentMethods(currency).map(method => (
           <div key={method.label} className="flex items-start gap-3 rounded-xl border border-primary-200 p-4">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-accent-50 text-accent-700">
               <method.icon className="h-5 w-5" aria-hidden="true" />
@@ -94,6 +130,11 @@ export function PaymentInstructions({ amount, currency, reference }: PaymentInst
                   </div>
                 ))}
               </dl>
+              {method.note && (
+                <ul className="mt-3 space-y-1.5 border-t border-primary-100 pt-3 text-xs leading-relaxed text-primary-600">
+                  {method.note.map(line => <li key={line}>{line}</li>)}
+                </ul>
+              )}
             </div>
           </div>
         ))}
