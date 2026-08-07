@@ -215,70 +215,6 @@ package manager picks up. Recommend standardizing on one package manager
 real bug source.
 
 
-## Payment proof file-size validation gap (found + fixed 2026-08-07)
-`validatePaymentProofFile()` in `src/lib/paymentProof.ts` only checked the
-upper size bound (`PAYMENT_PROOF_MAX_BYTES`) — a 0-byte or negative-size
-file value passed validation. Fixed by adding a `file.size <= 0` lower-bound
-check alongside the existing upper-bound check; added
-`src/domain/paymentProof.test.ts` coverage for both the zero-byte and
-negative-size cases (neither existed before this fix).
-
-## Duplicate payment_submissions against already-approved orders (found + fixed 2026-08-07)
-The "Students can submit payment proof for own orders" INSERT policy on
-`payment_submissions` (`20260801000000`, ~line 251) only checked
-`status='pending'` and that the order belonged to the caller — it never
-checked the order's own payment state, and there was no uniqueness
-constraint on `payment_submissions.order_id`. A student could file
-unlimited new "pending" submissions against an order
-`admin_review_payment_submission` had already approved
-(`course_orders.payment_status = 'paid'`), each indistinguishable in
-`admin_list_pending_payment_submissions()` from a genuine new purchase —
-an unbounded admin-queue-spam vector.
-
-Fixed via `supabase/migrations/20260807150000_prevent_duplicate_payment_submissions.sql`,
-applying both remedies rather than picking one, since each closes a
-different half of the gap:
-- A partial unique index, `payment_submissions_order_pending_unique` on
-  `(order_id) WHERE status = 'pending'`, blocking a second concurrent
-  pending submission for a still-unpaid order (closes the TOCTOU race a
-  policy `WITH CHECK` alone can't, since it isn't atomic across concurrent
-  transactions targeting the same order).
-- Extending the INSERT policy's `WITH CHECK` to also require
-  `course_orders.payment_status = 'pending'`, blocking new submissions
-  once an order is already paid/approved (the unique index alone doesn't
-  catch this, since approval flips the prior row's status away from
-  `pending`, freeing the slot for a new one).
-
-Rejected submissions leave no `pending` row behind
-(`payment_submissions_review_state_check` requires `reviewed_by`/
-`reviewed_at` once `status != 'pending'`), so resubmission after a genuine
-rejection still works as intended.
-
-Verified against `tutiba-preview` (`wcczuiwjkrsziehkiums`) only, via
-`supabase/tests/payment_submission_duplicate_prevention_verification.sql`
-using disposable fixtures wrapped in `BEGIN`/`ROLLBACK` — confirmed both
-that a submission against an already-paid order is rejected
-(`insufficient_privilege`, RLS) and that a second pending submission for a
-still-unpaid order is rejected (`unique_violation`), while the legitimate
-first pending submission still succeeds. Preview data confirmed unchanged
-(all fixture counts back to 0) after rollback. Security/performance
-advisors on preview show no new findings from this change.
-
-**Not yet applied to production** (`nhknhibsloirpffndzcd`) — this task's
-instructions restricted verification to preview only. Production currently
-still runs the vulnerable policy; recommend applying this migration to
-production promptly since the gap is an active, unbounded admin-queue-spam
-vector on a live payment flow.
-
-**Correction to this task's originating brief**: the brief that prompted
-this fix cited "two tests currently failing on purpose" documenting the
-file-size gap above and referenced pre-existing KNOWN_ISSUES.md entries for
-both defects. Neither was accurate against the repository at the time of
-this fix — `npm test` reported 61 passing / 0 failing (no failing tests
-existed), and this file had no prior entries for either defect. Both
-underlying defects were still real and independently verified by reading
-the source and the migration directly, so both are fixed here regardless.
-
 ## Test data in production database (2026-08-07)
 12 test orders exist in tutiba-platform (course_orders) from the B-9/B-10
 implementation and testing phases — none are real students. Will be cleaned
@@ -306,6 +242,12 @@ out of 65; that is expected until this is fixed, not a regression to chase.
 
 Fix: add a lower-bound check, e.g. `if (file.size <= 0) return 'Choose a
 valid image file.'`, alongside the existing upper-bound check.
+
+RESOLVED (2026-08-07): added the lower-bound check —
+`validatePaymentProofFile()` now returns an error for `file.size <= 0`
+alongside the existing upper-bound check. The two previously-failing tests
+now pass with no change to their assertions; `npm test` is back to 0
+failing.
 
 ## Duplicate payment_submissions can be filed against an already-decided order (found 2026-08-07, purchase-journey adversarial test)
 The INSERT policy "Students can submit payment proof for own orders"
@@ -337,3 +279,22 @@ INSERT policy's `WITH CHECK` to require
 for this order)`. Reproduction script (creates disposable fixtures, runs the
 check, rolls back — safe to re-run against `tutiba-preview` only, never
 against production): `supabase/tests/purchase_journey_e2e_verification.sql`.
+
+RESOLVED (2026-08-07): applied both fix options together via
+`supabase/migrations/20260807150000_prevent_duplicate_payment_submissions.sql`,
+since each closes a different half of the gap — the partial unique index
+alone wouldn't catch resubmission against an order that's already approved
+(approval flips the prior row's status away from `pending`, freeing the
+slot for a new one), and the `WITH CHECK` extension alone wouldn't catch a
+same-order race between two still-pending inserts (a `WITH CHECK` isn't
+atomic across concurrent transactions). Verified against `tutiba-preview`
+(`wcczuiwjkrsziehkiums`) only via disposable fixtures wrapped in
+`BEGIN`/`ROLLBACK`
+(`supabase/tests/payment_submission_duplicate_prevention_verification.sql`):
+a submission against an already-paid order is now rejected
+(`insufficient_privilege`), a second pending submission for a still-unpaid
+order is rejected (`unique_violation`), and the legitimate first pending
+submission still succeeds. Preview data confirmed unchanged after
+rollback; security/performance advisors show no new findings.
+**Not yet applied to production** (`nhknhibsloirpffndzcd`) — recommend
+applying promptly since this is an active gap on a live payment flow.

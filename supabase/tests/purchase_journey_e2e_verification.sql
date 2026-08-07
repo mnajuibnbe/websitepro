@@ -207,26 +207,69 @@ BEGIN
   END;
   ASSERT v_caught, 'case6: a second review of an already-decided submission must be rejected';
 
-  SELECT status INTO v_count FROM public.payment_submissions WHERE id = v_submission_3 AND status = 'approved';
-  ASSERT FOUND, 'case6: the submission must retain the first (winning) decision, not the second';
+  SELECT count(*) INTO v_count FROM public.payment_submissions WHERE id = v_submission_3 AND status = 'approved';
+  ASSERT v_count = 1, 'case6: the submission must retain the first (winning) decision, not the second';
   RAISE NOTICE 'case 6 (concurrent double-review) passed';
 
-  -- ── Bonus adversarial finding (not one of the 7 required cases): the
-  -- INSERT policy on payment_submissions never checks whether the
-  -- linked order is already paid/decided, so a student can insert extra
-  -- "pending" submissions against an order that's already been approved.
-  -- Reported as a defect, not treated as a required-case failure.
-  SET ROLE authenticated;
-  PERFORM set_config('request.jwt.claims', json_build_object('sub', v_student_a, 'role', 'authenticated')::text, true);
-  INSERT INTO public.payment_submissions (order_id, method, reference_note, proof_image_url, status)
-  VALUES (v_order_1.id, 'instapay', 'duplicate after approval', v_student_a::text || '/proof-duplicate-after-approval.jpg', 'pending')
-  RETURNING id INTO v_dup_submission;
-  RESET ROLE;
-  IF v_dup_submission IS NOT NULL THEN
-    RAISE NOTICE 'DEFECT CONFIRMED: inserted a duplicate pending payment_submissions row (%) against order % which was already approved/paid. No DB-level constraint prevents this.', v_dup_submission, v_order_1.id;
-  END IF;
+  -- ── Bonus check (not one of the 7 required cases): the INSERT policy
+  -- on payment_submissions used to never check whether the linked order
+  -- was already paid/decided, so a student could insert extra "pending"
+  -- submissions against an order that's already been approved. Originally
+  -- reported here as a confirmed defect (no DB-level constraint prevented
+  -- it); fixed by 20260807150000_prevent_duplicate_payment_submissions,
+  -- which extended this INSERT policy's WITH CHECK to require the order
+  -- still be unpaid. Re-run as a regression guard: the same insert must
+  -- now be rejected, not silently accepted. ─────────────────────────────
+  v_caught := false;
+  BEGIN
+    SET ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_student_a, 'role', 'authenticated')::text, true);
+    INSERT INTO public.payment_submissions (order_id, method, reference_note, proof_image_url, status)
+    VALUES (v_order_1.id, 'instapay', 'duplicate after approval', v_student_a::text || '/proof-duplicate-after-approval.jpg', 'pending')
+    RETURNING id INTO v_dup_submission;
+    RESET ROLE;
+  EXCEPTION WHEN insufficient_privilege THEN
+    RESET ROLE;
+    v_caught := true;
+  END;
+  ASSERT v_caught, 'bonus: a duplicate pending submission against an already-approved order must now be rejected';
+  RAISE NOTICE 'bonus check 1 (duplicate submission against an already-approved order) now correctly blocked';
 
-  RAISE NOTICE 'All required cases (1,2,3,4,5,6) passed.';
+  -- ── Bonus check 2: the partial unique index on payment_submissions
+  -- (order_id) WHERE status = 'pending' must reject a second concurrent
+  -- pending submission for the same still-unpaid order (the WITH CHECK
+  -- extension above only covers already-decided orders, not this race). ─
+  DECLARE
+    v_order_4 public.course_orders;
+    v_submission_4 UUID;
+  BEGIN
+    SET ROLE service_role;
+    SELECT * INTO v_order_4 FROM public.checkout_create_order(v_course_2, v_student_b, 300, 'EGP', 'egypt', 'default');
+    RESET ROLE;
+
+    SET ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', v_student_b, 'role', 'authenticated')::text, true);
+    INSERT INTO public.payment_submissions (order_id, method, reference_note, proof_image_url, status)
+    VALUES (v_order_4.id, 'bank_transfer', 'first pending submission', v_student_b::text || '/proof-first-pending.jpg', 'pending')
+    RETURNING id INTO v_submission_4;
+    RESET ROLE;
+
+    v_caught := false;
+    BEGIN
+      SET ROLE authenticated;
+      PERFORM set_config('request.jwt.claims', json_build_object('sub', v_student_b, 'role', 'authenticated')::text, true);
+      INSERT INTO public.payment_submissions (order_id, method, reference_note, proof_image_url, status)
+      VALUES (v_order_4.id, 'instapay', 'second concurrent pending submission', v_student_b::text || '/proof-second-pending.jpg', 'pending');
+      RESET ROLE;
+    EXCEPTION WHEN unique_violation THEN
+      RESET ROLE;
+      v_caught := true;
+    END;
+    ASSERT v_caught, 'bonus: a second pending submission for the same still-unpaid order must be rejected';
+  END;
+  RAISE NOTICE 'bonus check 2 (duplicate pending submission for a still-unpaid order) now correctly blocked';
+
+  RAISE NOTICE 'All required cases (1,2,3,4,5,6) passed, plus both duplicate-submission regression checks.';
 END;
 $$;
 
