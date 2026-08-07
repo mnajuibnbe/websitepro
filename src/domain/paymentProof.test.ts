@@ -31,6 +31,16 @@ test('rejects files over 10 MB', () => {
   assert.match(error ?? '', /10 MB/);
 });
 
+test('rejects a zero-byte file', () => {
+  const error = validatePaymentProofFile({ type: 'image/png', size: 0 });
+  assert.match(error ?? '', /empty or unreadable/);
+});
+
+test('rejects a file reporting a negative size', () => {
+  const error = validatePaymentProofFile({ type: 'image/png', size: -1 });
+  assert.match(error ?? '', /empty or unreadable/);
+});
+
 test('builds a collision-safe path scoped to the uploader', () => {
   const path = buildPaymentProofPath('user-123', 'image/jpeg');
   assert.match(path, /^user-123\/[0-9a-f-]{36}\.jpg$/);
@@ -41,4 +51,12 @@ test('builds a collision-safe path scoped to the uploader', () => {
 test('maps each accepted mime type to its file extension', () => {
   assert.match(buildPaymentProofPath('u', 'image/png'), /\.png$/);
   assert.match(buildPaymentProofPath('u', 'image/webp'), /\.webp$/);
+});
+
+test('rejects SVG images (script-capable) even though they are commonly mistaken for safe raster images', () => {
+  assert.match(validatePaymentProofFile({ type: 'image/svg+xml', size: 1024 }) ?? '', /JPG, PNG, or WebP/);
+});
+
+test('mime type matching is case-sensitive: an uppercase-labeled type is rejected rather than normalized', () => {
+  assert.notEqual(validatePaymentProofFile({ type: 'IMAGE/PNG', size: 1024 }), null);
 });

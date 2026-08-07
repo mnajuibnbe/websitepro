@@ -219,3 +219,82 @@ real bug source.
 12 test orders exist in tutiba-platform (course_orders) from the B-9/B-10
 implementation and testing phases — none are real students. Will be cleaned
 up in Phase B-24.1 before launch, as planned.
+
+## Payment proof upload accepts empty/negative-size files (found 2026-08-07, purchase-journey adversarial test)
+`validatePaymentProofFile()` in `src/lib/paymentProof.ts:28-36` only rejects a
+file when `file.size > PAYMENT_PROOF_MAX_BYTES`. It never checks the lower
+bound, so:
+- `{ type: 'image/png', size: 0 }` passes validation (returns `null`, no error).
+- `{ type: 'image/jpeg', size: -1024 }` also passes validation.
+
+A 0-byte or negative-size value can't be a real payment screenshot; a
+0-byte "file" would upload successfully to the `payment-proofs` bucket
+and create a `payment_submissions` row with no usable proof, requiring an
+admin to notice and reject it manually rather than being caught client-side.
+Negative sizes can't occur from a real browser `File` object but would slip
+through if this function is ever called from a hand-built request bypassing
+the file picker (e.g. a direct API call).
+
+Reproduced by two failing tests intentionally left in
+`src/domain/paymentProof.test.ts` ("rejects a zero-byte file", "rejects a
+file reporting a negative size") — `npm test` currently reports 2 failing
+out of 65; that is expected until this is fixed, not a regression to chase.
+
+Fix: add a lower-bound check, e.g. `if (file.size <= 0) return 'Choose a
+valid image file.'`, alongside the existing upper-bound check.
+
+RESOLVED (2026-08-07): added the lower-bound check —
+`validatePaymentProofFile()` now returns an error for `file.size <= 0`
+alongside the existing upper-bound check. The two previously-failing tests
+now pass with no change to their assertions; `npm test` is back to 0
+failing.
+
+## Duplicate payment_submissions can be filed against an already-decided order (found 2026-08-07, purchase-journey adversarial test)
+The INSERT policy "Students can submit payment proof for own orders"
+(`supabase/migrations/20260801000000_database_content_model_foundation.sql:251-259`)
+only checks `status='pending' AND reviewed_by IS NULL AND reviewed_at IS NULL
+AND order belongs to caller`. It never checks the *order's* payment/enrollment
+state, and there is no unique constraint on `payment_submissions.order_id`.
+
+Live-verified against the `tutiba-preview` project (`wcczuiwjkrsziehkiums`):
+after a submission was approved (order `payment_status='paid'`,
+`enrollment_status='active'`), the same student could still insert another
+`status='pending'` row for that same order. It then appeared in
+`admin_list_pending_payment_submissions()`
+(`supabase/migrations/20260807120000_admin_payment_submission_review.sql:37-69`)
+indistinguishable from a genuine new purchase awaiting review.
+
+Not exploitable for money/access — `admin_review_payment_submission()`
+re-applying `approved` to an already-paid order is idempotent, and rejecting
+the duplicate doesn't touch the (already active) enrollment or order. The
+real cost is an unbounded, unrated-limited way for any authenticated student
+to spam the admin review queue with junk rows against their own orders
+(including already-resolved ones), with no dedupe.
+
+Fix options for a future session: either (a) add a partial unique index
+`payment_submissions (order_id) WHERE status = 'pending'` so only one
+undecided submission can exist per order at a time, and/or (b) extend the
+INSERT policy's `WITH CHECK` to require
+`o.payment_status <> 'paid' AND NOT EXISTS (an existing pending submission
+for this order)`. Reproduction script (creates disposable fixtures, runs the
+check, rolls back — safe to re-run against `tutiba-preview` only, never
+against production): `supabase/tests/purchase_journey_e2e_verification.sql`.
+
+RESOLVED (2026-08-07): applied both fix options together via
+`supabase/migrations/20260807150000_prevent_duplicate_payment_submissions.sql`,
+since each closes a different half of the gap — the partial unique index
+alone wouldn't catch resubmission against an order that's already approved
+(approval flips the prior row's status away from `pending`, freeing the
+slot for a new one), and the `WITH CHECK` extension alone wouldn't catch a
+same-order race between two still-pending inserts (a `WITH CHECK` isn't
+atomic across concurrent transactions). Verified against `tutiba-preview`
+(`wcczuiwjkrsziehkiums`) only via disposable fixtures wrapped in
+`BEGIN`/`ROLLBACK`
+(`supabase/tests/payment_submission_duplicate_prevention_verification.sql`):
+a submission against an already-paid order is now rejected
+(`insufficient_privilege`), a second pending submission for a still-unpaid
+order is rejected (`unique_violation`), and the legitimate first pending
+submission still succeeds. Preview data confirmed unchanged after
+rollback; security/performance advisors show no new findings.
+**Not yet applied to production** (`nhknhibsloirpffndzcd`) — recommend
+applying promptly since this is an active gap on a live payment flow.
