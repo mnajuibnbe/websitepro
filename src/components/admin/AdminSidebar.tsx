@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck, Tags, PanelsTopLeft, Newspaper } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck, Tags, PanelsTopLeft, Newspaper, ReceiptText } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMobileDrawerLifecycle } from '../../hooks/useMobileDrawerLifecycle';
 import { MobileDrawerBackdrop } from '../layout/MobileDrawerBackdrop';
+import { supabase } from '../../lib/supabase';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -12,6 +14,16 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout, user } = useAuth();
   const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
+  const [pendingPaymentCount, setPendingPaymentCount] = useState(0);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    let cancelled = false;
+    supabase.rpc('admin_list_pending_payment_submissions').then(({ data }) => {
+      if (!cancelled) setPendingPaymentCount(Array.isArray(data) ? data.length : 0);
+    });
+    return () => { cancelled = true; };
+  }, [user?.role, currentPath]);
 
   const navItems = user?.role === 'admin' ? [
     { icon: BarChart3, label: 'Admin overview', href: '/admin' },
@@ -23,6 +35,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     { icon: GraduationCap, label: 'Instructor applications', href: '/admin/instructors' },
     { icon: ClipboardCheck, label: 'Course reviews', href: '/admin/course-reviews' },
     { icon: ClipboardCheck, label: 'Learner reviews', href: '/admin/reviews' },
+    { icon: ReceiptText, label: 'Payment proofs', href: '/admin/payment-proofs', badge: pendingPaymentCount },
   ] : [
     { icon: BookOpen, label: 'My authored courses', href: '/instructor/courses' },
     { icon: GraduationCap, label: 'Create course', href: '/instructor/courses/new' },
@@ -74,7 +87,10 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-accent-600' : 'text-primary-400'}`} />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {'badge' in item && item.badge > 0 && (
+                  <span className="rounded-full bg-danger-100 px-2 py-0.5 text-xs font-bold text-danger-700">{item.badge}</span>
+                )}
               </Link>
             );
           })}

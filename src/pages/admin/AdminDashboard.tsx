@@ -1,30 +1,11 @@
 import { useAuth } from '../../contexts/AuthContext';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
-import { CheckCircle, Loader2, CheckCircle2, AlertCircle, XCircle, ShieldCheck } from 'lucide-react';
+import { Loader2, ShieldCheck, ReceiptText } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { formatCourseAmount } from '../../lib/pricing';
 import { PageContainer } from '../../components/layout/PageContainer';
-
-interface PendingEnrollment {
-  id: string;
-  user_id: string;
-  course_id: string;
-  status: string;
-  enrolled_at: string;
-  users: {
-    id: string;
-    full_name: string;
-    email: string;
-  } | null;
-  courses: {
-    id: string;
-    title: string;
-  } | null;
-  order?: { id: string; amount: string; currency: 'EGP' | 'USD' } | null;
-}
 
 interface WorkflowHealth {
   checked_at: string;
@@ -41,15 +22,11 @@ export function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [pendingEnrollments, setPendingEnrollments] = useState<PendingEnrollment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('Order');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [workflowHealth, setWorkflowHealth] = useState<WorkflowHealth | null>(null);
   const [workflowHealthError, setWorkflowHealthError] = useState(false);
+  const [pendingPaymentCount, setPendingPaymentCount] = useState<number | null>(null);
+  const [pendingPaymentError, setPendingPaymentError] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,90 +39,20 @@ export function AdminDashboard() {
       return;
     }
     setIsCheckingAuth(false);
-    loadPendingEnrollments();
+    loadDashboard();
   }
 
-  async function loadPendingEnrollments() {
-    try {
-      setIsLoading(true);
-      setErrorMsg(null);
-      setWorkflowHealthError(false);
-      const { data: health, error: healthError } = await supabase.rpc('admin_get_workflow_health');
-      if (healthError) setWorkflowHealthError(true);
-      else setWorkflowHealth((health || null) as WorkflowHealth | null);
-      const { data, error } = await supabase
-        .from('enrollments')
-        .select(`
-          id,
-          user_id,
-          course_id,
-          status,
-          enrolled_at,
-          users (
-            id,
-            full_name,
-            email
-          ),
-          courses (
-            id,
-            title
-          )
-        `)
-        .eq('status', 'pending')
-        .order('enrolled_at', { ascending: false });
+  async function loadDashboard() {
+    setWorkflowHealthError(false);
+    setPendingPaymentError(false);
 
-      if (error) {
-        console.error('Error fetching enrollments:', error);
-        setErrorMsg('Order.');
-      }
+    const { data: health, error: healthError } = await supabase.rpc('admin_get_workflow_health');
+    if (healthError) setWorkflowHealthError(true);
+    else setWorkflowHealth((health || null) as WorkflowHealth | null);
 
-      if (data) {
-        // Supabase typings can sometimes return an array for relations if it thinks it's one-to-many,
-        // but since users/courses are foreign keys on enrollments (many-to-one), they should be objects.
-        // We cast as any to handle potential TS mismatches if the generated types differ, but the runtime shape is correct.
-        const pending = data as any as PendingEnrollment[];
-        const { data: orders } = await supabase.from('course_orders').select('id,user_id,course_id,amount,currency,created_at').eq('enrollment_status', 'pending').order('created_at', { ascending: false });
-        const keyed = new Map<string, any>();
-        (orders || []).forEach(order => { const key = `${order.user_id}:${order.course_id}`; if (!keyed.has(key)) keyed.set(key, order); });
-        setPendingEnrollments(pending.map(item => ({ ...item, order: keyed.get(`${item.user_id}:${item.course_id}`) || null })));
-      }
-    } catch (e) {
-      console.error('Exception during fetch:', e);
-      setErrorMsg('Error.');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  const handleDecision = async (id: string, status: 'active' | 'cancelled') => {
-    try {
-      setActionLoadingId(id);
-      setErrorMsg(null);
-      const { data: updatedEnrollment, error } = await supabase
-        .from('enrollments')
-        .update({ status })
-        .eq('id', id)
-        .eq('status', 'pending')
-        .select('id, status')
-        .maybeSingle();
-
-      if (!error && updatedEnrollment?.status === status) {
-        const enrollment = pendingEnrollments.find(item => item.id === id);
-        if (enrollment?.order) await supabase.from('course_orders').update({ enrollment_status: status, updated_at: new Date().toISOString() }).eq('id', enrollment.order.id);
-        setPendingEnrollments(prev => prev.filter(e => e.id !== id));
-        setToastMessage(status === 'active' ? 'Order' : 'Order');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-      } else {
-        setErrorMsg('Please review the information and try again.');
-        console.error('Enrollment decision did not update a pending row:', error || { id, status });
-      }
-    } catch (e) {
-      console.error(e);
-      setErrorMsg('Error.');
-    } finally {
-      setActionLoadingId(null);
-    }
+    const { data: submissions, error: submissionsError } = await supabase.rpc('admin_list_pending_payment_submissions');
+    if (submissionsError) setPendingPaymentError(true);
+    else setPendingPaymentCount(Array.isArray(submissions) ? submissions.length : 0);
   }
 
   if (isCheckingAuth) {
@@ -157,147 +64,41 @@ export function AdminDashboard() {
   }
 
   return (
-    <>
-      {showToast && (
-        <div className="fixed bottom-4 left-4 z-[100] bg-white border border-success-200 text-success-800 px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <CheckCircle2 className="w-6 h-6 text-success-600" />
-          <p className="font-bold">{toastMessage}</p>
-        </div>
-      )}
+    <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
+      <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
-        <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
+        <PageContainer>
+          <h1 className="text-3xl font-bold text-primary-900 mb-8">Admin overview</h1>
 
-        <main id="main-content" className="pt-20 pb-24 transition-all duration-300 lg:pl-72 lg:pt-8">
-          <PageContainer>
-            <h1 className="text-3xl font-bold text-primary-900 mb-8">Admin overview</h1>
-
-            <section className="mb-8 rounded-2xl border border-primary-200 bg-white p-6 shadow-sm" aria-labelledby="workflow-health-title">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 id="workflow-health-title" className="flex items-center gap-2 text-xl font-bold text-primary-900"><ShieldCheck className="h-5 w-5 text-accent-600" />Course workflow health</h2><p className="mt-1 text-sm text-primary-600">Live integrity checks for authoring, review, and publication.</p></div><Link to="/admin/course-reviews" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-primary-200 px-4 font-bold text-primary-800">Open review queue</Link></div>
-              {workflowHealthError ? <div role="alert" className="mt-4 rounded-xl border border-danger-200 bg-danger-50 p-4"><p className="font-bold text-danger-700">Workflow health could not be loaded.</p><button type="button" onClick={() => void loadPendingEnrollments()} className="mt-2 min-h-11 rounded-lg border border-danger-200 px-4 font-bold">Retry</button></div> : workflowHealth ? <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[
-                ['Reviews overdue', workflowHealth.overdue_unfinished_reviews],
-                ['Blocking findings', workflowHealth.open_blocking_findings],
-                ['Submitted without revision', workflowHealth.submitted_without_revision],
-                ['Published without approved revision', workflowHealth.published_without_approved_revision],
-                ['Unmanaged published covers', workflowHealth.missing_managed_covers],
-                ['Instructor role drift', workflowHealth.approved_instructor_role_drift],
-                ['Inactive instructor profiles', workflowHealth.inactive_instructor_public_profiles],
-              ].map(([label, value]) => <div key={String(label)} className={`rounded-xl border p-4 ${Number(value) > 0 ? 'border-amber-200 bg-amber-50' : 'border-success-200 bg-success-100'}`}><p className="text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-primary-700">{label}</p></div>)}</div> : <p role="status" className="mt-4 text-sm text-primary-500">Loading workflow health…</p>}
-              {workflowHealth && <p className="mt-3 text-xs text-primary-500">Last checked {new Date(workflowHealth.checked_at).toLocaleString('en')}</p>}
-            </section>
-
-            {errorMsg && (
-              <div className="mb-6 bg-danger-50 text-danger-700 px-6 py-4 rounded-xl border border-danger-200 flex items-center gap-3">
-                <AlertCircle className="w-6 h-6 flex-shrink-0" />
-                <p className="font-bold">{errorMsg}</p>
-                <button
-                  onClick={loadPendingEnrollments}
-                  className="mr-auto text-sm bg-white px-4 py-2 rounded-lg border border-danger-200 hover:bg-danger-100 transition-colors"
-                >
-                  Retry
-                </button>
+          <section className="mb-8 rounded-2xl border border-primary-200 bg-white p-6 shadow-sm" aria-labelledby="payment-review-title">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 id="payment-review-title" className="flex items-center gap-2 text-xl font-bold text-primary-900"><ReceiptText className="h-5 w-5 text-accent-600" />Payment review</h2>
+                <p className="mt-1 text-sm text-primary-600">A paid enrollment activates only after its payment proof is approved here — there is no other way to grant access.</p>
               </div>
-            )}
-
-            <div className="bg-white rounded-2xl border border-primary-200 shadow-sm overflow-hidden mb-8">
-              <div className="p-6 border-b border-primary-200 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-primary-900">Enrollment requests</h2>
-                <span className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-bold">
-                  {pendingEnrollments.length} pending requests
-                </span>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-primary-50 border-b border-primary-200">
-                    <tr>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Student</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Course</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700">Requested</th>
-                      <th className="py-4 px-6 text-sm font-bold text-primary-700 text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-primary-100">
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan={4} className="py-12 text-center">
-                          <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto mb-4" />
-                          <p className="text-primary-500 font-medium">Loading...</p>
-                        </td>
-                      </tr>
-                    ) : pendingEnrollments.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="py-12 text-center text-primary-500 font-medium">
-                          No items found
-                        </td>
-                      </tr>
-                    ) : (
-                      pendingEnrollments.map((enrollment) => {
-                        const studentName = enrollment.users?.full_name || 'Not Found';
-                        const studentEmail = enrollment.users?.email || '';
-                        const courseTitle = enrollment.courses?.title || 'Not Found';
-                        const date = enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString('en', { dateStyle: 'medium' }) : 'Not available';
-
-                        return (
-                          <tr key={enrollment.id} className="hover:bg-primary-50/50 transition-colors">
-                            <td className="py-4 px-6">
-                              <div className="flex flex-col">
-                                <span className={`text-sm font-bold ${!enrollment.users ? 'text-danger-600' : 'text-primary-900'}`}>
-                                  {studentName}
-                                </span>
-                                {studentEmail && (
-                                  <span className="text-xs text-primary-500 mt-1">{studentEmail}</span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-4 px-6 text-sm">
-                              <span className={`font-bold ${!enrollment.courses ? 'text-danger-600' : 'text-primary-900'}`}>
-                                {courseTitle}
-                              </span>
-                              {enrollment.order && <div className="text-xs text-primary-500 mt-1">Original order: {formatCourseAmount(String(enrollment.order.amount), enrollment.order.currency)}</div>}
-                            </td>
-                            <td className="py-4 px-6 text-sm text-primary-500 font-medium" dir="ltr" style={{textAlign: 'right'}}>
-                              {date}
-                            </td>
-                            <td className="py-4 px-6 text-center">
-                              <div className="flex flex-nowrap items-center justify-center gap-2 min-w-max">
-                              <button
-                                onClick={() => handleDecision(enrollment.id, 'active')}
-                                disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title={(!enrollment.users || !enrollment.courses) ? 'Student or course data is unavailable' : 'Approve enrollment'}
-                                aria-label={`Approve enrollment for ${studentName} in ${courseTitle}`}
-                              >
-                                {actionLoadingId === enrollment.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <CheckCircle className="w-4 h-4" />
-                                )}
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleDecision(enrollment.id, 'cancelled')}
-                                disabled={actionLoadingId === enrollment.id || !enrollment.users || !enrollment.courses}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-danger-500 hover:bg-red-600 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Reject enrollment"
-                                aria-label={`Reject enrollment for ${studentName} in ${courseTitle}`}
-                              >
-                                <XCircle className="w-4 h-4" />
-                                Reject
-                              </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              <Link to="/admin/payment-proofs" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-accent-600 px-5 font-bold text-white hover:bg-accent-700">
+                {pendingPaymentCount ? `Review ${pendingPaymentCount} pending` : 'Open payment review'}
+              </Link>
             </div>
-          </PageContainer>
-        </main>
-      </div>
-    </>
+            {pendingPaymentError && <p role="alert" className="mt-3 text-sm text-danger-600">Pending count could not be loaded.</p>}
+          </section>
+
+          <section className="mb-8 rounded-2xl border border-primary-200 bg-white p-6 shadow-sm" aria-labelledby="workflow-health-title">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 id="workflow-health-title" className="flex items-center gap-2 text-xl font-bold text-primary-900"><ShieldCheck className="h-5 w-5 text-accent-600" />Course workflow health</h2><p className="mt-1 text-sm text-primary-600">Live integrity checks for authoring, review, and publication.</p></div><Link to="/admin/course-reviews" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-primary-200 px-4 font-bold text-primary-800">Open review queue</Link></div>
+            {workflowHealthError ? <div role="alert" className="mt-4 rounded-xl border border-danger-200 bg-danger-50 p-4"><p className="font-bold text-danger-700">Workflow health could not be loaded.</p><button type="button" onClick={() => void loadDashboard()} className="mt-2 min-h-11 rounded-lg border border-danger-200 px-4 font-bold">Retry</button></div> : workflowHealth ? <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[
+              ['Reviews overdue', workflowHealth.overdue_unfinished_reviews],
+              ['Blocking findings', workflowHealth.open_blocking_findings],
+              ['Submitted without revision', workflowHealth.submitted_without_revision],
+              ['Published without approved revision', workflowHealth.published_without_approved_revision],
+              ['Unmanaged published covers', workflowHealth.missing_managed_covers],
+              ['Instructor role drift', workflowHealth.approved_instructor_role_drift],
+              ['Inactive instructor profiles', workflowHealth.inactive_instructor_public_profiles],
+            ].map(([label, value]) => <div key={String(label)} className={`rounded-xl border p-4 ${Number(value) > 0 ? 'border-amber-200 bg-amber-50' : 'border-success-200 bg-success-100'}`}><p className="text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-primary-700">{label}</p></div>)}</div> : <p role="status" className="mt-4 text-sm text-primary-500">Loading workflow health…</p>}
+            {workflowHealth && <p className="mt-3 text-xs text-primary-500">Last checked {new Date(workflowHealth.checked_at).toLocaleString('en')}</p>}
+          </section>
+        </PageContainer>
+      </main>
+    </div>
   );
 }
