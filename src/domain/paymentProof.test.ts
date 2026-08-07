@@ -31,6 +31,16 @@ test('rejects files over 10 MB', () => {
   assert.match(error ?? '', /10 MB/);
 });
 
+test('rejects a zero-byte file', () => {
+  const error = validatePaymentProofFile({ type: 'image/png', size: 0 });
+  assert.match(error ?? '', /empty or unreadable/);
+});
+
+test('rejects a file reporting a negative size', () => {
+  const error = validatePaymentProofFile({ type: 'image/png', size: -1 });
+  assert.match(error ?? '', /empty or unreadable/);
+});
+
 test('builds a collision-safe path scoped to the uploader', () => {
   const path = buildPaymentProofPath('user-123', 'image/jpeg');
   assert.match(path, /^user-123\/[0-9a-f-]{36}\.jpg$/);

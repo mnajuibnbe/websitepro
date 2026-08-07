@@ -29,6 +29,9 @@ export function validatePaymentProofFile(file: { type: string; size: number }): 
   if (!PAYMENT_PROOF_ACCEPTED_TYPES.has(file.type)) {
     return 'Choose a JPG, PNG, or WebP image.';
   }
+  if (file.size <= 0) {
+    return 'The selected file is empty or unreadable.';
+  }
   if (file.size > PAYMENT_PROOF_MAX_BYTES) {
     return 'The image must be 10 MB or smaller.';
   }
