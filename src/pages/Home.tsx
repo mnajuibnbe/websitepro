@@ -12,6 +12,7 @@ import { Newsletter } from '../components/sections/Newsletter';
 import { PublicLayout } from '../components/layout/PublicLayout';
 import { LatestArticles } from '../components/sections/LatestArticles';
 import { HomepageFAQ } from '../components/sections/HomepageFAQ';
+import { FEATURE_FLAGS } from '../config/featureFlags';
 
 export function Home() {
   return (
@@ -28,7 +29,7 @@ export function Home() {
         <LatestArticles />
         <HomepageFAQ />
         <FinalCTA />
-        <Newsletter />
+        {FEATURE_FLAGS.newsletter && <Newsletter />}
       </div>
     </PublicLayout>
   );
