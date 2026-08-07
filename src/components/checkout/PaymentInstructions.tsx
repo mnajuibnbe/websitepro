@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Landmark, Smartphone, MessageCircle, Copy, Check } from 'lucide-react';
 import { formatCourseAmount, type PricingCurrency } from '../../lib/pricing';
 
-const SUPPORT_WHATSAPP_DISPLAY = '01065826509';
-const SUPPORT_WHATSAPP_LINK = 'https://wa.me/201065826509';
+export const SUPPORT_WHATSAPP_DISPLAY = '01065826509';
+export const SUPPORT_WHATSAPP_LINK = 'https://wa.me/201065826509';
 
 interface PaymentMethodLine {
   text: string;
