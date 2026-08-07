@@ -42,7 +42,7 @@ export function CheckoutPage() {
             {/* Main Form (8 columns) */}
             <div className="lg:col-span-8 order-2 lg:order-1">
               <AccountDetails />
-              <PaymentMethod />
+              <PaymentMethod price={localizedPrice} />
             </div>
 
             {/* Order Summary (4 columns) */}

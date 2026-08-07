@@ -1,6 +1,7 @@
 import { useAuth } from '../contexts/AuthContext';
 import React, { useEffect, useState } from 'react';
 import { Sidebar } from '../components/dashboard/Sidebar';
+import { OrdersStatusList } from '../components/dashboard/OrdersStatusList';
 import { PlayCircle, Award, BookOpen, Loader2, Menu, Search } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
@@ -120,6 +121,8 @@ export function MyCourses() {
         <main id="main-content" className="flex-grow overflow-y-auto py-4 sm:py-8">
           <PageContainer className="space-y-8 pb-12">
             <h1 className="text-3xl font-bold text-primary-900 mb-8 hidden lg:block">My Courses</h1>
+
+            <OrdersStatusList />
 
             {!isLoading && errorState === 'none' && enrollments.length > 0 && (
               <div className="flex flex-col gap-4 rounded-2xl border border-primary-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">

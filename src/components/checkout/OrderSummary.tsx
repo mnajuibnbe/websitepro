@@ -4,6 +4,9 @@ import { Button } from '../ui/Button';
 import { CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { OptimizedImage } from '../ui/OptimizedImage';
+import { PaymentInstructions } from './PaymentInstructions';
+import { getOrderReference } from '../../lib/orderReference';
+import type { PricingCurrency } from '../../lib/pricing';
 
 interface OrderSummaryProps {
   courseId?: string;
@@ -13,10 +16,18 @@ interface OrderSummaryProps {
   available: boolean;
 }
 
+interface CreatedOrder {
+  id: string;
+  amount: string;
+  currency: PricingCurrency;
+  enrollment_status: string;
+}
+
 export function OrderSummary({ courseId, title, thumbnail, price, available }: OrderSummaryProps) {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [order, setOrder] = useState<CreatedOrder | null>(null);
 
   const handleCheckout = async () => {
     if (!courseId || !available) return;
@@ -33,6 +44,7 @@ export function OrderSummary({ courseId, title, thumbnail, price, available }: O
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'We could not create your order.');
+      setOrder(payload.order ? { ...payload.order, amount: String(payload.order.amount) } : null);
       setStatus('success');
     } catch (checkoutError) {
       setError(checkoutError instanceof Error ? checkoutError.message : 'We could not create your order.');
@@ -41,11 +53,23 @@ export function OrderSummary({ courseId, title, thumbnail, price, available }: O
   };
 
   if (status === 'success') {
+    const isActive = order?.enrollment_status === 'active';
     return (
       <section aria-live="polite" className="rounded-2xl border border-success-200 bg-white p-8 text-center shadow-lg">
         <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-success-500" aria-hidden="true" />
         <h2 className="mb-2 text-2xl font-bold text-primary-900">Order received</h2>
-        <p className="mb-6 text-primary-600">Your order was created securely. You can track enrollment status from your dashboard.</p>
+        {isActive ? (
+          <p className="mb-6 text-primary-600">You're all set — this course is now active in your dashboard.</p>
+        ) : (
+          <>
+            <p className="mb-6 text-primary-600">Complete your payment below to activate this course. You can also find these details anytime in your dashboard.</p>
+            {order && (
+              <div className="mb-6 text-left">
+                <PaymentInstructions amount={order.amount} currency={order.currency} reference={getOrderReference(order.id)} />
+              </div>
+            )}
+          </>
+        )}
         <Button variant="primary" className="w-full" onClick={() => navigate('/dashboard')}>Go to dashboard</Button>
       </section>
     );

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { ContinueLearning } from '../components/dashboard/ContinueLearning';
 import { MyCoursesList } from '../components/dashboard/MyCoursesList';
+import { OrdersStatusList } from '../components/dashboard/OrdersStatusList';
 import { Achievements } from '../components/dashboard/Achievements';
 import { DailyReview } from '../components/dashboard/DailyReview';
 import { Menu, Loader2, BookOpen } from 'lucide-react';
@@ -83,6 +84,8 @@ export function Dashboard() {
 
             {/* Mobile Greeting */}
             <h1 className="text-2xl font-bold text-primary-900 sm:hidden mb-6">Welcome! 👋</h1>
+
+            <OrdersStatusList />
 
             {isLoading ? (
                <div className="flex justify-center py-20">
