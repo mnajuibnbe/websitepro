@@ -1,4 +1,4 @@
-import { Suspense, useLayoutEffect } from 'react';
+import { Suspense, useLayoutEffect, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PricingProvider } from './contexts/PricingContext';
@@ -10,6 +10,7 @@ import { Permission } from './types/auth';
 import { lazyNamed } from './lib/lazyNamed';
 import { LocaleProvider } from './contexts/LocaleContext';
 import { FEATURE_FLAGS } from './config/featureFlags';
+import { trackPageView } from './lib/analytics';
 
 const Home = lazyNamed(() => import('./pages/Home'), 'Home');
 const About = lazyNamed(() => import('./pages/About'), 'About');
@@ -66,6 +67,10 @@ function AppContent() {
     if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.key]);
+
+  useEffect(() => {
+    trackPageView(location.pathname, location.search);
+  }, [location.pathname, location.search]);
 
   const browserSearch = window.location.search;
   const browserHash = window.location.hash;

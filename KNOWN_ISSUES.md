@@ -328,3 +328,15 @@ earlier deployment (not the current production domain
 websitepro-seven.vercel.app). Discovered during Phase B-18 (SEO) since it
 breaks Open Graph image previews and Course structured data image for this
 course. Needs the DB field updated to a live asset URL.
+
+## Password from Database Not Clear (2026-08-08)  
+When I try to reset the password, I encounter an issue.  
+This password does not match the password complexity requirements;  
+I got a general error. The message is a general one;  
+I think it is from the database, but this error does not indicate  
+exactly where the issue is.  
+For example, in my trial, it was related to password complexity.  
+It must say, for example,  
+"Here you must choose one uppercase letter, one lowercase letter, and so on."  
+Or, just what is still missing, not all combinations.  
+If this error is clear from the database, then just show it.

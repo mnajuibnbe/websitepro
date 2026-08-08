@@ -20,6 +20,7 @@ import type { CoursePreviewLesson } from '../components/course-detail/CourseMedi
 import { applyPageMeta, setStructuredData, SITE_NAME } from '../components/layout/PageMeta';
 import { usePricingContext } from '../contexts/PricingContext';
 import { resolveCoursePrice } from '../lib/pricing';
+import { trackCourseDetailViewed } from '../lib/analytics';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -108,6 +109,10 @@ export function CourseDetail() {
 
     fetchRelatedCourseData();
   }, [id, validCourseId]);
+
+  useEffect(() => {
+    if (course) trackCourseDetailViewed(course.id);
+  }, [course?.id]);
 
   const isLoading = validCourseId && (courseLoading || relatedDataLoading);
   const errorState = !validCourseId
