@@ -261,6 +261,40 @@ function publicCacheKeyUrl(request: Request, fileId: string): string {
   return url.toString();
 }
 
+// The Workers Cache API does not auto-slice a stored response against a Range header
+// on the lookup request — cache.match() only ever returns the object as stored. So a
+// cache hit for a ranged request is served by reading the (already edge-local, no
+// origin round trip) cached bytes into memory and slicing them here. Safe for the
+// homepage intro's size; never used for lesson videos.
+async function serveRangeFromCachedResponse(cached: Response, rangeHeader: string): Promise<Response> {
+  // Content-Length does not reliably survive a cache.put()/match() round trip for a
+  // streamed body, so the real size comes from the buffered bytes, not the header.
+  const buffer = await cached.arrayBuffer();
+  const totalSize = buffer.byteLength;
+  const mimeType = cached.headers.get('Content-Type') || 'application/octet-stream';
+  const parts = rangeHeader.replace(/bytes=/, '').split('-');
+  const start = Number.parseInt(parts[0], 10);
+  let end = totalSize - 1;
+  if (parts[1]?.trim()) {
+    const parsedEnd = Number.parseInt(parts[1], 10);
+    if (!Number.isNaN(parsedEnd)) end = Math.min(parsedEnd, totalSize - 1);
+  }
+  if (Number.isNaN(start) || start >= totalSize || start > end) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${totalSize}` } });
+  }
+  const slice = buffer.slice(start, end + 1);
+  return new Response(slice, {
+    status: 206,
+    headers: {
+      'Content-Type': mimeType,
+      'Accept-Ranges': 'bytes',
+      'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+      'Content-Length': String(end - start + 1),
+      'Cache-Control': `public, max-age=${PUBLIC_CACHE_TTL_SECONDS}`,
+    },
+  });
+}
+
 // Populates the shared Cloudflare edge cache with the full homepage-intro object so
 // future requests at this colo (any visitor, GET or HEAD, ranged or not) are served
 // straight from cache with zero Drive/Google round trips. Never called for lesson or
@@ -349,9 +383,8 @@ async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): P
 
   if (isPublicHomepageIntro) {
     try {
-      const lookupHeaders: HeadersInit = range ? { Range: range } : {};
-      const cached = await caches.default.match(new Request(publicCacheKeyUrl(request, fileId), { headers: lookupHeaders }));
-      if (cached) return cached;
+      const cachedFull = await caches.default.match(new Request(publicCacheKeyUrl(request, fileId)));
+      if (cachedFull) return range ? await serveRangeFromCachedResponse(cachedFull, range) : cachedFull;
     } catch {
       // Cache API failure: fall through to the normal authorised-fetch path below.
     }
