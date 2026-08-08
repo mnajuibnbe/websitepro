@@ -1,8 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Award, Trophy } from 'lucide-react';
+import { FEATURE_FLAGS } from '../../config/featureFlags';
 
 export function Achievements() {
+  if (!FEATURE_FLAGS.certificates) {
+    return null;
+  }
+
   return (
     <div className="bg-white border border-primary-200 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">

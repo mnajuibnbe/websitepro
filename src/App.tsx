@@ -103,7 +103,7 @@ function AppContent() {
       <Route path="/learn/:courseId/lesson/:lessonId" element={<RequireAuth><LessonPlayer /></RequireAuth>} />
       <Route path="/lesson" element={<RequireAuth><LegacyLessonRedirector /></RequireAuth>} />
       <Route path="/quiz" element={<RequireAuth><QuizPage /></RequireAuth>} />
-      <Route path="/certificate" element={<RequireAuth><CertificatePage /></RequireAuth>} />
+      <Route path="/certificate" element={FEATURE_FLAGS.certificates ? <RequireAuth><CertificatePage /></RequireAuth> : <NotFoundPage />} />
 
       {/* Admin Routes */}
       <Route path="/admin" element={<RequireAuth permission={Permission.ADMIN_ACCESS}><AdminDashboard /></RequireAuth>} />

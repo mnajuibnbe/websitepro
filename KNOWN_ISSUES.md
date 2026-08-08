@@ -298,3 +298,24 @@ submission still succeeds. Preview data confirmed unchanged after
 rollback; security/performance advisors show no new findings.
 **Not yet applied to production** (`nhknhibsloirpffndzcd`) — recommend
 applying promptly since this is an active gap on a live payment flow.
+
+
+
+## Certificate feature hidden pending a real implementation (2026-08-08)
+Phase B-16's audit found the certificate feature was entirely client-side
+theater: no `certificates` table exists anywhere in the schema, nothing is
+durably issued (certificate ID and completion date are recomputed live in
+the browser on every page load — completion date is always "today"), and
+the "verification link" doesn't verify a specific credential — it just
+re-renders whoever is currently logged in as if they hold the certificate
+for that course id. `Achievements.tsx` also showed fully hardcoded fake
+certificate/badge data unrelated to any real student.
+
+The whole flow is now hidden behind `FEATURE_FLAGS.certificates` (off) as a
+stopgap. Not fixed, because a correct fix requires a real `certificates`
+table with a persisted issuance event (student id, course id, snapshotted
+course title, real completion timestamp, a non-guessable serial), a
+server-side eligibility check backing the client-side one, and an actual
+third-party verification lookup — a project-sized piece of work, not a
+quick patch. Recommend scoping this as its own future phase before
+re-enabling the flag.

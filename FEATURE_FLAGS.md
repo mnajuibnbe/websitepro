@@ -63,3 +63,36 @@ so subscribers currently get nothing.
 **Re-enable:** set `newsletter: true` in `src/config/featureFlags.ts`. Do
 this once an actual sending service is wired up, otherwise subscribers will
 sign up expecting emails that never arrive.
+
+## `certificates` (currently `false`)
+
+Hides the certificate feature. It's entirely client-side today: there is no
+`certificates` table, nothing is durably issued, and the "verification
+link" doesn't actually verify a specific credential. It's not gated because
+it's unused — it's gated because it's fake, and showing it would mislead a
+student into thinking they hold a real, verifiable credential.
+
+- The "Certificate" button on completed courses in
+  [`src/pages/MyCourses.tsx`](src/pages/MyCourses.tsx) is not rendered
+  (an empty spacer keeps the row's flex layout intact).
+- The `/certificate` route in [`src/App.tsx`](src/App.tsx) renders the 404
+  page instead of `CertificatePage` while the flag is off (`CertificatePage`
+  and `src/components/certificate/*` are untouched).
+- The "Certificates" nav item in
+  [`src/components/dashboard/Sidebar.tsx`](src/components/dashboard/Sidebar.tsx)
+  is not rendered.
+- [`src/components/dashboard/Achievements.tsx`](src/components/dashboard/Achievements.tsx)
+  renders nothing. Its content was hardcoded fake data (a fixed certificate
+  title and a fake completion date unrelated to any real student activity),
+  not real-but-unused data, so unlike the other flags it has nothing valid
+  to fall back to — the whole widget is dropped from the dashboard while the
+  flag is off, with no layout gap left behind.
+- Marketing copy that merely mentions "certificate" as a course benefit
+  (About, FAQ, homepage sections, footer, etc.) is untouched — that's a
+  separate copy pass, not part of this flag.
+
+**Re-enable:** set `certificates: true` in `src/config/featureFlags.ts`.
+Do this only once real certificate issuance is backed by a persisted,
+verifiable record — flipping the flag today would restore the fake
+Achievements data along with the rest of the flow, since none of the
+underlying issues are fixed by this flag.
