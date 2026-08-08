@@ -6,3 +6,7 @@ workers_dev = true
 [vars]
 ALLOWED_ORIGIN = "https://websitepro-seven.vercel.app"
 TOKEN_ISSUER_BASE_URL = "https://websitepro-seven.vercel.app"
+
+[[kv_namespaces]]
+binding = "VIDEO_EDGE_KV"
+id = "6a70215705334e498f035a93e7cb0d82"

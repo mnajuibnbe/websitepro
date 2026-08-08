@@ -340,3 +340,20 @@ It must say, for example,
 "Here you must choose one uppercase letter, one lowercase letter, and so on."  
 Or, just what is still missing, not all combinations.  
 If this error is clear from the database, then just show it.
+
+## Certificate overclaim also on About page (2026-08-09)
+Phase B-20's copy rewrite removed unsubstantiated certificate claims from
+the homepage flow (Hero, Outcomes, FinalCTA, Instructor, FAQ), since the
+certificate feature is fully disabled (`certificates: false` in
+featureFlags.ts — no table, nothing durably issued, per FEATURE_FLAGS.md).
+The same overclaim still exists on src/pages/About.tsx:44 ("Verified
+Achievement... Certificates that recognize completed learning") and
+possibly the standalone FAQ page/Footer — not fixed, flagged as a
+follow-up copy pass with the same scope as B-20.
+
+## Dead "Meet Your Instructor" button (2026-08-09)
+src/components/sections/InstructorSection.tsx:81 — the "Meet Your
+Instructor" button has no onClick handler; it renders but does nothing.
+Pre-existing bug, discovered during B-20's copy pass but out of scope for a
+copy-only task. Needs either a real destination (instructor bio
+page/section) or removal if no such content exists.
