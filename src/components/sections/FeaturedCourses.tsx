@@ -48,7 +48,7 @@ export function FeaturedCourses() {
         <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
           <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured Courses</p>
           <h2 className="mt-3 font-display text-4xl font-semibold text-primary-900 md:text-5xl">
-            Start with our <span className="italic text-accent-700">most trusted</span> courses.
+            Start with our <span className="italic text-accent-700">featured</span> courses.
           </h2>
           <p className="mt-5 text-lg text-primary-600">
             Compare the curriculum, lesson depth, and price before choosing your next stage.
@@ -72,7 +72,7 @@ export function FeaturedCourses() {
         {/* Bottom CTA */}
         <div className="flex justify-center">
           <Button variant="secondary" className="px-8" onClick={() => navigate('/courses')}>
-            View all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            Compare all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </PageContainer>

@@ -1,4 +1,4 @@
-import { Award, CheckCircle2, GraduationCap } from 'lucide-react';
+import { CheckCircle2, GraduationCap, Microscope } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { PageContainer } from '../layout/PageContainer';
@@ -56,7 +56,7 @@ export function InstructorSection() {
                 <GraduationCap className="h-4 w-4 text-accent-600" aria-hidden="true" /> Skin &amp; Beauty Nutrition Specialist
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-4 py-2 text-sm font-semibold text-primary-800">
-                <Award className="h-4 w-4 text-accent-600" aria-hidden="true" /> Certificate-Eligible Courses
+                <Microscope className="h-4 w-4 text-accent-600" aria-hidden="true" /> Evidence-Based Curriculum
               </span>
             </Reveal>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Award, BookOpen, CheckCircle2, Play, X } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Play, RefreshCw, X } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { Button } from '../ui/Button';
 import { Reveal } from '../ui/Reveal';
@@ -37,17 +37,17 @@ export function HeroSection() {
           <div className="flex flex-col items-center text-center lg:col-span-6 lg:items-start lg:text-left">
             <Reveal>
               <span className="mb-6 inline-block rounded-full bg-accent-100 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-accent-800">
-                Professional Medical Education
+                For Skincare &amp; Cosmeceutical Professionals
               </span>
             </Reveal>
             <Reveal delay={0.06}>
               <h1 className="mb-6 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-primary-900 md:text-6xl lg:text-7xl">
-                Evidence-based education, <span className="italic text-accent-700">powered by experts.</span>
+                Turn ingredient science into <span className="italic text-accent-700">decisions you can defend.</span>
               </h1>
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mb-10 max-w-xl text-lg leading-relaxed text-primary-600 md:text-xl lg:mb-12">
-                Practical, science-backed courses built for professionals who want confidence in what they know.
+                Structured, evidence-based courses in skin science and cosmeceutical ingredients — built for professionals who need to evaluate products and advise clients with confidence, not guesswork.
               </p>
             </Reveal>
             <Reveal delay={0.18}>
@@ -57,7 +57,7 @@ export function HeroSection() {
                   className="h-14 w-full justify-center text-lg shadow-lg shadow-accent-600/20 sm:w-auto lg:h-16 lg:px-8 lg:text-xl"
                   onClick={() => navigate('/courses')}
                 >
-                  Explore Courses <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                  See Courses &amp; Pricing <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </Reveal>
@@ -65,7 +65,7 @@ export function HeroSection() {
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-semibold text-primary-700 lg:justify-start">
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-accent-600" /><span>Evidence-based content</span></div>
                 <div className="flex items-center gap-2"><BookOpen className="h-5 w-5 text-accent-600" /><span>Expert-led courses</span></div>
-                <div className="flex items-center gap-2"><Award className="h-5 w-5 text-accent-600" /><span>Verified certificates</span></div>
+                <div className="flex items-center gap-2"><RefreshCw className="h-5 w-5 text-accent-600" /><span>Lifetime course access</span></div>
               </div>
             </Reveal>
           </div>
@@ -99,7 +99,7 @@ export function HeroSection() {
                         Meet your professional learning platform.
                       </h2>
                       <p className="mt-4 max-w-md text-sm leading-relaxed text-primary-300 md:text-base">
-                        Discover how expert teaching, scientific depth, and practical application come together at Tutiba.
+                        A short look at how a Tutiba lesson connects the science to a real product decision.
                       </p>
                       <button
                         type="button"

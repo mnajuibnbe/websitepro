@@ -9,8 +9,8 @@ export const faqEntries: FaqEntry[] = [
     a: 'Our courses are designed for health, beauty, and skincare professionals who want structured, evidence-based cosmeceutical education. Each course page lists its specific prerequisites.',
   },
   {
-    q: 'Will I receive a certificate?',
-    a: 'Eligible courses award a completion certificate after you finish the required lessons and assessments. Certificate availability is shown on each course page.',
+    q: 'Do courses include a certificate?',
+    a: 'Certificates are not issued on the platform yet. Every course is organized into clear, ordered stages so you can track your own progress in the meantime — we will announce certification here when it becomes available.',
   },
   {
     q: 'Which payment methods are available?',

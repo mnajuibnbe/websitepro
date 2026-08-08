@@ -1,4 +1,4 @@
-import { ArrowRight, Award, BookOpenCheck, Laptop, Microscope, RefreshCw, UsersRound } from 'lucide-react';
+import { ArrowRight, BookOpenCheck, Laptop, Microscope, PlayCircle, RefreshCw, UsersRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../layout/PageContainer';
 import { Button } from '../ui/Button';
@@ -7,7 +7,7 @@ import { Reveal } from '../ui/Reveal';
 const features = [
   { title: 'Evidence-Based', description: 'Learn from current science and clear reasoning, not marketing claims.', icon: Microscope },
   { title: 'Expert Instructors', description: 'Study with trusted subject specialists who connect knowledge to practice.', icon: UsersRound },
-  { title: 'Certificates', description: 'Complete structured learning paths and earn certificates that mark your progress.', icon: Award },
+  { title: 'Free Preview Lessons', description: 'Watch a complete lesson before you enroll, so you know exactly what you are paying for.', icon: PlayCircle },
   { title: 'Lifetime Updates', description: 'Return to your courses as lessons and supporting resources are updated.', icon: RefreshCw },
   { title: 'Learn Anywhere', description: 'Use a focused learning experience designed for desktop, tablet, and mobile.', icon: Laptop },
   { title: 'Practical Focus', description: 'Turn scientific foundations into better evaluation and real-world decisions.', icon: BookOpenCheck },
@@ -32,7 +32,7 @@ export function WhyChooseUs() {
                   A professional education platform built around credible teaching, flexible access, and useful outcomes.
                 </p>
                 <Button variant="secondary" className="mt-8" onClick={() => navigate('/courses')}>
-                  Explore Courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  Compare all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </Reveal>
             </div>

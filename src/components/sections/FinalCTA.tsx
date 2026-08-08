@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Award, ShieldCheck } from 'lucide-react';
+import { Layers, ShieldCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { IntroVideoModal } from '../video/IntroVideoModal';
@@ -53,7 +53,7 @@ export function FinalCTA() {
           </Reveal>
           <Reveal delay={0.2}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-primary-300">
-              <div className="flex items-center gap-2"><Award className="h-4 w-4 text-accent-300" aria-hidden="true" /><span>Certificate on completion</span></div>
+              <div className="flex items-center gap-2"><Layers className="h-4 w-4 text-accent-300" aria-hidden="true" /><span>Staged diploma structure</span></div>
               <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-accent-300" aria-hidden="true" /><span>Secure checkout</span></div>
             </div>
           </Reveal>
