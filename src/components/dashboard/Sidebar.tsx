@@ -23,7 +23,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const navItems = [
     { icon: Home, label: 'Dashboard', href: '/dashboard' },
     { icon: BookOpen, label: 'My Courses', href: '/my-courses' },
-    { icon: Award, label: 'Certificates', href: '/certificate' },
+    ...(FEATURE_FLAGS.certificates ? [{ icon: Award, label: 'Certificates', href: '/certificate' }] : []),
     { icon: Settings, label: 'Settings', href: '/profile' },
     ...(isInstructor
       ? [

@@ -8,4 +8,5 @@ export const FEATURE_FLAGS = {
   assignments: false,
   instructorProgramme: false,
   newsletter: false,
+  certificates: false,
 } as const;

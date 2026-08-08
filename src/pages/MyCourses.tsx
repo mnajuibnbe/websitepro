@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchCoursesProgress } from '../lib/courseProgress';
 import { OptimizedImage } from '../components/ui/OptimizedImage';
 import { PageContainer } from '../components/layout/PageContainer';
+import { FEATURE_FLAGS } from '../config/featureFlags';
 
 export function MyCourses() {
   const { user } = useAuth();
@@ -238,7 +239,7 @@ export function MyCourses() {
                           </div>
                         </div>
                         <div className="flex items-center justify-between mt-auto">
-                          {progress === 100 ? <Button variant="secondary" onClick={() => navigate('/certificate', { state: { courseId: course.id } })}>Certificate</Button> : <span className="text-sm text-primary-500">Ready when you are</span>}
+                          {progress === 100 ? (FEATURE_FLAGS.certificates ? <Button variant="secondary" onClick={() => navigate('/certificate', { state: { courseId: course.id } })}>Certificate</Button> : <span />) : <span className="text-sm text-primary-500">Ready when you are</span>}
                           <Button
                             variant={progress === 100 ? 'secondary' : 'primary'}
                             onClick={() => navigate(`/learn/${course.id}`)}
