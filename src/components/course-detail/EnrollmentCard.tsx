@@ -11,6 +11,7 @@ import { OptimizedImage } from '../ui/OptimizedImage';
 import type { CourseCatalogItem } from '../../services/courseCatalog.service';
 import { resolveCourseImageUrl } from '../../lib/courseCard';
 import { CourseMediaLightbox, type CoursePreviewLesson } from './CourseMediaLightbox';
+import { trackCheckoutStarted } from '../../lib/analytics';
 
 export function EnrollmentCard({ course, previewLesson }: { course: CourseCatalogItem; previewLesson: CoursePreviewLesson | null }) {
   const { user } = useAuth();
@@ -82,6 +83,7 @@ export function EnrollmentCard({ course, previewLesson }: { course: CourseCatalo
         navigate('/login', { state: { from: `/course/${courseId}` } });
         return;
       }
+      trackCheckoutStarted(courseId);
       navigate('/checkout', { state: { courseId, course } });
 
     } catch (err) {

@@ -11,6 +11,32 @@ import { Menu, Loader2, BookOpen } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
+import { isAnalyticsEnabled, trackEnrollmentActivated } from '../lib/analytics';
+
+// Enrollment activation happens asynchronously (admin approval), so the
+// student only discovers it on a later dashboard visit. Track it once per
+// course per browser using a local "seen" set to avoid re-firing on every
+// subsequent dashboard load.
+async function trackNewlyActivatedEnrollments(userId: string) {
+  try {
+    const { data } = await supabase.from('enrollments').select('course_id').eq('user_id', userId).eq('status', 'active');
+    if (!data || data.length === 0) return;
+    const storageKey = `tutiba_ga_enrollment_seen_${userId}`;
+    const seen = new Set<string>(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+    let changed = false;
+    for (const row of data) {
+      const courseId = String(row.course_id);
+      if (!seen.has(courseId)) {
+        trackEnrollmentActivated(courseId);
+        seen.add(courseId);
+        changed = true;
+      }
+    }
+    if (changed) localStorage.setItem(storageKey, JSON.stringify([...seen]));
+  } catch {
+    // Analytics is best-effort; a failed lookup should never affect the dashboard.
+  }
+}
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -35,6 +61,7 @@ export function Dashboard() {
           if (error) throw error;
           if (count && count > 0) {
             setHasEnrollments(true);
+            if (isAnalyticsEnabled) void trackNewlyActivatedEnrollments(user.id);
           } else {
             setHasEnrollments(false);
           }

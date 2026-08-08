@@ -8,6 +8,7 @@ import { PaymentInstructions } from './PaymentInstructions';
 import { PaymentProofUpload } from './PaymentProofUpload';
 import { getOrderReference } from '../../lib/orderReference';
 import type { PricingCurrency } from '../../lib/pricing';
+import { trackOrderCreated, trackEnrollmentActivated } from '../../lib/analytics';
 
 interface OrderSummaryProps {
   courseId?: string;
@@ -45,8 +46,13 @@ export function OrderSummary({ courseId, title, thumbnail, price, available }: O
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'We could not create your order.');
-      setOrder(payload.order ? { ...payload.order, amount: String(payload.order.amount) } : null);
+      const createdOrder = payload.order ? { ...payload.order, amount: String(payload.order.amount) } : null;
+      setOrder(createdOrder);
       setStatus('success');
+      if (createdOrder) {
+        trackOrderCreated(createdOrder.id, courseId);
+        if (createdOrder.enrollment_status === 'active') trackEnrollmentActivated(courseId!, createdOrder.id);
+      }
     } catch (checkoutError) {
       setError(checkoutError instanceof Error ? checkoutError.message : 'We could not create your order.');
       setStatus('error');

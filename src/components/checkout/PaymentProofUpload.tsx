@@ -13,6 +13,7 @@ import {
   type PaymentMethod,
 } from '../../lib/paymentProof';
 import type { PricingCurrency } from '../../lib/pricing';
+import { trackPaymentProofSubmitted } from '../../lib/analytics';
 
 interface PaymentProofUploadProps {
   orderId: string;
@@ -73,6 +74,7 @@ export function PaymentProofUpload({ orderId, currency, hasPendingSubmission, on
       if (insertError) throw insertError;
 
       setJustSubmitted(true);
+      trackPaymentProofSubmitted(orderId);
       onSubmitted?.();
     } catch {
       if (uploaded) {
