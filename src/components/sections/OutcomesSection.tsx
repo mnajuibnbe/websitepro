@@ -1,12 +1,12 @@
-import { Award, Microscope, ScanSearch, ShieldCheck } from 'lucide-react';
+import { Layers, Microscope, ScanSearch, ShieldCheck } from 'lucide-react';
 import { PageContainer } from '../layout/PageContainer';
 import { Reveal } from '../ui/Reveal';
 
 const outcomes = [
   {
-    title: 'Certificate on completion',
-    description: 'Eligible courses award a completion certificate once you finish the required lessons and assessments.',
-    icon: Award,
+    title: 'Clear course stages',
+    description: 'Work through ordered stages — like Part 1 and Part 2 — so you always know what comes next.',
+    icon: Layers,
   },
   {
     title: 'Evidence-based curriculum',
