@@ -3,6 +3,7 @@ interface Env {
   TOKEN_ISSUER_BASE_URL: string;
   STREAMING_TOKEN_SECRET: string;
   GOOGLE_SERVICE_ACCOUNT_JSON: string;
+  VIDEO_EDGE_KV: KVNamespace;
 }
 
 interface StreamTokenPayload {
@@ -31,8 +32,47 @@ const DRIVE_API_BASE_URL = 'https://www.googleapis.com/drive/v3/files';
 const DRIVE_METADATA_TTL_MS = 5 * 60 * 1000;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+// Isolate-local caches: instant on a warm isolate, but empty on every cold start.
+// Backed by VIDEO_EDGE_KV below so a cold isolate reads KV (fast) instead of
+// re-running the Google OAuth + Drive metadata round trips (slow).
 const driveMetadataCache = new Map<string, DriveMetadata>();
-let googleAccessTokenCache: { token: string; expiresAt: number } | null = null;
+let googleAccessTokenCache: CachedGoogleToken | null = null;
+
+// Must match HOMEPAGE_INTRO_FILE_ID in src/server/controllers/video.controller.ts.
+// This is the ONLY fileId ever served from the shared edge cache below — course and
+// lesson videos never match it, so they can never be cached or shared cross-visitor.
+const HOMEPAGE_INTRO_FILE_ID = '1Dbt6IIl0vLQYlXcuKE4_Vkkja-JYB9EC';
+const PUBLIC_CACHE_TTL_SECONDS = 60 * 60;
+// Google Drive's media endpoint is slow to start streaming when no Range header is
+// sent at all. Requesting an explicit bounded range keeps it fast even when the
+// client asked for the whole file, so a "no Range" request is served via two chained
+// bounded upstream fetches instead of one unbounded one.
+const INITIAL_RANGE_BYTES = 3 * 1024 * 1024;
+const GOOGLE_TOKEN_KV_KEY = 'google:access-token';
+const DRIVE_METADATA_KV_PREFIX = 'drive:metadata:';
+
+interface CachedGoogleToken {
+  token: string;
+  expiresAt: number;
+}
+
+async function readKvJson<T>(kv: KVNamespace, key: string): Promise<T | null> {
+  try {
+    return (await kv.get(key, 'json')) as T | null;
+  } catch {
+    // KV is a latency optimization on top of the isolate-memory cache and the
+    // origin round trip; treat any KV failure as a cache miss, never as a hard error.
+    return null;
+  }
+}
+
+async function writeKvJson(kv: KVNamespace, key: string, value: unknown, ttlSeconds: number): Promise<void> {
+  try {
+    await kv.put(key, JSON.stringify(value), { expirationTtl: Math.max(60, Math.floor(ttlSeconds)) });
+  } catch {
+    // Best-effort warm of the next cold start; failures here must not fail the request.
+  }
+}
 
 function base64UrlToBytes(value: string): Uint8Array {
   const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
@@ -97,7 +137,15 @@ function pemToPkcs8(pem: string): ArrayBuffer {
 }
 
 async function getGoogleAccessToken(env: Env): Promise<string> {
-  if (googleAccessTokenCache && googleAccessTokenCache.expiresAt > Date.now() + 60_000) return googleAccessTokenCache.token;
+  const safetyMarginMs = 60_000;
+  if (googleAccessTokenCache && googleAccessTokenCache.expiresAt > Date.now() + safetyMarginMs) return googleAccessTokenCache.token;
+
+  const stored = await readKvJson<CachedGoogleToken>(env.VIDEO_EDGE_KV, GOOGLE_TOKEN_KV_KEY);
+  if (stored && stored.expiresAt > Date.now() + safetyMarginMs) {
+    googleAccessTokenCache = stored;
+    return stored.token;
+  }
+
   const credentials = parseServiceAccount(env.GOOGLE_SERVICE_ACCOUNT_JSON);
   if (!credentials.client_email || !credentials.private_key) throw new Error('Invalid Google Service Account configuration');
   const tokenUrl = credentials.token_uri || GOOGLE_TOKEN_URL;
@@ -128,7 +176,10 @@ async function getGoogleAccessToken(env: Env): Promise<string> {
   if (!tokenResponse.ok) throw new Error(`Google OAuth request failed (${tokenResponse.status})`);
   const result = await tokenResponse.json() as { access_token?: string; expires_in?: number };
   if (!result.access_token) throw new Error('Google OAuth response did not include an access token');
-  googleAccessTokenCache = { token: result.access_token, expiresAt: Date.now() + (result.expires_in || 3600) * 1000 };
+  const expiresInSeconds = result.expires_in || 3600;
+  const tokenRecord: CachedGoogleToken = { token: result.access_token, expiresAt: Date.now() + expiresInSeconds * 1000 };
+  googleAccessTokenCache = tokenRecord;
+  await writeKvJson(env.VIDEO_EDGE_KV, GOOGLE_TOKEN_KV_KEY, tokenRecord, expiresInSeconds - 60);
   return result.access_token;
 }
 
@@ -141,6 +192,14 @@ async function driveFetch(env: Env, fileId: string, parameters: URLSearchParams,
 async function getDriveMetadata(env: Env, fileId: string): Promise<DriveMetadata> {
   const cached = driveMetadataCache.get(fileId);
   if (cached && cached.expiresAt > Date.now()) return cached;
+
+  const kvKey = `${DRIVE_METADATA_KV_PREFIX}${fileId}`;
+  const stored = await readKvJson<DriveMetadata>(env.VIDEO_EDGE_KV, kvKey);
+  if (stored && stored.expiresAt > Date.now()) {
+    driveMetadataCache.set(fileId, stored);
+    return stored;
+  }
+
   const response = await driveFetch(env, fileId, new URLSearchParams({ fields: 'size,mimeType', supportsAllDrives: 'true' }));
   if (!response.ok) throw Object.assign(new Error(`Drive metadata request failed (${response.status})`), { status: response.status });
   const data = await response.json() as { size?: string; mimeType?: string };
@@ -149,7 +208,112 @@ async function getDriveMetadata(env: Env, fileId: string): Promise<DriveMetadata
   if (!Number.isFinite(fileSize) || fileSize <= 0 || !mimeType.startsWith('video/')) throw new Error('Drive video metadata is invalid');
   const metadata = { fileSize, mimeType, expiresAt: Date.now() + DRIVE_METADATA_TTL_MS };
   driveMetadataCache.set(fileId, metadata);
+  await writeKvJson(env.VIDEO_EDGE_KV, kvKey, metadata, DRIVE_METADATA_TTL_MS / 1000);
   return metadata;
+}
+
+async function pumpReaderIntoWriter(readable: ReadableStream<Uint8Array>, writer: WritableStreamDefaultWriter<Uint8Array>): Promise<void> {
+  const reader = readable.getReader();
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      if (value) await writer.write(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+// Always asks Drive for an explicit bounded range (see INITIAL_RANGE_BYTES above),
+// chaining a second bounded fetch for the remainder when the file is larger, then
+// exposes the two as a single continuous stream. Callers still see one 200 response
+// with the correct total Content-Length, matching what a client that sent no Range
+// header expects.
+async function fetchFullMediaBody(env: Env, fileId: string, fileSize: number): Promise<ReadableStream<Uint8Array>> {
+  const params = new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' });
+  const lastByte = fileSize - 1;
+  const initialEnd = Math.min(INITIAL_RANGE_BYTES - 1, lastByte);
+  const first = await driveFetch(env, fileId, params, { Range: `bytes=0-${initialEnd}` });
+  if (!first.ok || !first.body) throw Object.assign(new Error(`Drive media request failed (${first.status})`), { status: first.status });
+  if (initialEnd >= lastByte) return first.body;
+
+  const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+  const writer = writable.getWriter();
+  (async () => {
+    try {
+      await pumpReaderIntoWriter(first.body!, writer);
+      const rest = await driveFetch(env, fileId, params, { Range: `bytes=${initialEnd + 1}-${lastByte}` });
+      if (!rest.ok || !rest.body) throw Object.assign(new Error(`Drive media request failed (${rest.status})`), { status: rest.status });
+      await pumpReaderIntoWriter(rest.body, writer);
+      await writer.close();
+    } catch (error) {
+      await writer.abort(error);
+    }
+  })();
+  return readable;
+}
+
+function publicCacheKeyUrl(request: Request, fileId: string): string {
+  const url = new URL(request.url);
+  url.pathname = `/__edge-cache/public-video/${fileId}`;
+  url.search = '';
+  return url.toString();
+}
+
+// The Workers Cache API does not auto-slice a stored response against a Range header
+// on the lookup request — cache.match() only ever returns the object as stored. So a
+// cache hit for a ranged request is served by reading the (already edge-local, no
+// origin round trip) cached bytes into memory and slicing them here. Safe for the
+// homepage intro's size; never used for lesson videos.
+async function serveRangeFromCachedResponse(cached: Response, rangeHeader: string): Promise<Response> {
+  // Content-Length does not reliably survive a cache.put()/match() round trip for a
+  // streamed body, so the real size comes from the buffered bytes, not the header.
+  const buffer = await cached.arrayBuffer();
+  const totalSize = buffer.byteLength;
+  const mimeType = cached.headers.get('Content-Type') || 'application/octet-stream';
+  const parts = rangeHeader.replace(/bytes=/, '').split('-');
+  const start = Number.parseInt(parts[0], 10);
+  let end = totalSize - 1;
+  if (parts[1]?.trim()) {
+    const parsedEnd = Number.parseInt(parts[1], 10);
+    if (!Number.isNaN(parsedEnd)) end = Math.min(parsedEnd, totalSize - 1);
+  }
+  if (Number.isNaN(start) || start >= totalSize || start > end) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${totalSize}` } });
+  }
+  const slice = buffer.slice(start, end + 1);
+  return new Response(slice, {
+    status: 206,
+    headers: {
+      'Content-Type': mimeType,
+      'Accept-Ranges': 'bytes',
+      'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+      'Content-Length': String(end - start + 1),
+      'Cache-Control': `public, max-age=${PUBLIC_CACHE_TTL_SECONDS}`,
+    },
+  });
+}
+
+// Populates the shared Cloudflare edge cache with the full homepage-intro object so
+// future requests at this colo (any visitor, GET or HEAD, ranged or not) are served
+// straight from cache with zero Drive/Google round trips. Never called for lesson or
+// course-trailer fileIds — see the isPublicHomepageIntro gate in streamVideo.
+async function warmPublicVideoCache(env: Env, fileId: string, metadata: DriveMetadata, cacheKeyUrl: string): Promise<void> {
+  const cache = caches.default;
+  const baseRequest = new Request(cacheKeyUrl);
+  if (await cache.match(baseRequest)) return;
+  const body = await fetchFullMediaBody(env, fileId, metadata.fileSize);
+  const response = new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': metadata.mimeType,
+      'Content-Length': String(metadata.fileSize),
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': `public, max-age=${PUBLIC_CACHE_TTL_SECONDS}`,
+    },
+  });
+  await cache.put(baseRequest, response);
 }
 
 const PREVIEW_ORIGIN_PATTERN = /^https:\/\/websitepro-[a-z0-9-]+-mnajuibnbes-projects\.vercel\.app$/;
@@ -201,7 +365,7 @@ function mapDriveError(error: unknown, metadataRequest: boolean): Response {
   return jsonResponse({ error: 'Failed to stream media.' }, 500);
 }
 
-async function streamVideo(request: Request, env: Env): Promise<Response> {
+async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const token = new URL(request.url).searchParams.get('token');
   if (!token) return jsonResponse({ error: 'Missing streaming token' }, 401);
   let fileId: string;
@@ -211,6 +375,21 @@ async function streamVideo(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ error: 'Invalid or expired streaming token' }, 401);
   }
 
+  // The homepage intro is the only asset ever eligible for the shared edge cache.
+  // Everything else (lesson videos, course trailers) always falls through to the
+  // per-request authorised Drive fetch below and is always sent no-store.
+  const isPublicHomepageIntro = fileId === HOMEPAGE_INTRO_FILE_ID;
+  const range = request.headers.get('Range');
+
+  if (isPublicHomepageIntro) {
+    try {
+      const cachedFull = await caches.default.match(new Request(publicCacheKeyUrl(request, fileId)));
+      if (cachedFull) return range ? await serveRangeFromCachedResponse(cachedFull, range) : cachedFull;
+    } catch {
+      // Cache API failure: fall through to the normal authorised-fetch path below.
+    }
+  }
+
   let metadata: DriveMetadata;
   try {
     metadata = await getDriveMetadata(env, fileId);
@@ -218,9 +397,13 @@ async function streamVideo(request: Request, env: Env): Promise<Response> {
     return mapDriveError(error, request.method === 'HEAD');
   }
   const { fileSize, mimeType } = metadata;
+
+  if (isPublicHomepageIntro) {
+    ctx.waitUntil(warmPublicVideoCache(env, fileId, metadata, publicCacheKeyUrl(request, fileId)).catch(() => undefined));
+  }
+
   if (request.method === 'HEAD') return new Response(null, { status: 200, headers: { 'Content-Length': String(fileSize), 'Content-Type': mimeType, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store' } });
 
-  const range = request.headers.get('Range');
   let start: number | null = null;
   let end = fileSize - 1;
   if (range) {
@@ -234,34 +417,32 @@ async function streamVideo(request: Request, env: Env): Promise<Response> {
   }
 
   try {
-    const upstream = await driveFetch(
-      env,
-      fileId,
-      new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }),
-      start === null ? undefined : { Range: `bytes=${start}-${end}` },
-    );
-    if (!upstream.ok) throw Object.assign(new Error(`Drive media request failed (${upstream.status})`), { status: upstream.status });
     const headers = new Headers({ 'Content-Type': mimeType, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store' });
-    if (start === null) headers.set('Content-Length', String(fileSize));
-    else {
-      headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
-      headers.set('Content-Length', String(end - start + 1));
+    if (start === null) {
+      const body = await fetchFullMediaBody(env, fileId, fileSize);
+      headers.set('Content-Length', String(fileSize));
+      return new Response(body, { status: 200, headers });
     }
-    return new Response(upstream.body, { status: start === null ? 200 : 206, headers });
+
+    const upstream = await driveFetch(env, fileId, new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }), { Range: `bytes=${start}-${end}` });
+    if (!upstream.ok) throw Object.assign(new Error(`Drive media request failed (${upstream.status})`), { status: upstream.status });
+    headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+    headers.set('Content-Length', String(end - start + 1));
+    return new Response(upstream.body, { status: 206, headers });
   } catch (error) {
     return mapDriveError(error, false);
   }
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const origin = request.headers.get('Origin');
     if (origin && !isAllowedOrigin(origin, env)) return withCors(jsonResponse({ error: 'Origin not allowed' }, 403), env, request);
     if (request.method === 'OPTIONS') return withCors(new Response(null, { status: 204 }), env, request);
     const pathname = new URL(request.url).pathname.replace(/\/$/, '');
     let response: Response;
     if (pathname === '/api/video/token' && request.method === 'POST') response = await proxyTokenRequest(request, env);
-    else if (pathname === '/api/video/stream' && (request.method === 'GET' || request.method === 'HEAD')) response = await streamVideo(request, env);
+    else if (pathname === '/api/video/stream' && (request.method === 'GET' || request.method === 'HEAD')) response = await streamVideo(request, env, ctx);
     else response = jsonResponse({ error: 'Not found' }, 404);
     return withCors(response, env, request);
   },
