@@ -1,5 +1,5 @@
 import { Suspense, useLayoutEffect } from 'react';
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PricingProvider } from './contexts/PricingContext';
 import { RequireAuth } from './components/auth/RequireAuth';
@@ -131,10 +131,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppErrorBoundary><HashRouter><LocaleProvider>
+    <AppErrorBoundary><BrowserRouter><LocaleProvider>
       <AuthProvider>
         <PricingProvider><AppContent /></PricingProvider>
       </AuthProvider>
-    </LocaleProvider></HashRouter></AppErrorBoundary>
+    </LocaleProvider></BrowserRouter></AppErrorBoundary>
   );
 }

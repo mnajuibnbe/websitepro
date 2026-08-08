@@ -6,10 +6,10 @@ import {initSentry} from './lib/sentry';
 
 initSentry();
 
-// HashRouter owns the client route. If an API URL was accidentally used as
-// the document base, normalize it without losing the current hash route.
-if (window.location.pathname !== '/') {
-  window.history.replaceState(null, '', `/${window.location.search}${window.location.hash}`);
+// Legacy links from the old HashRouter looked like /#/path. Redirect them to
+// the equivalent clean BrowserRouter path so previously shared links keep working.
+if (window.location.hash.startsWith('#/')) {
+  window.history.replaceState(null, '', window.location.hash.slice(1) + window.location.search);
 }
 
 createRoot(document.getElementById('root')!).render(

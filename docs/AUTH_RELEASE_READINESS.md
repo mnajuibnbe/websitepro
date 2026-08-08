@@ -16,7 +16,7 @@ This checklist is the production gate for the Tutiba sign-in, registration, pass
 
 - [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the intended production project. Never expose the service-role key in a `VITE_` variable.
 - [ ] Configure the exact production origin and approved preview/staging origins in Supabase URL configuration.
-- [ ] Allow the recovery destination `https://<origin>/#/update-password`; reject unowned wildcard origins.
+- [ ] Allow the recovery destination `https://<origin>/?type=recovery`; reject unowned wildcard origins.
 - [ ] Verify email confirmation is enabled or intentionally disabled and that UI behavior matches the setting.
 - [ ] Review password minimums so Supabase policy and the eight-character client requirement agree.
 - [ ] Verify sign-in, sign-up, and recovery rate limits and bot-abuse controls.
