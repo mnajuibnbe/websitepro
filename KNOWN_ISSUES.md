@@ -319,3 +319,12 @@ server-side eligibility check backing the client-side one, and an actual
 third-party verification lookup — a project-sized piece of work, not a
 quick patch. Recommend scoping this as its own future phase before
 re-enabling the flag.
+
+
+## Not working cover_image URL on published course (2026-08-08)
+Course "Skin and Hair Cair Diploma Part 1" has cover_image pointing at
+https://tutiba.vercel.app/backgrounds/1.png — a Not working URL from an apparently
+earlier deployment (not the current production domain
+websitepro-seven.vercel.app). Discovered during Phase B-18 (SEO) since it
+breaks Open Graph image previews and Course structured data image for this
+course. Needs the DB field updated to a live asset URL.
