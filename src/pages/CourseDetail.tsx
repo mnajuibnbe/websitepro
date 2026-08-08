@@ -17,6 +17,9 @@ import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useCourseCatalog } from '../hooks/useCourseCatalog';
 import type { CoursePreviewLesson } from '../components/course-detail/CourseMediaLightbox';
+import { applyPageMeta, setStructuredData, SITE_NAME } from '../components/layout/PageMeta';
+import { usePricingContext } from '../contexts/PricingContext';
+import { resolveCoursePrice } from '../lib/pricing';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +37,45 @@ export function CourseDetail() {
     pageSize: 1,
   });
   const course = courses[0] || null;
+  const pricingContext = usePricingContext();
+
+  useEffect(() => {
+    const url = `${window.location.origin}/course/${id ?? ''}`;
+
+    if (!validCourseId || (!courseLoading && !course)) {
+      applyPageMeta({
+        title: `Course Not Found | ${SITE_NAME}`,
+        description: 'This course link is invalid or the course is no longer available. Browse the Tutiba course catalog to find the right course.',
+        url,
+        robots: 'noindex, follow',
+      });
+      setStructuredData('structured-data-course', null);
+      return;
+    }
+
+    if (!course) return;
+
+    const title = course.seo_title || `${course.title} | ${SITE_NAME}`;
+    const description = course.seo_description || course.short_description || course.description || `${course.title} — a professional cosmeceutical course from Tutiba.`;
+    const image = course.cover_image || undefined;
+
+    applyPageMeta({ title, description, url, image });
+
+    const price = resolveCoursePrice(course, pricingContext);
+    setStructuredData('structured-data-course', {
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name: course.title,
+      description,
+      url,
+      ...(image ? { image } : {}),
+      provider: { '@type': 'Organization', name: SITE_NAME, sameAs: window.location.origin },
+      ...(price.available ? { offers: { '@type': 'Offer', price: price.amount, priceCurrency: price.currency, url, availability: 'https://schema.org/InStock' } } : {}),
+      ...(course.reviewCount > 0 ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: course.rating, reviewCount: course.reviewCount } } : {}),
+    });
+
+    return () => setStructuredData('structured-data-course', null);
+  }, [course, courseLoading, validCourseId, id, pricingContext]);
 
   useEffect(() => {
     async function fetchRelatedCourseData() {

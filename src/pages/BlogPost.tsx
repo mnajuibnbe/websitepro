@@ -6,6 +6,7 @@ import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { PageContainer } from '../components/layout/PageContainer';
 import { BlogCoverImage } from '../components/blog/BlogCoverImage';
 import { fetchPublishedBlogPost, type BlogPost as BlogPostData } from '../services/blogPosts.service';
+import { applyPageMeta, setStructuredData, SITE_NAME } from '../components/layout/PageMeta';
 
 export function BlogPost() {
   const { slug = '' } = useParams();
@@ -21,6 +22,44 @@ export function BlogPost() {
     fetchPublishedBlogPost(slug).then(data => { if (active) { setPost(data); setError(!data); } }).catch(() => { if (active) setError(true); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [slug]);
+
+  useEffect(() => {
+    const url = `${window.location.origin}/blog/${slug}`;
+
+    if (error || (!loading && !post)) {
+      applyPageMeta({
+        title: `Article Not Found | ${SITE_NAME}`,
+        description: 'This article may have moved or is not published. Browse the Tutiba blog for other articles.',
+        url,
+        robots: 'noindex, follow',
+      });
+      setStructuredData('structured-data-article', null);
+      return;
+    }
+
+    if (!post) return;
+
+    const title = `${post.title} | ${SITE_NAME} Blog`;
+    const description = post.excerpt || `Read ${post.title} on the Tutiba blog.`;
+    const image = post.cover_image_url || undefined;
+
+    applyPageMeta({ title, description, url, image, type: 'article' });
+
+    setStructuredData('structured-data-article', {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description,
+      ...(image ? { image } : {}),
+      datePublished: post.published_at || post.created_at,
+      dateModified: post.updated_at || post.published_at || post.created_at,
+      author: { '@type': 'Organization', name: 'Tutiba Education Team' },
+      publisher: { '@type': 'Organization', name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${window.location.origin}/images/tutiba-instructor-logo.png` } },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    });
+
+    return () => setStructuredData('structured-data-article', null);
+  }, [post, loading, error, slug]);
 
   const date = post?.published_at ? new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(post.published_at)) : null;
   return <div className="min-h-screen bg-primary-50 font-sans" dir="ltr"><MarketingNavbar /><main id="main-content" className="pb-24 pt-32"><PageContainer><div className="mx-auto max-w-4xl">
