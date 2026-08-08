@@ -82,7 +82,7 @@ export function UpdatePassword() {
       if (verifyError || !data.session) throw verifyError || new Error('This password reset link is invalid or has expired.');
       setHasSession(true);
       setAwaitingConfirmation(false);
-      window.history.replaceState(null, '', '/#/update-password');
+      window.history.replaceState(null, '', '/update-password');
     } catch (caughtError) {
       setError(getAuthErrorMessage(caughtError, 'recovery'));
     } finally {

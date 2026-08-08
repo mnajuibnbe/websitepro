@@ -37,7 +37,7 @@ export function CertificatePage() {
   }, [courseId, user]);
 
   const certificateId = courseId && user ? `TUT-${courseId.slice(0, 8).toUpperCase()}-${user.id.slice(0, 8).toUpperCase()}` : '';
-  const verificationUrl = courseId ? `${window.location.origin}${window.location.pathname}#/certificate?course=${encodeURIComponent(courseId)}` : '';
+  const verificationUrl = courseId ? `${window.location.origin}/certificate?course=${encodeURIComponent(courseId)}` : '';
   const completionDate = new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date());
 
   const copyVerificationLink = async () => {

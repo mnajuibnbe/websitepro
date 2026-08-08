@@ -44,7 +44,7 @@ export function PageMeta() {
     const base = window.location.origin;
     const organization = { '@type': 'EducationalOrganization', name: 'Tutiba', url: base, description: 'Evidence-based cosmeceutical education for professionals.' };
     const schemas: Record<string, unknown>[] = [{ '@context': 'https://schema.org', ...organization }];
-    if (pathname === '/') schemas.push({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Tutiba', url: base, potentialAction: { '@type': 'SearchAction', target: `${base}/#/courses?search={search_term_string}`, 'query-input': 'required name=search_term_string' } });
+    if (pathname === '/') schemas.push({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Tutiba', url: base, potentialAction: { '@type': 'SearchAction', target: `${base}/courses?search={search_term_string}`, 'query-input': 'required name=search_term_string' } });
     if (pathname === '/faq') schemas.push({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
       { '@type': 'Question', name: 'Who are Tutiba courses designed for?', acceptedAnswer: { '@type': 'Answer', text: 'Health, beauty, and skincare professionals seeking structured cosmeceutical education.' } },
       { '@type': 'Question', name: 'Will I receive a certificate?', acceptedAnswer: { '@type': 'Answer', text: 'Eligible completed courses award a certificate when the published requirements are met.' } },
