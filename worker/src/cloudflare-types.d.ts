@@ -12,10 +12,17 @@ declare global {
     metadata?: unknown;
   }
 
+  interface KVNamespaceGetWithMetadataResult<Metadata> {
+    value: ArrayBuffer | null;
+    metadata: Metadata | null;
+  }
+
   interface KVNamespace {
     get(key: string, type: 'json'): Promise<any>;
+    get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer | null>;
     get(key: string, type?: 'text'): Promise<string | null>;
-    put(key: string, value: string, options?: KVNamespacePutOptions): Promise<void>;
+    getWithMetadata<Metadata = unknown>(key: string, type: 'arrayBuffer'): Promise<KVNamespaceGetWithMetadataResult<Metadata>>;
+    put(key: string, value: string | ArrayBuffer | ArrayBufferView, options?: KVNamespacePutOptions): Promise<void>;
     delete(key: string): Promise<void>;
   }
 

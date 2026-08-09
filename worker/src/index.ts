@@ -226,26 +226,48 @@ async function pumpReaderIntoWriter(readable: ReadableStream<Uint8Array>, writer
 }
 
 // Always asks Drive for an explicit bounded range (see INITIAL_RANGE_BYTES above),
-// chaining a second bounded fetch for the remainder when the file is larger, then
-// exposes the two as a single continuous stream. Callers still see one 200 response
-// with the correct total Content-Length, matching what a client that sent no Range
-// header expects.
-async function fetchFullMediaBody(env: Env, fileId: string, fileSize: number): Promise<ReadableStream<Uint8Array>> {
+// chaining a second bounded fetch for the remainder when the requested span is
+// larger, then exposes the two as a single continuous stream. Callers still see one
+// response with the correct Content-Length, matching what a client that asked for
+// [start, end] expects regardless of how many upstream fetches it took.
+async function fetchDriveRangeStream(env: Env, fileId: string, start: number, end: number): Promise<ReadableStream<Uint8Array>> {
   const params = new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' });
-  const lastByte = fileSize - 1;
-  const initialEnd = Math.min(INITIAL_RANGE_BYTES - 1, lastByte);
-  const first = await driveFetch(env, fileId, params, { Range: `bytes=0-${initialEnd}` });
+  const initialEnd = Math.min(start + INITIAL_RANGE_BYTES - 1, end);
+  const first = await driveFetch(env, fileId, params, { Range: `bytes=${start}-${initialEnd}` });
   if (!first.ok || !first.body) throw Object.assign(new Error(`Drive media request failed (${first.status})`), { status: first.status });
-  if (initialEnd >= lastByte) return first.body;
+  if (initialEnd >= end) return first.body;
 
   const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
   const writer = writable.getWriter();
   (async () => {
     try {
       await pumpReaderIntoWriter(first.body!, writer);
-      const rest = await driveFetch(env, fileId, params, { Range: `bytes=${initialEnd + 1}-${lastByte}` });
+      const rest = await driveFetch(env, fileId, params, { Range: `bytes=${initialEnd + 1}-${end}` });
       if (!rest.ok || !rest.body) throw Object.assign(new Error(`Drive media request failed (${rest.status})`), { status: rest.status });
       await pumpReaderIntoWriter(rest.body, writer);
+      await writer.close();
+    } catch (error) {
+      await writer.abort(error);
+    }
+  })();
+  return readable;
+}
+
+// A "no Range" request wants the whole file as one continuous stream starting at 0.
+async function fetchFullMediaBody(env: Env, fileId: string, fileSize: number): Promise<ReadableStream<Uint8Array>> {
+  return fetchDriveRangeStream(env, fileId, 0, fileSize - 1);
+}
+
+// Concatenates in-memory bytes (already fetched/cached) with a lazily-streamed
+// continuation, exposed as a single stream. Used to stitch the cached faststart
+// prefix (ftyp + relocated moov) onto the Drive-streamed mdat continuation below.
+function concatBytesWithStream(prefix: Uint8Array, rest: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+  const writer = writable.getWriter();
+  (async () => {
+    try {
+      await writer.write(prefix);
+      await pumpReaderIntoWriter(rest, writer);
       await writer.close();
     } catch (error) {
       await writer.abort(error);
@@ -365,6 +387,239 @@ function mapDriveError(error: unknown, metadataRequest: boolean): Response {
   return jsonResponse({ error: 'Failed to stream media.' }, 500);
 }
 
+// ---- MP4 "moov faststart" relocation ----------------------------------------
+//
+// Lesson videos are exported/recorded with the moov atom (the sample/chunk index)
+// written AFTER mdat (the media payload) — standard output for many simple muxers,
+// but it forces browsers to seek to the end of a 100MB+ file before they can start
+// decoding anything, which is the ~40s start-of-playback delay this fixes.
+// Re-encoding every existing video with `ffmpeg -movflags +faststart` isn't
+// practical, so this relocates moov in front of mdat on the fly:
+//   - mdat's bytes are never touched (media payload stays bit-for-bit identical,
+//     always streamed straight from Drive, same as before this change).
+//   - moov is fetched once per fileId, its stco/co64 chunk-offset tables are
+//     patched by the exact number of bytes mdat shifts forward by, and the small
+//     relocated prefix (ftyp + any leading boxes + rewritten moov) is cached in KV
+//     so it's computed at most once per lesson, ever, across every viewer/colo.
+// This is a from-scratch reimplementation of the qt-faststart algorithm rather
+// than the `moov-faststart` npm package: that package's API relocates moov by
+// operating on a single in-memory Buffer of the whole file, which doesn't fit a
+// Worker's per-isolate memory budget for 100MB+ lesson videos, and this worker
+// deliberately has no package.json / dependency graph (see cloudflare-types.d.ts).
+
+interface Mp4BoxHeader {
+  type: string;
+  headerSize: number;
+  boxSize: number;
+}
+
+const MAX_UINT32 = 0xffffffff;
+
+export function readBoxHeader(view: DataView, offset: number): Mp4BoxHeader | null {
+  if (offset + 8 > view.byteLength) return null;
+  const size32 = view.getUint32(offset);
+  const type = String.fromCharCode(view.getUint8(offset + 4), view.getUint8(offset + 5), view.getUint8(offset + 6), view.getUint8(offset + 7));
+  if (size32 === 1) {
+    if (offset + 16 > view.byteLength) return null;
+    const high = view.getUint32(offset + 8);
+    const low = view.getUint32(offset + 12);
+    return { type, headerSize: 16, boxSize: high * 2 ** 32 + low };
+  }
+  // size32 === 0 ("extends to end of file") is legal MP4 but leaves no room for a
+  // trailing moov box to relocate, so it is treated the same as "not found" below.
+  return { type, headerSize: 8, boxSize: size32 };
+}
+
+interface LeadingBoxLayout {
+  mdatStart: number;
+  mdatDeclaredSize: number;
+  alreadyFastStart: boolean;
+}
+
+// Scans top-level boxes from the start of the file looking for mdat. If moov is
+// found first, the file is already faststart (or never needed it) and nothing
+// should be relocated. headBytes only needs to cover ftyp/free/etc. — never mdat's
+// payload — so FASTSTART_HEAD_SCAN_BYTES is generous by a wide margin.
+export function scanLeadingBoxes(headBytes: Uint8Array): LeadingBoxLayout | null {
+  const view = new DataView(headBytes.buffer, headBytes.byteOffset, headBytes.byteLength);
+  let offset = 0;
+  while (offset + 8 <= headBytes.byteLength) {
+    const header = readBoxHeader(view, offset);
+    if (!header || header.boxSize < header.headerSize) return null;
+    if (header.type === 'moov') return { mdatStart: offset, mdatDeclaredSize: header.boxSize, alreadyFastStart: true };
+    if (header.type === 'mdat') return { mdatStart: offset, mdatDeclaredSize: header.boxSize, alreadyFastStart: false };
+    offset += header.boxSize;
+  }
+  return null;
+}
+
+// Only these box types can contain stco/co64 further down the tree
+// (moov > trak > mdia > minf > stbl > {stco|co64}), per ISO/IEC 14496-12.
+const MOOV_CONTAINER_TYPES = new Set(['moov', 'trak', 'mdia', 'minf', 'stbl']);
+
+function patchStco(view: DataView, contentStart: number, contentEnd: number, delta: number): boolean {
+  if (contentStart + 8 > contentEnd) return false;
+  const entryCount = view.getUint32(contentStart + 4);
+  const entriesStart = contentStart + 8;
+  for (let index = 0; index < entryCount; index += 1) {
+    const entryOffset = entriesStart + index * 4;
+    if (entryOffset + 4 > contentEnd) return false;
+    const newValue = view.getUint32(entryOffset) + delta;
+    if (newValue > MAX_UINT32) return false; // would need co64 upgrade; bail to passthrough instead
+    view.setUint32(entryOffset, newValue);
+  }
+  return true;
+}
+
+function patchCo64(view: DataView, contentStart: number, contentEnd: number, delta: number): boolean {
+  if (contentStart + 8 > contentEnd) return false;
+  const entryCount = view.getUint32(contentStart + 4);
+  const entriesStart = contentStart + 8;
+  for (let index = 0; index < entryCount; index += 1) {
+    const entryOffset = entriesStart + index * 8;
+    if (entryOffset + 8 > contentEnd) return false;
+    const high = view.getUint32(entryOffset);
+    const low = view.getUint32(entryOffset + 4);
+    const combined = high * 2 ** 32 + low + delta;
+    view.setUint32(entryOffset, Math.floor(combined / 2 ** 32));
+    view.setUint32(entryOffset + 4, combined % 2 ** 32);
+  }
+  return true;
+}
+
+// Walks a standalone buffer containing exactly one top-level moov box and adds
+// `delta` to every absolute chunk offset in every stco/co64 table at any depth.
+// Returns false if relocation cannot be safely applied (malformed box, or a
+// patched offset would overflow a 32-bit stco entry), signalling the caller to
+// fall back to unmodified passthrough for this file rather than risk a corrupt index.
+export function patchChunkOffsets(moovBytes: Uint8Array, delta: number): boolean {
+  const view = new DataView(moovBytes.buffer, moovBytes.byteOffset, moovBytes.byteLength);
+
+  function walk(start: number, end: number): boolean {
+    let offset = start;
+    while (offset + 8 <= end) {
+      const header = readBoxHeader(view, offset);
+      if (!header || header.boxSize < header.headerSize || offset + header.boxSize > end) return false;
+      const contentStart = offset + header.headerSize;
+      const contentEnd = offset + header.boxSize;
+      if (header.type === 'stco') {
+        if (!patchStco(view, contentStart, contentEnd, delta)) return false;
+      } else if (header.type === 'co64') {
+        if (!patchCo64(view, contentStart, contentEnd, delta)) return false;
+      } else if (MOOV_CONTAINER_TYPES.has(header.type)) {
+        if (!walk(contentStart, contentEnd)) return false;
+      }
+      offset += header.boxSize;
+    }
+    return true;
+  }
+
+  return walk(0, moovBytes.byteLength);
+}
+
+interface FaststartActive {
+  status: 'active';
+  prefixBytes: Uint8Array; // ftyp + any leading boxes (unchanged) + rewritten moov
+  mdatStart: number; // offset where mdat begins, in both the original file and prefixBytes
+  fileSize: number;
+}
+interface FaststartPassthrough {
+  status: 'passthrough';
+  fileSize: number;
+}
+type FaststartResult = FaststartActive | FaststartPassthrough;
+
+// Isolate-local cache backed by KV, same warm/cold-start pattern as
+// driveMetadataCache above: instant on a warm isolate, KV read (no Drive round
+// trip) on a cold one, full recompute only on a true first-ever view.
+const faststartCache = new Map<string, FaststartResult>();
+const FASTSTART_KV_PREFIX = 'video:faststart:';
+const FASTSTART_HEAD_SCAN_BYTES = 262_144;
+const FASTSTART_CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
+
+interface FaststartKvMetadata {
+  fileSize: number;
+  mdatStart?: number;
+  passthrough?: boolean;
+}
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+}
+
+async function fetchDriveRangeBytes(env: Env, fileId: string, start: number, end: number): Promise<Uint8Array> {
+  const response = await driveFetch(env, fileId, new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }), { Range: `bytes=${start}-${end}` });
+  if (!response.ok || !response.body) throw Object.assign(new Error(`Drive media request failed (${response.status})`), { status: response.status });
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+async function readFaststartFromKv(kv: KVNamespace, fileId: string): Promise<FaststartResult | null> {
+  try {
+    const { value, metadata } = await kv.getWithMetadata<FaststartKvMetadata>(`${FASTSTART_KV_PREFIX}${fileId}`, 'arrayBuffer');
+    if (!metadata) return null;
+    if (metadata.passthrough) return { status: 'passthrough', fileSize: metadata.fileSize };
+    if (!value || typeof metadata.mdatStart !== 'number') return null;
+    return { status: 'active', prefixBytes: new Uint8Array(value), mdatStart: metadata.mdatStart, fileSize: metadata.fileSize };
+  } catch {
+    return null;
+  }
+}
+
+async function writeFaststartToKv(kv: KVNamespace, fileId: string, result: FaststartResult): Promise<void> {
+  try {
+    const key = `${FASTSTART_KV_PREFIX}${fileId}`;
+    const value = result.status === 'active' ? toArrayBuffer(result.prefixBytes) : new ArrayBuffer(0);
+    const metadata: FaststartKvMetadata = result.status === 'active'
+      ? { fileSize: result.fileSize, mdatStart: result.mdatStart }
+      : { fileSize: result.fileSize, passthrough: true };
+    await kv.put(key, value, { expirationTtl: FASTSTART_CACHE_TTL_SECONDS, metadata });
+  } catch {
+    // Best-effort: a KV write failure just means the next request recomputes.
+  }
+}
+
+// Builds the relocated prefix for a fileId never seen before (isolate- or KV-cold).
+// Only ftyp/leading-box bytes and the moov atom itself are ever fetched or cached
+// here — mdat (the actual audio/video payload) is never read into memory or stored.
+async function buildFaststartPrefix(env: Env, fileId: string, fileSize: number): Promise<FaststartResult> {
+  const headBytes = await fetchDriveRangeBytes(env, fileId, 0, Math.min(FASTSTART_HEAD_SCAN_BYTES, fileSize) - 1);
+  const layout = scanLeadingBoxes(headBytes);
+  if (!layout || layout.alreadyFastStart) return { status: 'passthrough', fileSize };
+
+  const moovStart = layout.mdatStart + layout.mdatDeclaredSize;
+  if (moovStart >= fileSize) return { status: 'passthrough', fileSize };
+  const moovSize = fileSize - moovStart;
+
+  const moovBytes = await fetchDriveRangeBytes(env, fileId, moovStart, fileSize - 1);
+  const moovView = new DataView(moovBytes.buffer, moovBytes.byteOffset, moovBytes.byteLength);
+  const moovHeader = readBoxHeader(moovView, 0);
+  if (!moovHeader || moovHeader.type !== 'moov' || moovHeader.boxSize !== moovBytes.byteLength) return { status: 'passthrough', fileSize };
+
+  const delta = moovSize; // mdat shifts forward by exactly the relocated moov's size
+  if (!patchChunkOffsets(moovBytes, delta)) return { status: 'passthrough', fileSize };
+
+  const prefixBytes = new Uint8Array(layout.mdatStart + moovSize);
+  prefixBytes.set(headBytes.subarray(0, layout.mdatStart), 0);
+  prefixBytes.set(moovBytes, layout.mdatStart);
+  return { status: 'active', prefixBytes, mdatStart: layout.mdatStart, fileSize };
+}
+
+async function getFaststartPrefix(env: Env, ctx: ExecutionContext, fileId: string, fileSize: number): Promise<FaststartResult> {
+  const cached = faststartCache.get(fileId);
+  if (cached && cached.fileSize === fileSize) return cached;
+
+  const stored = await readFaststartFromKv(env.VIDEO_EDGE_KV, fileId);
+  if (stored && stored.fileSize === fileSize) {
+    faststartCache.set(fileId, stored);
+    return stored;
+  }
+
+  const result = await buildFaststartPrefix(env, fileId, fileSize);
+  faststartCache.set(fileId, result);
+  ctx.waitUntil(writeFaststartToKv(env.VIDEO_EDGE_KV, fileId, result));
+  return result;
+}
+
 async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const token = new URL(request.url).searchParams.get('token');
   if (!token) return jsonResponse({ error: 'Missing streaming token' }, 401);
@@ -411,13 +666,52 @@ async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): P
     start = Number.parseInt(parts[0], 10);
     if (parts[1]?.trim()) {
       const parsedEnd = Number.parseInt(parts[1], 10);
-      if (!Number.isNaN(parsedEnd)) end = parsedEnd;
+      if (!Number.isNaN(parsedEnd)) end = Math.min(parsedEnd, fileSize - 1);
     }
     if (Number.isNaN(start) || start >= fileSize || start > end) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${fileSize}` } });
   }
 
+  // The homepage intro never reaches this: it's small and already served from the
+  // shared edge cache above whenever warm. Faststart relocation is scoped to the
+  // large (100MB+) lesson/course-trailer videos that actually suffer the trailing-
+  // moov delay. A failure here (e.g. a transient Drive error) must never break
+  // playback, so it degrades to the unmodified passthrough path below.
+  const faststart = isPublicHomepageIntro ? null : await getFaststartPrefix(env, ctx, fileId, fileSize).catch(() => null);
+
   try {
     const headers = new Headers({ 'Content-Type': mimeType, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store' });
+
+    if (faststart && faststart.status === 'active') {
+      const prefixBytes = faststart.prefixBytes;
+      const prefixLen = prefixBytes.byteLength;
+      const moovSize = prefixLen - faststart.mdatStart;
+      const mdatByteCount = fileSize - prefixLen; // original mdat box size; total size is unchanged by relocation
+      const mdatEnd = faststart.mdatStart + mdatByteCount - 1;
+
+      if (start === null) {
+        const mdatStream = await fetchDriveRangeStream(env, fileId, faststart.mdatStart, mdatEnd);
+        headers.set('Content-Length', String(fileSize));
+        return new Response(concatBytesWithStream(prefixBytes, mdatStream), { status: 200, headers });
+      }
+
+      headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+      headers.set('Content-Length', String(end - start + 1));
+
+      if (end < prefixLen) {
+        // Entirely inside the cached ftyp+moov prefix: no Drive round trip at all.
+        return new Response(prefixBytes.slice(start, end + 1), { status: 206, headers });
+      }
+
+      const driveStart = Math.max(start, prefixLen) - moovSize;
+      const driveEnd = end - moovSize;
+      const mdatStream = await fetchDriveRangeStream(env, fileId, driveStart, driveEnd);
+
+      if (start >= prefixLen) return new Response(mdatStream, { status: 206, headers });
+      // Spans the prefix/mdat boundary: stitch the cached tail of the prefix onto
+      // the Drive-streamed mdat continuation.
+      return new Response(concatBytesWithStream(prefixBytes.slice(start), mdatStream), { status: 206, headers });
+    }
+
     if (start === null) {
       const body = await fetchFullMediaBody(env, fileId, fileSize);
       headers.set('Content-Length', String(fileSize));
