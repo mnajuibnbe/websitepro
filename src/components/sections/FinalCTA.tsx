@@ -35,13 +35,11 @@ export function FinalCTA() {
             <h2 className="mb-6 font-display text-4xl font-semibold text-white md:text-6xl">
               Ready to advance your <span className="italic text-accent-300">cosmeceutical career?</span>
             </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
             <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-primary-300 md:text-xl">
               Begin Part 1 with six published lessons covering skin structure, hyaluronic acid, and real product evaluation.
             </p>
           </Reveal>
-          <Reveal delay={0.14}>
+          <Reveal delay={0.1}>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Button variant="primary" onClick={() => navigate(coursePath)} className="h-14 border-none bg-accent-500 px-8 text-lg text-primary-900 shadow-lg shadow-accent-500/20 transition-all duration-300 hover:bg-accent-400 hover:shadow-xl">
                 {ctaText}
@@ -50,8 +48,6 @@ export function FinalCTA() {
                 Watch a Free Lesson
               </Button>
             </div>
-          </Reveal>
-          <Reveal delay={0.2}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-primary-300">
               <div className="flex items-center gap-2"><Layers className="h-4 w-4 text-accent-300" aria-hidden="true" /><span>Staged diploma structure</span></div>
               <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-accent-300" aria-hidden="true" /><span>Secure checkout</span></div>

@@ -56,7 +56,7 @@ export function Newsletter() {
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 lg:mx-0">
               <Mail className="w-8 h-8 text-accent-600" />
             </div>
-            <h2 className="mb-4 font-display text-2xl font-semibold text-primary-900 md:text-3xl">
+            <h2 className="mb-4 font-display text-4xl font-semibold leading-tight text-primary-900 md:text-5xl">
               Stay current with cosmeceutical insights
             </h2>
             <p className="text-primary-600 text-lg leading-relaxed">
@@ -89,7 +89,7 @@ export function Newsletter() {
                 </Button>
               </div>
               {message && (
-                <p role={submissionState === 'error' ? 'alert' : 'status'} aria-live="polite" className={`text-left rounded-xl border px-4 py-3 text-sm font-semibold ${submissionState === 'error' ? 'border-danger-200 bg-danger-50 text-danger-700' : submissionState === 'duplicate' ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-success-200 bg-success-50 text-success-800'}`}>
+                <p role={submissionState === 'error' ? 'alert' : 'status'} aria-live="polite" className={`text-left rounded-xl border px-4 py-3 text-sm font-semibold ${submissionState === 'error' ? 'border-danger-200 bg-danger-50 text-danger-700' : submissionState === 'duplicate' ? 'border-warning-200 bg-warning-50 text-warning-900' : 'border-success-200 bg-success-50 text-success-800'}`}>
                   {message}
                 </p>
               )}

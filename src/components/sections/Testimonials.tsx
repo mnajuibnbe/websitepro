@@ -41,7 +41,7 @@ export function Testimonials() {
   return <section className="bg-white py-20 md:py-28"><PageContainer>
     <Reveal className="mb-14 text-center md:mb-16">
       <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Student Reviews</p>
-      <h2 className="mt-3 font-display text-4xl font-semibold text-primary-900 md:text-5xl">What our students say</h2>
+      <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-primary-900 md:text-5xl">What our students say</h2>
       <p className="mx-auto mt-5 max-w-2xl text-lg text-primary-600">Real experiences from health professionals who developed their skills with Tutiba.</p>
     </Reveal>
     {isLoading && <div role="status" className="flex min-h-56 items-center justify-center text-primary-500"><Loader2 className="h-8 w-8 animate-spin" /><span className="sr-only">Loading student reviews</span></div>}

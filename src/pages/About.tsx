@@ -16,7 +16,7 @@ export function About() {
       <main id="main-content" className="pt-32 pb-24">
         <PageContainer>
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-primary-900 mb-6">About Us</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-6">About Us</h1>
             <p className="text-xl text-primary-600 max-w-3xl mx-auto leading-relaxed">
               Tutiba provides focused, evidence-based education for professionals working in cosmetics and cosmeceuticals.
             </p>

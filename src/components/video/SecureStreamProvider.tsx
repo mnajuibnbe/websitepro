@@ -199,7 +199,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (loading) {
     return (
-      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-primary-950`}>
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-primary-900`}>
         <div className="flex flex-col items-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full border border-accent-300/30 bg-primary-900 shadow-xl"><div className="h-7 w-7 animate-spin rounded-full border-[3px] border-accent-200 border-t-accent-600" /></div>
           <p className="mt-4 text-sm font-semibold text-primary-100">Preparing your video…</p>
@@ -210,18 +210,18 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (sessionExpired) {
     return (
-      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-slate-900 p-6 text-center`}>
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-primary-900 p-6 text-center`}>
         <div className="max-w-md">
-          <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-warning-500/20 text-warning-400 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z" />
             </svg>
           </div>
           <h3 className="text-lg font-bold text-white mb-2">Sign in to keep watching</h3>
-          <p className="text-slate-400 text-sm mb-6">{error || 'Your session has expired. Sign in again to continue — playback will resume where you left off.'}</p>
+          <p className="text-primary-400 text-sm mb-6">{error || 'Your session has expired. Sign in again to continue — playback will resume where you left off.'}</p>
           <button
             onClick={() => navigate('/login', { state: { from: location } })}
-            className="px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded-md transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent-300"
           >
             Sign In
           </button>
@@ -232,18 +232,18 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
 
   if (error || !streamUrl) {
     return (
-      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-slate-900 p-6 text-center`}>
+      <div className={`${fill ? 'h-full' : 'aspect-video'} flex w-full items-center justify-center bg-primary-900 p-6 text-center`}>
         <div className="max-w-md">
-          <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-danger-500/20 text-danger-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
-          <p className="text-slate-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
+          <p className="text-primary-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
             onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId || `${asset}:${courseId || ''}`}`); setRetryVersion(value => value + 1); }}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-primary-800 hover:bg-primary-700 text-white rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent-300"
           >
             Try Again
           </button>

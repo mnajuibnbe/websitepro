@@ -35,7 +35,7 @@ export function ContactPage() {
 
             {/* Contact Info */}
             <div>
-              <h1 className="text-4xl font-bold text-primary-900 mb-4">Contact Us</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">Contact Us</h1>
               <p className="text-lg text-primary-600 mb-12 max-w-lg leading-relaxed">
                 Have a question about a course, enrollment, or your account? Our support team is ready to help.
               </p>

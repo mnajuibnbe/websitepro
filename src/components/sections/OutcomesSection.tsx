@@ -31,7 +31,7 @@ export function OutcomesSection() {
       <PageContainer>
         <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
           <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-300">Why enroll with confidence</p>
-          <h2 className="mt-3 font-display text-4xl font-semibold md:text-5xl">
+          <h2 className="mt-3 font-display text-4xl font-semibold leading-tight md:text-5xl">
             Built so you can <span className="italic text-accent-300">learn, and use it.</span>
           </h2>
         </Reveal>
