@@ -1,12 +1,18 @@
 import React from 'react';
 import { VideoOff } from 'lucide-react';
 import { VideoProviderResolver } from '../video/VideoProviderResolver';
+import { useAuth } from '../../contexts/AuthContext';
+import { useLessonPlaybackPosition } from '../../hooks/useLessonPlaybackPosition';
 
 interface VideoLessonRendererProps {
   lessonId: string;
   videoUrl: string | null;
   title: string;
   publicPreview?: boolean;
+  /** Required for cross-session resume; omit (e.g. public preview) to disable it. */
+  courseId?: string;
+  /** The student's last saved position for this lesson, or null if never started. */
+  initialPositionSeconds?: number | null;
 }
 
 function detectProvider(url: string | null): string {
@@ -24,8 +30,16 @@ function detectProvider(url: string | null): string {
   return 'mp4';
 }
 
-export function VideoLessonRenderer({ lessonId, videoUrl, title, publicPreview = false }: VideoLessonRendererProps) {
+export function VideoLessonRenderer({ lessonId, videoUrl, title, publicPreview = false, courseId, initialPositionSeconds = null }: VideoLessonRendererProps) {
   const provider = detectProvider(videoUrl);
+  const { user } = useAuth();
+  const playback = useLessonPlaybackPosition({
+    userId: user?.id,
+    courseId,
+    lessonId,
+    initialPositionSeconds,
+    enabled: !publicPreview,
+  });
 
   if (provider === 'none' || !videoUrl) {
     return (
@@ -48,6 +62,10 @@ export function VideoLessonRenderer({ lessonId, videoUrl, title, publicPreview =
       provider={provider}
       title={title}
       publicPreview={publicPreview}
+      initialPositionSeconds={playback.startAt}
+      resumeSkipThresholdSeconds={playback.resumeSkipThresholdSeconds}
+      onTimeUpdate={playback.onTimeUpdate}
+      onPlaybackStateChange={playback.onPlaybackStateChange}
     />
   );
 }
