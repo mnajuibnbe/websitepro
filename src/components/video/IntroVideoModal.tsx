@@ -61,7 +61,7 @@ export function IntroVideoModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-primary-950/85 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-primary-900/85 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="secure-video-title" aria-describedby="secure-video-description" className="flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-primary-200 bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-5xl sm:rounded-3xl" onMouseDown={(event) => event.stopPropagation()}>
         <header className="flex flex-none items-start justify-between gap-3 border-b border-primary-100 px-4 py-3 sm:px-6 sm:py-5">
           <div className="min-w-0">
@@ -73,12 +73,12 @@ export function IntroVideoModal({
             <X className="h-5 w-5" />
           </button>
         </header>
-        <div className="min-h-0 overflow-y-auto bg-primary-950 p-0 sm:bg-white sm:p-6">
+        <div className="min-h-0 overflow-y-auto bg-primary-900 p-0 sm:bg-white sm:p-6">
           {lessonId || asset
             ? asset
               ? <SecureStreamProvider asset={asset} publicPreview autoPlay title={title} />
               : <SecureStreamProvider lessonId={lessonId!} publicPreview autoPlay title={title} />
-            : <div className="flex aspect-video items-center justify-center bg-primary-950 p-8 text-center text-primary-200">A free preview lesson is not available yet.</div>}
+            : <div className="flex aspect-video items-center justify-center bg-primary-900 p-8 text-center text-primary-200">A free preview lesson is not available yet.</div>}
         </div>
         <footer className="flex flex-none justify-end border-t border-primary-100 bg-white p-3 sm:hidden">
           <button type="button" onClick={onClose} className="min-h-11 w-full rounded-xl bg-primary-100 px-5 font-bold text-primary-900">Close video</button>

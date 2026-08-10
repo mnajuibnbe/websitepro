@@ -23,7 +23,7 @@ export function FAQ() {
             <div className="w-16 h-16 bg-accent-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <HelpCircle className="w-8 h-8 text-accent-600" />
             </div>
-            <h1 className="text-4xl font-bold text-primary-900 mb-4">Frequently Asked Questions</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">Frequently Asked Questions</h1>
             <p className="text-xl text-primary-600">Find clear answers about courses, enrollment, payments, and certificates.</p>
           </div>
 

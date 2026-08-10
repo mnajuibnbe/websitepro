@@ -1,6 +1,7 @@
 import { PlayCircle } from 'lucide-react';
 import { VideoPlayer } from '../video/VideoPlayer';
 import { SecureStreamProvider } from '../video/SecureStreamProvider';
+import { OptimizedImage } from '../ui/OptimizedImage';
 
 function youtubeEmbedUrl(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
@@ -17,7 +18,7 @@ export function CourseTrailer({ courseId, title, trailerUrl, poster }: { courseI
   const isDriveVideo = /https:\/\/(?:drive|docs)\.google\.com\//i.test(url);
   const embedUrl = url ? youtubeEmbedUrl(url) || vimeoEmbedUrl(url) : null;
 
-  if (!url) return poster ? <img src={poster} alt={`${title} course cover`} className="mt-8 aspect-video w-full rounded-2xl object-cover" /> : null;
+  if (!url) return poster ? <OptimizedImage src={poster} alt={`${title} course cover`} displayWidth={1200} width={1200} height={675} priority className="mt-8 aspect-video w-full rounded-2xl object-cover" /> : null;
 
   return <section className="mt-8" aria-labelledby="course-trailer-heading">
     <h2 id="course-trailer-heading" className="mb-4 flex items-center gap-2 text-xl font-bold text-primary-900">

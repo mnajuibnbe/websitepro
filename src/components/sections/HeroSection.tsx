@@ -39,18 +39,14 @@ export function HeroSection() {
               <span className="mb-6 inline-block rounded-full bg-accent-100 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-accent-800">
                 For Skincare &amp; Cosmeceutical Professionals
               </span>
-            </Reveal>
-            <Reveal delay={0.06}>
               <h1 className="mb-6 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-primary-900 md:text-6xl lg:text-7xl">
                 Turn ingredient science into <span className="italic text-accent-700">decisions you can defend.</span>
               </h1>
-            </Reveal>
-            <Reveal delay={0.12}>
               <p className="mb-10 max-w-xl text-lg leading-relaxed text-primary-600 md:text-xl lg:mb-12">
                 Structured, evidence-based courses in skin science and cosmeceutical ingredients — built for professionals who need to evaluate products and advise clients with confidence, not guesswork.
               </p>
             </Reveal>
-            <Reveal delay={0.18}>
+            <Reveal delay={0.1}>
               <div className="mb-12 flex w-full justify-center lg:mb-14 lg:justify-start">
                 <Button
                   variant="primary"
@@ -60,8 +56,6 @@ export function HeroSection() {
                   See Courses &amp; Pricing <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
-            </Reveal>
-            <Reveal delay={0.24}>
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-semibold text-primary-700 lg:justify-start">
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-accent-600" /><span>Evidence-based content</span></div>
                 <div className="flex items-center gap-2"><BookOpen className="h-5 w-5 text-accent-600" /><span>Expert-led courses</span></div>
@@ -82,7 +76,7 @@ export function HeroSection() {
                       type="button"
                       onClick={() => setIsPlayingIntro(false)}
                       aria-label="Back to welcome video cover"
-                      className="absolute right-3 top-3 z-20 flex h-9 items-center gap-1.5 rounded-full bg-primary-950/80 px-3 text-xs font-bold text-white shadow-lg backdrop-blur transition hover:bg-primary-950 focus:outline-none focus:ring-4 focus:ring-accent-300/60 sm:right-4 sm:top-4 sm:h-11 sm:px-4 sm:text-sm"
+                      className="absolute right-3 top-3 z-20 flex h-9 items-center gap-1.5 rounded-full bg-primary-900/80 px-3 text-xs font-bold text-white shadow-lg backdrop-blur transition hover:bg-primary-900 focus:outline-none focus:ring-4 focus:ring-accent-300/60 sm:right-4 sm:top-4 sm:h-11 sm:px-4 sm:text-sm"
                     >
                       <X className="h-4 w-4" /> Back
                     </button>

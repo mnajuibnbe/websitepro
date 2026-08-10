@@ -11,7 +11,7 @@ export function HomepageFAQ() {
         <div className="mx-auto max-w-3xl">
           <Reveal className="mb-10 text-center md:mb-12">
             <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Before you enroll</p>
-            <h2 id="homepage-faq-heading" className="mt-3 font-display text-3xl font-semibold text-primary-900 md:text-4xl">
+            <h2 id="homepage-faq-heading" className="mt-3 font-display text-4xl font-semibold leading-tight text-primary-900 md:text-5xl">
               Questions, answered.
             </h2>
           </Reveal>

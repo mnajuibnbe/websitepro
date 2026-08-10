@@ -47,7 +47,7 @@ export function FeaturedCourses() {
         {/* Section Header */}
         <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
           <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured Courses</p>
-          <h2 className="mt-3 font-display text-4xl font-semibold text-primary-900 md:text-5xl">
+          <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-primary-900 md:text-5xl">
             Start with our <span className="italic text-accent-700">featured</span> courses.
           </h2>
           <p className="mt-5 text-lg text-primary-600">
