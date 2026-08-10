@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { Maximize, Pause, Play, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
+import { Maximize, Minimize, Pause, Play, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
 
 const PLAYBACK_RATES = [0.5, 1, 1.25, 1.5, 2] as const;
+
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+type FullscreenVideoElement = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitExitFullscreen?: () => void;
+  webkitDisplayingFullscreen?: boolean;
+};
 
 export interface VideoPlayerProps {
   src: string; poster?: string; title?: string; onEnded?: () => void;
@@ -39,9 +49,29 @@ export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPla
   const [buffering, setBuffering] = useState(true);
   const [error, setError] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => { setPlaying(false); setCurrentTime(0); setDuration(0); setBuffering(true); setError(false); pendingPlayIntentRef.current = false; }, [src]);
   useEffect(() => { if (videoRef.current) videoRef.current.playbackRate = playbackRate; }, [playbackRate, src]);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const fsDoc = document as FullscreenDocument;
+      setIsFullscreen(Boolean(document.fullscreenElement || fsDoc.webkitFullscreenElement));
+    };
+    const handleVideoFullscreenBegin = () => setIsFullscreen(true);
+    const handleVideoFullscreenEnd = () => setIsFullscreen(false);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    const video = videoRef.current;
+    video?.addEventListener('webkitbeginfullscreen', handleVideoFullscreenBegin);
+    video?.addEventListener('webkitendfullscreen', handleVideoFullscreenEnd);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      video?.removeEventListener('webkitbeginfullscreen', handleVideoFullscreenBegin);
+      video?.removeEventListener('webkitendfullscreen', handleVideoFullscreenEnd);
+    };
+  }, []);
   const togglePlayback = async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -68,7 +98,27 @@ export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPla
     video.currentTime = next;
     setCurrentTime(next);
   };
-  const toggleFullscreen = async () => { if (!frameRef.current) return; if (document.fullscreenElement) await document.exitFullscreen(); else await frameRef.current.requestFullscreen(); };
+  const toggleFullscreen = async () => {
+    const container = frameRef.current;
+    const video = videoRef.current as FullscreenVideoElement | null;
+    const fsDoc = document as FullscreenDocument;
+    if (document.fullscreenElement || fsDoc.webkitFullscreenElement) {
+      if (document.exitFullscreen) await document.exitFullscreen();
+      else if (fsDoc.webkitExitFullscreen) await fsDoc.webkitExitFullscreen();
+      return;
+    }
+    if (video?.webkitDisplayingFullscreen) {
+      video.webkitExitFullscreen?.();
+      return;
+    }
+    if (container?.requestFullscreen) {
+      await container.requestFullscreen();
+      return;
+    }
+    if (video && typeof video.webkitEnterFullscreen === 'function') {
+      video.webkitEnterFullscreen();
+    }
+  };
   const handleError = () => { if (onPlaybackError) onPlaybackError(); else setError(true); };
 
   if (error) return <div role="alert" className={`flex w-full items-center justify-center bg-primary-950 p-8 text-center text-primary-100 ${fill ? 'h-full' : 'aspect-video rounded-xl'}`}>This video could not be played. Please try again.</div>;
@@ -80,7 +130,7 @@ export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPla
     {controls === 'full' && !playing && !buffering && <button type="button" onClick={() => void togglePlayback()} aria-label="Play video" className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent-600/95 text-white shadow-2xl transition hover:scale-105 hover:bg-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-300/60 sm:h-16 sm:w-16"><Play className="h-6 w-6 fill-current ms-1 sm:h-7 sm:w-7" /></button>}
     {controls === 'playback-only' ? <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center bg-gradient-to-t from-primary-950 via-primary-950/70 to-transparent px-3 pb-3 pt-10 text-white">
       <button type="button" onClick={() => void togglePlayback()} aria-label={playing ? 'Pause video' : 'Play video'} className="flex h-11 min-w-11 items-center justify-center rounded-full bg-primary-950/80 px-4 shadow-lg backdrop-blur hover:bg-primary-950 focus:outline-none focus:ring-4 focus:ring-accent-300/60">{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current ms-0.5" />}</button>
-    </div> : <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-primary-950 via-primary-950/90 to-transparent px-3 pb-2 pt-8 text-white md:px-5 md:pb-3">
+    </div> : <div className="absolute inset-x-0 bottom-0 z-20 bg-primary-900 px-3 pb-2 pt-8 text-white md:px-5 md:pb-3">
       <label className="block"><span className="sr-only">Seek video</span><input type="range" min="0" max={duration || 0} step="0.1" value={Math.min(currentTime, duration || 0)} onChange={event => { const next = Number(event.target.value); if (videoRef.current) videoRef.current.currentTime = next; setCurrentTime(next); }} className="h-1.5 w-full cursor-pointer accent-accent-500" /></label>
       <div className="mt-1.5 flex items-center gap-1 sm:gap-2">
         <button type="button" onClick={() => skip(-10)} aria-label="Rewind 10 seconds" className="relative flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10"><RotateCcw className="h-4 w-4" /><span aria-hidden="true" className="pointer-events-none absolute text-[8px] font-bold leading-none">10</span></button>
@@ -91,7 +141,7 @@ export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPla
         <span className="ml-1 text-xs font-semibold tabular-nums text-primary-100">{formatTime(currentTime)} / {formatTime(duration)}</span>
         <div className="ml-auto flex items-center gap-1">
           <label><span className="sr-only">Playback speed</span><select value={playbackRate} onChange={event => setPlaybackRate(Number(event.target.value))} className="h-9 rounded-lg border border-white/10 bg-primary-950/80 px-1.5 text-xs font-semibold text-primary-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent-300/60">{PLAYBACK_RATES.map(rate => <option key={rate} value={rate}>{rate}x</option>)}</select></label>
-          <button type="button" onClick={() => void toggleFullscreen()} aria-label="Enter fullscreen" className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10"><Maximize className="h-4 w-4" /></button>
+          <button type="button" onClick={() => void toggleFullscreen()} aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10">{isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}</button>
         </div>
       </div>
     </div>}
