@@ -210,6 +210,7 @@ export interface LessonProgress {
   is_completed: boolean;
   last_accessed_at: string;
   completed_at: string | null;
+  last_position_seconds: number | null;
   created_at: string;
   updated_at: string;
 }

@@ -81,9 +81,16 @@ type SecureStreamProviderProps = SecureVideoRequest & {
   autoPlay?: boolean;
   fill?: boolean;
   controls?: 'full' | 'playback-only';
+  /** Seconds to seek to on the very first load (cross-session resume), not on token renewal. */
+  initialPositionSeconds?: number;
+  /** Skip the initial resume seek if it lands within this many seconds of the video's end. */
+  resumeSkipThresholdSeconds?: number;
+  /** Forwarded in addition to this component's own renewal-tracking. */
+  onTimeUpdate?: (time: number) => void;
+  onPlaybackStateChange?: (playing: boolean) => void;
 };
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false, controls }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false, controls, initialPositionSeconds, resumeSkipThresholdSeconds, onTimeUpdate: onExternalTimeUpdate, onPlaybackStateChange: onExternalPlaybackStateChange }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
@@ -164,7 +171,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
         const { url, expiresAt } = await requestStreamUrl(requestTarget, token);
         if (isMounted) {
           setStreamUrl(url);
-          setResumeAt(undefined);
+          setResumeAt(initialPositionSeconds);
           setResumePlaying(false);
           setLoading(false);
           scheduleRenewal(expiresAt);
@@ -256,9 +263,10 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
       controls={controls ?? 'full'}
       startAt={resumeAt}
       resumePlaying={resumePlaying}
+      resumeSkipThresholdSeconds={resumeSkipThresholdSeconds}
       reconnecting={reconnecting}
-      onTimeUpdate={time => { currentTimeRef.current = time; }}
-      onPlaybackStateChange={playing => { wasPlayingRef.current = playing; }}
+      onTimeUpdate={time => { currentTimeRef.current = time; onExternalTimeUpdate?.(time); }}
+      onPlaybackStateChange={playing => { wasPlayingRef.current = playing; onExternalPlaybackStateChange?.(playing); }}
       onPlaybackError={handlePlaybackError}
     />
   );

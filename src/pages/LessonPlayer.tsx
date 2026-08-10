@@ -520,7 +520,13 @@ export function LessonPlayer() {
             ) : currentLesson.content_type === 'pdf' || currentLesson.lesson_type === 'pdf' ? (
               <PdfLessonRenderer lessonId={currentLesson.id} title={currentLesson.title} />
             ) : currentLesson.type === 'video' ? (
-              <VideoLessonRenderer lessonId={currentLesson.id} videoUrl={currentLesson.video_url} title={currentLesson.title} />
+              <VideoLessonRenderer
+                lessonId={currentLesson.id}
+                videoUrl={currentLesson.video_url}
+                title={currentLesson.title}
+                courseId={course.id}
+                initialPositionSeconds={progressRows.find((p) => p.lesson_id === currentLesson.id)?.last_position_seconds ?? null}
+              />
             ) : currentLesson.type === 'text' ? (
               <TextLessonRenderer content={currentLesson.content} title={currentLesson.title} />
             ) : currentLesson.type === 'quiz' ? (
@@ -544,6 +550,7 @@ export function LessonPlayer() {
                         is_completed: true,
                         completed_at: now,
                         last_accessed_at: now,
+                        last_position_seconds: existing?.last_position_seconds ?? null,
                         created_at: now,
                         updated_at: now,
                       },

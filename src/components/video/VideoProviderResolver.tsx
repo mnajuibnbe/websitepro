@@ -10,6 +10,12 @@ interface VideoProviderResolverProps {
   poster?: string;
   onEnded?: () => void;
   publicPreview?: boolean;
+  /** Seconds to seek to on the very first load (cross-session resume). */
+  initialPositionSeconds?: number;
+  /** Skip the initial resume seek if it lands within this many seconds of the video's end. */
+  resumeSkipThresholdSeconds?: number;
+  onTimeUpdate?: (time: number) => void;
+  onPlaybackStateChange?: (playing: boolean) => void;
 }
 
 function getYoutubeEmbedUrl(url: string): string {
@@ -36,6 +42,10 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
   poster,
   onEnded,
   publicPreview = false,
+  initialPositionSeconds,
+  resumeSkipThresholdSeconds,
+  onTimeUpdate,
+  onPlaybackStateChange,
 }) => {
   if (import.meta.env.DEV) console.log(`[DevLog] Provider detected: ${provider} for lessonId: ${lessonId}`);
 
@@ -48,6 +58,10 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
         poster={poster}
         onEnded={onEnded}
         publicPreview={publicPreview}
+        initialPositionSeconds={initialPositionSeconds}
+        resumeSkipThresholdSeconds={resumeSkipThresholdSeconds}
+        onTimeUpdate={onTimeUpdate}
+        onPlaybackStateChange={onPlaybackStateChange}
       />
     );
   }
@@ -89,6 +103,10 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
       title={title}
       poster={poster}
       onEnded={onEnded}
+      startAt={initialPositionSeconds}
+      resumeSkipThresholdSeconds={resumeSkipThresholdSeconds}
+      onTimeUpdate={onTimeUpdate}
+      onPlaybackStateChange={onPlaybackStateChange}
     />
   );
 };

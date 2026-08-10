@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import { Maximize, Minimize, Pause, Play, RotateCcw, RotateCw, Volume2, VolumeX } from 'lucide-react';
+import { shouldSkipNearEndResume } from '../../domain/videoResume';
 
 const PLAYBACK_RATES = [0.5, 1, 1.25, 1.5, 2] as const;
 
@@ -174,6 +175,13 @@ export interface VideoPlayerProps {
   startAt?: number;
   /** Resume playback once seeked to startAt, e.g. after a token renewal mid-playback. */
   resumePlaying?: boolean;
+  /**
+   * Skip the very first startAt seek if it lands within this many seconds of the
+   * loaded duration, so a finished video doesn't reopen at the very end. Only applies
+   * to the first metadata load of this component instance — later startAt changes
+   * (e.g. token-renewal resume) always seek normally.
+   */
+  resumeSkipThresholdSeconds?: number;
   /** Reported on every play/pause so a parent can remember playback state across a src swap. */
   onPlaybackStateChange?: (playing: boolean) => void;
   /**
@@ -190,10 +198,11 @@ function formatTime(value: number) {
   return `${Math.floor(value / 60)}:${Math.floor(value % 60).toString().padStart(2, '0')}`;
 }
 
-export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPlay = false, fill = false, controls = 'full', startAt, resumePlaying = false, onPlaybackStateChange, onPlaybackError, reconnecting = false }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPlay = false, fill = false, controls = 'full', startAt, resumePlaying = false, resumeSkipThresholdSeconds, onPlaybackStateChange, onPlaybackError, reconnecting = false }: VideoPlayerProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const pendingPlayIntentRef = useRef(false);
+  const initialResumeAppliedRef = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -282,7 +291,7 @@ export function VideoPlayer({ src, poster, title, onEnded, onTimeUpdate, autoPla
   if (error) return <div role="alert" className={`flex w-full items-center justify-center bg-primary-900 p-8 text-center text-primary-100 ${fill ? 'h-full' : 'aspect-video rounded-xl'}`}>This video could not be played. Please try again.</div>;
 
   return <div ref={frameRef} className={`group relative w-full overflow-hidden bg-black shadow-lg ${fill ? 'h-full' : 'aspect-video rounded-xl'}`}>
-    <video ref={videoRef} src={src} poster={poster} title={title} aria-label={title || 'Tutiba video'} autoPlay={autoPlay} playsInline preload="metadata" controls={false} controlsList="nodownload noplaybackrate noremoteplayback" disablePictureInPicture onClick={() => void togglePlayback()} onPlay={() => { setPlaying(true); onPlaybackStateChange?.(true); }} onPlaying={() => setBuffering(false)} onPause={() => { setPlaying(false); onPlaybackStateChange?.(false); }} onWaiting={() => setBuffering(true)} onCanPlay={handleReadyToPlay} onLoadedData={handleReadyToPlay} onSeeked={() => setBuffering(false)} onLoadedMetadata={event => { const videoElement = event.currentTarget; setDuration(videoElement.duration || 0); if (startAt !== undefined) { videoElement.currentTime = startAt; setCurrentTime(startAt); } if (resumePlaying) void videoElement.play().catch(() => undefined); }} onDurationChange={event => setDuration(event.currentTarget.duration || 0)} onProgress={event => setBufferedRanges(getBufferedRanges(event.currentTarget))} onTimeUpdate={event => { setCurrentTime(event.currentTarget.currentTime); onTimeUpdate?.(event.currentTarget.currentTime); }} onVolumeChange={event => setVolume(event.currentTarget.muted ? 0 : event.currentTarget.volume)} onEnded={() => { setPlaying(false); onEnded?.(); }} onError={handleError} className="h-full w-full object-contain" />
+    <video ref={videoRef} src={src} poster={poster} title={title} aria-label={title || 'Tutiba video'} autoPlay={autoPlay} playsInline preload="metadata" controls={false} controlsList="nodownload noplaybackrate noremoteplayback" disablePictureInPicture onClick={() => void togglePlayback()} onPlay={() => { setPlaying(true); onPlaybackStateChange?.(true); }} onPlaying={() => setBuffering(false)} onPause={() => { setPlaying(false); onPlaybackStateChange?.(false); }} onWaiting={() => setBuffering(true)} onCanPlay={handleReadyToPlay} onLoadedData={handleReadyToPlay} onSeeked={() => setBuffering(false)} onLoadedMetadata={event => { const videoElement = event.currentTarget; const loadedDuration = videoElement.duration || 0; setDuration(loadedDuration); if (startAt !== undefined) { const isFirstApplication = !initialResumeAppliedRef.current; initialResumeAppliedRef.current = true; const skipNearEnd = isFirstApplication && resumeSkipThresholdSeconds !== undefined && shouldSkipNearEndResume(loadedDuration, startAt, resumeSkipThresholdSeconds); if (!skipNearEnd) { videoElement.currentTime = startAt; setCurrentTime(startAt); } } if (resumePlaying) void videoElement.play().catch(() => undefined); }} onDurationChange={event => setDuration(event.currentTarget.duration || 0)} onProgress={event => setBufferedRanges(getBufferedRanges(event.currentTarget))} onTimeUpdate={event => { setCurrentTime(event.currentTarget.currentTime); onTimeUpdate?.(event.currentTarget.currentTime); }} onVolumeChange={event => setVolume(event.currentTarget.muted ? 0 : event.currentTarget.volume)} onEnded={() => { setPlaying(false); onEnded?.(); }} onError={handleError} className="h-full w-full object-contain" />
     {buffering && <div role="status" aria-label="Loading video" className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-primary-900/35"><span className="flex h-14 w-14 items-center justify-center rounded-full border border-accent-300/30 bg-primary-900/80 shadow-xl backdrop-blur"><span className="h-7 w-7 animate-spin rounded-full border-[3px] border-accent-200 border-t-accent-600" /></span></div>}
     {reconnecting && <div role="status" aria-label="Reconnecting" className="pointer-events-none absolute inset-x-0 top-3 z-20 flex justify-center"><span className="rounded-full bg-primary-900/85 px-3 py-1 text-xs font-semibold text-primary-100 shadow-lg backdrop-blur">Reconnecting…</span></div>}
     {controls === 'full' && !playing && !buffering && <button type="button" onClick={() => void togglePlayback()} aria-label="Play video" className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent-600/95 text-white shadow-2xl transition hover:scale-105 hover:bg-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-300/60 sm:h-16 sm:w-16"><Play className="h-6 w-6 fill-current ms-1 sm:h-7 sm:w-7" /></button>}
