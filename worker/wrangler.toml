@@ -4,8 +4,8 @@ compatibility_date = "2026-08-01"
 workers_dev = true
 
 [vars]
-ALLOWED_ORIGIN = "https://websitepro-seven.vercel.app"
-TOKEN_ISSUER_BASE_URL = "https://websitepro-seven.vercel.app"
+ALLOWED_ORIGIN = "https://www.tutiba.com"
+TOKEN_ISSUER_BASE_URL = "https://www.tutiba.com"
 
 [[kv_namespaces]]
 binding = "VIDEO_EDGE_KV"
