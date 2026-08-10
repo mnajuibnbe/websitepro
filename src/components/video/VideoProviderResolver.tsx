@@ -37,7 +37,7 @@ export const VideoProviderResolver: React.FC<VideoProviderResolverProps> = ({
   onEnded,
   publicPreview = false,
 }) => {
-  if (import.meta.env.DEV) console.log(`[DevLog] Provider detected: ${provider} for lessonId: ${lessonId}`);
+  console.log(`[DevLog] Provider detected: ${provider} for lessonId: ${lessonId}`);
 
   // If it's google_drive, we use our SecureStreamProvider to fetch token and stream
   if (provider === 'google_drive' || videoUrl.includes('drive.google.com')) {
