@@ -88,7 +88,7 @@ export function AdminPaymentReview() {
     <>
       <PortalLayout sidebar={<AdminSidebar isOpen={sidebar} setIsOpen={setSidebar} />}>
         <header className="mb-7">
-          <p className="text-sm font-bold text-amber-700">Payment review</p>
+          <p className="text-sm font-bold text-accent-700">Payment review</p>
           <h1 className="text-2xl font-bold text-primary-900 sm:text-3xl">Payment proofs</h1>
           <p className="mt-1 text-primary-600">Approve activates the course immediately. Reject requires a reason the student can see.</p>
         </header>
@@ -100,7 +100,7 @@ export function AdminPaymentReview() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center p-16"><Loader2 className="h-8 w-8 animate-spin text-amber-600" /></div>
+            <div className="flex justify-center p-16"><Loader2 className="h-8 w-8 animate-spin text-accent-600" /></div>
           ) : rows.length === 0 ? (
             <div className="p-12 text-center">
               <ReceiptText className="mx-auto mb-3 h-10 w-10 text-primary-300" />
@@ -138,14 +138,14 @@ export function AdminPaymentReview() {
                     <button
                       type="button"
                       onClick={() => { setPending({ row, decision: 'approved' }); setReason(''); }}
-                      className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-success-600 px-4 py-2 text-sm font-bold text-white hover:bg-success-700"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-success-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-success-700 focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2 active:bg-success-800"
                     >
                       <CheckCircle className="h-4 w-4" />Approve
                     </button>
                     <button
                       type="button"
                       onClick={() => { setPending({ row, decision: 'rejected' }); setReason(''); }}
-                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger-200 px-4 py-2 text-sm font-bold text-danger-700 hover:bg-danger-50"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger-200 px-4 py-2 text-sm font-bold text-danger-700 transition-colors hover:bg-danger-50 focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 active:bg-danger-100"
                     >
                       <XCircle className="h-4 w-4" />Reject
                     </button>

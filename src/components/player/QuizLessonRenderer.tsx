@@ -304,7 +304,7 @@ export function QuizLessonRenderer({
   if (phase === 'loading') {
     return (
       <div className="bg-white border border-primary-200 rounded-2xl p-8 shadow-sm text-center py-16" dir="ltr">
-        <Loader2 className="w-10 h-10 text-amber-600 animate-spin mx-auto mb-4" />
+        <Loader2 className="w-10 h-10 text-warning-600 animate-spin mx-auto mb-4" />
         <p className="text-primary-700 font-bold text-base">Loading quiz...</p>
       </div>
     );
@@ -335,13 +335,13 @@ export function QuizLessonRenderer({
     return (
       <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-10 shadow-sm text-left" dir="ltr">
         {/* Header Badge */}
-        <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-primary-100 text-amber-600">
+        <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-primary-100 text-warning-600">
           <HelpCircle className="w-6 h-6 flex-shrink-0" />
           <span className="font-bold text-sm">Quiz</span>
         </div>
 
         <div className="max-w-2xl mx-auto text-center py-4">
-          <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mx-auto mb-5 border border-amber-200 shadow-xs">
+          <div className="w-16 h-16 bg-warning-50 rounded-2xl flex items-center justify-center text-warning-600 mx-auto mb-5 border border-warning-200 shadow-xs">
             <Award className="w-8 h-8" />
           </div>
 
@@ -377,7 +377,7 @@ export function QuizLessonRenderer({
           <button
             onClick={() => startOrResumeAttempt(quizInfo.id)}
             disabled={isActionLoading}
-            className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 px-8 rounded-xl transition-colors shadow-sm min-h-[48px] text-base w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 bg-warning-600 hover:bg-warning-700 text-white font-bold py-3.5 px-8 rounded-xl transition-colors shadow-sm min-h-12 text-base w-full sm:w-auto"
           >
             {isActionLoading ? (
               <>
@@ -403,7 +403,7 @@ export function QuizLessonRenderer({
         {/* Sticky Active Top Info Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-primary-200">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 w-fit mb-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-warning-700 bg-warning-50 px-2.5 py-1 rounded-md border border-warning-200/80 w-fit mb-1.5">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Quiz Information #{activeAttempt.attempt_number} {activeAttempt.max_attempts ? `Quiz Information ${activeAttempt.max_attempts}` : ''}</span>
             </div>
@@ -445,11 +445,11 @@ export function QuizLessonRenderer({
         {/* Progress Summary Header */}
         <div className="mb-8 bg-primary-50 p-4 rounded-xl border border-primary-200/80 flex items-center justify-between gap-4">
           <div className="text-xs font-bold text-primary-700">
-            Quiz Information: <span className="text-amber-700">{answeredQuestionsCount}</span> Quiz Information <span className="text-primary-900">{totalQuestionsCount}</span> Quiz Information
+            Quiz Information: <span className="text-warning-700">{answeredQuestionsCount}</span> Quiz Information <span className="text-primary-900">{totalQuestionsCount}</span> Quiz Information
           </div>
           <div className="w-32 sm:w-48 bg-primary-200 rounded-full h-2 overflow-hidden">
             <div
-              className="bg-amber-600 h-2 rounded-full transition-all duration-300"
+              className="bg-warning-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${totalQuestionsCount > 0 ? (answeredQuestionsCount / totalQuestionsCount) * 100 : 0}%` }}
             />
           </div>
@@ -471,7 +471,7 @@ export function QuizLessonRenderer({
                 {/* Question Header */}
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="w-7 h-7 bg-warning-100 text-warning-800 text-xs font-bold rounded-lg flex items-center justify-center flex-shrink-0">
                       {qIdx + 1}
                     </span>
                     <h3 id={`quiz-question-${question.question_id}`} className="text-base md:text-lg font-bold text-primary-900 leading-snug">
@@ -484,13 +484,13 @@ export function QuizLessonRenderer({
                       {question.points} {question.points === 1 ? 'point' : 'points'}
                     </span>
                     {status === 'saving' && (
-                      <span aria-live="polite" className="text-xs text-amber-600 flex items-center gap-1 font-medium">
+                      <span aria-live="polite" className="text-xs text-warning-600 flex items-center gap-1 font-medium">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         Saving…
                       </span>
                     )}
                     {status === 'saved' && (
-                      <span aria-live="polite" className="text-xs text-emerald-600 flex items-center gap-1 font-medium">
+                      <span aria-live="polite" className="text-xs text-success-600 flex items-center gap-1 font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Saved
                       </span>
@@ -510,17 +510,17 @@ export function QuizLessonRenderer({
                         disabled={isTimeExpired || phase === 'submitting'}
                         onClick={() => handleSelectOption(question.question_id, option.option_id)}
                         aria-pressed={isSelected}
-                        className={`w-full text-left p-4 rounded-xl border text-sm md:text-base font-medium transition-all flex items-center justify-between min-h-[48px] ${
+                        className={`w-full text-left p-4 rounded-xl border text-sm md:text-base font-medium transition-all flex items-center justify-between min-h-12 ${
                           isSelected
-                            ? 'border-amber-600 bg-amber-50/80 text-amber-950 font-bold shadow-xs'
-                            : 'border-primary-200 hover:border-amber-300 hover:bg-primary-50/50 text-primary-800'
+                            ? 'border-warning-600 bg-warning-50/80 text-warning-900 font-bold shadow-xs'
+                            : 'border-primary-200 hover:border-warning-200 hover:bg-primary-50/50 text-primary-800'
                         } ${isTimeExpired ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                       >
                         <span className="leading-relaxed pl-4">{option.option_text}</span>
                         <div
                           className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 ${
                             isSelected
-                              ? 'border-amber-600 bg-amber-600 text-white'
+                              ? 'border-warning-600 bg-warning-600 text-white'
                               : 'border-primary-300 bg-white'
                           }`}
                         >
@@ -544,7 +544,7 @@ export function QuizLessonRenderer({
           <button
             onClick={() => setShowSubmitModal(true)}
             disabled={phase === 'submitting'}
-            className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-sm min-h-[48px] text-base"
+            className="inline-flex items-center justify-center gap-2 bg-warning-600 hover:bg-warning-700 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-sm min-h-12 text-base"
           >
             {phase === 'submitting' ? (
               <>
@@ -564,14 +564,14 @@ export function QuizLessonRenderer({
         {showSubmitModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
             <div role="dialog" aria-modal="true" aria-labelledby="submit-quiz-title" className="bg-white rounded-2xl max-w-md w-full p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-warning-50 text-warning-600 rounded-full flex items-center justify-center mb-4">
                 <HelpCircle className="w-6 h-6" />
               </div>
 
               <h3 id="submit-quiz-title" className="text-xl font-bold text-primary-900 mb-2">Submit quiz?</h3>
 
               <p className="text-primary-600 text-sm leading-relaxed mb-4">
-                You answered <span className="font-bold text-amber-700">{answeredQuestionsCount}</span> of <span className="font-bold text-primary-900">{totalQuestionsCount}</span> questions. Submitted answers cannot be changed.
+                You answered <span className="font-bold text-warning-700">{answeredQuestionsCount}</span> of <span className="font-bold text-primary-900">{totalQuestionsCount}</span> questions. Submitted answers cannot be changed.
               </p>
 
               {answeredQuestionsCount < totalQuestionsCount && (
@@ -585,7 +585,7 @@ export function QuizLessonRenderer({
                 <button
                   onClick={handleSubmitQuiz}
                   disabled={isActionLoading}
-                  className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 bg-warning-600 hover:bg-warning-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
                 >
                   {isActionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm'}
                 </button>
@@ -614,14 +614,14 @@ export function QuizLessonRenderer({
         <div
           className={`p-6 md:p-8 rounded-2xl mb-8 border text-center ${
             isPassed
-              ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950'
+              ? 'bg-success-50/80 border-success-200 text-success-900'
               : 'bg-danger-50/80 border-danger-200 text-danger-950'
           }`}
         >
           <div
             className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border shadow-xs ${
               isPassed
-                ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+                ? 'bg-success-100 border-success-300 text-success-700'
                 : 'bg-danger-100 border-danger-300 text-danger-700'
             }`}
           >
@@ -642,7 +642,7 @@ export function QuizLessonRenderer({
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold">
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
               <span>Result: </span>
-              <span className={isPassed ? 'text-emerald-700' : 'text-danger-700'}>
+              <span className={isPassed ? 'text-success-700' : 'text-danger-700'}>
                 {resultData.score_percentage}%
               </span>
             </div>
@@ -656,7 +656,7 @@ export function QuizLessonRenderer({
 
             <div className="bg-white/80 backdrop-blur-xs px-4 py-2.5 rounded-xl border border-black/5 shadow-xs">
               <span>Quiz Information: </span>
-              <span className={isPassed ? 'text-emerald-700' : 'text-danger-700'}>
+              <span className={isPassed ? 'text-success-700' : 'text-danger-700'}>
                 {isPassed ? 'Quiz Information' : 'Quiz Information'}
               </span>
             </div>
@@ -665,7 +665,7 @@ export function QuizLessonRenderer({
 
         {/* Detailed Questions Review */}
         <h3 className="text-lg font-bold text-primary-900 mb-6 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-amber-600" />
+          <FileText className="w-5 h-5 text-warning-600" />
           <span>Quiz Information:</span>
         </h3>
 
@@ -677,7 +677,7 @@ export function QuizLessonRenderer({
               <div
                 key={question.question_id}
                 className={`p-5 md:p-6 rounded-2xl border transition-colors ${
-                  isCorrectAnswer ? 'border-emerald-200 bg-emerald-50/20' : 'border-danger-200 bg-danger-50/20'
+                  isCorrectAnswer ? 'border-success-200 bg-success-50/20' : 'border-danger-200 bg-danger-50/20'
                 }`}
               >
                 {/* Question Header */}
@@ -686,7 +686,7 @@ export function QuizLessonRenderer({
                     <span
                       className={`w-7 h-7 text-xs font-bold rounded-lg flex items-center justify-center flex-shrink-0 ${
                         isCorrectAnswer
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-success-100 text-success-800'
                           : 'bg-danger-100 text-danger-800'
                       }`}
                     >
@@ -700,7 +700,7 @@ export function QuizLessonRenderer({
                   <span
                     className={`text-xs font-bold px-2.5 py-1 rounded-md flex-shrink-0 ${
                       isCorrectAnswer
-                        ? 'bg-emerald-100 text-emerald-800'
+                        ? 'bg-success-100 text-success-800'
                         : 'bg-danger-100 text-danger-800'
                     }`}
                   >
@@ -718,8 +718,8 @@ export function QuizLessonRenderer({
                     let iconNode = null;
 
                     if (isCorrectOption) {
-                      optionStyle = 'border-emerald-500 bg-emerald-50 text-emerald-950 font-bold';
-                      iconNode = <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />;
+                      optionStyle = 'border-success-500 bg-success-50 text-success-900 font-bold';
+                      iconNode = <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />;
                     } else if (isSelected && !isCorrectOption) {
                       optionStyle = 'border-danger-500 bg-danger-50 text-danger-950 font-bold';
                       iconNode = <XCircle className="w-5 h-5 text-danger-600 flex-shrink-0" />;
@@ -746,9 +746,9 @@ export function QuizLessonRenderer({
 
                 {/* Question Explanation Box */}
                 {question.explanation && (
-                  <div className="mt-4 p-4 bg-amber-50/80 border border-amber-200/80 rounded-xl text-amber-950 text-sm leading-relaxed">
-                    <span className="font-bold block mb-1 text-amber-900">Quiz Information:</span>
-                    <p className="text-amber-900/90 text-xs md:text-sm">{question.explanation}</p>
+                  <div className="mt-4 p-4 bg-warning-50/80 border border-warning-200/80 rounded-xl text-warning-900 text-sm leading-relaxed">
+                    <span className="font-bold block mb-1 text-warning-900">Quiz Information:</span>
+                    <p className="text-warning-900/90 text-xs md:text-sm">{question.explanation}</p>
                   </div>
                 )}
               </div>
@@ -768,7 +768,7 @@ export function QuizLessonRenderer({
               <button
                 onClick={() => startOrResumeAttempt(quizInfo.id)}
                 disabled={isActionLoading}
-                className="inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm text-sm"
+                className="inline-flex items-center justify-center gap-2 bg-warning-600 hover:bg-warning-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm text-sm"
               >
                 {isActionLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

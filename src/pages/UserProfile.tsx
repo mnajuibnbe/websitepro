@@ -51,6 +51,7 @@ export function UserProfile() {
 
   return (
     <PortalLayout
+      sidebarPosition="sticky"
       sidebar={<Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />}
       mobileNavigationTrigger={
         <button

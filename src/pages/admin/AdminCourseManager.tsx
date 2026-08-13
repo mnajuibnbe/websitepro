@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { OptimizedImage } from '../../components/ui/OptimizedImage';
 import { PageContainer } from '../../components/layout/PageContainer';
 import {
@@ -308,11 +309,10 @@ export function AdminCourseManager() {
             <RequirePermission permission={Permission.CREATE_COURSE}>
               <Button
                 variant="primary"
-                className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl shadow-xs"
+                icon={<Plus className="w-5 h-5" />}
                 onClick={() => navigate('/admin/courses/new')}
               >
-                <Plus className="w-5 h-5" />
-                <span>Create Course</span>
+                Create Course
               </Button>
             </RequirePermission>
           </div>
@@ -327,7 +327,7 @@ export function AdminCourseManager() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search courses..."
-                className="w-full pl-4 pr-11 py-2.5 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white text-sm transition-all"
+                className="w-full pl-4 pr-11 py-2.5 bg-primary-50 border border-primary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-500 focus:bg-white text-sm transition-all"
               />
             </div>
 
@@ -337,7 +337,7 @@ export function AdminCourseManager() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
+                className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-500 focus:bg-white transition-all font-semibold"
               >
                 <option value="all">All statuses</option>
                 <option value="published">Published</option>
@@ -352,7 +352,7 @@ export function AdminCourseManager() {
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all font-semibold"
+                  className="bg-primary-50 border border-primary-200 text-primary-800 text-sm rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-500 focus:bg-white transition-all font-semibold"
                 >
                   <option value="all">All categories</option>
                   {categoriesList.map((cat) => (
@@ -373,13 +373,9 @@ export function AdminCourseManager() {
                 <h3 className="font-bold text-base">Courses</h3>
               </div>
               <p className="text-primary-700 text-sm mb-4">{errorMessage}</p>
-              <button
-                onClick={fetchCourses}
-                className="inline-flex items-center gap-2 bg-primary-900 text-white font-bold text-xs py-2 px-4 rounded-xl hover:bg-primary-800 transition-colors"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Retry</span>
-              </button>
+              <Button variant="primary" icon={<RotateCcw className="w-4 h-4" />} onClick={fetchCourses}>
+                Retry
+              </Button>
             </div>
           )}
 
@@ -387,7 +383,7 @@ export function AdminCourseManager() {
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xs overflow-hidden">
             {isLoading ? (
               <div className="p-12 text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
+                <Loader2 className="w-8 h-8 animate-spin text-accent-600 mx-auto mb-3" />
                 <p className="text-primary-600 font-bold text-sm">Loading courses…</p>
               </div>
             ) : filteredCourses.length === 0 ? (
@@ -401,11 +397,10 @@ export function AdminCourseManager() {
                 </p>
                 <Button
                   variant="primary"
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm"
+                  icon={<Plus className="w-4 h-4" />}
                   onClick={() => navigate('/admin/courses/new')}
                 >
-                  <Plus className="w-4 h-4 ml-2 inline" />
-                  <span>Create Course</span>
+                  Create Course
                 </Button>
               </div>
             ) : (
@@ -414,11 +409,11 @@ export function AdminCourseManager() {
                 {filteredCourses.map(course => (
                   <article key={course.id} className="p-4">
                     <div className="flex items-start gap-3">
-                      {course.thumbnail ? <OptimizedImage src={course.thumbnail} alt="" displayWidth={160} className="h-16 w-24 flex-none rounded-lg object-cover" /> : <div className="flex h-16 w-24 flex-none items-center justify-center rounded-lg bg-amber-50 text-amber-700"><BookOpen className="h-6 w-6" /></div>}
+                      {course.thumbnail ? <OptimizedImage src={course.thumbnail} alt="" displayWidth={160} width="160" height="107" className="h-16 w-24 flex-none rounded-lg object-cover" /> : <div className="flex h-16 w-24 flex-none items-center justify-center rounded-lg border border-primary-200 bg-primary-50 text-primary-400"><BookOpen className="h-6 w-6" /></div>}
                       <div className="min-w-0 flex-1"><h2 className="break-words font-bold leading-snug text-primary-900">{course.title}</h2><p className="mt-1 text-sm font-bold text-primary-700">{course.price_egp == null ? 'Price unavailable' : formatCourseAmount(String(course.price_egp), 'EGP')}</p><span className="mt-2 inline-block rounded-full bg-primary-100 px-2.5 py-1 text-xs font-bold text-primary-700">{course.status}</span></div>
                     </div>
                     <dl className="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-primary-50 p-3 text-center text-xs"><div><dt className="text-primary-500">Sections</dt><dd className="font-bold text-primary-900">{course.sections_count}</dd></div><div><dt className="text-primary-500">Lessons</dt><dd className="font-bold text-primary-900">{course.lessons_count}</dd></div><div><dt className="text-primary-500">Students</dt><dd className="font-bold text-primary-900">{course.enrolled_count}</dd></div></dl><p className="mt-3 text-xs font-bold text-primary-500">Review: {(course.review_status || 'not_submitted').replace('_', ' ')}</p>
-                    <div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="min-h-11 rounded-xl bg-amber-600 px-3 text-sm font-bold text-white">Manage course</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800">Manage students</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/edit`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800">Course settings</button><button type="button" onClick={() => setSelectedCourseForDelete(course)} className="min-h-11 rounded-xl border border-danger-200 px-3 text-sm font-bold text-danger-700">Delete course</button></div>
+                    <div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="min-h-11 rounded-xl bg-accent-600 px-3 text-sm font-bold text-white transition-colors hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 active:bg-accent-800">Manage course</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800 transition-colors hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-100">Manage students</button><button type="button" onClick={() => navigate(`/admin/courses/${course.id}/edit`)} className="min-h-11 rounded-xl border border-primary-200 px-3 text-sm font-bold text-primary-800 transition-colors hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-100">Course settings</button><button type="button" onClick={() => setSelectedCourseForDelete(course)} className="min-h-11 rounded-xl border border-danger-200 px-3 text-sm font-bold text-danger-700 transition-colors hover:bg-danger-50 focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-1 active:bg-danger-100">Delete course</button></div>
                   </article>
                 ))}
               </div>
@@ -452,12 +447,12 @@ export function AdminCourseManager() {
                                   className="w-14 h-10 object-cover rounded-lg border border-primary-200 shadow-2xs flex-shrink-0"
                                 />
                               ) : (
-                                <div className="w-14 h-10 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <div className="w-14 h-10 bg-primary-50 border border-primary-200 rounded-lg flex items-center justify-center text-primary-400 flex-shrink-0">
                                   <BookOpen className="w-5 h-5" />
                                 </div>
                               )}
                               <div className="min-w-0">
-                                <h4 className="font-bold text-primary-900 text-base leading-snug line-clamp-2 group-hover:text-amber-700 transition-colors">
+                                <h4 className="font-bold text-primary-900 text-base leading-snug line-clamp-2 group-hover:text-accent-700 transition-colors">
                                   {course.title}
                                 </h4>
                                 <div className="flex items-center gap-2 mt-0.5">
@@ -496,8 +491,8 @@ export function AdminCourseManager() {
                                 <FileText className="w-3.5 h-3.5 text-primary-400" />
                                 {course.lessons_count} Lesson
                               </span>
-                              <span className="flex items-center gap-1 text-amber-700 font-bold" title="course">
-                                <Users className="w-3.5 h-3.5 text-amber-600" />
+                              <span className="flex items-center gap-1 text-accent-700 font-bold" title="course">
+                                <Users className="w-3.5 h-3.5 text-accent-600" />
                                 {course.enrolled_count} students
                               </span>
                             </div>
@@ -509,10 +504,10 @@ export function AdminCourseManager() {
                               <span
                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
                                   isPublished
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                    ? 'bg-success-100 text-success-800 border border-success-200'
                                     : isArchived
                                     ? 'bg-primary-100 text-primary-700 border border-primary-200'
-                                    : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                    : 'bg-warning-100 text-warning-800 border border-warning-200'
                                 }`}
                               >
                                 {isPublished ? 'Published' : isArchived ? 'Archived' : 'Draft'}
@@ -545,10 +540,10 @@ export function AdminCourseManager() {
                                 onBlur={(event) => handleHomeOrderChange(course.id, event.target.value, course.home_order)}
                                 disabled={!isPublished || homeOrderSavingId === course.id}
                                 placeholder="Enter details"
-                                className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="w-20 h-9 px-2 text-center border border-primary-200 rounded-lg bg-white disabled:bg-primary-50 disabled:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-200 focus:border-accent-500"
                                 aria-label={`Home page order for ${course.title}`}
                               />
-                              {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-amber-600" />}
+                              {homeOrderSavingId === course.id && <Loader2 className="w-4 h-4 animate-spin text-accent-600" />}
                             </label>
                           </td>
 
@@ -558,31 +553,31 @@ export function AdminCourseManager() {
                               {/* Open Builder */}
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/builder`)}
-                                className="p-2 text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1"
+                                className="p-2 text-accent-700 hover:text-accent-900 bg-accent-50 hover:bg-accent-100 rounded-lg transition-colors font-bold text-xs flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 active:bg-accent-200"
                                 aria-label={`Open curriculum builder for ${course.title}`}
                                 title="Curriculum builder"
                               >
-                                <Sparkles className="w-4 h-4 text-amber-600" />
+                                <Sparkles className="w-4 h-4 text-accent-600" />
                                 <span className="hidden xl:inline">Curriculum</span>
                               </button>
 
                               {/* Edit Metadata */}
                               <button
                                 onClick={() => navigate(`/admin/courses/${course.id}/edit`)}
-                                className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-200/60 rounded-lg transition-colors"
+                                className="p-2 text-primary-600 hover:text-primary-900 bg-primary-100/60 hover:bg-primary-200/60 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-200"
                                 aria-label={`Edit course settings for ${course.title}`}
                                 title="Course settings"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
 
-                              <button onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="inline-flex min-h-10 items-center gap-1 rounded-lg bg-primary-100 px-2 text-xs font-bold text-primary-700 hover:bg-primary-200" aria-label={`Manage students in ${course.title}`} title="Manage students"><Users className="h-4 w-4" /><span className="hidden xl:inline">Students</span></button>
+                              <button onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="inline-flex min-h-10 items-center gap-1 rounded-lg bg-primary-100 px-2 text-xs font-bold text-primary-700 hover:bg-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-300" aria-label={`Manage students in ${course.title}`} title="Manage students"><Users className="h-4 w-4" /><span className="hidden xl:inline">Students</span></button>
 
                               {/* Status Toggle Quick Button */}
                               {isPublished ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'draft')}
-                                  className="p-2 text-amber-700 hover:bg-amber-50 rounded-lg transition-colors"
+                                  className="p-2 text-warning-700 hover:bg-warning-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-1 active:bg-warning-100"
                                   aria-label={`Unpublish ${course.title}`}
                                   title="Unpublish course"
                                 >
@@ -591,18 +586,18 @@ export function AdminCourseManager() {
                               ) : course.review_status === 'approved' ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'published')}
-                                  className="p-2 text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                                  className="p-2 text-success-700 hover:bg-success-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-1 active:bg-success-100"
                                   aria-label={`Publish approved course ${course.title}`}
                                   title="Publish approved course"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
                               ) : course.review_status === 'submitted' ? (
-                                <button onClick={() => navigate(`/admin/course-reviews/${course.id}`)} className="p-2 text-accent-700 hover:bg-accent-50 rounded-lg transition-colors" aria-label={`Review ${course.title}`} title="Open submitted review">
+                                <button onClick={() => navigate(`/admin/course-reviews/${course.id}`)} className="p-2 text-accent-700 hover:bg-accent-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 active:bg-accent-100" aria-label={`Review ${course.title}`} title="Open submitted review">
                                   <Eye className="w-4 h-4" />
                                 </button>
                               ) : (
-                                <button onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" aria-label={`Finalize ${course.title}`} title="Complete readiness and finalize">
+                                <button onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-100" aria-label={`Finalize ${course.title}`} title="Complete readiness and finalize">
                                   <Sparkles className="w-4 h-4" />
                                 </button>
                               )}
@@ -611,7 +606,7 @@ export function AdminCourseManager() {
                               {!isArchived && (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'archived')}
-                                  className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
+                                  className="p-2 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-200"
                                   aria-label={`Archive ${course.title}`}
                                   title="Archive course"
                                 >
@@ -622,7 +617,7 @@ export function AdminCourseManager() {
                               {/* Delete Button */}
                               <button
                                 onClick={() => setSelectedCourseForDelete(course)}
-                                className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
+                                className="p-2 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-1 active:bg-danger-100"
                                 aria-label={`Delete ${course.title}`}
                                 title="Delete course"
                               >
@@ -643,78 +638,31 @@ export function AdminCourseManager() {
       </main>
 
       {/* Delete / Safety Modal */}
-      {selectedCourseForDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" dir="ltr">
-          <div role="alertdialog" aria-modal="true" aria-labelledby="course-delete-title" className="bg-white rounded-2xl max-w-md w-full p-6 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            {selectedCourseForDelete.enrolled_count > 0 ? (
-              // Case 1: Students enrolled -> Block direct delete & suggest archive
-              <>
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-4 border border-amber-200">
-                  <AlertTriangle className="w-6 h-6" />
-                </div>
-
-                <h3 id="course-delete-title" className="text-xl font-bold text-primary-900 mb-2">Archive course instead?</h3>
-
-                <p className="text-primary-700 text-sm leading-relaxed mb-4">
-                  <span className="font-bold text-primary-900">“{selectedCourseForDelete.title}”</span> has{' '}
-                  <span className="font-bold text-amber-700">{selectedCourseForDelete.enrolled_count} active enrollment(s)</span>, so it cannot be deleted safely.
-                </p>
-
-                <p className="text-xs text-primary-500 leading-relaxed bg-primary-50 p-3 rounded-xl border border-primary-200 mb-6">
-                  Archiving removes the course from the public catalog while preserving enrolled students’ records.
-                </p>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      handleUpdateStatus(selectedCourseForDelete.id, 'archived');
-                      setSelectedCourseForDelete(null);
-                    }}
-                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors"
-                  >
-                    Archive course
-                  </button>
-                  <button
-                    onClick={() => setSelectedCourseForDelete(null)}
-                    className="flex-1 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-2.5 px-4 rounded-xl text-sm transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            ) : (
-              // Case 2: 0 Students enrolled -> Allow direct deletion with confirmation
-              <>
-                <div className="w-12 h-12 bg-danger-50 text-danger-600 rounded-2xl flex items-center justify-center mb-4 border border-danger-200">
-                  <Trash2 className="w-6 h-6" />
-                </div>
-
-                <h3 id="course-delete-title" className="text-xl font-bold text-primary-900 mb-2">Delete course?</h3>
-
-                <p className="text-primary-700 text-sm leading-relaxed mb-6">
-                  <span className="font-bold text-primary-900">“{selectedCourseForDelete.title}”</span> will be permanently deleted. This action cannot be undone.
-                </p>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleConfirmDelete}
-                    disabled={isDeleting}
-                    className="flex-1 bg-danger-600 hover:bg-danger-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
-                  >
-                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
-                  </button>
-                  <button
-                    onClick={() => setSelectedCourseForDelete(null)}
-                    disabled={isDeleting}
-                    className="flex-1 bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-2.5 px-4 rounded-xl text-sm transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+      {selectedCourseForDelete && selectedCourseForDelete.enrolled_count > 0 && (
+        <ConfirmDialog
+          open
+          title="Archive course instead?"
+          description={`"${selectedCourseForDelete.title}" has ${selectedCourseForDelete.enrolled_count} active enrollment(s), so it cannot be deleted safely. Archiving removes the course from the public catalog while preserving enrolled students' records.`}
+          confirmLabel="Archive course"
+          confirmTone="primary"
+          onCancel={() => setSelectedCourseForDelete(null)}
+          onConfirm={() => {
+            handleUpdateStatus(selectedCourseForDelete.id, 'archived');
+            setSelectedCourseForDelete(null);
+          }}
+        />
+      )}
+      {selectedCourseForDelete && selectedCourseForDelete.enrolled_count === 0 && (
+        <ConfirmDialog
+          open
+          title="Delete course?"
+          description={`"${selectedCourseForDelete.title}" will be permanently deleted. This action cannot be undone.`}
+          confirmLabel="Delete"
+          confirmTone="danger"
+          busy={isDeleting}
+          onCancel={() => setSelectedCourseForDelete(null)}
+          onConfirm={() => void handleConfirmDelete()}
+        />
       )}
 
       {/* Toast Notifications */}

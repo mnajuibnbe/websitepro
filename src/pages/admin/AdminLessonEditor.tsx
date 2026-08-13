@@ -368,12 +368,12 @@ export function AdminLessonEditor() {
 
   const getLessonTypeIcon = (type: string) => {
     switch (type) {
-      case 'video': return <Video className="w-4 h-4 text-amber-600" />;
-      case 'pdf': return <FileCode className="w-4 h-4 text-red-600" />;
-      case 'external_link': return <ExternalLink className="w-4 h-4 text-blue-600" />;
-      case 'quiz': return <HelpCircle className="w-4 h-4 text-amber-600" />;
-      case 'assignment': return <ClipboardCheck className="w-4 h-4 text-teal-600" />;
-      default: return <Video className="w-4 h-4 text-amber-600" />;
+      case 'video': return <Video className="w-4 h-4 text-accent-600" />;
+      case 'pdf': return <FileCode className="w-4 h-4 text-danger-600" />;
+      case 'external_link': return <ExternalLink className="w-4 h-4 text-info-600" />;
+      case 'quiz': return <HelpCircle className="w-4 h-4 text-accent-600" />;
+      case 'assignment': return <ClipboardCheck className="w-4 h-4 text-accent-600" />;
+      default: return <Video className="w-4 h-4 text-accent-600" />;
     }
   };
 
@@ -403,7 +403,7 @@ export function AdminLessonEditor() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
+                    <span className="text-xs font-bold text-accent-700 bg-accent-50 px-2.5 py-0.5 rounded-md border border-accent-200 flex items-center gap-1">
                       {getLessonTypeIcon(lessonType)}
                       <span>{lessonType.replaceAll('_', ' ')}</span>
                     </span>
@@ -411,27 +411,27 @@ export function AdminLessonEditor() {
                     <span
                       className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
                         isPublished
-                          ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                          : 'bg-amber-100 text-amber-800 border-amber-200'
+                          ? 'bg-success-100 text-success-800 border-success-200'
+                          : 'bg-warning-100 text-warning-800 border-warning-200'
                       }`}
                     >
                       {isPublished ? 'Published' : 'Draft'}
                     </span>
 
                     {isPreview && (
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-info-100 text-info-700 border border-info-100">
                         Free
                       </span>
                     )}
 
                     {isDirty && (
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-white animate-pulse">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-warning-500 text-white animate-pulse">
                         Unsaved changes
                       </span>
                     )}
                   </div>
 
-                  <h1 className="text-xl sm:text-2xl font-bold text-primary-900 leading-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 leading-tight">
                     {title || (isEditMode ? 'Edit' : 'Add')}
                   </h1>
                   <p className="text-primary-500 text-xs mt-0.5">
@@ -472,7 +472,7 @@ export function AdminLessonEditor() {
                   type="button"
                   onClick={() => handleSave()}
                   disabled={isSaving}
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xs"
+                  className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xs"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   <span>{isSaving ? 'Save...' : 'Save'}</span>
@@ -495,7 +495,7 @@ export function AdminLessonEditor() {
                     onClick={() => setActiveTab(tab.id as EditorTab)}
                     className={`flex items-center gap-2 py-2.5 px-4 rounded-xl whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-amber-600 text-white shadow-2xs'
+                        ? 'bg-accent-600 text-white shadow-2xs'
                         : 'text-primary-600 hover:bg-primary-100 hover:text-primary-900'
                     }`}
                   >
@@ -510,7 +510,7 @@ export function AdminLessonEditor() {
           {/* Main Body per Active Tab */}
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
-              <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
+              <Loader2 className="w-8 h-8 animate-spin text-accent-600 mx-auto mb-3" />
               <p className="text-primary-700 font-bold text-sm">Loading...</p>
             </div>
           ) : errorMessage ? (
@@ -534,7 +534,7 @@ export function AdminLessonEditor() {
               {activeTab === 'general' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <SettingsIcon className="w-5 h-5 text-amber-600" />
+                    <SettingsIcon className="w-5 h-5 text-accent-600" />
                     <span>Lesson</span>
                   </h3>
 
@@ -555,7 +555,7 @@ export function AdminLessonEditor() {
                         placeholder="Enter a clear lesson title"
                         className={`w-full px-4 py-2.5 bg-white border ${
                           errors.title ? 'border-danger-500' : 'border-primary-200'
-                        } rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium`}
+                        } rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium`}
                       />
                       {errors.title && <p className="text-danger-600 text-xs font-bold mt-1">{errors.title}</p>}
                     </div>
@@ -573,7 +573,7 @@ export function AdminLessonEditor() {
                           setSectionId(e.target.value);
                           setIsDirty(true);
                         }}
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold"
+                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-bold"
                       >
                         {sections.map((sec, idx) => (
                           <option key={sec.id} value={sec.id}>
@@ -590,11 +590,11 @@ export function AdminLessonEditor() {
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {[
-                          { id: 'video', label: 'Video', icon: Video, color: 'text-amber-600' },
-                          { id: 'pdf', label: 'PDF document', icon: FileCode, color: 'text-red-600' },
-                          { id: 'external_link', label: 'External link', icon: ExternalLink, color: 'text-blue-600' },
-                          { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-600' },
-                          { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-teal-600' },
+                          { id: 'video', label: 'Video', icon: Video, color: 'text-accent-600' },
+                          { id: 'pdf', label: 'PDF document', icon: FileCode, color: 'text-danger-600' },
+                          { id: 'external_link', label: 'External link', icon: ExternalLink, color: 'text-info-600' },
+                          { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-accent-600' },
+                          { id: 'assignment', label: 'Assignment', icon: ClipboardCheck, color: 'text-accent-600' },
                         ].map((typeItem) => {
                           const Icon = typeItem.icon;
                           const isSelected = lessonType === typeItem.id;
@@ -609,7 +609,7 @@ export function AdminLessonEditor() {
                               }}
                               className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all ${
                                 isSelected
-                                  ? 'bg-amber-50 border-amber-500 text-amber-900 ring-2 ring-amber-500/20 font-bold'
+                                  ? 'bg-accent-50 border-accent-500 text-accent-900 ring-2 ring-accent-500/20 font-bold'
                                   : 'bg-white border-primary-200 text-primary-700 hover:bg-primary-50'
                               }`}
                             >
@@ -634,7 +634,7 @@ export function AdminLessonEditor() {
                           setIsDirty(true);
                         }}
                         placeholder="Briefly explain what students will learn."
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
+                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium"
                       />
                     </div>
                   </div>
@@ -665,12 +665,12 @@ export function AdminLessonEditor() {
                           }}
                           placeholder="YouTube, Vimeo, Google Drive video file, MP4, or HLS URL"
                           dir="ltr"
-                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium text-left"
+                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium text-left"
                         />
                         {errors.videoUrl && <p className="text-danger-600 text-xs font-bold mt-1">{errors.videoUrl}</p>}
                         {videoMetadataState === 'loading' && <p role="status" className="mt-2 flex items-center gap-2 text-xs font-bold text-primary-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />Detecting video duration…</p>}
                         {videoMetadataState === 'ready' && videoMetadata?.durationSeconds && <p className="mt-2 text-xs font-bold text-success-700">Duration detected automatically: {Math.ceil(videoMetadata.durationSeconds / 60)} min</p>}
-                        {videoMetadataState === 'unavailable' && <div role="alert" className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"><p className="font-bold">Video duration could not be verified.</p><p className="mt-1">You can save this as a draft, but the lesson will block course review until verification succeeds. Check the sharing permissions and provider link, then retry.</p><button type="button" onClick={() => void inspectVideoMetadata()} className="mt-3 min-h-11 rounded-lg border border-amber-300 px-4 font-bold">Retry verification</button></div>}
+                        {videoMetadataState === 'unavailable' && <div role="alert" className="mt-3 rounded-lg border border-warning-200 bg-warning-50 p-3 text-xs text-warning-900"><p className="font-bold">Video duration could not be verified.</p><p className="mt-1">You can save this as a draft, but the lesson will block course review until verification succeeds. Check the sharing permissions and provider link, then retry.</p><button type="button" onClick={() => void inspectVideoMetadata()} className="mt-3 min-h-11 rounded-lg border border-warning-400 bg-white px-4 font-bold">Retry verification</button></div>}
                         {videoMetadataState === 'error' && <div role="alert" className="mt-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-xs text-danger-700"><p className="font-bold">This video URL could not be verified. Check the provider and URL.</p><button type="button" onClick={() => void inspectVideoMetadata()} className="mt-3 min-h-11 rounded-lg border border-danger-300 px-4 font-bold">Retry verification</button></div>}
                       </div>
 
@@ -686,7 +686,7 @@ export function AdminLessonEditor() {
                             setIsDirty(true);
                           }}
                           placeholder="Add a transcript or lesson notes..."
-                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
+                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium"
                         />
                       </div>
 
@@ -756,7 +756,7 @@ export function AdminLessonEditor() {
                               setPdfAllowDownload(e.target.checked);
                               setIsDirty(true);
                             }}
-                            className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                            className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                           />
                           <span>Allow students to download this PDF</span>
                         </label>
@@ -769,7 +769,7 @@ export function AdminLessonEditor() {
                               setPdfWatermark(e.target.checked);
                               setIsDirty(true);
                             }}
-                            className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                            className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                           />
                           <span>Apply the configured PDF watermark</span>
                         </label>
@@ -805,7 +805,7 @@ export function AdminLessonEditor() {
                             setOpenInNewTab(e.target.checked);
                             setIsDirty(true);
                           }}
-                          className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                          className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                         />
                         <span>Open this resource in a new tab</span>
                       </label>
@@ -816,12 +816,12 @@ export function AdminLessonEditor() {
                   {lessonType === 'quiz' && (
                     isEditMode && lessonId
                       ? <QuizBuilder lessonId={lessonId} lessonTitle={title} />
-                      : <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><p className="font-bold">Save the lesson to open the quiz builder.</p><p className="mt-1">Questions, correct answers, pass score, and retry limits are configured after the lesson has been created.</p></div>
+                      : <div className="rounded-xl border border-accent-200 bg-accent-50 p-4 text-sm text-accent-900"><p className="font-bold">Save the lesson to open the quiz builder.</p><p className="mt-1">Questions, correct answers, pass score, and retry limits are configured after the lesson has been created.</p></div>
                   )}
 
                   {/* Assignment Notification */}
                   {lessonType === 'assignment' && (
-                    isEditMode && lessonId ? <AssignmentBuilder lessonId={lessonId} /> : <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm"><p className="font-bold">Save the lesson to open the assignment builder.</p><p className="mt-1">Instructions, deadlines, grading points, and response format are configured after creation.</p></div>
+                    isEditMode && lessonId ? <AssignmentBuilder lessonId={lessonId} /> : <div className="rounded-xl border border-accent-200 bg-accent-50 p-4 text-sm"><p className="font-bold">Save the lesson to open the assignment builder.</p><p className="mt-1">Instructions, deadlines, grading points, and response format are configured after creation.</p></div>
                   )}
                 </div>
               )}
@@ -830,7 +830,7 @@ export function AdminLessonEditor() {
               {activeTab === 'access' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 shadow-2xs space-y-6">
                   <h3 className="text-lg font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <Lock className="w-5 h-5 text-amber-600" />
+                    <Lock className="w-5 h-5 text-accent-600" />
                     <span>Student access</span>
                   </h3>
 
@@ -854,7 +854,7 @@ export function AdminLessonEditor() {
                           }}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success-600"></div>
                       </label>
                     </div>
 
@@ -877,7 +877,7 @@ export function AdminLessonEditor() {
                           }}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-info-600"></div>
                       </label>
                     </div>
 

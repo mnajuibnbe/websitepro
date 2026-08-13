@@ -39,7 +39,7 @@ export function DynamicListEditor({ id, label, description, value, onChange, err
                 aria-label={`${label} item ${index + 1}`}
                 aria-describedby={`${descriptionId}${error ? ` ${errorId}` : ''}`}
                 aria-invalid={Boolean(error && !item.trim())}
-                className={`w-full rounded-xl border bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 ${!item.trim() ? 'border-danger-300' : 'border-primary-200'}`}
+                className={`w-full rounded-xl border bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-200 ${!item.trim() ? 'border-danger-300' : 'border-primary-200 focus:border-accent-500'}`}
               />
             </div>
             <div className="flex flex-none gap-1">

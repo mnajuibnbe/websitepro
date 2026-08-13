@@ -93,7 +93,7 @@ export function CourseSidebar({
                   onClick={() => toggleSection(section.id)}
                   aria-expanded={isOpen}
                   aria-controls={`player-section-${section.id}`}
-                  className="w-full flex items-center justify-between p-4 min-h-[48px] hover:bg-primary-50/80 transition-colors focus:outline-none text-left"
+                  className="w-full flex items-center justify-between p-4 min-h-12 hover:bg-primary-50/80 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500 text-left"
                 >
                   <div className="flex flex-col items-start gap-1 text-left max-w-[85%]">
                     <span className={`font-bold text-sm leading-snug ${isOpen ? 'text-primary-900' : 'text-primary-800'}`}>
@@ -124,7 +124,7 @@ export function CourseSidebar({
                             type="button"
                             key={lesson.id}
                             onClick={() => onLessonSelect(lesson)}
-                            className={`w-full flex items-start gap-3 p-3 px-4 min-h-[48px] transition-all text-left group ${
+                            className={`w-full flex items-start gap-3 p-3 px-4 min-h-12 transition-all text-left group ${
                               isCurrent
                                 ? 'bg-accent-50/90 border-r-4 border-accent-600 shadow-inner'
                                 : 'border-r-4 border-transparent hover:bg-white'

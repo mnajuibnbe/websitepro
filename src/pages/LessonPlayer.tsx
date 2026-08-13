@@ -18,6 +18,7 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { LessonDetails } from '../components/player/LessonDetails';
 import { prefetchSecureStream } from '../components/video/SecureStreamProvider';
 import { FEATURE_FLAGS } from '../config/featureFlags';
+import { Button } from '../components/ui/Button';
 
 type AccessState =
   | 'verifying'
@@ -371,12 +372,9 @@ export function LessonPlayer() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             This lesson address is incomplete or invalid. Return to your courses and choose a lesson again.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -395,19 +393,13 @@ export function LessonPlayer() {
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
-              <button
-                onClick={() => navigate(`/course/${courseId}`)}
-                className="w-full bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-              >
+              <Button variant="primary" className="w-full" onClick={() => navigate(`/course/${courseId}`)}>
                 View course details
-              </button>
+              </Button>
             )}
-            <button
-              onClick={() => navigate('/my-courses')}
-              className="w-full bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl transition-colors"
-            >
+            <Button variant="secondary" className="w-full" onClick={() => navigate('/my-courses')}>
               My Courses
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -425,12 +417,9 @@ export function LessonPlayer() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             Your enrollment is awaiting confirmation. You can check its status from My Courses.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -451,12 +440,9 @@ export function LessonPlayer() {
               ? 'This course could not be found or is no longer available.'
               : 'This lesson could not be found or is not published.'}
           </p>
-          <button
-            onClick={() => navigate(courseId ? `/learn/${courseId}` : '/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate(courseId ? `/learn/${courseId}` : '/my-courses')}>
             Back to course
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -470,12 +456,9 @@ export function LessonPlayer() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             This course does not have any published lessons yet.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -485,14 +468,11 @@ export function LessonPlayer() {
     return (
       <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
         <div className="bg-danger-50 text-danger-700 p-8 rounded-2xl border border-danger-200 text-center max-w-md w-full">
-          <h2 className="font-bold text-xl mb-2">Lesson unavailable</h2>
+          <h2 className="font-bold text-2xl mb-2">Lesson unavailable</h2>
           <p className="mb-6">{errorMessage || 'This lesson could not be loaded. Please try again.'}</p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-danger-600 hover:bg-danger-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="danger" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -605,7 +585,7 @@ export function LessonPlayer() {
                 type="button"
                 aria-label="Close course curriculum"
                 onClick={() => setIsMobileSidebarOpen(false)}
-                className="p-2 text-primary-500 hover:text-primary-900 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="p-2 text-primary-500 hover:text-primary-900 rounded-xl transition-colors min-w-11 min-h-11 flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
