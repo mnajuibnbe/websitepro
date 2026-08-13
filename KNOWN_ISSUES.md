@@ -357,3 +357,9 @@ Instructor" button has no onClick handler; it renders but does nothing.
 Pre-existing bug, discovered during B-20's copy pass but out of scope for a
 copy-only task. Needs either a real destination (instructor bio
 page/section) or removal if no such content exists.
+
+
+##
+src/components/sections/FreeContent.tsx
+& src/components/layout/MobileDrawerBackdrop.tsx 
+Not used anywhere 

@@ -71,16 +71,16 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
 
   const getItemTypeIcon = (type: string) => {
     switch (type) {
-      case 'video': return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
-      case 'article': return <FileText className="w-4 h-4 text-emerald-600 flex-shrink-0" />;
-      case 'pdf': return <FileCode className="w-4 h-4 text-red-600 flex-shrink-0" />;
-      case 'audio': return <Volume2 className="w-4 h-4 text-purple-600 flex-shrink-0" />;
-      case 'external_link': return <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />;
-      case 'embed': return <Code className="w-4 h-4 text-indigo-600 flex-shrink-0" />;
-      case 'live': return <Radio className="w-4 h-4 text-rose-600 flex-shrink-0" />;
-      case 'quiz': return <HelpCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />;
-      case 'assignment': return <ClipboardCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />;
-      default: return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+      case 'video': return <Video className="w-4 h-4 text-accent-600 flex-shrink-0" />;
+      case 'article': return <FileText className="w-4 h-4 text-primary-600 flex-shrink-0" />;
+      case 'pdf': return <FileCode className="w-4 h-4 text-danger-600 flex-shrink-0" />;
+      case 'audio': return <Volume2 className="w-4 h-4 text-primary-500 flex-shrink-0" />;
+      case 'external_link': return <ExternalLink className="w-4 h-4 text-info-600 flex-shrink-0" />;
+      case 'embed': return <Code className="w-4 h-4 text-primary-700 flex-shrink-0" />;
+      case 'live': return <Radio className="w-4 h-4 text-danger-500 flex-shrink-0" />;
+      case 'quiz': return <HelpCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />;
+      case 'assignment': return <ClipboardCheck className="w-4 h-4 text-success-600 flex-shrink-0" />;
+      default: return <Video className="w-4 h-4 text-accent-600 flex-shrink-0" />;
     }
   };
 
@@ -101,13 +101,13 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
 
   if (isOverlay) {
     return (
-      <div className="p-3.5 bg-white border-2 border-amber-500 rounded-xl shadow-xl flex items-center justify-between gap-3 text-left cursor-grabbing scale-102">
+      <div className="p-3.5 bg-white border-2 border-accent-500 rounded-xl shadow-xl flex items-center justify-between gap-3 text-left cursor-grabbing scale-102">
         <div className="flex items-center gap-3">
-          <GripVertical className="w-4 h-4 text-amber-600" />
+          <GripVertical className="w-4 h-4 text-accent-600" />
           {getItemTypeIcon(item.itemType)}
           <span className="font-bold text-primary-900 text-sm">{item.title}</span>
         </div>
-        <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-md">
+        <span className="text-xs bg-accent-100 text-accent-900 font-bold px-2 py-0.5 rounded-md">
           Loading...
         </span>
       </div>
@@ -120,7 +120,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
       style={style}
       className={`group p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 sm:gap-3 text-left ${
         isSelected
-          ? 'bg-amber-50/80 border-amber-400 ring-1 ring-amber-400/30'
+          ? 'bg-accent-50/80 border-accent-400 ring-1 ring-accent-400/30'
           : 'bg-white hover:bg-primary-50/80 border-primary-200/80 hover:border-primary-300'
       }`}
     >
@@ -131,11 +131,11 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <button
             type="button"
             onClick={() => onToggleSelect(item.id)}
-            className="text-primary-400 hover:text-amber-600 transition-colors flex-shrink-0 p-0.5"
+            className="text-primary-400 hover:text-accent-600 transition-colors flex-shrink-0 p-0.5"
             title="Curriculum Item"
           >
             {isSelected ? (
-              <CheckSquare className="w-4 h-4 text-amber-600" />
+              <CheckSquare className="w-4 h-4 text-accent-600" />
             ) : (
               <Square className="w-4 h-4" />
             )}
@@ -176,7 +176,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             )}
 
             {item.isPreview && (
-              <span className="rounded bg-blue-100 px-1.5 py-0.5 text-micro font-bold text-blue-800">
+              <span className="rounded bg-info-100 px-1.5 py-0.5 text-micro font-bold text-info-700">
                 Free
               </span>
             )}
@@ -184,8 +184,8 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
             <span
               className={`rounded px-1.5 py-0.5 text-micro font-bold ${
                 item.isPublished
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : 'bg-amber-100 text-amber-800'
+                  ? 'bg-success-100 text-success-800'
+                  : 'bg-warning-100 text-warning-800'
               }`}
             >
               {item.isPublished ? 'Published' : 'Draft'}
@@ -198,7 +198,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
       <div className="flex items-center gap-1 flex-shrink-0">
         <Link
           to={`/admin/courses/${courseId}/lessons/${item.id}/edit`}
-          className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+          className="p-1.5 text-accent-600 hover:text-accent-800 hover:bg-accent-50 rounded-lg transition-colors"
           title="Edit"
         >
           <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

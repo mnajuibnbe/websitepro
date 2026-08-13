@@ -39,7 +39,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel = 'Delete
   if (!open) return null;
   return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-900/60 p-4" onMouseDown={event => event.target === event.currentTarget && !busy && onCancel()}>
     <div ref={dialogRef} role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${confirmTone === 'danger' ? 'bg-danger-50 text-danger-600' : 'bg-amber-50 text-amber-700'}`}><AlertTriangle className="h-6 w-6" /></div>
+      <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${confirmTone === 'danger' ? 'bg-danger-50 text-danger-600' : 'bg-warning-50 text-warning-700'}`}><AlertTriangle className="h-6 w-6" /></div>
       <h2 id={titleId} className="text-xl font-bold text-primary-900">{title}</h2>
       <p id={descriptionId} className="mt-2 leading-relaxed text-primary-600">{description}</p>
       {children}
