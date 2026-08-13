@@ -265,26 +265,26 @@ export function AdminCourseBuilder() {
   const getLessonTypeIcon = (type?: string) => {
     switch (type) {
       case 'video':
-        return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+        return <Video className="w-4 h-4 text-accent-600 flex-shrink-0" />;
       case 'article':
       case 'text':
-        return <FileText className="w-4 h-4 text-emerald-600 flex-shrink-0" />;
+        return <FileText className="w-4 h-4 text-primary-600 flex-shrink-0" />;
       case 'pdf':
-        return <FileCode className="w-4 h-4 text-red-600 flex-shrink-0" />;
+        return <FileCode className="w-4 h-4 text-danger-600 flex-shrink-0" />;
       case 'audio':
-        return <Volume2 className="w-4 h-4 text-purple-600 flex-shrink-0" />;
+        return <Volume2 className="w-4 h-4 text-primary-500 flex-shrink-0" />;
       case 'external_link':
-        return <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />;
+        return <ExternalLink className="w-4 h-4 text-info-600 flex-shrink-0" />;
       case 'embed':
-        return <Code className="w-4 h-4 text-indigo-600 flex-shrink-0" />;
+        return <Code className="w-4 h-4 text-primary-700 flex-shrink-0" />;
       case 'live':
-        return <Radio className="w-4 h-4 text-rose-600 flex-shrink-0" />;
+        return <Radio className="w-4 h-4 text-danger-500 flex-shrink-0" />;
       case 'quiz':
-        return <HelpCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+        return <HelpCircle className="w-4 h-4 text-warning-600 flex-shrink-0" />;
       case 'assignment':
-        return <ClipboardCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />;
+        return <ClipboardCheck className="w-4 h-4 text-success-600 flex-shrink-0" />;
       default:
-        return <Video className="w-4 h-4 text-amber-600 flex-shrink-0" />;
+        return <Video className="w-4 h-4 text-accent-600 flex-shrink-0" />;
     }
   };
 

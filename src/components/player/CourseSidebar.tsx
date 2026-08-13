@@ -144,7 +144,7 @@ export function CourseSidebar({
                               <span
                                 className={`text-sm leading-snug mb-1 truncate ${
                                   isCurrent
-                                    ? 'font-bold text-accent-950'
+                                    ? 'font-bold text-accent-900'
                                     : isCompleted
                                     ? 'font-medium text-primary-700'
                                     : 'font-medium text-primary-800'

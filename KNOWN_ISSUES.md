@@ -329,7 +329,7 @@ websitepro-seven.vercel.app). Discovered during Phase B-18 (SEO) since it
 breaks Open Graph image previews and Course structured data image for this
 course. Needs the DB field updated to a live asset URL.
 
-## Password from Database Not Clear (2026-08-08)  
+## Password from Database Not Clear (2026-08-08) — RESOLVED 2026-08-13
 When I try to reset the password, I encounter an issue.  
 This password does not match the password complexity requirements;  
 I got a general error. The message is a general one;  
@@ -341,7 +341,17 @@ It must say, for example,
 Or, just what is still missing, not all combinations.  
 If this error is clear from the database, then just show it.
 
-## Certificate overclaim also on About page (2026-08-09)
+RESOLUTION: The static hint text under the password field (UpdatePassword.tsx
+and RegisterPage.tsx, both used the same copy) only said "Use at least 8
+characters. A longer, unique password is more secure." — it never told the
+user about the uppercase/lowercase/digit/symbol rules Supabase actually
+enforces (see "Security" section above), so a rejected password looked
+unexplained. Both hints now state the real requirements up front: "Use at
+least 8 characters, including an uppercase letter, a lowercase letter, a
+number, and a symbol." Parsing Supabase's raw rejection error into a
+field-specific message was not in scope for this pass.
+
+## Certificate overclaim also on About page (2026-08-09) — RESOLVED 2026-08-13
 Phase B-20's copy rewrite removed unsubstantiated certificate claims from
 the homepage flow (Hero, Outcomes, FinalCTA, Instructor, FAQ), since the
 certificate feature is fully disabled (`certificates: false` in
@@ -351,9 +361,32 @@ Achievement... Certificates that recognize completed learning") and
 possibly the standalone FAQ page/Footer — not fixed, flagged as a
 follow-up copy pass with the same scope as B-20.
 
-## Dead "Meet Your Instructor" button (2026-08-09)
+RESOLUTION: Replaced the "Verified Achievement / Certificates that
+recognize completed learning" card on About.tsx with "Lifetime Access /
+Return to your courses anytime as lessons and resources are updated" — a
+claim already made truthfully elsewhere (WhyChooseUs' "Lifetime Updates").
+Also found and fixed the same overclaim in Footer.tsx's site-wide trust
+line ("Certificate on completion", shown on every page) — replaced with
+"Lifetime course access". FAQ page checked — its certificate copy
+("Certificates are not issued on the platform yet...") is already
+accurate, no change needed.
+
+## Dead "Meet Your Instructor" button (2026-08-09) — RESOLVED 2026-08-13
 src/components/sections/InstructorSection.tsx:81 — the "Meet Your
 Instructor" button has no onClick handler; it renders but does nothing.
 Pre-existing bug, discovered during B-20's copy pass but out of scope for a
 copy-only task. Needs either a real destination (instructor bio
 page/section) or removal if no such content exists.
+
+RESOLUTION: Searched for any instructor bio route/section/anchor
+(App.tsx routes, CourseInstructor.tsx, InstructorApplication/Courses
+pages) — none exists for the platform's own instructor (Dr. Aya
+Elbrashy) shown in this section; those routes are for course authoring
+by instructor-role users, not a public bio page. No honest destination
+exists, so the button was removed rather than left dead.
+
+
+##
+src/components/sections/FreeContent.tsx
+& src/components/layout/MobileDrawerBackdrop.tsx 
+Not used anywhere 

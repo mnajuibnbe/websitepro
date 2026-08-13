@@ -739,7 +739,7 @@ export function AdminLessonEditor() {
                           <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-success-700"><CheckCircle className="h-4 w-4" aria-hidden="true" /> PDF verified: {pdfMetadata.name}</p>
                         )}
                         {pdfMetadataState === 'error' && (
-                          <div role="alert" className="mt-3 rounded-xl border border-warning-300 bg-warning-50 p-4 text-sm text-warning-900">
+                          <div role="alert" className="mt-3 rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-900">
                             <p className="font-bold">PDF access could not be verified.</p>
                             <p className="mt-1">{pdfMetadataError}</p>
                             <button type="button" onClick={() => void inspectPdfMetadata()} className="mt-3 min-h-11 rounded-lg border border-warning-400 bg-white px-4 font-bold">Retry verification</button>

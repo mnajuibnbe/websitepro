@@ -1,5 +1,4 @@
 import { CheckCircle2, GraduationCap, Microscope } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { PageContainer } from '../layout/PageContainer';
 import { Reveal } from '../ui/Reveal';
@@ -71,12 +70,6 @@ export function InstructorSection() {
                   <span className="text-lg">Structured diploma stages with visible progress</span>
                 </li>
               </ul>
-            </Reveal>
-
-            <Reveal delay={0.18} className="w-full">
-              <Button variant="secondary" className="h-12 w-full px-8 text-lg sm:w-auto">
-                Meet Your Instructor
-              </Button>
             </Reveal>
           </div>
 

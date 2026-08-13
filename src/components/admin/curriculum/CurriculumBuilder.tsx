@@ -560,7 +560,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
   if (loading) {
     return (
       <div className="p-12 text-center bg-white rounded-2xl border border-primary-200/80 shadow-2xs space-y-4" dir="ltr">
-        <Loader2 className="w-8 h-8 text-amber-600 animate-spin mx-auto" />
+        <Loader2 className="w-8 h-8 text-accent-600 animate-spin mx-auto" />
         <p className="text-sm font-bold text-primary-700">Course...</p>
       </div>
     );
@@ -572,13 +572,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       <div className="bg-white rounded-2xl border border-primary-200/90 p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span className="text-xs font-bold text-accent-800 bg-accent-50 border border-accent-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-accent-600" />
               <span>Curriculum</span>
             </span>
 
             {isSavingOrder && (
-              <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5 animate-pulse">
+              <span className="text-xs font-bold text-info-700 bg-info-100 border border-info-100 px-2.5 py-0.5 rounded-md flex items-center gap-1.5 animate-pulse">
                 <Loader2 className="w-3 h-3 animate-spin" />
                 <span>Save...</span>
               </span>
@@ -595,7 +595,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <span className="text-primary-300">•</span>
             <span>{totalItems} Lessons</span>
             <span className="text-primary-300">•</span>
-            <span className="text-emerald-700">{totalPublished} Published</span>
+            <span className="text-success-700">{totalPublished} Published</span>
           </div>
 
           <button
@@ -631,9 +631,9 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <button
             type="button"
             onClick={() => setAddSectionDialogOpen(true)}
-            className="px-4 py-2.5 bg-primary-900 hover:bg-primary-950 text-white font-bold text-xs rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-primary-900 hover:bg-primary-800 text-white font-bold text-xs rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
           >
-            <FolderPlus className="w-4 h-4 text-amber-400" />
+            <FolderPlus className="w-4 h-4 text-accent-400" />
             <span>Add section</span>
           </button>
         </div>
@@ -659,7 +659,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       {selectedItemIds.length > 0 && (
         <div className="sticky top-4 z-30 p-3 bg-primary-900 text-white rounded-2xl shadow-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-3 duration-200">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold bg-amber-500 text-primary-950 px-2.5 py-1 rounded-lg">
+            <span className="text-xs font-bold bg-accent-500 text-primary-900 px-2.5 py-1 rounded-lg">
               {selectedItemIds.length} items selected
             </span>
 
@@ -676,7 +676,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <button
               type="button"
               onClick={() => handleBulkPublish(true)}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
+              className="px-3 py-1.5 bg-success-600 hover:bg-success-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>Publish</span>
@@ -685,7 +685,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
             <button
               type="button"
               onClick={() => handleBulkPublish(false)}
-              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
+              className="px-3 py-1.5 bg-warning-600 hover:bg-warning-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <EyeOff className="w-3.5 h-3.5" />
               <span>Draft</span>
@@ -698,7 +698,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 setTargetBulkSectionId(available.length > 0 ? available[0].id : '');
                 setShowBulkMoveDialog(true);
               }}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
+              className="px-3 py-1.5 bg-info-600 hover:bg-info-700 text-white rounded-xl text-xs font-bold flex items-center gap-1"
             >
               <MoveRight className="w-3.5 h-3.5" />
               <span>Curriculum</span>
@@ -720,13 +720,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       {undoToast.show && (
         <div className="fixed bottom-6 left-6 z-50 p-4 bg-primary-900 text-white rounded-2xl shadow-2xl border border-primary-700 flex items-center justify-between gap-4 max-w-md w-full animate-in slide-in-from-bottom-5 duration-200">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-success-300 flex-shrink-0" />
             <p className="text-xs font-bold">{undoToast.message}</p>
           </div>
           <button
             type="button"
             onClick={handleUndoDelete}
-            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold text-xs rounded-xl flex items-center gap-1.5 flex-shrink-0 transition-colors"
+            className="px-3 py-1.5 bg-accent-500 hover:bg-accent-400 text-primary-900 font-bold text-xs rounded-xl flex items-center gap-1.5 flex-shrink-0 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Curriculum</span>
@@ -737,7 +737,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
       {/* Curriculum Sections List */}
       {sections.length === 0 ? (
         <div className="bg-white rounded-2xl border-2 border-dashed border-primary-200 p-12 text-center space-y-4">
-          <div className="w-16 h-16 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center mx-auto text-amber-600">
+          <div className="w-16 h-16 bg-accent-50 border border-accent-200 rounded-full flex items-center justify-center mx-auto text-accent-600">
             <Layers className="w-8 h-8" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
@@ -749,7 +749,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
           <button
             type="button"
             onClick={() => setAddSectionDialogOpen(true)}
-            className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center gap-2 shadow-2xs"
+            className="px-5 py-2.5 bg-accent-600 hover:bg-accent-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center gap-2 shadow-2xs"
           >
             <Plus className="w-4 h-4" />
             <span>Add section</span>
@@ -802,11 +802,11 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Add Section */}
       {addSectionDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-900/60 backdrop-blur-xs" dir="ltr">
           <div role="dialog" aria-modal="true" aria-labelledby="add-section-title" className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-primary-100 pb-3">
               <h3 id="add-section-title" className="text-base font-bold text-primary-900 flex items-center gap-2">
-                <FolderPlus className="w-5 h-5 text-amber-600" />
+                <FolderPlus className="w-5 h-5 text-accent-600" />
                 <span>Add a new section</span>
               </h3>
               <button
@@ -829,7 +829,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   value={newSectionTitle}
                   onChange={(e) => setNewSectionTitle(e.target.value)}
                   placeholder="Example: Skin care foundations"
-                  className="w-full text-xs font-bold p-3 bg-primary-50/50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
+                  className="w-full text-xs font-bold p-3 bg-primary-50/50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 outline-none"
                   autoFocus
                 />
               </div>
@@ -860,7 +860,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 type="button"
                 onClick={handleCreateSection}
                 disabled={!newSectionTitle.trim()}
-                className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors"
+                className="px-5 py-2 bg-accent-600 hover:bg-accent-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-colors"
               >
                 Create section
               </button>
@@ -880,7 +880,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Delete Section Prompt */}
       {deleteSectionModal.isOpen && deleteSectionModal.section && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-900/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 text-danger-600">
               <AlertCircle className="w-6 h-6" />
@@ -889,13 +889,13 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
             <p className="text-xs text-primary-600 leading-relaxed">
               Section <strong>&quot;{deleteSectionModal.section.title}&quot;</strong> Curriculum{' '}
-              <strong className="text-amber-800">{deleteSectionModal.section.items.length} Lessons</strong>.
+              <strong className="text-warning-800">{deleteSectionModal.section.items.length} Lessons</strong>.
               Select:
             </p>
 
             {sections.filter((s) => s.id !== deleteSectionModal.section?.id).length > 0 && (
-              <div className="space-y-2 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                <label className="block text-xs font-bold text-amber-900">
+              <div className="space-y-2 p-3 bg-warning-50 rounded-xl border border-warning-200">
+                <label className="block text-xs font-bold text-warning-900">
                   Delete:
                 </label>
                 <select
@@ -903,7 +903,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                   onChange={(e) =>
                     setDeleteSectionModal((prev) => ({ ...prev, moveTargetId: e.target.value }))
                   }
-                  className="w-full text-xs font-bold p-2 bg-white border border-amber-300 rounded-lg outline-none"
+                  className="w-full text-xs font-bold p-2 bg-white border border-warning-200 rounded-lg outline-none"
                 >
                   {sections
                     .filter((s) => s.id !== deleteSectionModal.section?.id)
@@ -921,7 +921,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                       deleteSectionModal.moveTargetId
                     )
                   }
-                  className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg transition-colors mt-2"
+                  className="w-full py-2 bg-warning-600 hover:bg-warning-700 text-white font-bold text-xs rounded-lg transition-colors mt-2"
                 >
                   Delete
                 </button>
@@ -953,7 +953,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
 
       {/* Dialog: Bulk Move Selection */}
       {showBulkMoveDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-950/60 backdrop-blur-xs" dir="ltr">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-900/60 backdrop-blur-xs" dir="ltr">
           <div className="bg-white rounded-2xl border border-primary-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-200">
             <h3 className="text-base font-bold text-primary-900">
               {selectedItemIds.length} items selected
@@ -986,7 +986,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
               <button
                 type="button"
                 onClick={handleBulkMove}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors"
+                className="px-5 py-2 bg-info-600 hover:bg-info-700 text-white font-bold text-xs rounded-xl transition-colors"
               >
                 Confirm
               </button>

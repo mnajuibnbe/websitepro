@@ -40,7 +40,7 @@ export function LessonDetails({ lesson, section }: LessonDetailsProps) {
       </div>
 
       {/* Lesson Title */}
-      <h2 className="text-xl md:text-2xl font-bold text-primary-950 mb-3 leading-snug">
+      <h2 className="text-xl md:text-2xl font-bold text-primary-900 mb-3 leading-snug">
         {lesson.title}
       </h2>
 

@@ -88,11 +88,11 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
 
   if (isOverlay) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-amber-500 p-5 shadow-2xl flex items-center justify-between text-left cursor-grabbing">
+      <div className="bg-white rounded-2xl border-2 border-accent-500 p-5 shadow-2xl flex items-center justify-between text-left cursor-grabbing">
         <div className="flex items-center gap-3">
-          <GripVertical className="w-5 h-5 text-amber-600" />
+          <GripVertical className="w-5 h-5 text-accent-600" />
           <h4 className="font-bold text-primary-900 text-base">{section.title}</h4>
-          <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg">
+          <span className="text-xs bg-accent-100 text-accent-900 font-bold px-2.5 py-1 rounded-lg">
             {section.items.length} items
           </span>
         </div>
@@ -114,7 +114,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
           <div
             {...attributes}
             {...listeners}
-            className="p-1.5 text-primary-400 hover:text-amber-600 cursor-grab active:cursor-grabbing rounded-xl hover:bg-primary-100/80 transition-colors flex-shrink-0 mt-0.5 sm:mt-0"
+            className="p-1.5 text-primary-400 hover:text-accent-600 cursor-grab active:cursor-grabbing rounded-xl hover:bg-primary-100/80 transition-colors flex-shrink-0 mt-0.5 sm:mt-0"
             title="Drag to reorder section" aria-label={`Reorder section ${section.title}`}
           >
             <GripVertical className="w-5 h-5" />
@@ -127,7 +127,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                 type="text"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full text-sm font-bold p-2 bg-white border border-primary-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
+                className="w-full text-sm font-bold p-2 bg-white border border-primary-300 rounded-xl focus:ring-2 focus:ring-accent-500 outline-none"
                 placeholder="Section..."
               />
               <input
@@ -141,7 +141,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
                 <button
                   type="button"
                   onClick={handleSaveEdit}
-                  className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg flex items-center gap-1"
+                  className="px-3 py-1 bg-accent-600 hover:bg-accent-700 text-white font-bold text-xs rounded-lg flex items-center gap-1"
                 >
                   <Check className="w-3.5 h-3.5" />
                   Save
@@ -179,11 +179,11 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
         <div className="flex items-center justify-between md:justify-end gap-2 sm:gap-3 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-primary-100">
           <div className="flex items-center gap-2 text-xs text-primary-600 font-medium">
             <span className="flex items-center gap-1 bg-white border border-primary-200 px-2 py-1 rounded-lg">
-              <BookOpen className="w-3.5 h-3.5 text-amber-600" />
+              <BookOpen className="w-3.5 h-3.5 text-accent-600" />
               {section.items.length} Lessons
             </span>
             <span className="flex items-center gap-1 bg-white border border-primary-200 px-2 py-1 rounded-lg">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-success-600" />
               {publishedCount} Published
             </span>
           </div>
@@ -192,7 +192,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
             <button
               type="button"
               onClick={() => onAddItem(section.id, section.title)}
-              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1 shadow-2xs"
+              className="px-3 py-1.5 bg-accent-600 hover:bg-accent-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1 shadow-2xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add lesson</span>
@@ -239,11 +239,11 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
 
       {/* Section Items Body */}
       {!isCollapsed && (
-        <div ref={setDroppableRef} className="p-3 sm:p-4 bg-primary-50/20 min-h-[70px]">
+        <div ref={setDroppableRef} className="p-3 sm:p-4 bg-primary-50/20 min-h-16">
           {section.items.length === 0 ? (
             <div
               className={`p-6 border-2 border-dashed rounded-xl text-center transition-colors flex flex-col items-center justify-center gap-2 ${
-                isOver ? 'border-amber-500 bg-amber-50/60' : 'border-primary-200 bg-primary-50/40'
+                isOver ? 'border-accent-500 bg-accent-50/60' : 'border-primary-200 bg-primary-50/40'
               }`}
             >
               <Layers className="w-6 h-6 text-primary-400" />
@@ -253,7 +253,7 @@ export const CurriculumSectionCard: React.FC<CurriculumSectionCardProps> = ({
               <button
                 type="button"
                 onClick={() => onAddItem(section.id, section.title)}
-                className="mt-1 text-xs text-amber-700 hover:text-amber-800 font-bold underline"
+                className="mt-1 text-xs text-accent-700 hover:text-accent-800 font-bold underline"
               >
                 Add lesson
               </button>

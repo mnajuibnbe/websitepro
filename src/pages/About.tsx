@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Info, Award, Users, BookOpen } from 'lucide-react';
+import { Info, RefreshCw, Users, BookOpen } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -41,7 +41,7 @@ export function About() {
             {[
               { icon: BookOpen, title: "Expert Curriculum", desc: "Structured courses grounded in current scientific practice" },
               { icon: Users, title: "Learner Focused", desc: "Clear instruction designed around professional goals" },
-              { icon: Award, title: "Verified Achievement", desc: "Certificates that recognize completed learning" },
+              { icon: RefreshCw, title: "Lifetime Access", desc: "Return to your courses anytime as lessons and resources are updated" },
               { icon: Info, title: "Practical Guidance", desc: "Knowledge you can apply confidently in your work" }
             ].map((feature, idx) => (
               <div key={idx} className="bg-white p-6 rounded-2xl border border-primary-200 text-center">
