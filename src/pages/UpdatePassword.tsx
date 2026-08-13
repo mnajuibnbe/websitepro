@@ -170,7 +170,7 @@ export function UpdatePassword() {
         <form onSubmit={handleUpdatePassword} aria-busy={isLoading} className="space-y-5">
           {error && <div id="password-update-error" role="alert" className="rounded-xl border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700">{error}</div>}
           <PasswordField id="new-password" label="New password" value={password} onChange={setPassword} show={showPassword} disabled={isLoading} describedBy={error ? 'password-update-error password-requirement' : 'password-requirement'} onToggle={() => setShowPassword(value => !value)} />
-          <p id="password-requirement" className="-mt-3 text-xs text-primary-500">Use at least 8 characters. A longer, unique password is more secure.</p>
+          <p id="password-requirement" className="-mt-3 text-xs text-primary-500">Use at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a symbol.</p>
           <PasswordField id="confirm-password" label="Confirm new password" value={confirmPassword} onChange={setConfirmPassword} show={showPassword} disabled={isLoading} describedBy={error ? 'password-update-error' : undefined} />
           <Button type="submit" isLoading={isLoading} className="w-full">{isLoading ? 'Updating password…' : 'Update password'}</Button>
         </form>

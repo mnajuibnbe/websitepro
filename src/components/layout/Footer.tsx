@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, ChevronDown, Globe, Mail, Microscope, ShieldCheck } from 'lucide-react';
+import { ChevronDown, Globe, Mail, Microscope, RefreshCw, ShieldCheck } from 'lucide-react';
 import { TutibaBrand } from './TutibaBrand';
 import { PageContainer } from './PageContainer';
 
 const trustLine = [
   { label: 'Evidence-based curriculum', icon: Microscope },
-  { label: 'Certificate on completion', icon: Award },
+  { label: 'Lifetime course access', icon: RefreshCw },
   { label: 'Secure checkout', icon: ShieldCheck },
 ];
 
