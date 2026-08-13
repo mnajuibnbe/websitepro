@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { isValidUUID } from '../lib/uuid';
 import { Loader2, Lock, ShieldAlert, BookOpen, Clock } from 'lucide-react';
 import { CourseSection, Lesson, LessonProgress } from '../types/database.types';
+import { Button } from '../components/ui/Button';
 
 type ResolverState =
   | 'verifying'
@@ -191,12 +192,9 @@ export function CourseLearnResolver() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             The requested information could not be loaded. Please try again.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -215,19 +213,13 @@ export function CourseLearnResolver() {
           </p>
           <div className="flex flex-col gap-3">
             {courseId && (
-              <button
-                onClick={() => navigate(`/course/${courseId}`)}
-                className="w-full bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-              >
+              <Button variant="primary" className="w-full" onClick={() => navigate(`/course/${courseId}`)}>
                 Course
-              </button>
+              </Button>
             )}
-            <button
-              onClick={() => navigate('/my-courses')}
-              className="w-full bg-primary-100 hover:bg-primary-200 text-primary-800 font-bold py-3 px-6 rounded-xl transition-colors"
-            >
+            <Button variant="secondary" className="w-full" onClick={() => navigate('/my-courses')}>
               My Courses
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -245,12 +237,9 @@ export function CourseLearnResolver() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             The requested information could not be loaded. Please try again.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -264,12 +253,9 @@ export function CourseLearnResolver() {
           <p className="text-primary-600 mb-6 leading-relaxed">
             The requested information could not be loaded. Please try again.
           </p>
-          <button
-            onClick={() => navigate('/my-courses')}
-            className="w-full bg-primary-900 hover:bg-primary-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-          >
+          <Button variant="primary" className="w-full" onClick={() => navigate('/my-courses')}>
             My Courses
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -278,14 +264,11 @@ export function CourseLearnResolver() {
   return (
     <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center p-4 text-left" dir="ltr">
       <div className="bg-danger-50 text-danger-700 p-8 rounded-2xl border border-danger-200 text-center max-w-md w-full">
-        <h2 className="font-bold text-xl mb-2">Error</h2>
+        <h2 className="font-bold text-2xl mb-2">Error</h2>
         <p className="mb-6">{errorMessage || 'Course.'}</p>
-        <button
-          onClick={() => navigate('/my-courses')}
-          className="w-full bg-danger-600 hover:bg-danger-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-        >
+        <Button variant="danger" className="w-full" onClick={() => navigate('/my-courses')}>
           My Courses
-        </button>
+        </Button>
       </div>
     </div>
   );

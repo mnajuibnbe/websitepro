@@ -94,7 +94,7 @@ export function AdminDashboard() {
               ['Unmanaged published covers', workflowHealth.missing_managed_covers],
               ['Instructor role drift', workflowHealth.approved_instructor_role_drift],
               ['Inactive instructor profiles', workflowHealth.inactive_instructor_public_profiles],
-            ].map(([label, value]) => <div key={String(label)} className={`rounded-xl border p-4 ${Number(value) > 0 ? 'border-amber-200 bg-amber-50' : 'border-success-200 bg-success-100'}`}><p className="text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-primary-700">{label}</p></div>)}</div> : <p role="status" className="mt-4 text-sm text-primary-500">Loading workflow health…</p>}
+            ].map(([label, value]) => <div key={String(label)} className={`rounded-xl border p-4 ${Number(value) > 0 ? 'border-warning-200 bg-warning-50' : 'border-success-200 bg-success-100'}`}><p className="text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-primary-700">{label}</p></div>)}</div> : <p role="status" className="mt-4 text-sm text-primary-500">Loading workflow health…</p>}
             {workflowHealth && <p className="mt-3 text-xs text-primary-500">Last checked {new Date(workflowHealth.checked_at).toLocaleString('en')}</p>}
           </section>
         </PageContainer>

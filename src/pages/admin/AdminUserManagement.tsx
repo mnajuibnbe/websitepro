@@ -44,7 +44,7 @@ const formatDate = (value: string | null) => value
 const statusClass = (status: string) => status === 'active' || status === 'published' || status === 'paid'
   ? 'bg-success-100 text-success-800'
   : status === 'cancelled' || status === 'archived'
-    ? 'bg-amber-50 text-amber-800'
+    ? 'bg-warning-50 text-warning-800'
     : 'bg-primary-100 text-primary-700';
 
 export function AdminUserManagement() {

@@ -170,7 +170,7 @@ export function AdminCourseCreate() {
               type="submit"
               form="create-course-form"
               disabled={isSubmitting}
-              className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 shadow-xs"
+              className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 shadow-xs"
             >
               {isSubmitting ? (
                 <>
@@ -196,7 +196,7 @@ export function AdminCourseCreate() {
             {/* Section 1: Basic Info */}
             <div id="course-basics" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                <Tag className="w-5 h-5 text-amber-600" />
+                <Tag className="w-5 h-5 text-accent-600" />
                 <span>Basic Information</span>
               </h2>
 
@@ -214,7 +214,7 @@ export function AdminCourseCreate() {
                       if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                     }}
                     placeholder="Example: Professional Skin Care Diploma"
-                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium ${
+                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-medium ${
                       errors.title ? 'border-danger-400 bg-danger-50/50' : 'border-primary-200'
                     }`}
                   />
@@ -241,7 +241,7 @@ export function AdminCourseCreate() {
                     required
                     aria-describedby="course-summary-help"
                     placeholder="Summarize the course for catalog cards"
-                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm ${errors.shortDescription ? 'border-danger-400' : 'border-primary-200'}`}
+                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.shortDescription ? 'border-danger-400' : 'border-primary-200'}`}
                   />
                   <p id="course-summary-help" className={`mt-1.5 text-xs ${errors.shortDescription ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.shortDescription || `${shortDescription.trim().length}/${COURSE_SUMMARY_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
@@ -259,7 +259,7 @@ export function AdminCourseCreate() {
                     required
                     aria-describedby="course-description-help"
                     placeholder="Build practical skills with structured, expert-led course content...."
-                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed resize-y ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
+                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm leading-relaxed resize-y ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
                   />
                   <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
@@ -269,7 +269,7 @@ export function AdminCourseCreate() {
             {/* Section 2: Classification & Pricing */}
             <div id="course-classification" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                <Globe className="w-5 h-5 text-amber-600" />
+                <Globe className="w-5 h-5 text-accent-600" />
                 <span>Catalog details</span>
               </h2>
 
@@ -283,7 +283,7 @@ export function AdminCourseCreate() {
                   <select
                     value={level}
                     onChange={(e) => setLevel(e.target.value as any)}
-                    className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
+                    className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold"
                   >
                     <option value="all_levels">All Levels</option>
                     <option value="beginner">Beginner</option>
@@ -295,7 +295,7 @@ export function AdminCourseCreate() {
                 {/* Language */}
                 <div>
                   <label className="block text-sm font-bold text-primary-900 mb-2">Course Language</label>
-                  <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold">{COURSE_LANGUAGES.map(item => <option key={item}>{item}</option>)}</select>
+                  <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold">{COURSE_LANGUAGES.map(item => <option key={item}>{item}</option>)}</select>
                 </div>
 
                 <div id="course-commerce" className="scroll-mt-24">
@@ -317,12 +317,12 @@ export function AdminCourseCreate() {
             {/* Section 3: Media */}
             <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
               <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-amber-600" />
+                <ImageIcon className="w-5 h-5 text-accent-600" />
                 <span>Course media</span>
               </h2>
 
               <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
-              <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="new-course-trailer" className="mb-2 block text-sm font-bold text-primary-900">Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="new-course-trailer" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500" /><p className="mt-2 text-xs text-primary-500">If empty, the sales page will use a published preview lesson when one is available.</p></div>
+              <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="new-course-trailer" className="mb-2 block text-sm font-bold text-primary-900">Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="new-course-trailer" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-accent-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-500" /><p className="mt-2 text-xs text-primary-500">If empty, the sales page will use a published preview lesson when one is available.</p></div>
             </div>
 
             {/* Bottom Form Action */}
@@ -338,7 +338,7 @@ export function AdminCourseCreate() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 shadow-xs text-base"
+                className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 shadow-xs text-base"
               >
                 {isSubmitting ? (
                   <>

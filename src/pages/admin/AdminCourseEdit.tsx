@@ -279,9 +279,9 @@ export function AdminCourseEdit() {
               <button
                 type="button"
                 onClick={() => navigate(`/admin/courses/${courseId}/builder`)}
-                className="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-colors"
+                className="bg-accent-50 hover:bg-accent-100 text-accent-800 border border-accent-200 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-colors"
               >
-                <Sparkle className="w-4 h-4 text-amber-600" />
+                <Sparkle className="w-4 h-4 text-accent-600" />
                 <span>Open Course Builder</span>
               </button>
 
@@ -289,7 +289,7 @@ export function AdminCourseEdit() {
                 type="submit"
                 form="edit-course-form"
                 disabled={isSubmitting || isLoading}
-                className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 shadow-xs"
+                className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-2.5 px-6 rounded-xl flex items-center gap-2 shadow-xs"
               >
                 {isSubmitting ? (
                   <>
@@ -309,7 +309,7 @@ export function AdminCourseEdit() {
           {/* Loading State */}
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
-              <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
+              <Loader2 className="w-8 h-8 animate-spin text-accent-600 mx-auto mb-3" />
               <p className="text-primary-700 font-bold text-sm">Course...</p>
             </div>
           ) : errorMessage ? (
@@ -341,7 +341,7 @@ export function AdminCourseEdit() {
               {/* Basic Info */}
               <div id="course-basics" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                  <Tag className="w-5 h-5 text-amber-600" />
+                  <Tag className="w-5 h-5 text-accent-600" />
                   <span>Publishing and Visibility</span>
                 </h2>
 
@@ -358,7 +358,7 @@ export function AdminCourseEdit() {
                         setTitle(e.target.value);
                         if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
                       }}
-                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-medium ${
+                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-medium ${
                         errors.title ? 'border-danger-400 bg-danger-50/50' : 'border-primary-200'
                       }`}
                     />
@@ -379,7 +379,7 @@ export function AdminCourseEdit() {
                       minLength={COURSE_SUMMARY_MIN_LENGTH}
                       required
                       aria-describedby="course-summary-help"
-                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm ${errors.shortDescription ? 'border-danger-400' : 'border-primary-200'}`}
+                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.shortDescription ? 'border-danger-400' : 'border-primary-200'}`}
                     />
                     <p id="course-summary-help" className={`mt-1.5 text-xs ${errors.shortDescription ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.shortDescription || `${shortDescription.trim().length}/${COURSE_SUMMARY_MIN_LENGTH} minimum characters required for review.`}</p>
                   </div>
@@ -394,7 +394,7 @@ export function AdminCourseEdit() {
                       minLength={COURSE_DESCRIPTION_MIN_LENGTH}
                       required
                       aria-describedby="course-description-help"
-                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm leading-relaxed ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
+                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm leading-relaxed ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
                     />
                     <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                   </div>
@@ -410,7 +410,7 @@ export function AdminCourseEdit() {
               {/* Status, Category & Pricing */}
               <div id="course-classification" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-amber-600" />
+                  <Globe className="w-5 h-5 text-accent-600" />
                   <span>Publish</span>
                 </h2>
 
@@ -421,7 +421,7 @@ export function AdminCourseEdit() {
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value as any)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
+                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold"
                     >
                       <option value="draft">Draft (Draft)</option>
                       {!isInstructor && <option value="published">Published</option>}
@@ -435,7 +435,7 @@ export function AdminCourseEdit() {
                     <select
                       value={visibility}
                       onChange={(e) => setVisibility(e.target.value as any)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
+                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold"
                     >
                       <option value="public">Public (Course Catalog)</option>
                       <option value="unlisted">Unlisted (Direct Link)</option>
@@ -451,7 +451,7 @@ export function AdminCourseEdit() {
                     <select
                       value={level}
                       onChange={(e) => setLevel(e.target.value as any)}
-                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold"
+                      className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold"
                     >
                       <option value="all_levels">All Levels</option>
                       <option value="beginner">Beginner</option>
@@ -474,7 +474,7 @@ export function AdminCourseEdit() {
                   {/* Language */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">Language</label>
-                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all text-sm font-bold">{COURSE_LANGUAGES.map(item => <option key={item}>{item}</option>)}</select>
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm font-bold">{COURSE_LANGUAGES.map(item => <option key={item}>{item}</option>)}</select>
                   </div>
 
                   {/* Instructor */}
@@ -484,9 +484,9 @@ export function AdminCourseEdit() {
 
               {/* One canonical cover reused by catalog and sales page. */}
               <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
-                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-amber-600" /><span>Course media</span></h2>
+                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-accent-600" /><span>Course media</span></h2>
                 <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
-                <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="course-trailer-video" className="mb-2 flex items-center gap-2 text-sm font-bold text-primary-900"><Video className="h-4 w-4 text-amber-600" />Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="course-trailer-video" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500" /><p className="mt-2 text-xs leading-relaxed text-primary-500">When empty, the sales page uses the published preview lesson. If neither is available, the cover remains a static image.</p></div>
+                <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="course-trailer-video" className="mb-2 flex items-center gap-2 text-sm font-bold text-primary-900"><Video className="h-4 w-4 text-accent-600" />Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="course-trailer-video" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-accent-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-500" /><p className="mt-2 text-xs leading-relaxed text-primary-500">When empty, the sales page uses the published preview lesson. If neither is available, the cover remains a static image.</p></div>
               </div>
 
               {/* Bottom Actions */}
@@ -502,7 +502,7 @@ export function AdminCourseEdit() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 shadow-xs text-base"
+                  className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 shadow-xs text-base"
                 >
                   {isSubmitting ? (
                     <>

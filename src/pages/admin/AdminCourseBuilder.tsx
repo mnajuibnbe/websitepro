@@ -432,7 +432,7 @@ export function AdminCourseBuilder() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
+                    <span className="text-xs font-bold text-accent-700 bg-accent-50 px-2.5 py-0.5 rounded-md border border-accent-200">
                       Course Builder Shell
                     </span>
 
@@ -440,10 +440,10 @@ export function AdminCourseBuilder() {
                       <span
                         className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
                           course.status === 'published'
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                            ? 'bg-success-100 text-success-800 border-success-200'
                             : course.status === 'archived'
                             ? 'bg-primary-100 text-primary-700 border-primary-200'
-                            : 'bg-amber-100 text-amber-800 border-amber-200'
+                            : 'bg-warning-100 text-warning-800 border-warning-200'
                         }`}
                       >
                         {course.status === 'published' ? 'Published' : course.status === 'archived' ? 'Archived' : 'Draft'}
@@ -451,7 +451,7 @@ export function AdminCourseBuilder() {
                     )}
                   </div>
 
-                  <h1 className="text-xl sm:text-2xl font-bold text-primary-900 leading-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-primary-900 leading-tight">
                     {course?.title || 'Course...'}
                   </h1>
                 </div>
@@ -484,8 +484,8 @@ export function AdminCourseBuilder() {
                   onClick={() => selectTab('publish')}
                   className={`font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-colors ${
                     course?.status === 'published'
-                      ? 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
-                      : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                      ? 'bg-warning-100 text-warning-900 hover:bg-warning-200 border border-warning-200'
+                      : 'bg-success-600 hover:bg-success-700 text-white shadow-xs'
                   }`}
                 >
                   <CheckCircle className="w-4 h-4" />
@@ -511,7 +511,7 @@ export function AdminCourseBuilder() {
                     onClick={() => selectTab(tab.id as TabType)}
                     className={`flex items-center gap-2 py-2.5 px-4 rounded-xl whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-amber-600 text-white shadow-2xs'
+                        ? 'bg-accent-600 text-white shadow-2xs'
                         : 'text-primary-600 hover:bg-primary-100 hover:text-primary-900'
                     }`}
                   >
@@ -526,7 +526,7 @@ export function AdminCourseBuilder() {
           {/* Main Body per Active Tab */}
           {isLoading ? (
             <div className="bg-white border border-primary-200 rounded-2xl p-12 text-center shadow-xs">
-              <Loader2 className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-3" />
+              <Loader2 className="w-8 h-8 animate-spin text-accent-600 mx-auto mb-3" />
               <p className="text-primary-700 font-bold text-sm">Processing... Course Builder...</p>
             </div>
           ) : errorMessage ? (
@@ -562,7 +562,7 @@ export function AdminCourseBuilder() {
 
                     <Button
                       onClick={() => setIsAddSectionOpen(true)}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm flex items-center gap-2"
+                      className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add</span>
@@ -573,11 +573,11 @@ export function AdminCourseBuilder() {
                   {isAddSectionOpen && (
                     <form
                       onSubmit={handleAddSection}
-                      className="bg-amber-50/70 border border-amber-300 rounded-2xl p-5 shadow-2xs space-y-4"
+                      className="bg-accent-50/70 border border-accent-300 rounded-2xl p-5 shadow-2xs space-y-4"
                     >
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-amber-900 text-base flex items-center gap-2">
-                          <Layers className="w-5 h-5 text-amber-600" />
+                        <h4 className="font-bold text-accent-900 text-base flex items-center gap-2">
+                          <Layers className="w-5 h-5 text-accent-600" />
                           <span>Add</span>
                         </h4>
                         <button
@@ -596,7 +596,7 @@ export function AdminCourseBuilder() {
                           value={newSectionTitle}
                           onChange={(e) => setNewSectionTitle(e.target.value)}
                           placeholder="Example: Section 1 - Skin Care Foundations"
-                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-medium"
+                          className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium"
                           autoFocus
                         />
                       </div>
@@ -612,7 +612,7 @@ export function AdminCourseBuilder() {
                         <button
                           type="submit"
                           disabled={isSaving}
-                          className="px-5 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 flex items-center gap-1.5"
+                          className="px-5 py-2 bg-accent-600 text-white rounded-xl text-xs font-bold hover:bg-accent-700 flex items-center gap-1.5"
                         >
                           {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                           <span>Save</span>
@@ -629,7 +629,7 @@ export function AdminCourseBuilder() {
                       <p className="text-primary-500 text-xs mb-4">Add the first section to begin organizing this course.</p>
                       <Button
                         onClick={() => setIsAddSectionOpen(true)}
-                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-xl text-xs"
+                        className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-2 px-5 rounded-xl text-xs"
                       >
                         <Plus className="w-4 h-4 ml-1 inline" />
                         <span>Add</span>
@@ -657,7 +657,7 @@ export function AdminCourseBuilder() {
                                   />
                                   <button
                                     onClick={() => handleUpdateSectionTitle(section.id)}
-                                    className="p-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold"
+                                    className="p-1.5 bg-success-600 text-white rounded-lg text-xs font-bold"
                                   >
                                     Save
                                   </button>
@@ -670,7 +670,7 @@ export function AdminCourseBuilder() {
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-3">
-                                  <span className="w-7 h-7 rounded-lg bg-amber-600 text-white font-bold text-xs flex items-center justify-center">
+                                  <span className="w-7 h-7 rounded-lg bg-accent-600 text-white font-bold text-xs flex items-center justify-center">
                                     {sIndex + 1}
                                   </span>
                                   <h3 className="font-bold text-primary-900 text-base">
@@ -742,7 +742,7 @@ export function AdminCourseBuilder() {
                                           )}
 
                                           {lesson.is_preview && (
-                                            <span className="rounded bg-blue-100 px-1.5 py-0.5 text-micro font-bold text-blue-800">
+                                            <span className="rounded bg-info-100 px-1.5 py-0.5 text-micro font-bold text-info-700">
                                               Free
                                             </span>
                                           )}
@@ -750,8 +750,8 @@ export function AdminCourseBuilder() {
                                           <span
                                             className={`rounded px-1.5 py-0.5 text-micro font-bold ${
                                               lesson.is_published
-                                                ? 'bg-emerald-100 text-emerald-800'
-                                                : 'bg-amber-100 text-amber-800'
+                                                ? 'bg-success-100 text-success-800'
+                                                : 'bg-warning-100 text-warning-800'
                                             }`}
                                           >
                                             {lesson.is_published ? 'Published' : 'Draft'}
@@ -784,7 +784,7 @@ export function AdminCourseBuilder() {
 
                                       <Link
                                         to={`/admin/courses/${courseId}/lessons/${lesson.id}/edit`}
-                                        className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors"
+                                        className="p-1.5 text-accent-600 hover:text-accent-800 hover:bg-accent-50 rounded-lg transition-colors"
                                         title="Edit lesson"
                                         aria-label={`Edit ${lesson.title}`}
                                       >
@@ -817,7 +817,7 @@ export function AdminCourseBuilder() {
                               {/* Canonical lesson creation entry point */}
                               <Link
                                 to={`/admin/courses/${courseId}/lessons/new?sectionId=${section.id}`}
-                                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-amber-400 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-900 transition-colors hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-accent-400 bg-accent-50 px-4 py-2.5 text-sm font-bold text-accent-900 transition-colors hover:bg-accent-100 focus:outline-none focus:ring-2 focus:ring-accent-500"
                               >
                                 <Plus className="h-4 w-4" aria-hidden="true" />
                                 <span>Add lesson</span>
@@ -835,7 +835,7 @@ export function AdminCourseBuilder() {
               {activeTab === 'settings' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-amber-600" />
+                    <Settings className="w-5 h-5 text-accent-600" />
                     <span>Course</span>
                   </h2>
 
@@ -873,7 +873,7 @@ export function AdminCourseBuilder() {
                     </p>
                     <button
                       onClick={() => navigate(`/admin/courses/${courseId}/edit`)}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-colors"
+                      className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-colors"
                     >
                       Edit
                     </button>
@@ -885,7 +885,7 @@ export function AdminCourseBuilder() {
               {activeTab === 'pricing' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-amber-600" />
+                    <DollarSign className="w-5 h-5 text-accent-600" />
                     <span>Pricing</span>
                   </h2>
 
@@ -905,7 +905,7 @@ export function AdminCourseBuilder() {
                           type="checkbox"
                           checked={certificateEnabled}
                           onChange={(e) => setCertificateEnabled(e.target.checked)}
-                          className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                          className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
                           Your verified certificate is ready.
@@ -917,7 +917,7 @@ export function AdminCourseBuilder() {
                           type="checkbox"
                           checked={sequentialLearning}
                           onChange={(e) => setSequentialLearning(e.target.checked)}
-                          className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                          className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
                           Sort (Lesson)
@@ -929,7 +929,7 @@ export function AdminCourseBuilder() {
                           type="checkbox"
                           checked={dripEnabled}
                           onChange={(e) => setDripEnabled(e.target.checked)}
-                          className="w-4 h-4 text-amber-600 rounded border-primary-300 focus:ring-amber-500"
+                          className="w-4 h-4 text-accent-600 rounded border-primary-300 focus:ring-accent-500"
                         />
                         <span className="text-sm font-bold text-primary-900">
                           Lessons (Drip Content)
@@ -940,7 +940,7 @@ export function AdminCourseBuilder() {
                     <Button
                       onClick={() => handleSaveTabSettings('pricing')}
                       disabled={isSaving}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
+                      className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       <span>Save</span>
@@ -953,7 +953,7 @@ export function AdminCourseBuilder() {
               {activeTab === 'seo' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-amber-600" />
+                    <Globe className="w-5 h-5 text-accent-600" />
                     <span>Search (SEO)</span>
                   </h2>
 
@@ -1003,7 +1003,7 @@ export function AdminCourseBuilder() {
                     <Button
                       onClick={() => handleSaveTabSettings('seo')}
                       disabled={isSaving}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
+                      className="bg-accent-600 hover:bg-accent-700 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2"
                     >
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       <span>Save SEO</span>
@@ -1016,7 +1016,7 @@ export function AdminCourseBuilder() {
               {activeTab === 'publish' && (
                 <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs space-y-6">
                   <h2 className="text-xl font-bold text-primary-900 border-b border-primary-100 pb-3 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-amber-600" />
+                    <CheckCircle className="w-5 h-5 text-accent-600" />
                     <span>Submit for review</span>
                   </h2>
 

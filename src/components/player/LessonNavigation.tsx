@@ -29,7 +29,7 @@ export function LessonNavigation({
         type="button"
         onClick={() => prevLesson && onNavigate(prevLesson)}
         disabled={!prevLesson}
-        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-[48px] ${
+        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-12 ${
           prevLesson
             ? 'bg-white border border-primary-200 text-primary-800 hover:bg-primary-50 hover:border-primary-300'
             : 'bg-primary-50 border border-primary-100 text-primary-300 cursor-not-allowed opacity-60'
@@ -43,20 +43,20 @@ export function LessonNavigation({
       {isQuiz ? (
         <div className="w-full sm:w-auto flex items-center justify-center">
           {isCurrentCompleted ? (
-            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
+            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-12">
               <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
               <span>Quiz complete</span>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 font-bold text-sm min-h-[48px]">
-              <HelpCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-warning-50 text-warning-900 border border-warning-200 font-bold text-sm min-h-12">
+              <HelpCircle className="w-5 h-5 text-warning-600 flex-shrink-0" />
               <span>Complete the quiz to continue</span>
             </div>
           )}
         </div>
       ) : isCurrentCompleted ? (
         <div className="w-full flex items-center justify-center">
-          <div className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-[48px]">
+          <div className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-success-50 text-success-800 border border-success-200 font-bold text-sm min-h-12">
             <CheckCircle2 className="w-5 h-5 text-success-600 flex-shrink-0" />
             <span>Lesson complete</span>
           </div>
@@ -66,7 +66,7 @@ export function LessonNavigation({
           type="button"
           onClick={onCompleteAndContinue}
           disabled={isCompleting}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-xs min-h-[48px] bg-accent-600 hover:bg-accent-700 text-white"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-xs min-h-12 bg-accent-600 hover:bg-accent-700 text-white"
         >
           {isCompleting ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -87,7 +87,7 @@ export function LessonNavigation({
         type="button"
         onClick={() => nextLesson && onNavigate(nextLesson)}
         disabled={!nextLesson}
-        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-[48px] ${
+        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all min-h-12 ${
           nextLesson
             ? 'bg-primary-900 hover:bg-primary-800 text-white shadow-xs'
             : 'bg-primary-50 border border-primary-100 text-primary-300 cursor-not-allowed opacity-60'

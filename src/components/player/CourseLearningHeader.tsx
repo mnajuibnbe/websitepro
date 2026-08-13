@@ -28,7 +28,7 @@ export function CourseLearningHeader({
           <button
             type="button"
             onClick={() => navigate('/my-courses')}
-            className="p-2 text-primary-600 hover:text-primary-900 hover:bg-primary-50 rounded-xl transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2 text-primary-600 hover:text-primary-900 hover:bg-primary-50 rounded-xl transition-colors flex-shrink-0 min-w-11 min-h-11 flex items-center justify-center"
             title="Back to my courses"
             aria-label="Back to my courses"
           >
@@ -63,7 +63,7 @@ export function CourseLearningHeader({
             onClick={onToggleMobileSidebar}
             aria-label="Open course curriculum"
             aria-haspopup="dialog"
-            className="lg:hidden flex items-center gap-2 bg-primary-100 hover:bg-primary-200 text-primary-900 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-colors min-h-[44px]"
+            className="lg:hidden flex items-center gap-2 bg-primary-100 hover:bg-primary-200 text-primary-900 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-colors min-h-11"
           >
             <Menu className="w-4 h-4" />
             <span className="hidden min-[360px]:inline">Curriculum</span>

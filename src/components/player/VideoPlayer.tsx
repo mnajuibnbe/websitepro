@@ -44,18 +44,18 @@ export function VideoPlayer() {
           <div className="flex items-center sm:gap-2">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="text-white hover:text-accent-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="text-white hover:text-accent-400 transition-colors min-w-11 min-h-11 flex items-center justify-center"
             >
               {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
             </button>
-            <button className="text-white hover:text-accent-400 transition-colors hidden sm:flex min-w-[44px] min-h-[44px] items-center justify-center">
+            <button className="text-white hover:text-accent-400 transition-colors hidden sm:flex min-w-11 min-h-11 items-center justify-center">
               <Rewind className="w-5 h-5" />
             </button>
-            <button className="text-white hover:text-accent-400 transition-colors hidden sm:flex min-w-[44px] min-h-[44px] items-center justify-center">
+            <button className="text-white hover:text-accent-400 transition-colors hidden sm:flex min-w-11 min-h-11 items-center justify-center">
               <SkipForward className="w-5 h-5" />
             </button>
             <div className="flex items-center group/volume relative">
-              <button className="text-white hover:text-accent-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <button className="text-white hover:text-accent-400 transition-colors min-w-11 min-h-11 flex items-center justify-center">
                 <Volume2 className="w-5 h-5" />
               </button>
               <div className="w-0 overflow-hidden group-hover/volume:w-20 transition-all duration-300 h-1.5 bg-white/30 rounded-full cursor-pointer relative ml-2">
@@ -65,13 +65,13 @@ export function VideoPlayer() {
           </div>
 
           <div className="flex items-center sm:gap-2">
-            <button className="text-white text-sm font-bold hover:text-accent-400 transition-colors border border-white/30 px-2 py-1 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button className="text-white text-sm font-bold hover:text-accent-400 transition-colors border border-white/30 px-2 py-1 rounded min-w-11 min-h-11 flex items-center justify-center">
               1.25x
             </button>
-            <button className="text-white hover:text-accent-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button className="text-white hover:text-accent-400 transition-colors min-w-11 min-h-11 flex items-center justify-center">
               <Settings className="w-5 h-5" />
             </button>
-            <button className="text-white hover:text-accent-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button className="text-white hover:text-accent-400 transition-colors min-w-11 min-h-11 flex items-center justify-center">
               <Maximize className="w-5 h-5" />
             </button>
           </div>
