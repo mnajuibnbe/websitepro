@@ -3,9 +3,20 @@ type AuthOperation = 'login' | 'register' | 'recovery' | 'password-update';
 export function getAuthErrorMessage(error: unknown, operation: AuthOperation) {
   const message = error instanceof Error ? error.message.toLowerCase() : '';
   const status = typeof error === 'object' && error !== null && 'status' in error ? Number(error.status) : undefined;
+  const code = typeof error === 'object' && error !== null && 'code' in error ? String((error as { code?: unknown }).code) : undefined;
 
   if (status === 429 || message.includes('rate limit') || message.includes('too many')) {
     return 'Too many attempts. Please wait a few minutes before trying again.';
+  }
+  if (
+    code === 'weak_password'
+    || message.includes('weak_password')
+    || message.includes('should contain')
+    || message.includes('should be at least')
+    || message.includes('at least one character')
+    || message.includes('known to be weak')
+  ) {
+    return "Your password doesn't meet the requirements: use at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a symbol.";
   }
   if (message.includes('invalid login credentials')) return 'Incorrect email address or password.';
   if (message.includes('email not confirmed')) return 'Confirm your email address before signing in.';
