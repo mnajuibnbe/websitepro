@@ -15,6 +15,7 @@ const metadata: Array<{ match: RegExp; title: string; description: string; robot
   { match: /^\/contact/, title: 'Contact Tutiba', description: 'Contact the Tutiba support team for course and account assistance.' },
   { match: /^\/privacy/, title: 'Privacy Policy', description: 'Learn how Tutiba handles and protects personal information.' },
   { match: /^\/terms/, title: 'Terms of Service', description: 'Review the terms that apply when using Tutiba.' },
+  { match: /^\/refund-policy/, title: 'Refund Policy', description: 'Review Tutiba’s refund and cancellation policy for digital courses.' },
   { match: /^\/login/, title: 'Sign In', description: 'Sign in to continue learning with Tutiba.', robots: 'noindex, nofollow' },
   { match: /^\/register/, title: 'Create an Account', description: 'Create your Tutiba learning account.', robots: 'noindex, nofollow' },
   { match: /^\/forgot-password|^\/update-password/, title: 'Account Recovery', description: 'Recover access to your Tutiba account.', robots: 'noindex, nofollow' },

@@ -25,6 +25,7 @@ const RegisterPage = lazyNamed(() => import('./pages/RegisterPage'), 'RegisterPa
 const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
 const PrivacyPolicy = lazyNamed(() => import('./pages/PrivacyPolicy'), 'PrivacyPolicy');
 const Terms = lazyNamed(() => import('./pages/Terms'), 'Terms');
+const RefundPolicy = lazyNamed(() => import('./pages/RefundPolicy'), 'RefundPolicy');
 const UnauthorizedPage = lazyNamed(() => import('./pages/UnauthorizedPage'), 'UnauthorizedPage');
 const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPage');
 const UpdatePassword = lazyNamed(() => import('./pages/UpdatePassword'), 'UpdatePassword');
@@ -94,6 +95,7 @@ function AppContent() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* Authenticated Routes (Students, Instructors, Admins) */}

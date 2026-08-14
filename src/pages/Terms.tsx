@@ -64,7 +64,9 @@ export function Terms() {
               <section>
                 <h2 className="text-2xl font-bold text-primary-900 mb-4">5. Cancellations and Refunds</h2>
                 <p className="leading-relaxed">
-                  Refund requests are reviewed according to the policy presented during checkout and any applicable consumer-protection requirements. Contact support promptly if you experience an enrollment or payment issue.
+                  All course purchases are final. Because courses are digital products delivered instantly upon payment approval, we do not offer refunds except in limited cases such as duplicate charges or a platform error that prevented access. See our{' '}
+                  <Link to="/refund-policy" className="font-bold text-accent-600 hover:text-accent-700">Refund & Cancellation Policy</Link>{' '}
+                  for full details. Contact support promptly if you experience an enrollment or payment issue.
                 </p>
               </section>
             </div>

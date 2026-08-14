@@ -40,6 +40,7 @@ export function Footer() {
     { title: 'Legal', links: [
       { label: 'Terms and Conditions', href: '/terms' },
       { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Refund Policy', href: '/refund-policy' },
     ] },
   ];
 
