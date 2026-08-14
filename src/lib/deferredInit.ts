@@ -1,9 +1,16 @@
+import { isPrerendering } from './prerenderFlag';
+
 // Runs `task` once the page is idle (via requestIdleCallback, capped so it
 // doesn't wait forever) OR as soon as the user first interacts, whichever
 // comes first — whichever fires first cancels the other. Used to keep
 // non-critical third-party work (GTM, Sentry) off the initial render path
 // without delaying it past the point a real user would engage anyway.
 export function runWhenIdleOrInteractive(task: () => void): void {
+  // The prerender crawl's long "wait for network idle" step is exactly the
+  // kind of idle window this function targets — without this guard it would
+  // fire during the crawl and bake the GTM <script> tag into the static
+  // snapshot served to every visitor, undoing the deferral entirely.
+  if (isPrerendering()) return;
   let done = false;
   const run = () => {
     if (done) return;

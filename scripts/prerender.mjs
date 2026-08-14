@@ -188,6 +188,12 @@ async function main() {
     browser = await launchBrowser();
 
     const context = await browser.newContext();
+    // Signals to client code (src/lib/prerenderFlag.ts) that this load is the
+    // build-time crawl, not a real visitor, so it skips anything whose
+    // result would be wrong to bake into the static snapshot every visitor
+    // gets served — e.g. injecting the deferred GTM script tag once idle, or
+    // swapping the preloaded font link's rel before capture.
+    await context.addInitScript(() => { window.__PRERENDERING__ = true; });
     await context.route('**/*', (route) => {
       const url = route.request().url();
       if (BLOCKED_REQUEST_HOSTS.some((pattern) => pattern.test(new URL(url).hostname))) {
