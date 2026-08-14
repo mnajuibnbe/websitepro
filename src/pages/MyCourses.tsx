@@ -111,7 +111,7 @@ export function MyCourses() {
             <button
               type="button"
               aria-label="Open student navigation"
-              className="rounded-lg p-2 text-primary-600 hover:bg-primary-50"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-primary-600 hover:bg-primary-50"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="w-6 h-6" />

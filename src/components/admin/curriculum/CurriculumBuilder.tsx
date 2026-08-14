@@ -813,7 +813,7 @@ export function CurriculumBuilder({ courseId }: CurriculumBuilderProps) {
                 type="button"
                 onClick={() => setAddSectionDialogOpen(false)}
                 aria-label="Close add section dialog"
-                className="p-1 text-primary-400 hover:text-primary-800 rounded-lg"
+                className="flex min-h-11 min-w-11 -m-2 items-center justify-center text-primary-400 hover:text-primary-800 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>

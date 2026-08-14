@@ -571,13 +571,13 @@ export function AdminCourseManager() {
                                 <Edit className="w-4 h-4" />
                               </button>
 
-                              <button onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="inline-flex min-h-10 items-center gap-1 rounded-lg bg-primary-100 px-2 text-xs font-bold text-primary-700 hover:bg-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-300" aria-label={`Manage students in ${course.title}`} title="Manage students"><Users className="h-4 w-4" /><span className="hidden xl:inline">Students</span></button>
+                              <button onClick={() => navigate(`/admin/courses/${course.id}/students`)} className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-primary-100 px-2 text-xs font-bold text-primary-700 hover:bg-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-300" aria-label={`Manage students in ${course.title}`} title="Manage students"><Users className="h-4 w-4" /><span className="hidden xl:inline">Students</span></button>
 
                               {/* Status Toggle Quick Button */}
                               {isPublished ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'draft')}
-                                  className="p-2 text-warning-700 hover:bg-warning-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-1 active:bg-warning-100"
+                                  className="flex min-h-11 min-w-11 items-center justify-center text-warning-700 hover:bg-warning-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-warning-500 focus:ring-offset-1 active:bg-warning-100"
                                   aria-label={`Unpublish ${course.title}`}
                                   title="Unpublish course"
                                 >
@@ -586,18 +586,18 @@ export function AdminCourseManager() {
                               ) : course.review_status === 'approved' ? (
                                 <button
                                   onClick={() => handleUpdateStatus(course.id, 'published')}
-                                  className="p-2 text-success-700 hover:bg-success-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-1 active:bg-success-100"
+                                  className="flex min-h-11 min-w-11 items-center justify-center text-success-700 hover:bg-success-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-1 active:bg-success-100"
                                   aria-label={`Publish approved course ${course.title}`}
                                   title="Publish approved course"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
                               ) : course.review_status === 'submitted' ? (
-                                <button onClick={() => navigate(`/admin/course-reviews/${course.id}`)} className="p-2 text-accent-700 hover:bg-accent-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 active:bg-accent-100" aria-label={`Review ${course.title}`} title="Open submitted review">
+                                <button onClick={() => navigate(`/admin/course-reviews/${course.id}`)} className="flex min-h-11 min-w-11 items-center justify-center text-accent-700 hover:bg-accent-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 active:bg-accent-100" aria-label={`Review ${course.title}`} title="Open submitted review">
                                   <Eye className="w-4 h-4" />
                                 </button>
                               ) : (
-                                <button onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-100" aria-label={`Finalize ${course.title}`} title="Complete readiness and finalize">
+                                <button onClick={() => navigate(`/admin/courses/${course.id}/builder`)} className="flex min-h-11 min-w-11 items-center justify-center text-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 active:bg-primary-100" aria-label={`Finalize ${course.title}`} title="Complete readiness and finalize">
                                   <Sparkles className="w-4 h-4" />
                                 </button>
                               )}

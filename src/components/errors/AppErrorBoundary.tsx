@@ -1,6 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { reportClientError } from '../../lib/clientMonitoring';
-import { Sentry } from '../../lib/sentry';
 
 interface AppErrorBoundaryProps { children?: ReactNode }
 interface AppErrorBoundaryState { failed: boolean }
@@ -13,7 +12,11 @@ export class AppErrorBoundary extends TypedComponent<AppErrorBoundaryProps, AppE
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: Error, info: ErrorInfo) {
     reportClientError(error, info.componentStack || 'React render');
-    Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack || 'React render' } } });
+    // Dynamic import: keeps the Sentry SDK out of the initial bundle graph —
+    // it's only fetched on the rare path where a render actually crashed.
+    import('../../lib/sentry').then(({ Sentry }) => {
+      Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack || 'React render' } } });
+    });
   }
   render() {
     if (!this.state.failed) return this.props.children;

@@ -16,7 +16,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         type="button"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
-        className="w-10 h-10 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
+        className="h-11 w-11 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
@@ -27,7 +27,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           key={page}
           onClick={() => onPageChange(page)}
           aria-current={page === currentPage ? 'page' : undefined}
-          className={`w-10 h-10 flex items-center justify-center rounded-lg border font-bold transition-colors ${
+          className={`h-11 w-11 flex items-center justify-center rounded-lg border font-bold transition-colors ${
             page === currentPage
               ? 'bg-accent-600 border-accent-600 text-white shadow-sm'
               : 'border-primary-200 text-primary-700 hover:bg-primary-50 hover:border-primary-300'
@@ -41,7 +41,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         type="button"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
-        className="w-10 h-10 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
+        className="h-11 w-11 flex items-center justify-center rounded-lg border border-primary-200 text-primary-700 disabled:text-primary-400 disabled:cursor-not-allowed disabled:bg-primary-50"
       >
         <ChevronRight className="w-5 h-5" />
       </button>

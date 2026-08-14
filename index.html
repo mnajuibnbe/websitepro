@@ -10,7 +10,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://tutiba-video-stream.tutiba.workers.dev" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+    <!--
+      Non-blocking font loading: rel="preload" fetches the stylesheet with high
+      priority without blocking first paint. src/lib/fonts.ts flips it to
+      rel="stylesheet" once the app boots. The noscript fallback covers clients
+      that never run that script. display=swap keeps text visible on the
+      fallback font in the meantime.
+    -->
+    <link id="google-fonts" rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap"></noscript>
   </head>
   <body class="bg-primary-50 text-primary-900 font-sans antialiased">
     <div id="root"></div>
