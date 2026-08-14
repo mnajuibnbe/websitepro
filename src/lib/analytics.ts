@@ -22,7 +22,14 @@ const SENSITIVE_SEARCH_PARAMS = ['token_hash', 'access_token', 'refresh_token', 
 const SENSITIVE_PATHNAMES = new Set(['/update-password']);
 
 let initialized = false;
+let scriptLoaded = false;
 
+// Sets up window.dataLayer/gtag immediately so every trackXxx() call below can
+// queue events from the first render onward. Cheap and synchronous — no
+// network request. The actual gtag.js download is deferred separately (see
+// loadAnalyticsScript) since that's the part that costs bytes and main-thread
+// time; queued dataLayer events are replayed once it lands, so no events are
+// lost by delaying it.
 export function initAnalytics(): void {
   if (!isAnalyticsEnabled || initialized) return;
   initialized = true;
@@ -36,6 +43,14 @@ export function initAnalytics(): void {
   // and its history-based (pushState/popstate) page_view tracking, so route
   // changes only produce a page_view via the explicit trackPageView calls below.
   gtag('config', MEASUREMENT_ID as string, { send_page_view: false });
+}
+
+// Injects the actual gtag.js <script>. Split out from initAnalytics so callers
+// can delay this specifically until after first paint / idle time — it's the
+// part that downloads and executes ~300KB of third-party JS.
+export function loadAnalyticsScript(): void {
+  if (!isAnalyticsEnabled || scriptLoaded) return;
+  scriptLoaded = true;
 
   const script = document.createElement('script');
   script.async = true;

@@ -1,9 +1,11 @@
 import * as Sentry from '@sentry/react';
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
+let initialized = false;
 
 export function initSentry() {
-  if (!dsn) return;
+  if (!dsn || initialized) return;
+  initialized = true;
   Sentry.init({
     dsn,
     sendDefaultPii: false,

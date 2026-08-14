@@ -131,7 +131,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <button
             type="button"
             onClick={() => onToggleSelect(item.id)}
-            className="text-primary-400 hover:text-accent-600 transition-colors flex-shrink-0 p-0.5"
+            className="flex min-h-11 min-w-11 -m-3 items-center justify-center text-primary-400 hover:text-accent-600 transition-colors flex-shrink-0"
             title="Curriculum Item"
           >
             {isSelected ? (
@@ -198,7 +198,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
       <div className="flex items-center gap-1 flex-shrink-0">
         <Link
           to={`/admin/courses/${courseId}/lessons/${item.id}/edit`}
-          className="p-1.5 text-accent-600 hover:text-accent-800 hover:bg-accent-50 rounded-lg transition-colors"
+          className="flex min-h-11 min-w-11 -m-2 items-center justify-center text-accent-600 hover:text-accent-800 hover:bg-accent-50 rounded-lg transition-colors"
           title="Edit"
         >
           <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -208,7 +208,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <button
             type="button"
             onClick={() => onDuplicate(item.id)}
-            className="p-1.5 text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
+            className="flex min-h-11 min-w-11 -m-2 items-center justify-center text-primary-500 hover:text-primary-800 hover:bg-primary-100 rounded-lg transition-colors"
             title="Curriculum Item"
           >
             <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -219,7 +219,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <button
             type="button"
             onClick={() => onDelete(item.id)}
-            className="p-1.5 text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
+            className="flex min-h-11 min-w-11 -m-2 items-center justify-center text-danger-500 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-colors"
             title="Delete"
           >
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -231,7 +231,7 @@ export const CurriculumItemRow: React.FC<CurriculumItemRowProps> = ({
           <button
             type="button"
             onClick={() => setShowMenu((prev) => !prev)}
-            className="p-1.5 text-primary-400 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
+            className="flex min-h-11 min-w-11 -m-2 items-center justify-center text-primary-400 hover:text-primary-700 hover:bg-primary-100 rounded-lg transition-colors"
             title="Curriculum Item"
           >
             <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

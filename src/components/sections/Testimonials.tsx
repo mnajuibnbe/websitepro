@@ -50,7 +50,15 @@ export function Testimonials() {
     {!isLoading && !error && testimonials.length > 0 && <>
       {/* Mobile: single carousel of every testimonial */}
       <div ref={carouselRef} onScroll={updateActiveIndex} className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 md:hidden hide-scrollbar">{testimonials.map(testimonial => <TestimonialCard key={testimonial.review_id} testimonial={testimonial} mobile featured />)}</div>
-      <div className="flex justify-center gap-2 md:hidden" aria-label="Testimonial slides">{testimonials.map((testimonial, index) => <button key={testimonial.review_id} type="button" aria-label={`Go to testimonial ${index + 1}`} aria-current={activeIndex === index ? 'true' : undefined} onClick={() => { const card = carouselRef.current?.children[index] as HTMLElement | undefined; card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }} className={`h-2.5 rounded-full transition-all ${activeIndex === index ? 'w-7 bg-accent-600' : 'w-2.5 bg-primary-200'}`} />)}</div>
+      <div className="flex justify-center gap-2 md:hidden" aria-label="Testimonial slides">{testimonials.map((testimonial, index) => {
+        const isActive = activeIndex === index;
+        // The button is the real 44x44 tap target (WCAG 2.5.8); negative margins cancel its
+        // footprint back down to the visible dot's original size so the layout is unchanged
+        // and the extra hit area just overlaps invisibly into the surrounding gap.
+        return <button key={testimonial.review_id} type="button" aria-label={`Go to testimonial ${index + 1}`} aria-current={isActive ? 'true' : undefined} onClick={() => { const card = carouselRef.current?.children[index] as HTMLElement | undefined; card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }} className={`flex h-11 w-11 -my-[17px] items-center justify-center ${isActive ? '-mx-2' : '-mx-[17px]'}`}>
+          <span aria-hidden="true" className={`h-2.5 rounded-full transition-all ${isActive ? 'w-7 bg-accent-600' : 'w-2.5 bg-primary-200'}`} />
+        </button>;
+      })}</div>
 
       {/* Desktop: 3 featured + horizontal carousel for the rest */}
       <div className={`hidden gap-6 md:grid lg:gap-8 ${featured.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'}`}>

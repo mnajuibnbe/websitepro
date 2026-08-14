@@ -36,8 +36,10 @@ export function ToastContainer({ toasts, onDismiss }: ToastProps) {
           </div>
 
           <button
+            type="button"
             onClick={() => onDismiss(toast.id)}
-            className="text-primary-400 hover:text-primary-700 transition-colors p-0.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+            aria-label="Dismiss notification"
+            className="flex min-h-11 min-w-11 flex-shrink-0 -m-3 items-center justify-center text-primary-400 hover:text-primary-700 transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
           >
             <X className="w-4 h-4" />
           </button>

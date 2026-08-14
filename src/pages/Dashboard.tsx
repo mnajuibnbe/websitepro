@@ -92,7 +92,7 @@ export function Dashboard() {
             <button
               type="button"
               aria-label="Open student navigation"
-              className="lg:hidden p-2 -ml-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+              className="lg:hidden flex min-h-11 min-w-11 -ml-2 items-center justify-center text-primary-600 hover:bg-primary-50 rounded-lg"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="w-6 h-6" />
@@ -100,7 +100,7 @@ export function Dashboard() {
             <h1 className="text-xl md:text-2xl font-bold text-primary-900 hidden sm:block">Welcome! 👋</h1>
           </div>
 
-          <button type="button" onClick={() => navigate('/profile')} aria-label="Open profile" className="w-10 h-10 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 font-bold border border-accent-200 shadow-sm hover:shadow-md transition-shadow">
+          <button type="button" onClick={() => navigate('/profile')} aria-label="Open profile" className="h-11 w-11 rounded-full bg-accent-100 flex items-center justify-center text-accent-700 font-bold border border-accent-200 shadow-sm hover:shadow-md transition-shadow">
             {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
           </button>
         </header>

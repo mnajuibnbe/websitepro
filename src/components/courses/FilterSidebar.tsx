@@ -38,7 +38,7 @@ export function FilterSidebar({ filters, onChange, mobileOpen, onClose, categori
     >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-primary-900">Filters</h2>
-        <button type="button" onClick={onClose} className="lg:hidden p-2 rounded-lg text-primary-600 hover:bg-primary-100" aria-label="Close filters">
+        <button type="button" onClick={onClose} className="lg:hidden flex min-h-11 min-w-11 items-center justify-center -mr-2 rounded-lg text-primary-600 hover:bg-primary-100" aria-label="Close filters">
           <X className="w-5 h-5" />
         </button>
       </div>
