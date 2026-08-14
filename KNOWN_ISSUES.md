@@ -197,12 +197,61 @@ the same aggregate diff also turned up `public.blog_posts` having 2 fewer
 columns on preview than production, plus one orphaned function
 (`admin_create_course` exists on production, created by no migration) and one
 migration-created function that no longer exists on production
-(`admin_delete_empty_course`, created by `20260730000000_course_admin_issue_repairs.sql`).
+(`admin_delete_empty_course`, created by `20260730000000_course_admin_issue_repairs.sql`
+-- **RESOLVED 2026-08-14**, see below).
 These are outside the tables this investigation was scoped to and don't block
 anything (the full migration replay already succeeds without touching them) —
 flagging rather than fixing, since the pattern found above strongly suggests
 more of this exists elsewhere in the other ~24 tables that weren't part of
 this specific investigation.
+
+## Admin "Delete course" button failed for every admin (found + fixed 2026-08-14)
+`admin_delete_empty_course()` (called by the admin course manager's "Delete
+course" button) was never applied to production -- confirmed via direct
+database inspection, matching the residual gap flagged above. Every admin
+click failed. Fixed with
+`supabase/migrations/20260814120000_repair_admin_delete_empty_course.sql`,
+which also closes obstacles live testing surfaced that the original,
+never-applied function body did not handle even where it did apply:
+- `courses.submitted_revision_id`/`approved_revision_id` -> `course_revisions`
+  and `course_revisions.course_id` -> `courses` are both `ON DELETE RESTRICT`
+  (circular) -- the two columns are nulled on the course row before either
+  side deletes.
+- `course_review_events`, `course_review_findings`, and
+  `enrollment_access_events` all `RESTRICT`-reference `courses` (the first
+  two also `RESTRICT`-reference `course_revisions`) and are now cleared
+  first; the original body only cleared `course_review_events`.
+- The `trg_courses_cleanup_cover` trigger's raw `DELETE FROM storage.objects`
+  is blocked by `storage.protect_delete()` for any direct SQL caller. Fixed
+  by setting `storage.allow_delete_query = 'true'` with `SET LOCAL`, scoped
+  to the function's own transaction (auto-reverts on commit/rollback) rather
+  than disabling the trigger.
+- `lock_course_content_mutation()` on `questions`/`question_options` resolves
+  the owning course via a join back through `quizzes`/`questions`; letting
+  plain FK cascade delete those rows hit the guard's "Course content must
+  belong to a course" error because the parent row is already gone by the
+  time the child's own `BEFORE DELETE` trigger fires. Fixed by deleting
+  `question_options`, then `questions`, then `quizzes` explicitly before the
+  parents are gone; every other content table reads its `course_id` directly
+  off its own row, so cascade is safe for those.
+
+Also found and fixed during this pass: the new function was the only
+`admin_*` RPC in the project with `EXECUTE` granted to `anon` -- this
+project's public-schema default privileges grant `EXECUTE` on newly created
+functions directly to `anon`/`authenticated`/`service_role`, so
+`REVOKE ALL ... FROM PUBLIC` alone doesn't strip `anon`'s access on a
+brand-new function the way it does on an existing one. Revoked explicitly;
+every other `admin_*` function was already unaffected. Worth remembering for
+any future migration that creates a new function.
+
+Verified against production (`nhknhibsloirpffndzcd`) via a throwaway test
+course carrying quizzes/questions/options, a revision with both
+`submitted_revision_id`/`approved_revision_id` set, a review event, a review
+finding, and a cover image path -- deleted cleanly with zero orphaned rows.
+Separately verified a course with an enrollment is still rejected with the
+original "must be archived instead" message, and that no protective trigger
+was left permanently disabled. Test fixtures cleaned up; no real course data
+touched.
 
 ## Multiple package manager lockfiles (2026-08-05, discovered during CI setup)
 The repo tracks both `package-lock.json` (npm, used by CI) and `bun.lock`
