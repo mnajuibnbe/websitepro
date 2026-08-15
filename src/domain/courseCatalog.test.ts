@@ -31,6 +31,8 @@ const baseCourse: Course = {
   language: 'en',
   visibility: 'public',
   is_featured: true,
+  is_bestseller: false,
+  curriculum_highlights: null,
   home_order: 1,
   certificate_enabled: true,
   sequential_learning: false,

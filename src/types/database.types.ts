@@ -30,6 +30,8 @@ export interface Course {
   submitted_revision_id?: string | null;
   approved_revision_id?: string | null;
   is_featured: boolean | null;
+  is_bestseller: boolean | null;
+  curriculum_highlights: string[] | null;
   home_order: number | null;
   certificate_enabled: boolean | null;
   sequential_learning: boolean | null;
