@@ -14,6 +14,7 @@ import {
   Tag,
   DollarSign,
   UserCheck,
+  Flame,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/layout/PageContainer';
@@ -30,6 +31,7 @@ import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGui
 import { CategoryField } from '../../components/admin/course/CategoryField';
 import { COURSE_LANGUAGES } from '../../domain/courseTaxonomy';
 import { COURSE_DESCRIPTION_MIN_LENGTH, COURSE_SUMMARY_MIN_LENGTH } from '../../domain/courseReadiness';
+import { DynamicListEditor } from '../../components/admin/course/DynamicListEditor';
 
 // Helper to sanitize slug
 export const sanitizeSlug = sanitizeCourseSlug;
@@ -54,6 +56,9 @@ export function AdminCourseCreate() {
   const [coverImage, setCoverImage] = useState('');
   const [trailerVideo, setTrailerVideo] = useState('');
   const [instructorId, setInstructorId] = useState('');
+  const [curriculumHighlights, setCurriculumHighlights] = useState<string[]>([]);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isBestseller, setIsBestseller] = useState(false);
 
   // Instructors list for dropdown
 
@@ -81,7 +86,7 @@ export function AdminCourseCreate() {
     if (isSubmitting) return; // Prevent double click
 
     // Validation
-    const newErrors = validateCourseForm({ title, slug: '', shortDescription, description, priceEgp, priceUsd });
+    const newErrors = validateCourseForm({ title, slug: '', shortDescription, description, priceEgp, priceUsd, curriculumHighlights });
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -126,9 +131,15 @@ export function AdminCourseCreate() {
         return;
       }
 
-      if (trailerVideo.trim()) {
-        const { error: trailerError } = await supabase.from('courses').update({ trailer_video: trailerVideo.trim() }).eq('id', rpcCourseId);
-        if (trailerError) throw trailerError;
+      const postCreateUpdates: Record<string, unknown> = {};
+      if (trailerVideo.trim()) postCreateUpdates.trailer_video = trailerVideo.trim();
+      if (curriculumHighlights.length) postCreateUpdates.curriculum_highlights = curriculumHighlights.map(item => item.trim());
+      if (!isInstructor && isFeatured) postCreateUpdates.is_featured = true;
+      if (!isInstructor && isBestseller) postCreateUpdates.is_bestseller = true;
+
+      if (Object.keys(postCreateUpdates).length > 0) {
+        const { error: postCreateError } = await supabase.from('courses').update(postCreateUpdates).eq('id', rpcCourseId);
+        if (postCreateError) throw postCreateError;
       }
 
       await recordAdminAudit('create', 'course', String(rpcCourseId), { title: title.trim() });
@@ -263,8 +274,44 @@ export function AdminCourseCreate() {
                   />
                   <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${richTextVisibleLength(description)}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
+
+                <DynamicListEditor id="course-curriculum-highlights" label="Catalog card highlights" description="Optional. Overrides the checkmark bullets shown on course cards. Leave empty to show the two most relevant published lesson titles automatically once the course has content." value={curriculumHighlights} onChange={(items) => { setCurriculumHighlights(items); if (errors.curriculumHighlights) setErrors((prev) => ({ ...prev, curriculumHighlights: '' })); }} error={errors.curriculumHighlights} />
               </div>
             </div>
+
+            {/* Homepage and catalog curation, admin-only. */}
+            {!isInstructor && (
+              <div className="bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+                <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-accent-600" />
+                  <span>Catalog curation</span>
+                </h2>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-4 p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
+                    <div>
+                      <h4 className="flex items-center gap-1.5 font-bold text-primary-900 text-sm"><Sparkles className="w-4 h-4 text-info-600" />Featured</h4>
+                      <p className="text-primary-500 text-xs mt-0.5">Shows a "Featured" badge on this course's card.</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer flex-none">
+                      <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="sr-only peer" aria-label="Featured" />
+                      <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-info-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
+                    <div>
+                      <h4 className="flex items-center gap-1.5 font-bold text-primary-900 text-sm"><Flame className="w-4 h-4 text-warning-600" />Bestseller</h4>
+                      <p className="text-primary-500 text-xs mt-0.5">Shows a "Bestseller" badge on this course's card.</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer flex-none">
+                      <input type="checkbox" checked={isBestseller} onChange={(e) => setIsBestseller(e.target.checked)} className="sr-only peer" aria-label="Bestseller" />
+                      <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-warning-600"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Section 2: Classification & Pricing */}
             <div id="course-classification" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">

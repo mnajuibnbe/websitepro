@@ -7,7 +7,6 @@ import { usePricingContext } from '../../contexts/PricingContext';
 import { PageContainer } from '../layout/PageContainer';
 import { useCourseCatalog } from '../../hooks/useCourseCatalog';
 import { mapCourseToCardProps } from '../../lib/courseCard';
-import { formatHomepageCourseCta } from '../../lib/homepageMarketing';
 import { Reveal } from '../ui/Reveal';
 
 export function FeaturedCourses() {
@@ -62,7 +61,7 @@ export function FeaturedCourses() {
             return (
               <React.Fragment key={course.id}>
                 <Reveal delay={index * 0.06} className="h-full">
-                  <CourseCard {...cardProps} ctaText={formatHomepageCourseCta(course.title, cardProps.price)} fullWidthCta onEnroll={() => navigate(`/course/${course.id}`)} />
+                  <CourseCard {...cardProps} ctaText="Add to cart" fullWidthCta onEnroll={() => navigate(`/course/${course.id}`)} />
                 </Reveal>
               </React.Fragment>
             );

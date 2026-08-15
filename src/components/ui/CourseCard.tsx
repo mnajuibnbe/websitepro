@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 import { Badge } from './Badge';
-import { CheckCircle2, Clock, BookOpen, Star } from 'lucide-react';
+import { CheckCircle2, Clock, BookOpen, Star, Flame, Sparkles } from 'lucide-react';
 import { OptimizedImage } from './OptimizedImage';
 
 export interface CourseCardProps {
@@ -19,6 +19,8 @@ export interface CourseCardProps {
   ctaText?: string;
   onEnroll?: () => void;
   fullWidthCta?: boolean;
+  isFeatured?: boolean;
+  isBestseller?: boolean;
 }
 
 export function CourseCard({
@@ -35,6 +37,8 @@ export function CourseCard({
   ctaText = 'View Course',
   onEnroll,
   fullWidthCta = false,
+  isFeatured = false,
+  isBestseller = false,
 }: CourseCardProps) {
   const lessonsLabel = `${lessonsCount} ${lessonsCount === 1 ? 'lesson' : 'lessons'}`;
   return (
@@ -62,6 +66,20 @@ export function CourseCard({
 
       {/* Content */}
       <div className="flex flex-grow flex-col p-6 lg:p-7">
+        {(isBestseller || isFeatured) && (
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            {isBestseller && (
+              <Badge variant="warning" className="gap-1">
+                <Flame className="h-3 w-3 fill-current" aria-hidden="true" /> Bestseller
+              </Badge>
+            )}
+            {isFeatured && (
+              <Badge variant="info" className="gap-1">
+                <Sparkles className="h-3 w-3" aria-hidden="true" /> Featured
+              </Badge>
+            )}
+          </div>
+        )}
         <h3 className="mb-2 text-xl font-bold text-primary-900">{title}</h3>
         <p className="mb-4 line-clamp-2 text-sm text-primary-600">{description}</p>
 

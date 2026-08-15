@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Sparkle,
   Video,
+  Flame,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/layout/PageContainer';
@@ -67,6 +68,9 @@ export function AdminCourseEdit() {
   const [learningOutcomes, setLearningOutcomes] = useState<string[]>([]);
   const [requirements, setRequirements] = useState<string[]>([]);
   const [targetAudience, setTargetAudience] = useState<string[]>([]);
+  const [curriculumHighlights, setCurriculumHighlights] = useState<string[]>([]);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isBestseller, setIsBestseller] = useState(false);
 
 
   // Validation & Toasts
@@ -133,6 +137,9 @@ export function AdminCourseEdit() {
       setLearningOutcomes(Array.isArray(course.learning_outcomes) ? course.learning_outcomes : []);
       setRequirements(Array.isArray(course.requirements) ? course.requirements : []);
       setTargetAudience(Array.isArray(course.target_audience) ? course.target_audience : []);
+      setCurriculumHighlights(Array.isArray(course.curriculum_highlights) ? course.curriculum_highlights : []);
+      setIsFeatured(Boolean(course.is_featured));
+      setIsBestseller(Boolean(course.is_bestseller));
     } catch (err: any) {
       console.error('Error fetching course details:', err);
       setErrorMessage(err.message || 'Build practical skills with structured, expert-led course content..');
@@ -153,7 +160,7 @@ export function AdminCourseEdit() {
     if (!courseId || isSubmitting) return;
 
     // Validation
-    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd, learningOutcomes, requirements, targetAudience });
+    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd, learningOutcomes, requirements, targetAudience, curriculumHighlights });
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
@@ -202,8 +209,14 @@ export function AdminCourseEdit() {
         learning_outcomes: learningOutcomes.map(item => item.trim()),
         requirements: requirements.map(item => item.trim()),
         target_audience: targetAudience.map(item => item.trim()),
+        curriculum_highlights: curriculumHighlights.length ? curriculumHighlights.map(item => item.trim()) : null,
         updated_at: new Date().toISOString(),
       };
+
+      if (!isInstructor) {
+        updates.is_featured = isFeatured;
+        updates.is_bestseller = isBestseller;
+      }
 
       if (status === 'published') {
         if (!originalCourse?.published_at) {
@@ -402,6 +415,7 @@ export function AdminCourseEdit() {
                     <DynamicListEditor id="course-learning-outcomes" label="Learning outcomes" description="What learners will be able to do after completing this course. Items appear in this order on the course page." value={learningOutcomes} onChange={(items) => { setLearningOutcomes(items); if (errors.learningOutcomes) setErrors(current => ({ ...current, learningOutcomes: '' })); }} error={errors.learningOutcomes} />
                     <DynamicListEditor id="course-requirements" label="Requirements" description="Knowledge, materials, or experience learners should have before starting." value={requirements} onChange={(items) => { setRequirements(items); if (errors.requirements) setErrors(current => ({ ...current, requirements: '' })); }} error={errors.requirements} />
                     <DynamicListEditor id="course-target-audience" label="Target audience" description="The learners this course is designed for." value={targetAudience} onChange={(items) => { setTargetAudience(items); if (errors.targetAudience) setErrors(current => ({ ...current, targetAudience: '' })); }} error={errors.targetAudience} />
+                    <DynamicListEditor id="course-curriculum-highlights" label="Catalog card highlights" description="Optional. Overrides the checkmark bullets shown on course cards. Leave empty to keep showing the two most relevant published lesson titles automatically." value={curriculumHighlights} onChange={(items) => { setCurriculumHighlights(items); if (errors.curriculumHighlights) setErrors(current => ({ ...current, curriculumHighlights: '' })); }} error={errors.curriculumHighlights} />
                   </div>
                 </div>
               </div>
@@ -480,6 +494,40 @@ export function AdminCourseEdit() {
                   {!isInstructor && <div id="course-instructor" className="scroll-mt-24 md:col-span-2"><InstructorPicker value={instructorId} onChange={setInstructorId} /></div>}
                 </div>
               </div>
+
+              {/* Homepage and catalog curation, admin-only. */}
+              {!isInstructor && (
+                <div id="course-curation" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+                  <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-accent-600" />
+                    <span>Catalog curation</span>
+                  </h2>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-4 p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
+                      <div>
+                        <h4 className="flex items-center gap-1.5 font-bold text-primary-900 text-sm"><Sparkles className="w-4 h-4 text-info-600" />Featured</h4>
+                        <p className="text-primary-500 text-xs mt-0.5">Shows a "Featured" badge on this course's card.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer flex-none">
+                        <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="sr-only peer" aria-label="Featured" />
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-info-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 p-4 bg-primary-50/50 border border-primary-200 rounded-xl">
+                      <div>
+                        <h4 className="flex items-center gap-1.5 font-bold text-primary-900 text-sm"><Flame className="w-4 h-4 text-warning-600" />Bestseller</h4>
+                        <p className="text-primary-500 text-xs mt-0.5">Shows a "Bestseller" badge on this course's card.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer flex-none">
+                        <input type="checkbox" checked={isBestseller} onChange={(e) => setIsBestseller(e.target.checked)} className="sr-only peer" aria-label="Bestseller" />
+                        <div className="w-11 h-6 bg-primary-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-primary-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-warning-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* One canonical cover reused by catalog and sales page. */}
               <div id="course-media" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">

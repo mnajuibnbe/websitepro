@@ -11,6 +11,7 @@ export interface CourseFormValues {
   learningOutcomes?: string[];
   requirements?: string[];
   targetAudience?: string[];
+  curriculumHighlights?: string[];
 }
 
 export function sanitizeCourseSlug(input: string): string {
@@ -30,5 +31,6 @@ export function validateCourseForm(values: CourseFormValues): Record<string, str
   if (values.learningOutcomes?.some(item => !item.trim())) errors.learningOutcomes = 'Remove or complete every empty learning outcome.';
   if (values.requirements?.some(item => !item.trim())) errors.requirements = 'Remove or complete every empty requirement.';
   if (values.targetAudience?.some(item => !item.trim())) errors.targetAudience = 'Remove or complete every empty audience item.';
+  if (values.curriculumHighlights?.some(item => !item.trim())) errors.curriculumHighlights = 'Remove or complete every empty highlight.';
   return errors;
 }

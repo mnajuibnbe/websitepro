@@ -6,16 +6,14 @@ import { getCourseSalesTheme } from '../../domain/courseSalesTheme';
 import { CourseTrailer } from './CourseTrailer';
 import { RichTextContent } from '../ui/RichTextContent';
 import { Collapsible } from '../ui/Collapsible';
+import { formatCourseVideoLength } from '../../lib/courseDuration';
 
 const levelLabel = (level: string | null | undefined) => ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', all_levels: 'All levels' }[level || ''] || level || 'All levels');
 
 export function CourseHero({ course }: { course: CourseCatalogItem }) {
   const theme = getCourseSalesTheme(course.category);
   const CategoryIcon = theme.icon;
-  const durationSeconds = Number(course?.total_video_duration_seconds || 0);
-  const durationLabel = durationSeconds > 0
-    ? `${Math.floor(durationSeconds / 3600) > 0 ? `${Math.floor(durationSeconds / 3600)} hr ` : ''}${Math.ceil((durationSeconds % 3600) / 60)} min video`
-    : 'Self-paced learning';
+  const durationLabel = formatCourseVideoLength(Number(course?.total_video_duration_seconds || 0));
   return (
     <div className={`mb-8 rounded-3xl border-t-4 bg-gradient-to-br ${theme.accentBorder} ${theme.panel} px-5 pb-8 pt-5 shadow-sm lg:mb-12 md:px-8`}>
       {/* Breadcrumb */}
