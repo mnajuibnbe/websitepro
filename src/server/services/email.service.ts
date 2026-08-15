@@ -1,6 +1,8 @@
 const RESEND_API_URL = 'https://api.resend.com/emails';
+const RESEND_RECEIVING_API_URL = 'https://api.resend.com/emails/receiving';
 const DEFAULT_FROM = 'Tutiba Support <support@tutiba.com>';
 const BRAND_ACCENT = '#0D9488';
+const SUPPORT_REPLY_TO = 'support@tutiba.com';
 
 export interface SendEmailInput {
   to: string;
@@ -112,7 +114,61 @@ export function buildContactReplyEmail(name: string, originalMessage: string, re
   return { subject, html, text };
 }
 
-function htmlToPlainText(html: string): string {
+/**
+ * Reply-To address for an outbound admin reply. When RESEND_INBOUND_DOMAIN
+ * is configured (the Resend-provided <id>.resend.app address -- see Resend
+ * dashboard > Emails > Receiving), encodes the submission id into the local
+ * part so an inbound visitor reply can be matched back to its thread without
+ * relying on sender-address matching (which breaks if the visitor replies
+ * from a different address). Falls back to the static support address so
+ * outbound replies keep working before inbound is configured.
+ */
+export function buildReplyToAddress(submissionId: string): string {
+  const inboundDomain = process.env.RESEND_INBOUND_DOMAIN?.trim();
+  return inboundDomain ? `reply+${submissionId}@${inboundDomain}` : SUPPORT_REPLY_TO;
+}
+
+export interface ReceivedEmail {
+  id: string;
+  to: string[];
+  cc: string[];
+  from: string;
+  subject: string;
+  html: string | null;
+  text: string | null;
+  attachments: { id: string; filename: string }[];
+}
+
+/**
+ * Fetches the full body of an inbound email. The email.received webhook
+ * payload is metadata-only (no body/headers/attachments) by Resend's
+ * design, so this is a required second call for every inbound message.
+ */
+export async function fetchReceivedEmail(emailId: string): Promise<ReceivedEmail | null> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+
+  const response = await fetch(`${RESEND_RECEIVING_API_URL}/${encodeURIComponent(emailId)}`, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+  if (!response.ok) return null;
+
+  const data = await response.json() as Partial<ReceivedEmail> & { to?: unknown; cc?: unknown; attachments?: unknown };
+  return {
+    id: emailId,
+    to: Array.isArray(data.to) ? data.to.filter((v): v is string => typeof v === 'string') : [],
+    cc: Array.isArray(data.cc) ? data.cc.filter((v): v is string => typeof v === 'string') : [],
+    from: typeof data.from === 'string' ? data.from : '',
+    subject: typeof data.subject === 'string' ? data.subject : '',
+    html: typeof data.html === 'string' ? data.html : null,
+    text: typeof data.text === 'string' ? data.text : null,
+    attachments: Array.isArray(data.attachments)
+      ? data.attachments.filter((a): a is { id: string; filename: string } => !!a && typeof a === 'object')
+      : [],
+  };
+}
+
+export function htmlToPlainText(html: string): string {
   return html
     .replace(/<\/(p|li)>/gi, '\n')
     .replace(/<[^>]*>/g, '')

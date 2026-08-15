@@ -10,17 +10,26 @@ import mediaRoutes from './src/server/routes/media.routes.js';
 import instructorRoutes from './src/server/routes/instructor.routes.js';
 import documentRoutes from './src/server/routes/document.routes.js';
 import contactRoutes from './src/server/routes/contact.routes.js';
+import contactInboundRoutes from './src/server/routes/contact-inbound.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-app.use(express.json());
 
 // Logging Middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
+
+// Mounted before express.json(): this route needs the exact raw request
+// bytes to verify the Resend webhook signature (see
+// contact-inbound.routes.ts). It applies its own express.raw() parser --
+// if express.json() ran first, it would already have consumed the body
+// stream and the signature could never be verified.
+app.use('/api/webhooks', contactInboundRoutes);
+
+app.use(express.json());
 
 // API Routes
 app.use('/api/video', videoRoutes);

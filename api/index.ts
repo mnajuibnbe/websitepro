@@ -7,6 +7,7 @@ import clientErrorRoutes from '../src/server/routes/client-error.routes.js';
 import mediaRoutes from '../src/server/routes/media.routes.js';
 import documentRoutes from '../src/server/routes/document.routes.js';
 import contactRoutes from '../src/server/routes/contact.routes.js';
+import contactInboundRoutes from '../src/server/routes/contact-inbound.routes.js';
 
 const missingEnvironmentVariables = getMissingServerEnvironmentVariables();
 if (missingEnvironmentVariables.length > 0) {
@@ -16,7 +17,6 @@ if (missingEnvironmentVariables.length > 0) {
 }
 
 const app = express();
-app.use(express.json());
 
 // CORS headers for Vercel Serverless Function
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -39,6 +39,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
+
+// Mounted before express.json(): needs the exact raw request bytes to
+// verify the Resend webhook signature (see contact-inbound.routes.ts).
+app.use('/api/webhooks', contactInboundRoutes);
+
+app.use(express.json());
 
 // API Routes
 app.use('/api/video', videoRoutes);

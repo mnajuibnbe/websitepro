@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CircleAlert, Loader2, Mail, MessagesSquare, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, CircleAlert, Loader2, Mail, MessagesSquare, Paperclip, RotateCcw, Send } from 'lucide-react';
 import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { PortalLayout } from '../../components/layout/PortalLayout';
 import { RichTextEditor } from '../../components/ui/RichTextEditor';
@@ -18,16 +18,21 @@ interface Submission {
   created_at: string;
   read_at: string | null;
   replied_at: string | null;
+  resolved_at: string | null;
   reply_count: number;
 }
 
 interface Reply {
   id: string;
-  admin_id: string;
+  sender_type: 'admin' | 'visitor';
+  admin_id: string | null;
   admin_name: string;
+  visitor_email: string | null;
   message_html: string;
+  is_html: boolean;
+  attachment_count: number;
   created_at: string;
-  email_status: 'sent' | 'failed';
+  email_status: 'sent' | 'failed' | null;
   email_error: string | null;
 }
 
@@ -49,6 +54,7 @@ export function AdminContactMessages() {
   const [repliesLoading, setRepliesLoading] = useState(false);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [togglingResolved, setTogglingResolved] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const toast = (type: ToastMessage['type'], message: string) => setToasts((current) => [...current, { id: crypto.randomUUID(), type, message }]);
 
@@ -88,6 +94,23 @@ export function AdminContactMessages() {
 
   const selected = useMemo(() => rows.find((row) => row.id === selectedId) || null, [rows, selectedId]);
   const unreadCount = useMemo(() => rows.filter((row) => !row.read_at).length, [rows]);
+
+  const toggleResolved = async () => {
+    if (!selected || togglingResolved) return;
+    const nextResolved = !selected.resolved_at;
+    setTogglingResolved(true);
+    try {
+      const { error } = await supabase.rpc('admin_set_contact_submission_resolved', { p_id: selected.id, p_resolved: nextResolved });
+      if (error) throw error;
+      const now = new Date().toISOString();
+      setRows((current) => current.map((row) => (row.id === selected.id ? { ...row, resolved_at: nextResolved ? now : null } : row)));
+      toast('success', nextResolved ? 'Marked resolved.' : 'Reopened.');
+    } catch {
+      toast('error', 'Could not update this thread.');
+    } finally {
+      setTogglingResolved(false);
+    }
+  };
 
   const sendReply = async () => {
     if (!selected || isRichTextEmpty(draft) || sending) return;
@@ -150,7 +173,11 @@ export function AdminContactMessages() {
                     <p className={`mt-2 line-clamp-2 text-sm ${row.read_at ? 'text-primary-500' : 'text-primary-700'}`}>{row.message}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-bold text-primary-600">{TOPIC_LABELS[row.topic] || row.topic}</span>
-                      {row.replied_at && <span className="rounded-full bg-success-100 px-2 py-0.5 text-xs font-bold text-success-700">Replied</span>}
+                      {row.resolved_at ? (
+                        <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-bold text-primary-500">Resolved</span>
+                      ) : row.replied_at ? (
+                        <span className="rounded-full bg-success-100 px-2 py-0.5 text-xs font-bold text-success-700">Replied</span>
+                      ) : null}
                       <span className="ml-auto text-xs text-primary-400">{dateFormatter.format(new Date(row.created_at))}</span>
                     </div>
                   </button>
@@ -178,7 +205,20 @@ export function AdminContactMessages() {
                       <h2 className="text-lg font-bold text-primary-900">{selected.name}</h2>
                       <p className="text-sm text-primary-500" dir="ltr">{selected.email}{selected.phone ? ` · ${selected.phone}` : ''}</p>
                     </div>
-                    <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-bold text-primary-600">{TOPIC_LABELS[selected.topic] || selected.topic}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-bold text-primary-600">{TOPIC_LABELS[selected.topic] || selected.topic}</span>
+                      <button
+                        type="button"
+                        disabled={togglingResolved}
+                        onClick={() => void toggleResolved()}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                          selected.resolved_at ? 'bg-primary-100 text-primary-600 hover:bg-primary-200' : 'bg-success-100 text-success-700 hover:bg-success-200'
+                        }`}
+                      >
+                        {selected.resolved_at ? <RotateCcw className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                        {selected.resolved_at ? 'Reopen' : 'Mark resolved'}
+                      </button>
+                    </div>
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-primary-800">{selected.message}</p>
                   <p className="mt-2 text-xs text-primary-400">Submitted {dateFormatter.format(new Date(selected.created_at))}</p>
@@ -193,22 +233,40 @@ export function AdminContactMessages() {
                   {repliesLoading ? (
                     <Loader2 className="mx-auto h-6 w-6 animate-spin text-accent-600" />
                   ) : replies.length === 0 ? (
-                    <p className="text-sm text-primary-400">No replies sent yet.</p>
+                    <p className="text-sm text-primary-400">No replies yet.</p>
                   ) : (
-                    replies.map((reply) => (
-                      <div key={reply.id} className="rounded-xl border border-primary-100 bg-primary-50 p-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-primary-500">
-                          <span className="font-bold text-primary-700">{reply.admin_name}</span>
-                          <span>{dateFormatter.format(new Date(reply.created_at))}</span>
+                    replies.map((reply) => {
+                      const isVisitor = reply.sender_type === 'visitor';
+                      return (
+                        <div
+                          key={reply.id}
+                          className={`rounded-xl border p-4 ${isVisitor ? 'border-accent-100 bg-accent-50/60' : 'border-primary-100 bg-primary-50'}`}
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-primary-500">
+                            <span className={`font-bold ${isVisitor ? 'text-accent-700' : 'text-primary-700'}`}>
+                              {isVisitor ? `${selected.name} (reply by email)` : reply.admin_name}
+                            </span>
+                            <span>{dateFormatter.format(new Date(reply.created_at))}</span>
+                          </div>
+                          {isVisitor ? (
+                            <p className="mt-2 whitespace-pre-wrap text-sm text-primary-800">{reply.message_html}</p>
+                          ) : (
+                            <div className={`mt-2 text-sm text-primary-800 ${RICH_TEXT_TYPOGRAPHY_CLASS}`} dangerouslySetInnerHTML={{ __html: reply.message_html }} />
+                          )}
+                          {reply.attachment_count > 0 && (
+                            <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-primary-500">
+                              <Paperclip className="h-3.5 w-3.5" />
+                              {reply.attachment_count} attachment{reply.attachment_count === 1 ? '' : 's'} not shown
+                            </p>
+                          )}
+                          {reply.email_status === 'failed' && (
+                            <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-danger-700">
+                              <CircleAlert className="h-3.5 w-3.5" />Not delivered{reply.email_error ? ` — ${reply.email_error}` : ''}
+                            </p>
+                          )}
                         </div>
-                        <div className={`mt-2 text-sm text-primary-800 ${RICH_TEXT_TYPOGRAPHY_CLASS}`} dangerouslySetInnerHTML={{ __html: reply.message_html }} />
-                        {reply.email_status === 'failed' && (
-                          <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-danger-700">
-                            <CircleAlert className="h-3.5 w-3.5" />Not delivered{reply.email_error ? ` — ${reply.email_error}` : ''}
-                          </p>
-                        )}
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
