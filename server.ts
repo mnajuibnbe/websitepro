@@ -9,6 +9,7 @@ import clientErrorRoutes from './src/server/routes/client-error.routes.js';
 import mediaRoutes from './src/server/routes/media.routes.js';
 import instructorRoutes from './src/server/routes/instructor.routes.js';
 import documentRoutes from './src/server/routes/document.routes.js';
+import contactRoutes from './src/server/routes/contact.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -29,6 +30,7 @@ app.use('/api/client-errors', clientErrorRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Setup Vite middleware for development or static serving for production
 async function setupVite() {
