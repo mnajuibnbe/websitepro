@@ -43,3 +43,25 @@ test('Vercel entrypoint exposes authenticated document authorization', async () 
     });
   }
 });
+
+test('Vercel entrypoint exposes contact form validation', async () => {
+  const server = app.listen(0);
+
+  try {
+    const address = server.address();
+    assert.ok(address && typeof address === 'object');
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: '', email: 'not-an-email', message: '' }),
+    });
+    // Reaching the route's own validation (400, not a 404 from a missing
+    // mount) is what actually proves it's wired into this entrypoint --
+    // the one Vercel serves in production, distinct from server.ts.
+    assert.equal(response.status, 400);
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close(error => error ? reject(error) : resolve());
+    });
+  }
+});
