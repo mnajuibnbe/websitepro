@@ -5,6 +5,7 @@ import type { CourseCatalogItem } from '../../services/courseCatalog.service';
 import { getCourseSalesTheme } from '../../domain/courseSalesTheme';
 import { CourseTrailer } from './CourseTrailer';
 import { RichTextContent } from '../ui/RichTextContent';
+import { Collapsible } from '../ui/Collapsible';
 
 const levelLabel = (level: string | null | undefined) => ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', all_levels: 'All levels' }[level || ''] || level || 'All levels');
 
@@ -36,7 +37,9 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
       </h1>
 
       {course?.description ? (
-        <RichTextContent html={course.description} className="text-lg md:text-xl text-primary-600 mb-8 max-w-3xl leading-relaxed" />
+        <Collapsible collapsedClassName="max-h-[160px] md:max-h-[190px]" className="mb-8 max-w-3xl">
+          <RichTextContent html={course.description} className="text-lg md:text-xl text-primary-600 leading-relaxed" />
+        </Collapsible>
       ) : (
         <p className="text-lg md:text-xl text-primary-600 mb-8 leading-relaxed max-w-3xl">Course Information.</p>
       )}
