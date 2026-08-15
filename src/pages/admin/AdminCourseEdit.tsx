@@ -24,6 +24,8 @@ import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 
 import { sanitizeCourseSlug as sanitizeSlug, validateCourseForm } from '../../lib/adminCourseForm';
 import { recordAdminAudit } from '../../lib/adminAudit';
+import { RichTextEditor } from '../../components/ui/RichTextEditor';
+import { isRichTextEmpty, richTextVisibleLength, sanitizeRichText } from '../../lib/richTextHtml';
 import { CourseCoverUpload } from '../../components/admin/course/CourseCoverUpload';
 import { InstructorPicker } from '../../components/admin/course/InstructorPicker';
 import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGuide';
@@ -185,7 +187,7 @@ export function AdminCourseEdit() {
         title: title.trim(),
         slug: cleanSlug || null,
         short_description: shortDescription.trim() || null,
-        description: description.trim() || null,
+        description: isRichTextEmpty(description) ? null : sanitizeRichText(description),
         category: category.trim() || null,
         level: level,
         language: language.trim() || 'English',
@@ -387,16 +389,13 @@ export function AdminCourseEdit() {
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-bold text-primary-900 mb-2">Full course description <span className="text-danger-500">*</span></label>
-                    <textarea
-                      rows={5}
+                    <RichTextEditor
                       value={description}
-                      onChange={(e) => { setDescription(e.target.value); if (errors.description) setErrors((prev) => ({ ...prev, description: '' })); }}
-                      minLength={COURSE_DESCRIPTION_MIN_LENGTH}
-                      required
-                      aria-describedby="course-description-help"
-                      className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm leading-relaxed ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
+                      onChange={(html) => { setDescription(html); if (errors.description) setErrors((prev) => ({ ...prev, description: '' })); }}
+                      error={Boolean(errors.description)}
+                      ariaDescribedBy="course-description-help"
                     />
-                    <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
+                    <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${richTextVisibleLength(description)}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                   </div>
 
                   <div className="grid gap-5">

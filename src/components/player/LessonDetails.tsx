@@ -2,6 +2,7 @@ import React from 'react';
 import { Lesson, CourseSection } from '../../types/database.types';
 import { Clock, MonitorPlay, FileText } from 'lucide-react';
 import { FEATURE_FLAGS } from '../../config/featureFlags';
+import { RichTextContent } from '../ui/RichTextContent';
 
 interface LessonDetailsProps {
   lesson: Lesson;
@@ -46,9 +47,7 @@ export function LessonDetails({ lesson, section }: LessonDetailsProps) {
 
       {/* Description */}
       {lesson.description && (
-        <p className="text-primary-600 text-sm md:text-base leading-relaxed mb-4">
-          {lesson.description}
-        </p>
+        <RichTextContent html={lesson.description} className="text-primary-600 text-sm md:text-base leading-relaxed" />
       )}
     </div>
   );

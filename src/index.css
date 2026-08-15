@@ -118,4 +118,12 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .rich-text-editor p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    color: var(--color-primary-400);
+  }
 }

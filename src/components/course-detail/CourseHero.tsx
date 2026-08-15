@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import type { CourseCatalogItem } from '../../services/courseCatalog.service';
 import { getCourseSalesTheme } from '../../domain/courseSalesTheme';
 import { CourseTrailer } from './CourseTrailer';
+import { RichTextContent } from '../ui/RichTextContent';
 
 const levelLabel = (level: string | null | undefined) => ({ beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', all_levels: 'All levels' }[level || ''] || level || 'All levels');
 
@@ -34,9 +35,11 @@ export function CourseHero({ course }: { course: CourseCatalogItem }) {
         {course?.title || 'Course Information - Course Information'}
       </h1>
 
-      <p className="text-lg md:text-xl text-primary-600 mb-8 leading-relaxed max-w-3xl">
-        {course?.description || 'Course Information.'}
-      </p>
+      {course?.description ? (
+        <RichTextContent html={course.description} className="text-lg md:text-xl text-primary-600 mb-8 max-w-3xl leading-relaxed" />
+      ) : (
+        <p className="text-lg md:text-xl text-primary-600 mb-8 leading-relaxed max-w-3xl">Course Information.</p>
+      )}
 
       {/* Meta Info */}
       <div className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10">
