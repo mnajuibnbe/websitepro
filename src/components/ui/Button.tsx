@@ -22,7 +22,10 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  // Tailwind v4's preflight leaves buttons on `cursor: default`, so the pointer
+  // is opted back in here. Transitions are limited to compositor-friendly
+  // properties instead of `all`, which would also animate layout on hover.
+  const baseStyles = 'inline-flex cursor-pointer items-center justify-center gap-2 font-semibold rounded-lg transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
   // Padding based on Design System: space-3 (12px) space-6 (24px)
   const sizes = 'px-6 py-3';

@@ -38,7 +38,7 @@ export function CourseCard({
 }: CourseCardProps) {
   const lessonsLabel = `${lessonsCount} ${lessonsCount === 1 ? 'lesson' : 'lessons'}`;
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-primary-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:shadow-xl hover:shadow-primary-900/10">
+    <article className="group flex h-full flex-col overflow-hidden rounded-panel border border-primary-200 bg-white shadow-sm transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-primary-300 hover:shadow-xl hover:shadow-primary-900/10">
       {/* Thumbnail (16:9) */}
       <div className="relative aspect-video overflow-hidden bg-primary-100">
         <OptimizedImage
