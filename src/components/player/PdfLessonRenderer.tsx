@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileText, Loader2, RefreshCw, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { API_BASE_URL } from '../../lib/apiBaseUrl';
 
 interface PdfLessonRendererProps {
   lessonId: string;
@@ -22,7 +23,7 @@ export function PdfLessonRenderer({ lessonId, title }: PdfLessonRendererProps) {
       return () => { active = false; };
     }
 
-    void fetch('/api/documents/token', {
+    void fetch(`${API_BASE_URL}/api/documents/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ lessonId }),
@@ -31,7 +32,7 @@ export function PdfLessonRenderer({ lessonId, title }: PdfLessonRendererProps) {
       if (!response.ok || !payload.token) {
         throw new Error(`${payload.error || 'The PDF could not be authorized.'}${payload.correlationId ? ` (Reference: ${payload.correlationId})` : ''}`);
       }
-      if (active) setDocumentUrl(`/api/documents/file?token=${encodeURIComponent(payload.token)}`);
+      if (active) setDocumentUrl(`${API_BASE_URL}/api/documents/file?token=${encodeURIComponent(payload.token)}`);
     }).catch((cause: Error) => {
       if (active) setError(cause.message);
     });

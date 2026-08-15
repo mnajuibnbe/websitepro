@@ -98,7 +98,7 @@ function timingSafeEqual(left: Uint8Array, right: Uint8Array): boolean {
   return difference === 0;
 }
 
-export async function verifyStreamToken(token: string, secret: string): Promise<StreamTokenPayload> {
+export async function verifyStreamToken(token: string, secret: string, expectedResourceType: 'video' | 'pdf'): Promise<StreamTokenPayload> {
   const segments = token.split('.');
   if (segments.length !== 3) throw new Error('Malformed JWT');
   const [encodedHeader, encodedPayload, encodedSignature] = segments;
@@ -114,7 +114,8 @@ export async function verifyStreamToken(token: string, secret: string): Promise<
   const now = Math.floor(Date.now() / 1000);
   if (typeof payload.nbf === 'number' && now < payload.nbf) throw new Error('JWT is not active');
   if (typeof payload.exp === 'number' && now >= payload.exp) throw new Error('JWT expired');
-  if (!payload.fileId || payload.resourceType !== 'video') throw new Error('Token is not valid for video streaming');
+  // Scoped so a document token cannot be replayed against the video endpoint (or vice versa).
+  if (!payload.fileId || payload.resourceType !== expectedResourceType) throw new Error(`Token is not valid for ${expectedResourceType} streaming`);
   return payload;
 }
 
@@ -201,7 +202,13 @@ async function getDriveMetadata(env: Env, fileId: string): Promise<DriveMetadata
   }
 
   const response = await driveFetch(env, fileId, new URLSearchParams({ fields: 'size,mimeType', supportsAllDrives: 'true' }));
-  if (!response.ok) throw Object.assign(new Error(`Drive metadata request failed (${response.status})`), { status: response.status });
+  if (!response.ok) {
+    // Temporary diagnostic: surfaces Google's actual error reason in wrangler tail,
+    // since mapDriveError only forwards the bare status code to the client.
+    const body = await response.text().catch(() => '');
+    console.error(`Drive metadata request failed (${response.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+    throw Object.assign(new Error(`Drive metadata request failed (${response.status})`), { status: response.status });
+  }
   const data = await response.json() as { size?: string; mimeType?: string };
   const fileSize = Number(data.size || 0);
   const mimeType = data.mimeType || '';
@@ -234,7 +241,12 @@ async function fetchDriveRangeStream(env: Env, fileId: string, start: number, en
   const params = new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' });
   const initialEnd = Math.min(start + INITIAL_RANGE_BYTES - 1, end);
   const first = await driveFetch(env, fileId, params, { Range: `bytes=${start}-${initialEnd}` });
-  if (!first.ok || !first.body) throw Object.assign(new Error(`Drive media request failed (${first.status})`), { status: first.status });
+  if (!first.ok || !first.body) {
+    // Temporary diagnostic: surfaces Google's actual error reason in wrangler tail.
+    const body = await first.text().catch(() => '');
+    console.error(`Drive media request failed (${first.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+    throw Object.assign(new Error(`Drive media request failed (${first.status})`), { status: first.status });
+  }
   if (initialEnd >= end) return first.body;
 
   const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
@@ -367,7 +379,7 @@ function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 }
 
-async function proxyTokenRequest(request: Request, env: Env): Promise<Response> {
+async function proxyTokenRequest(request: Request, env: Env, path: string): Promise<Response> {
   const origin = request.headers.get('Origin');
   const issuerBase = origin && isAllowedOrigin(origin, env) ? origin : env.TOKEN_ISSUER_BASE_URL;
   const issuer = issuerBase.replace(/\/$/, '');
@@ -375,7 +387,7 @@ async function proxyTokenRequest(request: Request, env: Env): Promise<Response> 
   const headers = new Headers({ 'Content-Type': 'application/json' });
   const authorization = request.headers.get('Authorization');
   if (authorization) headers.set('Authorization', authorization);
-  const response = await fetch(`${issuer}/api/video/token`, { method: 'POST', headers, body: await request.arrayBuffer() });
+  const response = await fetch(`${issuer}${path}`, { method: 'POST', headers, body: await request.arrayBuffer() });
   return new Response(response.body, { status: response.status, headers: { 'Content-Type': response.headers.get('Content-Type') || 'application/json; charset=utf-8' } });
 }
 
@@ -549,7 +561,11 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 
 async function fetchDriveRangeBytes(env: Env, fileId: string, start: number, end: number): Promise<Uint8Array> {
   const response = await driveFetch(env, fileId, new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }), { Range: `bytes=${start}-${end}` });
-  if (!response.ok || !response.body) throw Object.assign(new Error(`Drive media request failed (${response.status})`), { status: response.status });
+  if (!response.ok || !response.body) {
+    const body = await response.text().catch(() => '');
+    console.error(`Drive media request failed (${response.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+    throw Object.assign(new Error(`Drive media request failed (${response.status})`), { status: response.status });
+  }
   return new Uint8Array(await response.arrayBuffer());
 }
 
@@ -625,7 +641,7 @@ async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): P
   if (!token) return jsonResponse({ error: 'Missing streaming token' }, 401);
   let fileId: string;
   try {
-    fileId = (await verifyStreamToken(token, env.STREAMING_TOKEN_SECRET)).fileId;
+    fileId = (await verifyStreamToken(token, env.STREAMING_TOKEN_SECRET, 'video')).fileId;
   } catch {
     return jsonResponse({ error: 'Invalid or expired streaming token' }, 401);
   }
@@ -719,10 +735,137 @@ async function streamVideo(request: Request, env: Env, ctx: ExecutionContext): P
     }
 
     const upstream = await driveFetch(env, fileId, new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }), { Range: `bytes=${start}-${end}` });
-    if (!upstream.ok) throw Object.assign(new Error(`Drive media request failed (${upstream.status})`), { status: upstream.status });
+    if (!upstream.ok) {
+      const body = await upstream.text().catch(() => '');
+      console.error(`Drive media request failed (${upstream.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+      throw Object.assign(new Error(`Drive media request failed (${upstream.status})`), { status: upstream.status });
+    }
     headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
     headers.set('Content-Length', String(end - start + 1));
     return new Response(upstream.body, { status: 206, headers });
+  } catch (error) {
+    return mapDriveError(error, false);
+  }
+}
+
+// ---- PDF document streaming ---------------------------------------------------
+//
+// Mirrors the video token/stream split above (token issuance stays on Vercel via
+// proxyTokenRequest; only the file bytes are served from here), but PDFs are
+// small enough (course lesson documents, not 100MB+ video) that none of the
+// faststart relocation or chained-range machinery above is needed — a single
+// direct Drive fetch, optionally range-scoped, is sufficient.
+
+interface DriveDocumentMetadata {
+  fileSize: number;
+  mimeType: string;
+  name: string;
+  expiresAt: number;
+}
+
+const driveDocumentMetadataCache = new Map<string, DriveDocumentMetadata>();
+const DRIVE_DOCUMENT_METADATA_KV_PREFIX = 'drive:document-metadata:';
+
+async function getDriveDocumentMetadata(env: Env, fileId: string): Promise<DriveDocumentMetadata> {
+  const cached = driveDocumentMetadataCache.get(fileId);
+  if (cached && cached.expiresAt > Date.now()) return cached;
+
+  const kvKey = `${DRIVE_DOCUMENT_METADATA_KV_PREFIX}${fileId}`;
+  const stored = await readKvJson<DriveDocumentMetadata>(env.VIDEO_EDGE_KV, kvKey);
+  if (stored && stored.expiresAt > Date.now()) {
+    driveDocumentMetadataCache.set(fileId, stored);
+    return stored;
+  }
+
+  const response = await driveFetch(env, fileId, new URLSearchParams({ fields: 'size,mimeType,name', supportsAllDrives: 'true' }));
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    console.error(`Drive document metadata request failed (${response.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+    throw Object.assign(new Error(`Drive document metadata request failed (${response.status})`), { status: response.status });
+  }
+  const data = await response.json() as { size?: string; mimeType?: string; name?: string };
+  const fileSize = Number(data.size || 0);
+  const mimeType = data.mimeType || '';
+  if (!Number.isFinite(fileSize) || fileSize <= 0 || mimeType !== 'application/pdf') throw new Error('Drive document metadata is invalid');
+  const metadata = { fileSize, mimeType, name: data.name || 'lesson.pdf', expiresAt: Date.now() + DRIVE_METADATA_TTL_MS };
+  driveDocumentMetadataCache.set(fileId, metadata);
+  await writeKvJson(env.VIDEO_EDGE_KV, kvKey, metadata, DRIVE_METADATA_TTL_MS / 1000);
+  return metadata;
+}
+
+function safeFilename(name: string): string {
+  return name.replace(/["\\\r\n]/g, '_').slice(0, 180) || 'lesson.pdf';
+}
+
+async function streamDocument(request: Request, env: Env): Promise<Response> {
+  const token = new URL(request.url).searchParams.get('token');
+  if (!token) return jsonResponse({ error: 'Missing document token' }, 401);
+  let fileId: string;
+  try {
+    fileId = (await verifyStreamToken(token, env.STREAMING_TOKEN_SECRET, 'pdf')).fileId;
+  } catch {
+    return jsonResponse({ error: 'Invalid or expired document token' }, 401);
+  }
+
+  let metadata: DriveDocumentMetadata;
+  try {
+    metadata = await getDriveDocumentMetadata(env, fileId);
+  } catch (error) {
+    return mapDriveError(error, request.method === 'HEAD');
+  }
+  const { fileSize, mimeType, name } = metadata;
+  const disposition = `inline; filename="${safeFilename(name)}"`;
+
+  if (request.method === 'HEAD') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Content-Length': String(fileSize),
+        'Content-Type': mimeType,
+        'Content-Disposition': disposition,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
+  }
+
+  const range = request.headers.get('Range');
+  let start = 0;
+  let end = fileSize - 1;
+  let isRanged = false;
+  if (range) {
+    const parts = range.replace(/bytes=/, '').split('-');
+    start = Number.parseInt(parts[0], 10);
+    if (parts[1]?.trim()) {
+      const parsedEnd = Number.parseInt(parts[1], 10);
+      if (!Number.isNaN(parsedEnd)) end = Math.min(parsedEnd, fileSize - 1);
+    }
+    if (Number.isNaN(start) || start >= fileSize || start > end) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${fileSize}` } });
+    isRanged = true;
+  }
+
+  try {
+    const upstream = await driveFetch(env, fileId, new URLSearchParams({ alt: 'media', supportsAllDrives: 'true' }), isRanged ? { Range: `bytes=${start}-${end}` } : undefined);
+    if (!upstream.ok || !upstream.body) {
+      const body = await upstream.text().catch(() => '');
+      console.error(`Drive document media request failed (${upstream.status}) fileId=${fileId}: ${body.slice(0, 1000)}`);
+      throw Object.assign(new Error(`Drive document media request failed (${upstream.status})`), { status: upstream.status });
+    }
+    const headers = new Headers({
+      'Content-Type': mimeType,
+      'Content-Disposition': disposition,
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    });
+    if (isRanged) {
+      headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+      headers.set('Content-Length', String(end - start + 1));
+      return new Response(upstream.body, { status: 206, headers });
+    }
+    headers.set('Content-Length', String(fileSize));
+    return new Response(upstream.body, { status: 200, headers });
   } catch (error) {
     return mapDriveError(error, false);
   }
@@ -735,8 +878,10 @@ export default {
     if (request.method === 'OPTIONS') return withCors(new Response(null, { status: 204 }), env, request);
     const pathname = new URL(request.url).pathname.replace(/\/$/, '');
     let response: Response;
-    if (pathname === '/api/video/token' && request.method === 'POST') response = await proxyTokenRequest(request, env);
+    if (pathname === '/api/video/token' && request.method === 'POST') response = await proxyTokenRequest(request, env, '/api/video/token');
     else if (pathname === '/api/video/stream' && (request.method === 'GET' || request.method === 'HEAD')) response = await streamVideo(request, env, ctx);
+    else if (pathname === '/api/documents/token' && request.method === 'POST') response = await proxyTokenRequest(request, env, '/api/documents/token');
+    else if (pathname === '/api/documents/file' && (request.method === 'GET' || request.method === 'HEAD')) response = await streamDocument(request, env);
     else response = jsonResponse({ error: 'Not found' }, 404);
     return withCors(response, env, request);
   },

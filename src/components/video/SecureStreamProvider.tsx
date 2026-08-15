@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { useAuth } from '../../contexts/AuthContext';
+import { API_BASE_URL } from '../../lib/apiBaseUrl';
 
 const STREAM_URL_TTL_MS = 90 * 60 * 1000;
 // Renew this long before the signed stream token actually expires, so a fresh URL
@@ -11,9 +12,6 @@ const MIN_RENEWAL_DELAY_MS = 5 * 1000;
 const RENEWAL_RETRY_DELAY_MS = 15 * 1000;
 const MAX_RENEWAL_ATTEMPTS = 5;
 const streamRequests = new Map<string, { promise: Promise<StreamRequestResult>; expiresAt: number }>();
-const API_BASE_URL = String(
-  import.meta.env?.VITE_API_BASE_URL || (import.meta.env?.PROD ? 'https://tutiba-video-stream.tutiba.workers.dev' : ''),
-).replace(/\/$/, '');
 
 export type SecureVideoRequest =
   | { lessonId: string; asset?: never; courseId?: never }
