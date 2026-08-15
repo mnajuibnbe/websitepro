@@ -5,12 +5,12 @@ import { Button } from '../ui/Button';
 import { Reveal } from '../ui/Reveal';
 
 const features = [
-  { title: 'Evidence-Based', description: 'Learn from current science and clear reasoning, not marketing claims.', icon: Microscope },
-  { title: 'Expert Instructors', description: 'Study with trusted subject specialists who connect knowledge to practice.', icon: UsersRound },
+  { title: 'Evidence-Based', description: 'Built on published research and clear reasoning, explained without sales language.', icon: Microscope },
+  { title: 'Expert Instructors', description: 'Study with specialists who connect the science to real practice.', icon: UsersRound },
   { title: 'Free Preview Lessons', description: 'Watch a complete lesson before you enroll, so you know exactly what you are paying for.', icon: PlayCircle },
   { title: 'Lifetime Updates', description: 'Return to your courses as lessons and supporting resources are updated.', icon: RefreshCw },
-  { title: 'Learn Anywhere', description: 'Use a focused learning experience designed for desktop, tablet, and mobile.', icon: Laptop },
-  { title: 'Practical Focus', description: 'Turn scientific foundations into better evaluation and real-world decisions.', icon: BookOpenCheck },
+  { title: 'Learn Anywhere', description: 'Works on desktop, tablet, and mobile, wherever you study.', icon: Laptop },
+  { title: 'Practical Focus', description: 'Build the skill to evaluate real products, using the science underneath.', icon: BookOpenCheck },
 ];
 
 export function WhyChooseUs() {
@@ -29,7 +29,7 @@ export function WhyChooseUs() {
                   Why professionals <span className="italic text-accent-700">choose Tutiba.</span>
                 </h2>
                 <p className="mx-auto mt-5 max-w-md text-pretty leading-relaxed text-primary-600 lg:mx-0">
-                  A professional education platform built around credible teaching, flexible access, and useful outcomes.
+                  Courses taught by a specialist, organized into clear stages, with lifetime access.
                 </p>
                 <Button variant="secondary" className="mt-8" onClick={() => navigate('/courses')}>
                   Compare all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />

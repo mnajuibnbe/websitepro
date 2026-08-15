@@ -28,7 +28,7 @@ export function Newsletter() {
 
       if (!error) {
         setSubmissionState('success');
-        setMessage('Thank you — you are now subscribed to Tutiba updates.');
+        setMessage("You're subscribed. Welcome to Tutiba updates.");
         setEmail('');
         return;
       }
@@ -41,10 +41,10 @@ export function Newsletter() {
 
       console.error('[Newsletter] Subscription failed', { code: error.code });
       setSubmissionState('error');
-      setMessage('We could not save your subscription. Please try again in a moment.');
+      setMessage("We couldn't save your subscription. Please try again in a moment.");
     } catch {
       setSubmissionState('error');
-      setMessage('We could not reach the subscription service. Check your connection and try again.');
+      setMessage("We couldn't reach the subscription service. Check your connection and try again.");
     }
   };
 

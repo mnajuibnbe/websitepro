@@ -44,7 +44,7 @@ export function FreeContent() {
             Explore Free Learning Resources
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            Preview our evidence-based teaching approach with practical guides and complimentary lessons.
+            See our teaching approach in action with practical guides and free lessons.
           </p>
         </div>
 

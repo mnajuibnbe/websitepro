@@ -5,22 +5,22 @@ import { Reveal } from '../ui/Reveal';
 const outcomes = [
   {
     title: 'Clear course stages',
-    description: 'Work through ordered stages — like Part 1 and Part 2 — so you always know what comes next.',
+    description: 'Move through ordered stages, like Part 1 and Part 2, so you always know what comes next.',
     icon: Layers,
   },
   {
     title: 'Evidence-based curriculum',
-    description: 'Every lesson is grounded in current science and clear reasoning, not marketing claims.',
+    description: 'Every lesson is grounded in current science and reasoned argument.',
     icon: Microscope,
   },
   {
     title: 'Apply it immediately',
-    description: 'Turn ingredient science into confident product evaluation and real professional decisions.',
+    description: 'Apply the science to real product evaluations and decisions you can stand behind.',
     icon: ScanSearch,
   },
   {
     title: 'Secure enrollment',
-    description: 'Your account and enrollment are protected by secure checkout and account workflows.',
+    description: 'Checkout and account access are secured end-to-end.',
     icon: ShieldCheck,
   },
 ];
@@ -32,7 +32,7 @@ export function OutcomesSection() {
         <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
           <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-300">Why enroll with confidence</p>
           <h2 className="mt-3 text-balance font-display text-4xl font-semibold leading-tight md:text-5xl">
-            Built so you can <span className="italic text-accent-300">learn, and use it.</span>
+            Built so you can <span className="italic text-accent-300">learn it, then use it.</span>
           </h2>
         </Reveal>
 

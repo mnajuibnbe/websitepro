@@ -43,7 +43,7 @@ export function HeroSection() {
                 Turn ingredient science into <span className="italic text-accent-700">decisions you can defend.</span>
               </h1>
               <p className="mb-10 max-w-xl text-pretty text-lg leading-relaxed text-primary-600 md:text-xl lg:mb-12">
-                Structured, evidence-based courses in skin science and cosmeceutical ingredients — built for professionals who need to evaluate products and advise clients with confidence, not guesswork.
+                Structured courses in skin science and cosmeceutical ingredients, built for professionals who evaluate products and advise clients with confidence.
               </p>
             </Reveal>
             <Reveal delay={0.1}>
@@ -90,7 +90,7 @@ export function HeroSection() {
                         Welcome to Tutiba
                       </span>
                       <h2 className="max-w-md font-display text-2xl font-semibold leading-tight text-white md:text-3xl">
-                        Meet your professional learning platform.
+                        This is how Tutiba teaches.
                       </h2>
                       <p className="mt-4 max-w-md text-sm leading-relaxed text-primary-300 md:text-base">
                         A short look at how a Tutiba lesson connects the science to a real product decision.

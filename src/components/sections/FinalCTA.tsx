@@ -33,10 +33,10 @@ export function FinalCTA() {
         <div className="mx-auto max-w-4xl">
           <Reveal>
             <h2 className="mb-6 text-balance font-display text-4xl font-semibold leading-tight text-white md:text-6xl">
-              Ready to advance your <span className="italic text-accent-300">cosmeceutical career?</span>
+              Start <span className="italic text-accent-300">with Part 1.</span>
             </h2>
             <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg leading-relaxed text-primary-300 md:text-xl">
-              Begin Part 1 with six published lessons covering skin structure, hyaluronic acid, and real product evaluation.
+              Six published lessons cover skin structure, hyaluronic acid, and real product evaluation.
             </p>
           </Reveal>
           <Reveal delay={0.1}>
