@@ -7,6 +7,22 @@
   --spacing-page-gutter-sm: 1.5rem;
   --spacing-page-gutter-lg: 2rem;
 
+  /* Vertical rhythm tiers for full-width page sections. Sections are paced by
+     their role on the page instead of all sharing one padding value:
+     `section-sm` is the mobile step, `section` supports the narrative,
+     `section-lg` carries the conversion spine, `section-xl` closes the page. */
+  --spacing-section-sm: 4rem;
+  --spacing-section: 5.5rem;
+  --spacing-section-lg: 7rem;
+  --spacing-section-xl: 9rem;
+
+  /* Corner-radius scale. Three steps by surface size: `card` for content
+     cards and icon tiles, `panel` for elevated multi-column surfaces,
+     `frame` for the full-bleed media frames. */
+  --radius-card: 1rem;
+  --radius-panel: 1.5rem;
+  --radius-frame: 2rem;
+
   --color-primary-900: #0F172A;
   --color-primary-800: #1E293B;
   --color-primary-700: #334155;

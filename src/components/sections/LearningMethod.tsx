@@ -28,34 +28,38 @@ export function LearningMethod() {
   const { ctaText, coursePath } = usePrimaryDiplomaOffer();
 
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section className="bg-primary-50 py-section-sm md:py-section">
       <PageContainer>
         <div className="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-16">
           <div className="text-center lg:col-span-4 lg:text-left">
             <Reveal>
               <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
-              <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-primary-900 md:text-5xl">Inside this featured course</h2>
-              <p className="mx-auto mt-5 max-w-sm leading-relaxed text-primary-600 lg:mx-0">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
+              <h2 className="mt-3 text-balance font-display text-3xl font-semibold leading-tight text-primary-900 md:text-4xl">Inside this featured course</h2>
+              <p className="mx-auto mt-5 max-w-sm text-pretty leading-relaxed text-primary-600 lg:mx-0">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
               <Button variant="secondary" className="mt-7 w-full px-6 sm:w-auto" onClick={() => navigate(coursePath)}>
                 {ctaText} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             </Reveal>
           </div>
 
-          <div className="relative lg:col-span-8">
-            <div aria-hidden="true" className="absolute left-[7%] right-[7%] top-11 hidden h-px bg-primary-100 md:block" />
-            <div className="grid gap-8 md:grid-cols-3 md:gap-6">
+          <div className="lg:col-span-8">
+            {/* Ordered stages: the hairline rule + numeral marks real curriculum
+                order, and replaces the decorative connector line that never
+                lined up with the icon centres. */}
+            <ol className="grid gap-8 lg:grid-cols-3">
               {curriculum.map(({ title, description, icon: Icon }, index) => (
-                <Reveal key={title} delay={index * 0.1} className="relative flex flex-col items-center text-center">
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl border border-accent-100 bg-white text-accent-700 shadow-sm">
-                    <Icon className="h-6 w-6" />
+                <Reveal key={title} delay={index * 0.06} as="li" className="border-t border-primary-200 pt-6">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-12 w-12 flex-none items-center justify-center rounded-card border border-accent-100 bg-white text-accent-700 shadow-sm">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="font-display text-2xl font-semibold leading-none tracking-tight text-primary-400 tabular-nums" aria-hidden="true">0{index + 1}</span>
                   </div>
-                  <span className="mt-4 font-display text-4xl font-semibold text-primary-200" aria-hidden="true">0{index + 1}</span>
-                  <h3 className="mt-2 text-lg font-bold text-primary-900">{title}</h3>
-                  <p className="mt-3 leading-relaxed text-primary-600">{description}</p>
+                  <h3 className="mt-5 text-balance text-lg font-bold text-primary-900">{title}</h3>
+                  <p className="mt-2 text-pretty leading-relaxed text-primary-600">{description}</p>
                 </Reveal>
               ))}
-            </div>
+            </ol>
           </div>
         </div>
       </PageContainer>

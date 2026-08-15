@@ -6,8 +6,10 @@ interface RevealProps {
   className?: string;
   delay?: number;
   y?: number;
-  as?: 'div' | 'span';
+  as?: 'div' | 'span' | 'li';
 }
+
+const MOTION_TAGS = { div: motion.div, span: motion.span, li: motion.li } as const;
 
 // A smaller trigger margin on short/small viewports keeps grouped sections from
 // appearing to fire out of sync while scrolling — on mobile, less of the page
@@ -38,7 +40,7 @@ export function Reveal({ children, className, delay = 0, y = 16, as = 'div' }: R
     return <Static className={className}>{children}</Static>;
   }
 
-  const MotionTag = as === 'span' ? motion.span : motion.div;
+  const MotionTag = MOTION_TAGS[as];
 
   return (
     <MotionTag
