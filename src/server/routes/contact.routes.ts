@@ -1,12 +1,12 @@
-import { Router, type Request, type Response } from 'express';
+import { Router, type Request, type Response, type NextFunction } from 'express';
 import { getSupabaseAdmin } from '../config/supabase.js';
-import { sendEmail, buildContactConfirmationEmail, buildContactReplyEmail } from '../services/email.service.js';
+import { sendEmail, buildContactConfirmationEmail, buildContactReplyEmail, buildReplyToAddress } from '../services/email.service.js';
+import { createFixedWindowLimiter } from '../services/rateLimiter.util.js';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const ALLOWED_TOPICS = ['support', 'billing', 'course', 'other'] as const;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const SUPPORT_REPLY_TO = 'support@tutiba.com';
 
 interface ContactDependencies {
   getSupabaseAdmin: typeof getSupabaseAdmin;
@@ -109,14 +109,16 @@ export const createContactReplyHandler = (deps: ContactDependencies) => async (r
   if (!submissionRow) { res.status(404).json({ error: 'Submission not found.' }); return; }
 
   const { subject, html, text } = buildContactReplyEmail(submissionRow.name, submissionRow.message, messageHtml);
-  const emailResult = await deps.sendEmail({ to: submissionRow.email, subject, html, text, replyTo: SUPPORT_REPLY_TO });
+  const emailResult = await deps.sendEmail({ to: submissionRow.email, subject, html, text, replyTo: buildReplyToAddress(submissionId) });
 
   const { data: reply, error: replyInsertError } = await admin
     .from('contact_submission_replies')
     .insert({
       submission_id: submissionId,
       admin_id: auth.user.id,
+      sender_type: 'admin',
       message_html: messageHtml,
+      is_html: true,
       email_status: emailResult.sent ? 'sent' : 'failed',
       email_error: emailResult.sent ? null : (emailResult.error?.slice(0, 500) || null),
     })
@@ -139,7 +141,24 @@ export const createContactReplyHandler = (deps: ContactDependencies) => async (r
   res.status(201).json({ id: reply.id });
 };
 
+// Per-email rate limiting above (createContactHandler) stops the same
+// address from being spammed, but does nothing against a script that
+// rotates fake addresses from one source -- each submission still costs a
+// DB row and an outbound confirmation email. This per-IP layer catches
+// that: generous enough for a real visitor who mistypes and resubmits, tight
+// enough to blunt a flood.
+const isAllowedByContactRateLimit = createFixedWindowLimiter(10 * 60_000, 20);
+
+function contactIpRateLimit(req: Request, res: Response, next: NextFunction): void {
+  const ip = req.ip || 'unknown';
+  if (!isAllowedByContactRateLimit(ip)) {
+    res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    return;
+  }
+  next();
+}
+
 const router = Router();
-router.post('/', createContactHandler(dependencies));
+router.post('/', contactIpRateLimit, createContactHandler(dependencies));
 router.post('/:id/reply', createContactReplyHandler(dependencies));
 export default router;
