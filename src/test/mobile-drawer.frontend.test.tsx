@@ -39,6 +39,7 @@ test('admin drawer exposes its role routes, fixed footer, and open backdrop', ()
   assert.match(markup, />Admin overview</);
   assert.match(markup, />Course management</);
   assert.match(markup, />User management</);
+  assert.match(markup, />Contact messages</);
   assert.match(markup, /shrink-0 border-t/);
   assert.match(markup, /aria-hidden="true"/);
   assert.match(markup, /right-0/);

@@ -1,11 +1,13 @@
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const DEFAULT_FROM = 'Tutiba Support <support@tutiba.com>';
+const BRAND_ACCENT = '#0D9488';
 
 export interface SendEmailInput {
   to: string;
   subject: string;
   html: string;
   text: string;
+  replyTo?: string;
 }
 
 export interface EmailSendResult {
@@ -32,6 +34,7 @@ export async function sendEmail(input: SendEmailInput): Promise<EmailSendResult>
         subject: input.subject,
         html: input.html,
         text: input.text,
+        ...(input.replyTo ? { reply_to: input.replyTo } : {}),
       }),
     });
 
@@ -46,21 +49,81 @@ export async function sendEmail(input: SendEmailInput): Promise<EmailSendResult>
   }
 }
 
+/**
+ * Shared branded shell (table-based layout, inline styles only) so the
+ * confirmation and reply emails render consistently across mail clients,
+ * most of which strip <style> blocks and modern CSS.
+ */
+function wrapEmailHtml(bodyHtml: string): string {
+  return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F4F6F5; padding: 32px 16px; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E4E9E8;">
+      <tr><td style="background-color: ${BRAND_ACCENT}; padding: 24px 32px;">
+        <span style="font-size: 20px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.05em;">TUTIBA</span>
+      </td></tr>
+      <tr><td style="padding: 32px;">${bodyHtml}</td></tr>
+      <tr><td style="padding: 20px 32px; background-color: #F9FAFA; border-top: 1px solid #E4E9E8;">
+        <p style="margin: 0; font-size: 13px; color: #6B7280;">Tutiba &middot; Evidence-based cosmeceutical education</p>
+        <p style="margin: 4px 0 0; font-size: 13px;"><a href="mailto:support@tutiba.com" style="color: ${BRAND_ACCENT}; text-decoration: none;">support@tutiba.com</a></p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`.trim();
+}
+
 export function buildContactConfirmationEmail(name: string): { subject: string; html: string; text: string } {
   const subject = 'We received your message — Tutiba';
   const firstName = name.trim().split(/\s+/)[0] || 'there';
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1f2937;">
-      <h2 style="color: #111827;">Thank you, ${escapeHtml(firstName)}.</h2>
-      <p>We've received your message and a member of the Tutiba support team will respond as soon as possible.</p>
-      <p>If your question is urgent, you can also reach us directly at
-        <a href="mailto:support@tutiba.com" style="color: #2563eb;">support@tutiba.com</a>.
-      </p>
-      <p style="margin-top: 32px; color: #6b7280; font-size: 14px;">— The Tutiba Team</p>
-    </div>
+  const body = `
+    <h1 style="margin: 0 0 16px; font-size: 20px; color: #111827;">Thank you, ${escapeHtml(firstName)}.</h1>
+    <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.6; color: #374151;">We've received your message and a member of the Tutiba support team will respond as soon as possible.</p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #374151;">If your question is urgent, you can also reach us directly at
+      <a href="mailto:support@tutiba.com" style="color: ${BRAND_ACCENT};">support@tutiba.com</a>.
+    </p>
   `.trim();
+  const html = wrapEmailHtml(body);
   const text = `Thank you, ${firstName}.\n\nWe've received your message and a member of the Tutiba support team will respond as soon as possible.\n\nIf your question is urgent, you can also reach us directly at support@tutiba.com.\n\n— The Tutiba Team`;
   return { subject, html, text };
+}
+
+/**
+ * The admin's replyHtml is expected to already be sanitized to the shared
+ * rich-text allowlist (p/strong/em/ol/ul/li) by the RichTextEditor that
+ * produced it -- see src/lib/richTextHtml.ts's sanitizeRichText, which the
+ * dashboard composer runs on every keystroke before this ever leaves the
+ * browser.
+ */
+export function buildContactReplyEmail(name: string, originalMessage: string, replyHtml: string): { subject: string; html: string; text: string } {
+  const subject = 'Re: your message to Tutiba support';
+  const firstName = name.trim().split(/\s+/)[0] || 'there';
+  const body = `
+    <h1 style="margin: 0 0 16px; font-size: 20px; color: #111827;">Hi ${escapeHtml(firstName)},</h1>
+    <div style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #374151;">${replyHtml}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-left: 3px solid #E4E9E8; margin: 0 0 8px;">
+      <tr><td style="padding: 4px 0 4px 16px;">
+        <p style="margin: 0 0 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF;">Your original message</p>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #6B7280; white-space: pre-wrap;">${escapeHtml(originalMessage)}</p>
+      </td></tr>
+    </table>
+  `.trim();
+  const html = wrapEmailHtml(body);
+  const text = `Hi ${firstName},\n\n${htmlToPlainText(replyHtml)}\n\n---\nYour original message:\n${originalMessage}`;
+  return { subject, html, text };
+}
+
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<\/(p|li)>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function escapeHtml(value: string): string {
