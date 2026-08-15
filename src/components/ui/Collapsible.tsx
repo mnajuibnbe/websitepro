@@ -31,19 +31,24 @@ export function Collapsible({
   const [expandedHeight, setExpandedHeight] = useState<number | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  // Static, never-toggled clone of the collapsed max-height rule. Reading the threshold off this
+  // element instead of the animated wrapper avoids a race where a computed-style read taken right
+  // after collapsing (while the wrapper's own class/inline-style just changed) could resolve to
+  // the wrong value and get `overflows` stuck at false — permanently hiding the toggle button.
+  const probeRef = useRef<HTMLDivElement>(null);
   const contentId = useId();
   const shouldReduceMotion = useReducedMotion();
 
   useLayoutEffect(() => {
     const content = contentRef.current;
-    const wrapper = wrapperRef.current;
-    if (!content || !wrapper) return;
+    const probe = probeRef.current;
+    if (!content || !probe) return;
 
     const measure = () => {
-      const collapsedMaxHeight = expanded ? null : parseFloat(getComputedStyle(wrapper).maxHeight);
+      const collapsedMaxHeight = parseFloat(getComputedStyle(probe).maxHeight);
       const fullHeight = content.scrollHeight;
       setExpandedHeight(fullHeight);
-      if (collapsedMaxHeight !== null && Number.isFinite(collapsedMaxHeight)) {
+      if (Number.isFinite(collapsedMaxHeight)) {
         setOverflows(fullHeight > collapsedMaxHeight + 1);
       }
     };
@@ -51,18 +56,20 @@ export function Collapsible({
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(content);
+    observer.observe(probe);
     window.addEventListener('resize', measure);
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [expanded]);
+  }, []);
 
   const showToggle = overflows || expanded;
   const isClipped = overflows && !expanded;
 
   return (
     <div className={className}>
+      <div ref={probeRef} aria-hidden="true" className={`invisible absolute w-0 h-0 overflow-hidden ${collapsedClassName}`} />
       <div
         ref={wrapperRef}
         id={contentId}
