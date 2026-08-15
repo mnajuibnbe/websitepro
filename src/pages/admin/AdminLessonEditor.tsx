@@ -37,6 +37,8 @@ import { defaultCompletionRule, isLessonContentType, LessonContentType } from '.
 import { MediaService, PdfMetadataResult, VideoMetadataResult } from '../../services/media.service';
 import { QuizBuilder } from '../../components/admin/quiz/QuizBuilder';
 import { AssignmentBuilder } from '../../components/admin/assignment/AssignmentBuilder';
+import { RichTextEditor } from '../../components/ui/RichTextEditor';
+import { isRichTextEmpty, sanitizeRichText } from '../../lib/richTextHtml';
 import { isGoogleDriveFileUrl } from '../../domain/videoUrl';
 
 type EditorTab = 'general' | 'content' | 'access';
@@ -287,7 +289,7 @@ export function AdminLessonEditor() {
         course_id: courseId,
         section_id: sectionId || null,
         title: title.trim(),
-        description: description.trim() || null,
+        description: isRichTextEmpty(description) ? null : sanitizeRichText(description),
         lesson_type: lessonType,
         content_type: lessonType,
         type: lessonType === 'pdf' || lessonType === 'external_link' ? 'text' : lessonType === 'quiz' ? 'quiz' : 'video',
@@ -626,15 +628,14 @@ export function AdminLessonEditor() {
                       <label className="block text-xs font-bold text-primary-900 mb-2">
                         Lesson description (optional)
                       </label>
-                      <textarea
-                        rows={3}
+                      <RichTextEditor
                         value={description}
-                        onChange={(e) => {
-                          setDescription(e.target.value);
+                        onChange={(html) => {
+                          setDescription(html);
                           setIsDirty(true);
                         }}
                         placeholder="Briefly explain what students will learn."
-                        className="w-full px-4 py-2.5 bg-white border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 text-sm font-medium"
+                        minHeightClassName="min-h-[4.5rem]"
                       />
                     </div>
                   </div>

@@ -22,6 +22,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ToastContainer, ToastMessage } from '../../components/ui/Toast';
 import { sanitizeCourseSlug, validateCourseForm } from '../../lib/adminCourseForm';
 import { recordAdminAudit } from '../../lib/adminAudit';
+import { RichTextEditor } from '../../components/ui/RichTextEditor';
+import { isRichTextEmpty, richTextVisibleLength, sanitizeRichText } from '../../lib/richTextHtml';
 import { CourseCoverUpload } from '../../components/admin/course/CourseCoverUpload';
 import { InstructorPicker } from '../../components/admin/course/InstructorPicker';
 import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGuide';
@@ -91,15 +93,16 @@ export function AdminCourseCreate() {
     setIsSubmitting(true);
 
     try {
+      const cleanDescription = isRichTextEmpty(description) ? null : sanitizeRichText(description);
 
       const { data: rpcCourseId, error: rpcError } = isInstructor
         ? await supabase.rpc('instructor_create_course_dual', {
-          p_title: title.trim(), p_short_description: shortDescription.trim() || null, p_description: description.trim() || null,
+          p_title: title.trim(), p_short_description: shortDescription.trim() || null, p_description: cleanDescription,
           p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'English',
           p_price_egp: priceEgp, p_price_usd: priceUsd, p_thumbnail: coverImage.trim() || null, p_cover_image: coverImage.trim() || null,
         })
         : await supabase.rpc('admin_create_course_dual', {
-          p_title: title.trim(), p_slug: null, p_short_description: shortDescription.trim() || null, p_description: description.trim() || null,
+          p_title: title.trim(), p_slug: null, p_short_description: shortDescription.trim() || null, p_description: cleanDescription,
           p_category: category.trim() || null, p_level: level, p_language: language.trim() || 'English', p_price_egp: priceEgp,
           p_price_usd: priceUsd, p_instructor_id: instructorId || null, p_thumbnail: coverImage.trim() || null,
           p_cover_image: coverImage.trim() || null, p_create_first_section: false,
@@ -251,17 +254,14 @@ export function AdminCourseCreate() {
                   <label className="block text-sm font-bold text-primary-900 mb-2">
                     Full course description <span className="text-danger-500">*</span>
                   </label>
-                  <textarea
-                    rows={5}
+                  <RichTextEditor
                     value={description}
-                    onChange={(e) => { setDescription(e.target.value); if (errors.description) setErrors((prev) => ({ ...prev, description: '' })); }}
-                    minLength={COURSE_DESCRIPTION_MIN_LENGTH}
-                    required
-                    aria-describedby="course-description-help"
+                    onChange={(html) => { setDescription(html); if (errors.description) setErrors((prev) => ({ ...prev, description: '' })); }}
+                    error={Boolean(errors.description)}
+                    ariaDescribedBy="course-description-help"
                     placeholder="Build practical skills with structured, expert-led course content...."
-                    className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm leading-relaxed resize-y ${errors.description ? 'border-danger-400' : 'border-primary-200'}`}
                   />
-                  <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${description.trim().length}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
+                  <p id="course-description-help" className={`mt-1.5 text-xs ${errors.description ? 'font-bold text-danger-600' : 'text-primary-500'}`}>{errors.description || `${richTextVisibleLength(description)}/${COURSE_DESCRIPTION_MIN_LENGTH} minimum characters required for review.`}</p>
                 </div>
               </div>
             </div>
