@@ -40,7 +40,7 @@ export function InstructorSection() {
                 Meet <span className="italic text-accent-700">your instructor.</span>
               </h2>
               <p className="mx-auto mt-5 mb-8 max-w-2xl text-pretty text-lg leading-relaxed text-primary-600 lg:mx-0">
-                Build your skin, hair, and beauty-nutrition knowledge with an educator who has spent more than a decade translating scientific concepts into practical professional decisions.
+                Learn skin, hair, and beauty-nutrition science from an educator who has spent more than a decade turning research into decisions professionals use every day.
               </p>
             </Reveal>
 

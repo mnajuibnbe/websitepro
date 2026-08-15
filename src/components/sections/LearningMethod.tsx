@@ -8,7 +8,7 @@ import { Reveal } from '../ui/Reveal';
 const curriculum = [
   {
     title: 'Skin layers and product targets',
-    description: 'See how products intended for the dermis and hypodermis are evaluated against skin structure.',
+    description: 'Evaluate products intended for the dermis and hypodermis against skin structure.',
     icon: ScanSearch,
   },
   {
@@ -18,7 +18,7 @@ const curriculum = [
   },
   {
     title: 'From ingredient science to product comparison',
-    description: 'Use the scientific foundation to compare finished products instead of relying on marketing categories alone.',
+    description: 'Use the scientific foundation to compare finished products by what they actually contain.',
     icon: BookOpenCheck,
   },
 ];

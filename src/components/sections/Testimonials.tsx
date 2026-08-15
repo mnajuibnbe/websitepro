@@ -52,7 +52,7 @@ export function Testimonials() {
     <Reveal className="mx-auto mb-14 max-w-2xl text-center md:mb-16">
       <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Student Reviews</p>
       <h2 className="mt-3 text-balance font-display text-3xl font-semibold leading-tight text-primary-900 md:text-4xl">What our students say</h2>
-      <p className="mx-auto mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-primary-600">Real experiences from health professionals who developed their skills with Tutiba.</p>
+      <p className="mx-auto mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-primary-600">From health professionals who built their skills with Tutiba.</p>
     </Reveal>
     {isLoading && <div role="status" className="flex min-h-56 items-center justify-center text-primary-500"><Loader2 className="h-8 w-8 animate-spin" /><span className="sr-only">Loading student reviews</span></div>}
     {!isLoading && error && <div role="alert" className="mx-auto max-w-xl rounded-panel border border-primary-200 bg-primary-50 p-8 text-center"><MessageSquareText className="mx-auto h-10 w-10 text-primary-300" aria-hidden="true" /><h3 className="mt-4 text-xl font-bold text-primary-900">Reviews are temporarily unavailable</h3><p className="mt-2 text-primary-600">Please try again in a moment.</p><button type="button" onClick={refetch} className="mt-5 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-card border border-primary-300 px-4 font-bold text-primary-800 transition-colors duration-200 ease-out hover:border-primary-400 hover:bg-white"><RefreshCw className="h-4 w-4" aria-hidden="true" /> Retry</button></div>}
