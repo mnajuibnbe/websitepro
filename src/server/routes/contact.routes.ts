@@ -1,10 +1,12 @@
 import { Router, type Request, type Response } from 'express';
 import { getSupabaseAdmin } from '../config/supabase.js';
-import { sendEmail, buildContactConfirmationEmail } from '../services/email.service.js';
+import { sendEmail, buildContactConfirmationEmail, buildContactReplyEmail } from '../services/email.service.js';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const ALLOWED_TOPICS = ['support', 'billing', 'course', 'other'] as const;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const SUPPORT_REPLY_TO = 'support@tutiba.com';
 
 interface ContactDependencies {
   getSupabaseAdmin: typeof getSupabaseAdmin;
@@ -15,6 +17,11 @@ const dependencies: ContactDependencies = { getSupabaseAdmin, sendEmail };
 
 function normalizeTopic(value: unknown): string {
   return typeof value === 'string' && (ALLOWED_TOPICS as readonly string[]).includes(value) ? value : 'other';
+}
+
+/** Visible text length ignoring markup -- enough to reject an empty/whitespace-only rich text reply. */
+function visibleHtmlLength(html: string): number {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().length;
 }
 
 export const createContactHandler = (deps: ContactDependencies) => async (req: Request, res: Response): Promise<void> => {
@@ -70,6 +77,69 @@ export const createContactHandler = (deps: ContactDependencies) => async (req: R
   res.status(201).json({ id: submission.id });
 };
 
+/**
+ * Admin-only: reply to a visitor's submission by email. Unlike the
+ * confirmation email above, a failed send here does fail the request (502)
+ * -- there's no fallback value in reporting success when the one thing the
+ * admin asked for (the reply reaching the visitor) didn't happen. The reply
+ * is still saved either way so the draft isn't lost and it's visible in the
+ * thread with its failed status.
+ */
+export const createContactReplyHandler = (deps: ContactDependencies) => async (req: Request, res: Response): Promise<void> => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Authentication required.' }); return; }
+  const admin = deps.getSupabaseAdmin();
+  const { data: auth, error: authError } = await admin.auth.getUser(authHeader.slice(7));
+  if (authError || !auth.user) { res.status(401).json({ error: 'Invalid session.' }); return; }
+  const { data: profile } = await admin.from('users').select('role').eq('id', auth.user.id).maybeSingle();
+  if (auth.user.app_metadata?.role !== 'admin' && profile?.role !== 'admin') { res.status(403).json({ error: 'Admin access required.' }); return; }
+
+  const submissionId = req.params.id;
+  if (!UUID_PATTERN.test(submissionId)) { res.status(400).json({ error: 'Invalid submission ID.' }); return; }
+
+  const messageHtml = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+  if (visibleHtmlLength(messageHtml) < 1 || messageHtml.length > 10000) { res.status(400).json({ error: 'Enter a reply message.' }); return; }
+
+  const { data: submissionRow, error: fetchError } = await admin
+    .from('contact_submissions')
+    .select('name, email, message, read_at')
+    .eq('id', submissionId)
+    .maybeSingle();
+  if (fetchError) { res.status(500).json({ error: 'Could not load this submission.' }); return; }
+  if (!submissionRow) { res.status(404).json({ error: 'Submission not found.' }); return; }
+
+  const { subject, html, text } = buildContactReplyEmail(submissionRow.name, submissionRow.message, messageHtml);
+  const emailResult = await deps.sendEmail({ to: submissionRow.email, subject, html, text, replyTo: SUPPORT_REPLY_TO });
+
+  const { data: reply, error: replyInsertError } = await admin
+    .from('contact_submission_replies')
+    .insert({
+      submission_id: submissionId,
+      admin_id: auth.user.id,
+      message_html: messageHtml,
+      email_status: emailResult.sent ? 'sent' : 'failed',
+      email_error: emailResult.sent ? null : (emailResult.error?.slice(0, 500) || null),
+    })
+    .select('id')
+    .single();
+  if (replyInsertError || !reply) { res.status(500).json({ error: 'Could not save this reply.' }); return; }
+
+  const now = new Date().toISOString();
+  await admin
+    .from('contact_submissions')
+    .update({ replied_at: now, ...(submissionRow.read_at ? {} : { read_at: now }) })
+    .eq('id', submissionId);
+
+  if (!emailResult.sent) {
+    console.error('[Contact] reply email failed', { submissionId, replyId: reply.id, error: emailResult.error });
+    res.status(502).json({ error: 'The reply was saved but could not be emailed. Please retry.', id: reply.id });
+    return;
+  }
+
+  res.status(201).json({ id: reply.id });
+};
+
 const router = Router();
 router.post('/', createContactHandler(dependencies));
+router.post('/:id/reply', createContactReplyHandler(dependencies));
 export default router;

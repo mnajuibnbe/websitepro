@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck, Tags, PanelsTopLeft, Newspaper, ReceiptText } from 'lucide-react';
+import { Home, BookOpen, Users, LogOut, Menu, X, BarChart3, GraduationCap, ClipboardCheck, Tags, PanelsTopLeft, Newspaper, ReceiptText, MessagesSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMobileDrawerLifecycle } from '../../hooks/useMobileDrawerLifecycle';
 import { MobileDrawerBackdrop } from '../layout/MobileDrawerBackdrop';
@@ -15,12 +15,16 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout, user } = useAuth();
   const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
   const [pendingPaymentCount, setPendingPaymentCount] = useState(0);
+  const [unreadContactCount, setUnreadContactCount] = useState(0);
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
     let cancelled = false;
     supabase.rpc('admin_list_pending_payment_submissions').then(({ data }) => {
       if (!cancelled) setPendingPaymentCount(Array.isArray(data) ? data.length : 0);
+    });
+    supabase.rpc('admin_count_unread_contact_submissions').then(({ data }) => {
+      if (!cancelled) setUnreadContactCount(typeof data === 'number' ? data : 0);
     });
     return () => { cancelled = true; };
   }, [user?.role, currentPath]);
@@ -36,6 +40,7 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     { icon: ClipboardCheck, label: 'Course reviews', href: '/admin/course-reviews' },
     { icon: ClipboardCheck, label: 'Learner reviews', href: '/admin/reviews' },
     { icon: ReceiptText, label: 'Payment proofs', href: '/admin/payment-proofs', badge: pendingPaymentCount },
+    { icon: MessagesSquare, label: 'Contact messages', href: '/admin/contact', badge: unreadContactCount },
   ] : [
     { icon: BookOpen, label: 'My authored courses', href: '/instructor/courses' },
     { icon: GraduationCap, label: 'Create course', href: '/instructor/courses/new' },
