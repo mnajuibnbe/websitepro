@@ -10,6 +10,7 @@ import { BlogSourcesList } from '../components/blog/BlogSourcesList';
 import { fetchPublishedBlogPost, type BlogPost as BlogPostData } from '../services/blogPosts.service';
 import { applyPageMeta, setStructuredData, SITE_NAME } from '../components/layout/PageMeta';
 import { deriveCanonicalUrl, deriveMetaDescription, deriveSeoTitle } from '../lib/blogSeo';
+import { extractFaqEntries } from '../lib/blogFaqExtract';
 
 export function BlogPost() {
   const { slug = '' } = useParams();
@@ -37,6 +38,7 @@ export function BlogPost() {
         robots: 'noindex, follow',
       });
       setStructuredData('structured-data-article', null);
+      setStructuredData('structured-data-faq', null);
       return;
     }
 
@@ -48,10 +50,16 @@ export function BlogPost() {
 
     applyPageMeta({ title, description, url, image, type: 'article' });
 
+    // The admin's SEO title override (if set) is a deliberately crafted headline; falling
+    // back to the raw title keeps the schema's headline matching what actually renders as
+    // the page's H1 — not `title` above, which appends " | Tutiba Blog" for the <title> tag.
+    const headline = post.seo_title?.trim() || post.title;
+    const keywords = [post.primary_keyword, ...(post.secondary_keywords || [])].filter((k): k is string => Boolean(k?.trim())).map((k) => k.trim());
+
     setStructuredData('structured-data-article', {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: post.title,
+      headline,
       description,
       ...(image ? { image } : {}),
       datePublished: post.published_at || post.created_at,
@@ -59,9 +67,24 @@ export function BlogPost() {
       author: { '@type': 'Organization', name: 'Tutiba Education Team' },
       publisher: { '@type': 'Organization', name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${window.location.origin}/images/tutiba-instructor-logo.png` } },
       mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+      ...(keywords.length > 0 ? { keywords: keywords.join(', ') } : {}),
+      ...((post.sources || []).length > 0 ? { citation: post.sources.map((source) => ({ '@type': 'CreativeWork', name: source.name, url: source.url })) } : {}),
     });
 
-    return () => setStructuredData('structured-data-article', null);
+    // Separate top-level schema block (not nested in Article) per Google's guidance for
+    // combining Article + FAQPage structured data on the same page.
+    const faqEntries = extractFaqEntries(post.content);
+    setStructuredData('structured-data-faq', faqEntries.length > 0 ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqEntries.map((entry) => ({
+        '@type': 'Question',
+        name: entry.question,
+        acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+      })),
+    } : null);
+
+    return () => { setStructuredData('structured-data-article', null); setStructuredData('structured-data-faq', null); };
   }, [post, loading, error, slug]);
 
   const date = post?.published_at ? new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(post.published_at)) : null;

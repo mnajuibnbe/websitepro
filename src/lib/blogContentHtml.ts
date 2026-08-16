@@ -21,6 +21,7 @@ export const BLOG_CONTENT_ALLOWED_TAGS = [
 export const BLOG_CONTENT_ALLOWED_ATTR = [
   'href', 'target', 'rel', 'class',
   'src', 'alt', 'loading', 'width', 'height',
+  'colspan', 'rowspan', 'colwidth',
 ];
 
 const SANITIZE_CONFIG = {
