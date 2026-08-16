@@ -1,15 +1,20 @@
 import { genericTitleHint, textLikelyMentionsQuery } from './blogSeo';
 import { splitProseBlocks } from './blogProseBlocks';
 import { analyzeHeadingStructure, analyzeIntroduction, analyzeReadability } from './blogSeoAnalysis';
+import { countInternalLinks } from './blogInternalLinks';
+import { originalValueScore } from './blogOriginalValue';
+import type { BlogSource, OriginalValueSignal } from '../services/blogPosts.service';
 
 /**
- * Combines every Phase 1/2 signal into one "Content SEO Score" panel. This is this
+ * Combines every signal built so far into one "Content SEO Score" panel. This is this
  * platform's own internal writing-readiness signal, explicitly not a Google ranking
  * score — Google has never published a formula like this, and the UI must say so
- * plainly (see the "not a Google score" disclaimer rendered by SeoSidebar). Three
- * categories are stubs until later phases add real analysis for them (Topic Coverage,
- * Internal Links, Trust/Sources — Phase 3): they show as "coming soon" and are excluded
- * from the weighted average rather than silently scored as 0.
+ * plainly (see the "not a Google score" disclaimer rendered by SeoSidebar). Topic
+ * Coverage remains a stub — it needs real topical judgment (an LLM call), which isn't
+ * available in this environment yet — and shows as "coming soon", excluded from the
+ * weighted average rather than silently scored as 0. Internal Links and Trust & Sources
+ * (Phase 3) are real, computed from the article's own links, the self-reported Original
+ * Value checklist, and added sources — no external API needed for either.
  */
 
 export interface ContentSeoScoreInput {
@@ -20,6 +25,8 @@ export interface ContentSeoScoreInput {
   primaryQuery: string | null;
   searchIntent: string | null;
   coverImageUrl: string | null;
+  originalValueSignals: OriginalValueSignal[];
+  sources: BlogSource[];
 }
 
 export interface ScoreCategory {
@@ -124,15 +131,46 @@ export function computeContentSeoScore(input: ContentSeoScoreInput): ContentSeoS
     notes: technicalChecks.filter((c) => c.applicable && !c.passed).map((c) => c.label),
   };
 
-  const stub = (key: string, label: string): ScoreCategory => ({ key, label, weight: 0, status: 'stub', scorePercent: null, notes: ['Coming in a later phase.'] });
+  const stub = (key: string, label: string): ScoreCategory => ({ key, label, weight: 0, status: 'stub', scorePercent: null, notes: ['Coming in a later phase — needs an AI API key that is not yet configured.'] });
+
+  // --- Internal Links ---
+  const internalLinkCounts = countInternalLinks(input.contentHtml);
+  const internalLinksChecks = [
+    { applicable: true, passed: internalLinkCounts.total > 0, label: 'Link to at least one other page on the site — see the Internal Linking Assistant for suggestions.' },
+    { applicable: true, passed: internalLinkCounts.uniqueHrefs.length >= 2, label: 'Consider linking to a couple of different related pages, not just one.' },
+  ];
+  const internalLinks: ScoreCategory = {
+    key: 'internal_links',
+    label: 'Internal Links',
+    weight: 10,
+    status: 'scored',
+    scorePercent: checkScore(internalLinksChecks),
+    notes: internalLinksChecks.filter((c) => !c.passed).map((c) => c.label),
+  };
+
+  // --- Trust & Sources ---
+  const originalValuePercent = originalValueScore(input.originalValueSignals);
+  const sourcesPercent = Math.min(100, input.sources.length * 50);
+  const trustNotes: string[] = [];
+  if (input.originalValueSignals.length === 0) trustNotes.push('No original value flagged yet — check off what this article actually has in Original Value.');
+  if (input.sources.length === 0) trustNotes.push('No sources added yet — cite at least one source backing up claims in the article.');
+  if (trustNotes.length === 0) trustNotes.push('Original value and sourcing look good.');
+  const trustSources: ScoreCategory = {
+    key: 'trust_sources',
+    label: 'Trust & Sources',
+    weight: 5,
+    status: 'scored',
+    scorePercent: Math.round((originalValuePercent + sourcesPercent) / 2),
+    notes: trustNotes,
+  };
 
   const categories: ScoreCategory[] = [
     searchIntent,
     stub('topic_coverage', 'Topic Coverage'),
     contentQuality,
     onPageSeo,
-    stub('internal_links', 'Internal Links'),
-    stub('trust_sources', 'Trust & Sources'),
+    internalLinks,
+    trustSources,
     technicalReadiness,
   ];
 

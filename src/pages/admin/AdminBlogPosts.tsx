@@ -10,7 +10,7 @@ import { isBlogContentEmpty } from '../../lib/blogContentHtml';
 import { deriveCanonicalUrl, deriveMetaDescription, deriveSeoTitle, metaDescriptionHint, seoTitleHint } from '../../lib/blogSeo';
 import type { BlogPost, BlogPostInput, BlogPostStatus } from '../../services/blogPosts.service';
 
-const EMPTY: BlogPostInput = { slug: '', title: '', excerpt: '', content: '', cover_image_url: null, status: 'draft', published_at: null, seo_title: null, meta_description: null, primary_keyword: null, secondary_keywords: [], search_intent: null };
+const EMPTY: BlogPostInput = { slug: '', title: '', excerpt: '', content: '', cover_image_url: null, status: 'draft', published_at: null, seo_title: null, meta_description: null, primary_keyword: null, secondary_keywords: [], search_intent: null, original_value_signals: [], sources: [] };
 const slugify = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export function AdminBlogPosts() {
@@ -25,7 +25,7 @@ export function AdminBlogPosts() {
   const load = useCallback(async () => { setLoading(true); const { data, error } = await supabase.from('blog_posts').select('*').order('updated_at', { ascending: false }); if (!error) setPosts((data || []) as BlogPost[]); else setMessage('Blog posts could not be loaded.'); setLoading(false); }, []);
   useEffect(() => { void load(); }, [load]);
   const reset = () => { setEditingId(null); setForm(EMPTY); setMessage(''); };
-  const edit = (post: BlogPost) => { setEditingId(post.id); setForm({ slug: post.slug, title: post.title, excerpt: post.excerpt, content: post.content, cover_image_url: post.cover_image_url, status: post.status, published_at: post.published_at, seo_title: post.seo_title, meta_description: post.meta_description, primary_keyword: post.primary_keyword, secondary_keywords: post.secondary_keywords || [], search_intent: post.search_intent }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const edit = (post: BlogPost) => { setEditingId(post.id); setForm({ slug: post.slug, title: post.title, excerpt: post.excerpt, content: post.content, cover_image_url: post.cover_image_url, status: post.status, published_at: post.published_at, seo_title: post.seo_title, meta_description: post.meta_description, primary_keyword: post.primary_keyword, secondary_keywords: post.secondary_keywords || [], search_intent: post.search_intent, original_value_signals: post.original_value_signals || [], sources: post.sources || [] }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const setStatus = (status: BlogPostStatus) => setForm(current => ({ ...current, status, published_at: status === 'published' ? current.published_at || new Date().toISOString() : null }));
 
   const save = async (event: FormEvent) => {
@@ -89,10 +89,12 @@ export function AdminBlogPosts() {
       <Button type="submit" className="mt-6 w-full" isLoading={saving} icon={<Save className="h-4 w-4" />}>Save post</Button>
     </form>
     <SeoSidebar
+      postId={editingId}
       title={form.title}
       effectiveSeoTitle={effectiveSeoTitle}
       effectiveMetaDescription={effectiveMetaDescription}
       contentHtml={form.content}
+      onContentChange={html => setForm(current => ({ ...current, content: html }))}
       coverImageUrl={form.cover_image_url}
       primaryQuery={form.primary_keyword || ''}
       onPrimaryQueryChange={value => setForm(current => ({ ...current, primary_keyword: value }))}
@@ -100,6 +102,10 @@ export function AdminBlogPosts() {
       onSecondaryQueriesChange={value => setForm(current => ({ ...current, secondary_keywords: value }))}
       searchIntent={form.search_intent}
       onSearchIntentChange={value => setForm(current => ({ ...current, search_intent: value }))}
+      originalValueSignals={form.original_value_signals}
+      onOriginalValueSignalsChange={value => setForm(current => ({ ...current, original_value_signals: value }))}
+      sources={form.sources}
+      onSourcesChange={value => setForm(current => ({ ...current, sources: value }))}
     />
   </div>
   <section className="mt-8 rounded-2xl border border-primary-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between"><h2 className="text-xl font-bold text-primary-900">All posts</h2><span className="flex items-center gap-2 text-sm text-primary-500"><FileText className="h-4 w-4" />{posts.length}</span></div>{loading ? <Loader2 className="mx-auto my-12 h-7 w-7 animate-spin text-accent-600" /> : <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{posts.map(post => <article key={post.id} className="rounded-xl border border-primary-100 p-4"><div className="flex items-start justify-between gap-4"><div><h3 className="font-bold text-primary-900">{post.title}</h3><p className="mt-1 line-clamp-2 text-sm text-primary-600">{post.excerpt}</p><span className={`mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold ${post.status === 'published' ? 'bg-success-50 text-success-700' : 'bg-primary-100 text-primary-600'}`}>{post.status}</span></div><div className="flex shrink-0 gap-1"><button type="button" onClick={() => edit(post)} aria-label={`Edit ${post.title}`} className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-primary-50"><Edit3 className="h-4 w-4" /></button><button type="button" onClick={() => void remove(post.id)} aria-label={`Delete ${post.title}`} className="flex h-11 w-11 items-center justify-center rounded-lg text-danger-600 hover:bg-danger-50"><Trash2 className="h-4 w-4" /></button></div></div></article>)}{posts.length === 0 && <p className="col-span-full py-10 text-center text-primary-500"><Plus className="mx-auto mb-2 h-6 w-6" />Create the first post.</p>}</div>}</section>

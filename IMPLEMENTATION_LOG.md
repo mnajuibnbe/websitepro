@@ -1,5 +1,110 @@
 # Implementation Log
 
+## 2026-08-16 — Blog SEO editor Phase 3: content-depth tooling
+
+Added Internal Linking Assistant, Original Value Checker, and Sources/Citations to the
+block-based blog editor's SEO sidebar (Phase 1/2: `bd6558f`). All advisory, never
+gating, matching the existing Content SEO Score's soft-signal design.
+
+- **Internal Linking Assistant** (`src/lib/blogInternalLinks.ts`,
+  `src/components/blog/InternalLinkingPanel.tsx`): no external API — ranks this site's
+  own published courses/blog posts by title/topic token overlap against the article and
+  lets the admin insert a link with one click. Reuses `blog_posts`/`courses` queries in
+  the same shape as `LinkPickerDialog`'s existing internal-link picker.
+- **Original Value Checker** (`src/lib/blogOriginalValue.ts`,
+  `src/components/blog/OriginalValuePanel.tsx`): self-reported checklist (personal
+  experience, original research, data, screenshots, case study, expert opinion,
+  original examples, testing results, unique process) — never auto-detected. New
+  `blog_posts.original_value_signals text[]` column, DB-constrained to the fixed set.
+- **Sources/Citations** (`src/lib/blogSources.ts`,
+  `src/components/blog/SourcesPanel.tsx`, `src/components/blog/BlogSourcesList.tsx`):
+  structured `{ name, url, accessedDate }` list, kept separate from the free-form
+  article HTML (unlike Internal Linking, which appends into content) so each entry
+  stays individually editable/removable. New `blog_posts.sources jsonb` column. Renders
+  as a numbered "Sources" section on the public article page, `rel="nofollow"`.
+- `blogSeoScore.ts`'s `internal_links` and `trust_sources` categories are now real
+  (computed from the above), no longer stubs. `topic_coverage` remains a stub.
+
+**Not built — reported instead of faked:** Topic Coverage (subtopic checklist) and
+"Questions Readers May Have" both need real topical judgment (an LLM call), not
+keyword matching. Checked this environment for a configured Gemini/Google AI key: none
+exists — `.env.local` has no such entry, `@google/genai` (already an installed
+dependency) is unused anywhere in `src/`, and no prior `.env.example` placeholder
+existed for one. Added a blank `GEMINI_API_KEY=` placeholder to `.env.example` and a
+clearly-labeled "not available" panel in `SeoSidebar.tsx` instead of a weaker
+pattern-matching substitute. Needs a Gemini API key to unblock (Phase 3.5 or later).
+
+Migration: `supabase/migrations/20260816150000_blog_posts_content_depth_columns.sql`
+(applied directly to `nhknhibsloirpffndzcd` via Supabase MCP). RLS unaffected — existing
+row-level admin/public policies already cover the new columns.
+
+Verified: `npm run lint`, `npm test` (205 pass, incl. new `blogInternalLinks.test.ts`,
+`blogOriginalValue.test.ts`, `blogSources.test.ts`), `npm run test:frontend` (54 pass,
+incl. new `blog-content-depth.frontend.test.tsx`), `npm run build` (prerender of
+existing sample posts with empty `sources` confirms no regression). The admin-only
+sidebar panels (Internal Linking/Original Value/Sources UI) were not exercised live in
+a browser — this session had no admin login credentials; the public Sources rendering
+path was verified live instead (loaded, no console errors, correctly renders nothing
+when a post has no sources).
+
+## 2026-08-16 — Blog SEO editor Phase 3 (continued): Topic Coverage & Reader Questions
+
+`GEMINI_API_KEY` was added to Vercel Production (not to this session's `.env.local`),
+unblocking the two panels reported as missing above. Implemented both server-side only.
+
+- **`src/server/services/gemini.service.ts`**: calls `@google/genai`
+  (`gemini-2.5-flash`, JSON-schema-constrained response) with a prompt built from the
+  article's target topic/query and its plain-text content. Prompt building and response
+  parsing are pure functions (`buildTopicInsightsPrompt`, `parseTopicInsightsResponse`),
+  tested directly; the live network call itself is untested, matching this codebase's
+  existing convention for external-API wrappers (`email.service.ts`'s `sendEmail` has no
+  direct test either).
+- **`POST /api/blog/topic-insights`** (`src/server/routes/blog-insights.routes.ts`,
+  registered in both `server.ts` and `api/index.ts`): admin-only (same bearer-token +
+  `users.role`/`app_metadata.role` check as `contact.routes.ts`/`instructor.routes.ts`),
+  a 20-requests/10-minutes per-IP limiter (each call is a billed Gemini request), input
+  length caps, and a 503 (not 500) with `{ error, reason }` on any failure — including a
+  missing key — so the client can show a clear "unavailable" state without crashing.
+  **The API key is read from `process.env.GEMINI_API_KEY` server-side only and is never
+  sent to the client** — confirmed by grepping the production `dist/assets/*.js` client
+  bundle post-build for `GoogleGenAI`/`genai`/`GEMINI_API_KEY`: zero matches (the one
+  `genai` hit found was Sentry's unrelated built-in `hasGenAiSpans` instrumentation).
+- **Client wiring**: `src/services/blogInsights.service.ts` (fetch wrapper, throws
+  `BlogInsightsUnavailableError` on a 503 so the panel can distinguish "not configured"
+  from a one-off failure) and `src/components/blog/TopicInsightsPanel.tsx`, replacing
+  the "not available" stub in `SeoSidebar.tsx`. Explicit "Analyze" button, not a typing
+  debounce — each call is billed, so it should only fire on deliberate request, and nothing
+  else in this sidebar auto-triggers a paid external call. On success: Topic Coverage
+  renders a covered/missing checklist (no insert action — it's informational); Reader
+  Questions renders a list with "+ Add to article" per question, inserting an FAQ block
+  (`src/lib/blogQuestionInsert.ts`, HTML-escaped) matching `FaqExtension.tsx`'s own
+  `parseHTML` contract — reusing the existing FAQ block rather than inventing a new one.
+- `blogSeoScore.ts`'s `topic_coverage` category remains a stub — it's advisory content
+  the admin triggers on demand, not a property of the saved article content itself, so
+  scoring it automatically wouldn't reflect anything the score can actually check.
+
+**Notable finding, not specific to this feature:** this project's `tsconfig.json` has no
+`"strict"` (defaults `false`). Under that setting, this repo's installed TypeScript
+(5.8.3) does not reliably narrow a two-branch discriminated union
+(`{ ok: true; ... } | { ok: false; ... }`) via `if (!result.ok)` / `if (result.ok)` —
+confirmed by an isolated repro outside this codebase (fails without `--strict`, passes
+with it). Not a mistake in this feature's code; `GeminiInsightsResult` was restructured
+to a flat interface with optional fields instead (`{ ok: boolean; insights?: ...;
+reason?: ...; message?: string }`), matching the flat-shape convention this codebase
+already uses for `EmailSendResult` in `email.service.ts`. Worth knowing before writing
+`{ ok: true; X } | { ok: false; Y }`-style unions anywhere else in this repo — either
+follow the same flat-shape pattern, or use `instanceof`/class-based errors instead of
+narrowing a plain-object union.
+
+Verified: `npm run lint`, `npm test` (229 pass), `npm run test:frontend` (56 pass),
+`npm run build` (client bundle confirmed key-free as above). **Not verified: live
+Gemini responses.** No key in this session's `.env.local` — request building, response
+parsing/validation, the `missing_key`/`invalid_response`/`api_error` failure paths, the
+route's auth/validation/rate-limit, and the UI's loading/success/unavailable/error
+states are all covered by tests using injected fakes, but an actual live call to Gemini
+(prompt quality, real response shape, latency) has not been exercised. Needs a
+post-deploy smoke test against the Vercel Production key.
+
 ## 2026-08-04 — Homepage intro video required two presses; homepage price inconsistency
 
 ### Proven root cause (video)

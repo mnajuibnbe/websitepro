@@ -47,9 +47,9 @@ export function metaDescriptionHint(description: string): string | null {
   return null;
 }
 
-const STOPWORDS = new Set(['a', 'an', 'the', 'and', 'or', 'but', 'for', 'of', 'to', 'in', 'on', 'with', 'is', 'are', 'how', 'what', 'why']);
+export const STOPWORDS = new Set(['a', 'an', 'the', 'and', 'or', 'but', 'for', 'of', 'to', 'in', 'on', 'with', 'is', 'are', 'how', 'what', 'why']);
 
-function normalizeTokens(value: string): string[] {
+export function normalizeTokens(value: string): string[] {
   return value.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((token) => token && !STOPWORDS.has(token));
 }
 
