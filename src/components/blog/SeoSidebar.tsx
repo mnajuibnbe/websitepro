@@ -1,15 +1,22 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Gauge, Heading2, Info, ListChecks, Plus, Target, Type, X } from 'lucide-react';
-import type { BlogSearchIntent } from '../../services/blogPosts.service';
+import { AlertTriangle, BadgeCheck, BookMarked, CheckCircle2, Gauge, Heading2, Info, Link2, ListChecks, Plus, Sparkles, Target, Type, X } from 'lucide-react';
+import type { BlogSearchIntent, BlogSource, OriginalValueSignal } from '../../services/blogPosts.service';
 import { genericTitleHint, metaDescriptionHint, seoTitleHint, textLikelyMentionsQuery } from '../../lib/blogSeo';
+import { sanitizeBlogContentHtml } from '../../lib/blogContentHtml';
 import { analyzeHeadingStructure, analyzeIntroduction, analyzeReadability, articleWordCount } from '../../lib/blogSeoAnalysis';
 import { computeContentSeoScore } from '../../lib/blogSeoScore';
+import { InternalLinkingPanel } from './InternalLinkingPanel';
+import { OriginalValuePanel } from './OriginalValuePanel';
+import { SourcesPanel } from './SourcesPanel';
+import { TopicInsightsPanel } from './TopicInsightsPanel';
 
 interface SeoSidebarProps {
+  postId: number | null;
   title: string;
   effectiveSeoTitle: string;
   effectiveMetaDescription: string;
   contentHtml: string;
+  onContentChange: (html: string) => void;
   coverImageUrl: string | null;
   primaryQuery: string;
   onPrimaryQueryChange: (value: string) => void;
@@ -17,6 +24,10 @@ interface SeoSidebarProps {
   onSecondaryQueriesChange: (value: string[]) => void;
   searchIntent: BlogSearchIntent | null;
   onSearchIntentChange: (value: BlogSearchIntent | null) => void;
+  originalValueSignals: OriginalValueSignal[];
+  onOriginalValueSignalsChange: (value: OriginalValueSignal[]) => void;
+  sources: BlogSource[];
+  onSourcesChange: (value: BlogSource[]) => void;
 }
 
 const SEARCH_INTENT_OPTIONS: Array<{ value: BlogSearchIntent; label: string }> = [
@@ -53,7 +64,7 @@ function ScoreBar({ percent }: { percent: number | null }) {
   );
 }
 
-export function SeoSidebar({ title, effectiveSeoTitle, effectiveMetaDescription, contentHtml, coverImageUrl, primaryQuery, onPrimaryQueryChange, secondaryQueries = [], onSecondaryQueriesChange, searchIntent, onSearchIntentChange }: SeoSidebarProps) {
+export function SeoSidebar({ postId, title, effectiveSeoTitle, effectiveMetaDescription, contentHtml, onContentChange, coverImageUrl, primaryQuery, onPrimaryQueryChange, secondaryQueries = [], onSecondaryQueriesChange, searchIntent, onSearchIntentChange, originalValueSignals, onOriginalValueSignalsChange, sources, onSourcesChange }: SeoSidebarProps) {
   const [secondaryDraft, setSecondaryDraft] = useState('');
   const deferredContent = useDeferredValue(contentHtml);
 
@@ -61,7 +72,10 @@ export function SeoSidebar({ title, effectiveSeoTitle, effectiveMetaDescription,
   const readability = useMemo(() => analyzeReadability(deferredContent), [deferredContent]);
   const intro = useMemo(() => analyzeIntroduction(deferredContent, primaryQuery), [deferredContent, primaryQuery]);
   const wordCount = useMemo(() => articleWordCount(deferredContent), [deferredContent]);
-  const score = useMemo(() => computeContentSeoScore({ title, effectiveSeoTitle, effectiveMetaDescription, contentHtml: deferredContent, primaryQuery: primaryQuery || null, searchIntent, coverImageUrl }), [title, effectiveSeoTitle, effectiveMetaDescription, deferredContent, primaryQuery, searchIntent, coverImageUrl]);
+  const score = useMemo(
+    () => computeContentSeoScore({ title, effectiveSeoTitle, effectiveMetaDescription, contentHtml: deferredContent, primaryQuery: primaryQuery || null, searchIntent, coverImageUrl, originalValueSignals, sources }),
+    [title, effectiveSeoTitle, effectiveMetaDescription, deferredContent, primaryQuery, searchIntent, coverImageUrl, originalValueSignals, sources],
+  );
 
   const titleMentionsQuery = textLikelyMentionsQuery(effectiveSeoTitle, primaryQuery);
   const descriptionMentionsQuery = textLikelyMentionsQuery(effectiveMetaDescription, primaryQuery);
@@ -148,6 +162,23 @@ export function SeoSidebar({ title, effectiveSeoTitle, effectiveMetaDescription,
         <Suggestion tone={metaDescriptionHint(effectiveMetaDescription) ? 'warn' : 'good'}>{metaDescriptionHint(effectiveMetaDescription) || 'Description length looks fine.'}</Suggestion>
         {descriptionMentionsQuery === true && <Suggestion tone="good">The meta description reflects your target query.</Suggestion>}
         {descriptionMentionsQuery === false && <Suggestion tone="warn">The meta description doesn't clearly reflect your target query.</Suggestion>}
+      </Panel>
+
+      <Panel icon={Link2} title="Internal Linking Assistant">
+        <InternalLinkingPanel postId={postId} title={title} primaryQuery={primaryQuery} secondaryQueries={secondaryQueries} contentHtml={deferredContent} onInsertContent={(html) => onContentChange(sanitizeBlogContentHtml(`${contentHtml}${html}`))} />
+      </Panel>
+
+      <Panel icon={BadgeCheck} title="Original Value Checker">
+        <p className="text-xs text-primary-500">Self-reported — check off what this specific article actually has. Nothing here is auto-detected.</p>
+        <OriginalValuePanel signals={originalValueSignals} onChange={onOriginalValueSignalsChange} />
+      </Panel>
+
+      <Panel icon={BookMarked} title="Sources & Citations">
+        <SourcesPanel sources={sources} onChange={onSourcesChange} />
+      </Panel>
+
+      <Panel icon={Sparkles} title="Topic Coverage & Reader Questions">
+        <TopicInsightsPanel title={title} primaryQuery={primaryQuery} contentHtml={deferredContent} onInsertContent={(html) => onContentChange(sanitizeBlogContentHtml(`${contentHtml}${html}`))} />
       </Panel>
 
       <section className="rounded-xl border border-accent-200 bg-accent-50/60 p-4">
