@@ -14,13 +14,21 @@ const MAX_RENEWAL_ATTEMPTS = 5;
 const streamRequests = new Map<string, { promise: Promise<StreamRequestResult>; expiresAt: number }>();
 
 export type SecureVideoRequest =
-  | { lessonId: string; asset?: never; courseId?: never }
-  | { lessonId?: never; asset: 'homepage-intro'; courseId?: never }
-  | { lessonId?: never; asset: 'course-trailer'; courseId: string };
+  | { lessonId: string; asset?: never; courseId?: never; postId?: never; blockIndex?: never }
+  | { lessonId?: never; asset: 'homepage-intro'; courseId?: never; postId?: never; blockIndex?: never }
+  | { lessonId?: never; asset: 'course-trailer'; courseId: string; postId?: never; blockIndex?: never }
+  | { lessonId?: never; asset: 'blog-post-video'; courseId?: never; postId: number; blockIndex: number };
 
 interface StreamRequestResult {
   url: string;
   expiresAt: number;
+}
+
+function requestTargetKey(requestTarget: SecureVideoRequest): string {
+  if (requestTarget.lessonId) return requestTarget.lessonId;
+  if (requestTarget.asset === 'course-trailer') return `${requestTarget.asset}:${requestTarget.courseId}`;
+  if (requestTarget.asset === 'blog-post-video') return `${requestTarget.asset}:${requestTarget.postId}:${requestTarget.blockIndex}`;
+  return requestTarget.asset;
 }
 
 // The signed streaming token is a JWT; its payload is base64url, not encrypted, so
@@ -45,8 +53,7 @@ function isSessionExpiredError(err: unknown): boolean {
 }
 
 async function requestStreamUrl(requestTarget: SecureVideoRequest, token?: string | null, forceRefresh = false): Promise<StreamRequestResult> {
-  const targetKey = requestTarget.lessonId || `${requestTarget.asset}:${'courseId' in requestTarget ? requestTarget.courseId || '' : ''}`;
-  const key = `${token || 'public'}:${targetKey}`;
+  const key = `${token || 'public'}:${requestTargetKey(requestTarget)}`;
   if (forceRefresh) streamRequests.delete(key);
   const cached = streamRequests.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
@@ -88,7 +95,7 @@ type SecureStreamProviderProps = SecureVideoRequest & {
   onPlaybackStateChange?: (playing: boolean) => void;
 };
 
-export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false, controls, initialPositionSeconds, resumeSkipThresholdSeconds, onTimeUpdate: onExternalTimeUpdate, onPlaybackStateChange: onExternalPlaybackStateChange }) => {
+export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ lessonId, asset, courseId, postId, blockIndex, title, poster, onEnded, publicPreview = false, autoPlay = false, fill = false, controls, initialPositionSeconds, resumeSkipThresholdSeconds, onTimeUpdate: onExternalTimeUpdate, onPlaybackStateChange: onExternalPlaybackStateChange }) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
@@ -116,7 +123,9 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
       ? { lessonId }
       : asset === 'course-trailer'
         ? { asset, courseId: courseId! }
-        : { asset: 'homepage-intro' };
+        : asset === 'blog-post-video'
+          ? { asset, postId: postId!, blockIndex: blockIndex! }
+          : { asset: 'homepage-intro' };
 
     const scheduleRenewal = (expiresAt: number) => {
       clearTimeout(renewalTimerRef.current);
@@ -189,7 +198,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
       isMounted = false;
       clearTimeout(renewalTimerRef.current);
     };
-  }, [asset, courseId, lessonId, publicPreview, token, retryVersion]);
+  }, [asset, courseId, lessonId, postId, blockIndex, publicPreview, token, retryVersion]);
 
   const handlePlaybackError = useCallback(() => {
     void renewFnRef.current?.();
@@ -240,7 +249,7 @@ export const SecureStreamProvider: React.FC<SecureStreamProviderProps> = ({ less
           <h3 className="text-lg font-bold text-white mb-2">Streaming Error</h3>
           <p className="text-primary-400 text-sm mb-6">{error || 'Failed to initialize stream.'}</p>
           <button
-            onClick={() => { streamRequests.delete(`${token || 'public'}:${lessonId || `${asset}:${courseId || ''}`}`); setRetryVersion(value => value + 1); }}
+            onClick={() => { streamRequests.delete(`${token || 'public'}:${requestTargetKey(lessonId ? { lessonId } : asset === 'course-trailer' ? { asset, courseId: courseId! } : asset === 'blog-post-video' ? { asset, postId: postId!, blockIndex: blockIndex! } : { asset: 'homepage-intro' })}`); setRetryVersion(value => value + 1); }}
             className="px-4 py-2 bg-primary-800 hover:bg-primary-700 text-white rounded-md transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent-300"
           >
             Try Again

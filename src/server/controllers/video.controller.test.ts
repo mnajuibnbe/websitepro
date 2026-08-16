@@ -13,6 +13,7 @@ interface Scenario {
   configurationError?: Error;
   course?: { id?: string; trailer_video?: string | null } | null;
   section?: { id: string } | null;
+  blogPost?: { content: string } | null;
 }
 
 function createSupabase(scenario: Scenario) {
@@ -43,6 +44,7 @@ function createSupabase(scenario: Scenario) {
         });
       if (table === 'courses') return query({ data: scenario.course === undefined ? { id: 'course-1' } : scenario.course, error: null });
       if (table === 'course_sections') return query({ data: scenario.section === undefined ? { id: 'section-1' } : scenario.section, error: null });
+      if (table === 'blog_posts') return query({ data: scenario.blogPost === undefined ? null : scenario.blogPost, error: null });
       return query({
           data: scenario.enrollment === undefined ? { id: 'enrollment-1' } : scenario.enrollment,
           error: scenario.enrollmentError ?? null,
@@ -106,6 +108,54 @@ test('routes a public Google Drive course trailer through the secure stream', as
   await handler({ body: { asset: 'course-trailer', courseId: 'course-1' }, headers: {} } as Request, response);
   assert.equal(state.status, 200);
   assert.equal(state.body.token, 'signed:courseTrailerFileIdentifier123');
+});
+
+test('routes a public blog post video block through the secure stream by ordinal position', async () => {
+  const { response, state } = createResponse();
+  const content = '<p>Intro</p><div data-block="video" data-provider="google_drive" data-url="https://drive.google.com/file/d/blogPostVideoFileIdentifier12/view"></div>';
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => createSupabase({ blogPost: { content } }) as any,
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'blog-post-video', postId: 1, blockIndex: 0 }, headers: {} } as Request, response);
+  assert.equal(state.status, 200);
+  assert.equal(state.body.token, 'signed:blogPostVideoFileIdentifier12');
+});
+
+test('never mints a blog post video token from an unpublished or missing article', async () => {
+  const { response, state } = createResponse();
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => createSupabase({ blogPost: null }) as any,
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'blog-post-video', postId: 999, blockIndex: 0 }, headers: {} } as Request, response);
+  assert.equal(state.status, 404);
+});
+
+test('rejects a blog post video request for a YouTube block (only Drive needs a signed proxy token)', async () => {
+  const { response, state } = createResponse();
+  const content = '<div data-block="video" data-provider="youtube" data-url="https://youtu.be/abcdefghijk"></div>';
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => createSupabase({ blogPost: { content } }) as any,
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'blog-post-video', postId: 1, blockIndex: 0 }, headers: {} } as Request, response);
+  assert.equal(state.status, 404);
+});
+
+test('rejects an out-of-range blog post video block index', async () => {
+  const { response, state } = createResponse();
+  const content = '<p>No videos here</p>';
+  const handler = createGenerateToken({
+    getSupabaseAdmin: () => createSupabase({ blogPost: { content } }) as any,
+    generateStreamToken: ({ fileId }) => `signed:${fileId}`,
+    createCorrelationId: () => 'correlation-1',
+  });
+  await handler({ body: { asset: 'blog-post-video', postId: 1, blockIndex: 3 }, headers: {} } as Request, response);
+  assert.equal(state.status, 404);
 });
 
 test('returns a streaming token for an authenticated enrolled user', async () => {

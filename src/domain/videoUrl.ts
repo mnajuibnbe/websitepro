@@ -10,3 +10,20 @@ export function isGoogleDriveFileUrl(input: string): boolean {
     return false;
   }
 }
+
+const YOUTUBE_ID_RE = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+
+export function parseYoutubeVideoId(input: string): string | null {
+  return input.trim().match(YOUTUBE_ID_RE)?.[1] ?? null;
+}
+
+export type BlogVideoUrlProvider = 'youtube' | 'google_drive';
+
+/** Used by the blog block editor's video-insert dialog to auto-detect the provider from a pasted URL. */
+export function detectBlogVideoProvider(input: string): BlogVideoUrlProvider | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  if (isGoogleDriveFileUrl(trimmed)) return 'google_drive';
+  if (parseYoutubeVideoId(trimmed)) return 'youtube';
+  return null;
+}

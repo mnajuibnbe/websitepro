@@ -4,6 +4,7 @@ import { generateStreamToken, verifyStreamToken } from '../services/token.servic
 import { getDriveClient } from '../config/google.js';
 import { getSupabaseAdmin } from '../config/supabase.js';
 import { parseVideoSource } from '../services/video-metadata.service.js';
+import { findBlogVideoByIndex } from '../../lib/blogContentSegments.js';
 
 interface DriveMetadata { fileSize: number; mimeType: string; expiresAt: number }
 const driveMetadataCache = new Map<string, DriveMetadata>();
@@ -40,7 +41,7 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
   res.setHeader('X-Correlation-ID', correlationId);
 
   try {
-    const { lessonId, asset, courseId } = req.body;
+    const { lessonId, asset, courseId, postId, blockIndex } = req.body;
 
     if (asset === 'homepage-intro') {
       const streamToken = dependencies.generateStreamToken({ fileId: HOMEPAGE_INTRO_FILE_ID, resourceType: 'video' });
@@ -68,6 +69,41 @@ export const createGenerateToken = (dependencies: TokenControllerDependencies) =
       try {
         const source = parseVideoSource(course.trailer_video);
         if (source.provider !== 'google_drive' || !source.externalId) throw new Error('Course trailer is not a Google Drive video file');
+        res.status(200).json({ token: dependencies.generateStreamToken({ fileId: source.externalId, resourceType: 'video' }) });
+      } catch (cause) {
+        res.status(422).json({ error: cause instanceof Error ? cause.message : 'Invalid Google Drive video link.' });
+      }
+      return;
+    }
+
+    if (asset === 'blog-post-video') {
+      if (!postId || typeof blockIndex !== 'number') {
+        res.status(400).json({ error: 'A blog post and video block are required' });
+        return;
+      }
+      // Never trust a client-supplied Drive URL directly: resolve it server-side from
+      // the post's own stored, sanitized content by ordinal position, mirroring the
+      // course-trailer pattern above. Only published articles are eligible — the block
+      // editor's preview card (not this endpoint) is what admins use to check drafts.
+      const supabase = dependencies.getSupabaseAdmin();
+      const { data: post, error: postError } = await supabase
+        .from('blog_posts')
+        .select('content')
+        .eq('id', postId)
+        .eq('status', 'published')
+        .maybeSingle();
+      if (postError || !post) {
+        res.status(404).json({ error: 'Article not found' });
+        return;
+      }
+      const video = findBlogVideoByIndex(post.content || '', blockIndex);
+      if (!video || video.provider !== 'google_drive') {
+        res.status(404).json({ error: 'Article video not found' });
+        return;
+      }
+      try {
+        const source = parseVideoSource(video.url);
+        if (source.provider !== 'google_drive' || !source.externalId) throw new Error('Article video is not a Google Drive video file');
         res.status(200).json({ token: dependencies.generateStreamToken({ fileId: source.externalId, resourceType: 'video' }) });
       } catch (cause) {
         res.status(422).json({ error: cause instanceof Error ? cause.message : 'Invalid Google Drive video link.' });
