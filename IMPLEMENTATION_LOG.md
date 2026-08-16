@@ -1,5 +1,228 @@
 # Implementation Log
 
+## 2026-08-16 — Blog editor audit: crash fix + table/Gemini bugs + UX overhaul
+
+Real hands-on testing of the block editor (Phases 1-4) surfaced a live Sentry crash and
+several other confirmed-broken or unclear areas. Investigated each with real evidence
+rather than guess-and-patch, then did the requested UX pass.
+
+**1. Fixed the "Insert image" infinite-loop crash (Sentry event
+`6b1987cb94964a81917a2521edd3ed0e`, "Maximum update depth exceeded").** Root cause traced
+by hand, not guessed: `useDialogA11y.ts`'s focus-trap effect depended on `[isOpen,
+onClose]`, but every dialog call site (`MediaUrlDialog`, `LinkPickerDialog`) passes an
+inline `onClose={() => setX(null)}` — a new function identity every render. These dialog
+components are always mounted in `BlogContentEditor`'s JSX (they self-gate on `isOpen`
+internally, not via conditional rendering in the parent), so they re-render every time
+`BlogContentEditor` does. `@tiptap/react`'s `useEditor` re-renders its host component on
+*every* ProseMirror transaction by default (`shouldRerenderOnTransaction` was never set
+to `false` — confirmed in `node_modules/@tiptap/react/dist/index.js`). The loop: dialog
+opens → effect focuses the URL input → parent re-renders for any reason → new `onClose`
+→ effect tears down, and teardown calls `previouslyFocused?.focus()`, moving focus back
+onto the Tiptap editor → focusing a contenteditable fires a DOM `selectionchange` →
+ProseMirror's `DOMObserver` (`node_modules/prosemirror-view`, `connectSelection`/
+`onSelectionChange`) turns that into a transaction → `useEditor` re-renders
+`BlogContentEditor` → new `onClose` again → repeat, synchronously, until React's update-
+depth guard throws. Fix (`useDialogA11y.ts`): read `onClose` through a ref instead of a
+dependency, so the trap only sets up/tears down on real `isOpen` transitions. Breaks the
+cycle at its root (no more repeated focus-steal on every parent re-render) rather than
+patching a symptom.
+
+**2. Fixed table insertion/editing.** Three independent bugs, not one:
+- `sanitizeBlogContentHtml`'s attribute allowlist (`blogContentHtml.ts`) didn't include
+  `colspan`/`rowspan`/`colwidth`, which `@tiptap/extension-table-cell` always emits (even
+  at the default value of 1). Every `onUpdate` sanitized those attributes away, so the
+  sanitized `value` passed back into `BlogContentEditor` never matched
+  `editor.getHTML()`, and the `useEffect` that reconciles `value` against the live editor
+  (`if (value !== current) editor.commands.setContent(...)`) replaced the *entire*
+  document on every keystroke inside a table — resetting the cursor and making cell
+  editing feel broken. Fixed by adding the three attributes to
+  `BLOG_CONTENT_ALLOWED_ATTR`.
+- The admin editor had zero CSS for `<table>`/`<th>`/`<td>` — all the block styling in
+  `index.css` was scoped to `.blog-article` (the public page) only, never
+  `.blog-content-editor`. A freshly inserted table rendered borderless/invisible while
+  editing. Extended the existing table/th/td selectors to cover both classes, plus a
+  `.selectedCell` style (prosemirror-tables' own multi-cell-selection class, previously
+  unstyled) so merge/split selection is visible.
+- There was no UI for row/column/merge/delete at all — the toolbar only had "Insert
+  table". Added a contextual table toolbar (`BlogContentEditor.tsx`) that appears when
+  `editor.isActive('table')`, wired to the Table extension's existing
+  `addRowBefore/After`, `deleteRow`, `addColumnBefore/After`, `deleteColumn`,
+  `mergeCells`, `splitCell`, `toggleHeaderRow`, `deleteTable` commands (all already
+  present in `@tiptap/extension-table`, just never surfaced).
+
+**3. Found and fixed the real cause of the Topic Insights 503** ("AI-assisted insights
+are temporarily unavailable"). Confirmed via live Vercel function logs (`vercel logs`,
+authenticated CLI, project `websitepro`) rather than assuming — the panel was already
+showing the generic-failure message, not the "not configured" missing-key message, which
+by itself ruled out a missing key. The actual logged error:
+`{"error":{"code":404,"message":"This model models/gemini-2.5-flash is no longer
+available to new users. ..."}}`. Google gated that model for this project's API
+key/account, unrelated to `GEMINI_API_KEY` being set correctly (it was, exactly as
+described). Fixed in `gemini.service.ts`: switched the default model to
+`gemini-3.5-flash-lite` (current GA flash-tier model per `ai.google.dev/gemini-api/docs/
+models`) and made it overridable via a new `GEMINI_MODEL` env var, since Google gating
+older model versions for existing keys is a demonstrated recurring failure mode for this
+API (multiple corroborating reports on Google's own developer forum), not a one-off.
+**Not verified against the live key in this sandbox** — pulling the real
+`GEMINI_API_KEY` value was blocked by this environment's own safety controls (secret
+exfiltration guard), so the model swap is backed by Google's current model-listing docs
+and the forum evidence, not a live test call. Worth a real smoke test after deploy.
+
+**4. Independent audit of the rest of the editor** (video/FAQ/callout/button
+extensions, link picker, content-sync effect): no further bugs found. `FaqExtension`,
+`CalloutExtension`, `ButtonBlockExtension`, `VideoEmbedExtension` all use self-contained
+React NodeViews with their own inline styling (unlike the stock `Table` extension), so
+they weren't affected by the missing `.blog-content-editor` CSS. Their `renderHTML`
+output attributes are all covered by the existing sanitizer allowlist (`data-*` via
+`ALLOW_DATA_ATTR`, plus `class`/`href`/`target`/`rel`), so no other silent
+attribute-stripping loop exists.
+
+**5. Hid the "Search & sharing" panel** (`AdminBlogPosts.tsx`) — SEO title/meta
+description/canonical URL overrides are no longer shown or editable. Automation is
+unaffected: `deriveSeoTitle`/`deriveCanonicalUrl` fallbacks (`blogSeo.ts`) were already
+the behavior whenever the override fields were empty, which they now always are for new
+posts (an already-set historical override on an existing post is left alone rather than
+force-cleared, since there's no data-loss reason to wipe it and no requirement to).
+
+**6. Meta description is now written by Gemini automatically.** New
+`generateMetaDescription`/`buildMetaDescriptionPrompt` in `gemini.service.ts`, new `POST
+/api/blog/meta-description` route (`blog-insights.routes.ts`, same admin-auth pattern as
+topic-insights — extracted a shared `authenticateAdmin` helper now that two handlers
+live in this file), new `fetchMetaDescription` client wrapper
+(`blogInsights.service.ts`). Prompt encodes Google Search Central's actual guidance
+(`developers.google.com/search/docs/appearance/snippet`: accurate/specific to the page,
+~120-155 chars since Google truncates, no keyword stuffing, unique per page) *and* this
+project's established anti-AI-writing-trope rules (loaded from the `copywriting` skill's
+`ai-tropes.md`: no "dive into/leverage/unlock"-style verbs, no "it's not just X, it's Y",
+no em dashes, no "In today's...", no rhetorical questions) so the output doesn't read as
+machine-generated. Triggered automatically from `AdminBlogPosts.tsx`'s `save()` only when
+publishing (not on every draft save, to avoid a billed Gemini call on every minor edit),
+folded into the existing `saving` state so there's no separate "generating…" UI — a
+failure silently keeps whatever `meta_description` already exists rather than blocking
+the save or surfacing an error.
+
+**7. Real cover-image upload**, replacing the URL text field. Investigated Phase 1 first:
+blog posts had never had anything beyond a raw URL input — courses, however, already had
+a complete, working pattern (`CourseCoverUpload.tsx` + `courseCover.ts`): client-side
+resize/crop/re-encode to WebP via canvas, upload to a dedicated Supabase Storage bucket,
+store only the resulting public URL (`blog_posts.cover_image_url` already has a CHECK
+constraint requiring an `https://` URL, so no schema change needed). No new
+account/credential required — this project already runs on Supabase. Generalized
+`courseCover.ts`'s image-processing function (`processCoverImage`, parameterized by
+target dimensions/byte budget) so course and blog covers share it instead of duplicating
+the crop-math/progressive-quality-loop logic; added `blogCover.ts` and
+`BlogCoverUpload.tsx` mirroring the course pattern. New Supabase migrations
+(`20260816160000_blog_cover_upload_storage.sql`,
+`20260816160100_blog_cover_cleanup_revoke_rpc_execute.sql`, applied directly to
+`nhknhibsloirpffndzcd`): a `blog-covers` bucket (public read, 700KB/WebP-only, mirroring
+`course-covers`), admin-only RLS on `storage.objects`, and a cleanup trigger that deletes
+the old storage object when a post's cover is replaced or the post is deleted (so
+replacing a cover doesn't leak orphaned blobs). `get_advisors` caught that the cleanup
+trigger function was callable directly via PostgREST's `/rest/v1/rpc/` endpoint by
+`anon`/`authenticated` (unlike the pre-existing course-cover equivalent, which relies on
+`REVOKE ... FROM PUBLIC` alone — this project also grants default `EXECUTE` to those
+roles at function-creation time, so that alone wasn't enough here); fixed with an
+explicit `REVOKE EXECUTE ... FROM anon, authenticated` in the second migration.
+
+**8. IA/UX pass on `AdminBlogPosts.tsx`/`SeoSidebar.tsx`.** Reorganized into an explicit
+workflow instead of a flat, equal-weight stack: main form groups "Write" (title, slug,
+excerpt, content — unchanged, still the primary focus) separately from "Cover &
+publishing" (new upload + status) now that Search & sharing is gone. Sidebar regrouped
+into four labeled tiers — "Plan" (search query + intent), "Check as you write" (heading
+structure/readability/introduction/word count), "Search snippet preview" (new: a
+read-only Google-style preview of the title/URL/description that actually ship, replacing
+the old editable-looking "SEO title & description" hints panel now that there's nothing
+left to edit there), and "Strengthen" (internal linking/original value/sources/duplicate
+check/topic coverage — the Phase 3 content-depth tools, most useful once a real draft
+exists). "Strengthen" is a native `<details>`, collapsed by default for a new/near-empty
+post and open by default when resuming a post that already has content (a one-time
+`useState` lazy initializer based on word count, not re-derived every render, so a
+manual toggle is never fought by a re-render). **Target Search Query field:** kept, not
+removed — `primaryQuery` is genuinely load-bearing (topic-insights topic, internal-link
+ranking, duplicate-content comparison, and every "does the title/description/intro match
+the query" check all read it, not the title), so deleting it would silently break those
+features. The actual problem was that its purpose wasn't explained: relabeled "Primary
+query" → "Search phrase readers would type" and added inline help copy that adapts to
+state — a concrete example of title vs. query differing while it's still the untouched
+auto-fill from the title, switching to a "customized" note once the admin has actually
+edited it away from the title, so the explanation matches whichever state the field is
+actually in.
+
+**Verified:** `npm run lint`, `npm test` (251 pass, incl. 19 new
+`blog-insights.routes.test.ts` cases for the new route/handler), `npm run test:frontend`
+(59 pass, unaffected), `npm run build` (prerender + sitemap regenerate unchanged).
+Confirmed live in a browser: public `/blog` and `/blog/*` pages load with zero console
+errors (the CSS/sanitizer changes don't touch the public rendering path). **Not verified
+live:** the admin editor UI itself (crash repro, table insert/edit, cover upload, the
+sidebar redesign) — same constraint as every prior phase's log entry in this file, no
+admin login credentials available in this environment. The crash and table fixes are
+instead justified by tracing the actual mechanism (ProseMirror/ `@tiptap/react` source
+read directly from `node_modules`), not by "tests pass."
+
+**Pre-existing, out of scope:** `get_advisors` also flagged ~80 other `SECURITY DEFINER`
+functions project-wide as directly callable via PostgREST that predate this session —
+worth a dedicated pass, not fixed here.
+
+## 2026-08-16 — Blog SEO editor Phase 4: technical SEO
+
+Completed the "automatic SEO the writer doesn't have to think about" layer on top of
+Phases 1-3 (`b22be0c`).
+
+- **Article JSON-LD enrichment** (`src/pages/BlogPost.tsx`): `headline` now prefers the
+  admin's `seo_title` override, falling back to the raw `title` — deliberately not the
+  page-`<title>` value (which appends " | Tutiba Blog"), so the schema's headline keeps
+  matching what actually renders as the page's H1. Added `keywords` (from
+  `primary_keyword`/`secondary_keywords`, Phase 2) and `citation` (from Phase 3's
+  `sources`, mapped to `CreativeWork`), both omitted entirely when empty rather than
+  emitted as empty arrays. Checked for a per-post author concept before touching
+  `author`: none exists anywhere in the schema (no `author_name`-shaped column or field
+  across Phases 1-3) — left the existing `Organization` attribution as-is rather than
+  inventing one.
+- **FAQPage structured data** (`src/lib/blogFaqExtract.ts`, new): extracts
+  question/answer pairs from the article's own FAQ blocks (the same
+  `div[data-block="faq"] > .faq-item > (h4.faq-question, .faq-answer)` contract
+  `FaqExtension.tsx`/`blogQuestionInsert.ts` already produce) via a regex scan on the
+  distinctive `faq-question`/`faq-answer` classes — no DOM parser, so it stays testable
+  under `npm test` like `blogProseBlocks.ts`/`blogContentSegments.ts`. Items with an
+  empty answer (a question added but not yet answered) are dropped. `BlogPost.tsx`
+  renders this as a **separate** top-level `FAQPage` script (`structured-data-faq`,
+  alongside the existing `structured-data-article`) only when the article actually has
+  FAQ blocks — matching Google's guidance for combining Article + FAQPage schemas on one
+  page, and reusing the exact `Question`/`acceptedAnswer` shape `PageMeta.tsx` already
+  uses for the static `/faq` page.
+- **Duplicate/Similar Content Checker** (`src/lib/blogDuplicateContent.ts`,
+  `src/components/blog/DuplicateContentPanel.tsx`, wired into `SeoSidebar.tsx` as a new
+  `allPosts` prop sourced from `AdminBlogPosts.tsx`'s already-loaded post list — no
+  extra fetch): the one piece from the original spec not yet built anywhere in this
+  rebuild. Compares the draft against this site's *other* posts only (external content
+  needs a paid API, explicitly out of scope). Deliberately a local word-shingle Jaccard
+  similarity (5-word n-grams), not a Gemini call like Topic Coverage: this needs to
+  re-check the live draft against every other post on every edit, not fire on an
+  explicit "Analyze" click, so a billed per-keystroke AI call would be slow, costly, and
+  silently degrade if the AI service is down. Shingle overlap requires matching runs of
+  consecutive words, not just shared vocabulary, so two distinct articles sharing topic
+  terminology score low while a copy-pasted-and-reworded article scores high (validated
+  in `blogDuplicateContent.test.ts` with a genuinely reworded near-duplicate vs. an
+  unrelated article on a different topic).
+
+**Schema validation:** no live Rich Results Test access in this environment: checked the
+enriched `Article`/new `FAQPage` output by hand against schema.org's documented
+required/recommended properties (`headline`/`image`/`datePublished` present;
+`dateModified`/`author`/`publisher.logo` present; `FAQPage.mainEntity[].{name,
+acceptedAnswer.text}` present), and confirmed the *unenriched* fields render correctly
+via the actual production build's prerendered output (`dist/blog/*/index.html` — real
+`Article` JSON-LD from the three existing sample posts, none of which have
+sources/keywords/FAQ blocks set, so those new fields correctly don't appear for them).
+
+Verified: `npm run lint`, `npm test` (241 pass, incl. new `blogFaqExtract.test.ts`,
+`blogDuplicateContent.test.ts`), `npm run test:frontend` (59 pass, incl. new
+`DuplicateContentPanel` cases in `blog-content-depth.frontend.test.tsx`), `npm run
+build` (prerender succeeds, sitemap/robots regenerate unchanged). **Not verified live in
+a browser:** the admin sidebar's new Duplicate Content Checker panel and an end-to-end
+FAQ-block-to-FAQPage-schema round trip — same reason as Phase 3's log entry, no admin
+login credentials in this session, and inserting a test post into the production
+Supabase project to work around that was avoided as an unnecessary write to live data.
+
 ## 2026-08-16 — Blog SEO editor Phase 3: content-depth tooling
 
 Added Internal Linking Assistant, Original Value Checker, and Sources/Citations to the

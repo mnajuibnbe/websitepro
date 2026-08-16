@@ -9,8 +9,8 @@ import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import TableCell from '@tiptap/extension-table-cell';
 import {
-  Bold, Heading2, Heading3, Heading4, Image as ImageIcon, Italic, Link2, List, ListOrdered,
-  MousePointerClick, Pilcrow, Quote, Redo2, HelpCircle, Table as TableIcon, Undo2, Video as VideoIcon,
+  Bold, Columns3, Heading2, Heading3, Heading4, Image as ImageIcon, Italic, Link2, List, ListOrdered,
+  MousePointerClick, Pilcrow, Quote, Redo2, HelpCircle, Rows3, Table as TableIcon, TableCellsMerge, TableCellsSplit, Trash2, Undo2, Video as VideoIcon,
 } from 'lucide-react';
 import { sanitizeBlogContentHtml } from '../../lib/blogContentHtml';
 import { VideoEmbed, type VideoEmbedAttrs } from './tiptap/VideoEmbedExtension';
@@ -145,6 +145,25 @@ export function BlogContentEditor({ value, onChange, placeholder }: BlogContentE
         <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} label="Undo"><Undo2 className="h-4 w-4" /></ToolbarButton>
         <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} label="Redo"><Redo2 className="h-4 w-4" /></ToolbarButton>
       </div>
+      {editor.isActive('table') && (
+        <div className="flex flex-wrap items-center gap-1 border-b border-primary-200/70 bg-accent-50/60 px-2 py-1.5">
+          <span className="mx-1 flex items-center gap-1 text-xs font-bold text-primary-500"><TableIcon className="h-3.5 w-3.5" />Table</span>
+          <ToolbarSeparator />
+          <ToolbarButton onClick={() => editor.chain().focus().addRowBefore().run()} disabled={!editor.can().addRowBefore()} label="Add row above"><Rows3 className="h-4 w-4" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().addRowAfter().run()} disabled={!editor.can().addRowAfter()} label="Add row below"><Rows3 className="h-4 w-4 rotate-180" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().deleteRow().run()} disabled={!editor.can().deleteRow()} label="Delete row"><Rows3 className="h-4 w-4 opacity-50" /></ToolbarButton>
+          <ToolbarSeparator />
+          <ToolbarButton onClick={() => editor.chain().focus().addColumnBefore().run()} disabled={!editor.can().addColumnBefore()} label="Add column left"><Columns3 className="h-4 w-4" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().addColumnAfter().run()} disabled={!editor.can().addColumnAfter()} label="Add column right"><Columns3 className="h-4 w-4 rotate-180" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()} label="Delete column"><Columns3 className="h-4 w-4 opacity-50" /></ToolbarButton>
+          <ToolbarSeparator />
+          <ToolbarButton onClick={() => editor.chain().focus().mergeCells().run()} disabled={!editor.can().mergeCells()} label="Merge cells"><TableCellsMerge className="h-4 w-4" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().splitCell().run()} disabled={!editor.can().splitCell()} label="Split cell"><TableCellsSplit className="h-4 w-4" /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleHeaderRow().run()} active={editor.isActive('tableHeader')} label="Toggle header row"><span className="text-xs font-bold leading-none">H</span></ToolbarButton>
+          <ToolbarSeparator />
+          <ToolbarButton onClick={() => editor.chain().focus().deleteTable().run()} label="Delete table"><Trash2 className="h-4 w-4" /></ToolbarButton>
+        </div>
+      )}
       <div className="px-4 py-4">
         <EditorContent editor={editor} />
       </div>

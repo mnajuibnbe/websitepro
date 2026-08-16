@@ -31,3 +31,28 @@ export async function fetchTopicInsights(topic: string, contentText: string): Pr
   }
   return { subtopics: payload.subtopics, questions: payload.questions };
 }
+
+interface MetaDescriptionResponsePayload { description?: string; error?: string }
+
+/**
+ * Calls the server-side Gemini proxy that writes the article's meta description
+ * automatically (POST /api/blog/meta-description) -- see AdminBlogPosts.tsx's save().
+ * Returns null on any failure (missing key, rate limit, API error) rather than throwing,
+ * so a Gemini hiccup never blocks saving the post -- the caller just keeps whatever
+ * meta_description was already stored.
+ */
+export async function fetchMetaDescription(title: string, excerpt: string, contentText: string, primaryKeyword: string): Promise<string | null> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const response = await fetch('/api/blog/meta-description', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session?.access_token || ''}` },
+      body: JSON.stringify({ title, excerpt, contentText, primaryKeyword }),
+    });
+    if (!response.ok) return null;
+    const payload = await response.json().catch(() => null) as MetaDescriptionResponsePayload | null;
+    return payload?.description?.trim() || null;
+  } catch {
+    return null;
+  }
+}

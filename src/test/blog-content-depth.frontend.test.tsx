@@ -6,6 +6,8 @@ import { OriginalValuePanel } from '../components/blog/OriginalValuePanel';
 import { SourcesPanel } from '../components/blog/SourcesPanel';
 import { BlogSourcesList } from '../components/blog/BlogSourcesList';
 import { TopicInsightsPanel } from '../components/blog/TopicInsightsPanel';
+import { DuplicateContentPanel } from '../components/blog/DuplicateContentPanel';
+import type { BlogPost } from '../services/blogPosts.service';
 
 test('internal linking assistant shows a loading state before its Supabase fetch resolves', () => {
   const markup = renderFrontend(<InternalLinkingPanel postId={null} title="Retinol Guide" primaryQuery="retinol" secondaryQueries={[]} contentHtml="" onInsertContent={() => {}} />);
@@ -54,4 +56,34 @@ test('topic insights panel offers an explicit Analyze trigger once a topic exist
   assert.match(markup, />Analyze</);
   assert.doesNotMatch(markup, /Analyzing…/);
   assert.doesNotMatch(markup, /Questions readers may have/);
+});
+
+const makePost = (overrides: Partial<BlogPost>): BlogPost => ({
+  id: 1, slug: 'post', title: 'Post', excerpt: 'Excerpt', content: '', cover_image_url: null,
+  status: 'published', published_at: null, created_at: '2026-01-01', updated_at: '2026-01-01',
+  seo_title: null, meta_description: null, primary_keyword: null, secondary_keywords: [],
+  search_intent: null, original_value_signals: [], sources: [], ...overrides,
+});
+
+const retinolArticle = '<p>Retinol is one of the most studied ingredients in cosmeceutical skincare. It works by increasing skin cell turnover, which helps fade dark spots and smooth fine lines over several months of consistent use. Most professionals recommend starting with a low concentration two or three nights a week before building up tolerance.</p>';
+const rewordedRetinolArticle = '<p>Retinol is one of the most researched ingredients in cosmeceutical skincare. It works by speeding up skin cell turnover, which helps fade dark spots and smooth fine lines over several months of regular use. Most professionals suggest starting with a low concentration two or three nights a week before building up tolerance.</p>';
+
+test('duplicate content checker shows a clean state when nothing else is similar', () => {
+  const posts = [makePost({ id: 2, title: 'Choosing a Micro-Needling Device', content: '<p>Needle depth, motor speed, and cartridge safety all matter when selecting a device for clinical use.</p>' })];
+  const markup = renderFrontend(<DuplicateContentPanel currentId={null} contentHtml={retinolArticle} posts={posts} />);
+  assert.match(markup, /No highly similar existing articles found/);
+});
+
+test('duplicate content checker flags a near-duplicate existing post by title and similarity percent', () => {
+  const posts = [makePost({ id: 2, title: 'The Complete Guide to Retinol', content: retinolArticle })];
+  const markup = renderFrontend(<DuplicateContentPanel currentId={null} contentHtml={rewordedRetinolArticle} posts={posts} />);
+  assert.match(markup, /reads similar to an existing article/);
+  assert.match(markup, /The Complete Guide to Retinol/);
+  assert.match(markup, /\d+% similar/);
+});
+
+test('duplicate content checker excludes the post currently being edited', () => {
+  const posts = [makePost({ id: 1, title: 'The Complete Guide to Retinol', content: retinolArticle })];
+  const markup = renderFrontend(<DuplicateContentPanel currentId={1} contentHtml={retinolArticle} posts={posts} />);
+  assert.match(markup, /No highly similar existing articles found/);
 });
