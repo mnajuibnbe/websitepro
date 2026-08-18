@@ -13,6 +13,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["vite", "preview", "--port", "4173"],
       "port": 4173
+    },
+    {
+      "name": "tutiba-full",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "server.ts"],
+      "port": 3000
     }
   ]
 }

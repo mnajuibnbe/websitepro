@@ -153,40 +153,40 @@
  * JS, in the public article page, and inside the admin block editor's own preview.
  */
 @layer components {
-  .blog-article :is(h2, h3, h4) { font-weight: 700; color: var(--color-primary-900); line-height: 1.3; }
-  .blog-article h2 { margin: 2rem 0 1rem; font-size: 1.5rem; }
-  .blog-article h3 { margin: 1.75rem 0 0.75rem; font-size: 1.25rem; }
-  .blog-article h4 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; }
-  .blog-article p { margin-bottom: 1.25rem; }
-  .blog-article :is(ul, ol) { margin: 0 0 1.25rem; padding-inline-start: 1.5rem; }
-  .blog-article ul { list-style: disc; }
-  .blog-article ol { list-style: decimal; }
-  .blog-article li { margin-bottom: 0.5rem; line-height: 1.75; }
-  .blog-article blockquote { margin: 1.5rem 0; padding: 0.25rem 1.25rem; border-inline-start: 3px solid var(--color-accent-500); color: var(--color-primary-700); font-style: italic; }
-  .blog-article img { margin: 1.5rem 0; border-radius: var(--radius-card); max-width: 100%; height: auto; }
+  .blog-article :is(h2, h3, h4), .blog-content-editor :is(h2, h3, h4) { font-weight: 700; color: var(--color-primary-900); line-height: 1.3; }
+  .blog-article h2, .blog-content-editor h2 { margin: 2rem 0 1rem; font-size: 1.5rem; }
+  .blog-article h3, .blog-content-editor h3 { margin: 1.75rem 0 0.75rem; font-size: 1.25rem; }
+  .blog-article h4, .blog-content-editor h4 { margin: 1.5rem 0 0.75rem; font-size: 1.1rem; }
+  .blog-article p, .blog-content-editor p { margin-bottom: 1.25rem; }
+  .blog-article :is(ul, ol), .blog-content-editor :is(ul, ol) { margin: 0 0 1.25rem; padding-inline-start: 1.5rem; }
+  .blog-article ul, .blog-content-editor ul { list-style: disc; }
+  .blog-article ol, .blog-content-editor ol { list-style: decimal; }
+  .blog-article li, .blog-content-editor li { margin-bottom: 0.5rem; line-height: 1.75; }
+  .blog-article blockquote, .blog-content-editor blockquote { margin: 1.5rem 0; padding: 0.25rem 1.25rem; border-inline-start: 3px solid var(--color-accent-500); color: var(--color-primary-700); font-style: italic; }
+  .blog-article img, .blog-content-editor img { margin: 1.5rem 0; border-radius: var(--radius-card); max-width: 100%; height: auto; }
   .blog-article table, .blog-content-editor table { width: 100%; margin: 1.5rem 0; border-collapse: collapse; font-size: 0.9375rem; }
   .blog-article :is(th, td), .blog-content-editor :is(th, td) { border: 1px solid var(--color-primary-200); padding: 0.625rem 0.875rem; text-align: start; }
   .blog-article th, .blog-content-editor th { background: var(--color-primary-50); font-weight: 700; color: var(--color-primary-900); }
   .blog-content-editor .selectedCell { position: relative; background: var(--color-accent-50); }
   .blog-content-editor .selectedCell::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-accent-500) 12%, transparent); pointer-events: none; }
-  .blog-article a { color: var(--color-accent-700); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
-  .blog-article a:hover { color: var(--color-accent-800); }
+  .blog-article a, .blog-content-editor a { color: var(--color-accent-700); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .blog-article a:hover, .blog-content-editor a:hover { color: var(--color-accent-800); }
 
-  .blog-article .faq-block { margin: 2rem 0; }
-  .blog-article .faq-item { padding: 1.25rem 0; border-bottom: 1px solid var(--color-primary-200); }
-  .blog-article .faq-item:first-child { padding-top: 0; }
-  .blog-article .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .blog-article .faq-question { margin: 0 0 0.5rem; font-size: 1.0625rem; font-weight: 700; color: var(--color-primary-900); }
-  .blog-article .faq-answer { color: var(--color-primary-700); }
-  .blog-article .faq-answer p { margin-bottom: 0; }
+  .blog-article .faq-block, .blog-content-editor .faq-block { margin: 2rem 0; }
+  .blog-article .faq-item, .blog-content-editor .faq-item { padding: 1.25rem 0; border-bottom: 1px solid var(--color-primary-200); }
+  .blog-article .faq-item:first-child, .blog-content-editor .faq-item:first-child { padding-top: 0; }
+  .blog-article .faq-item:last-child, .blog-content-editor .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .blog-article .faq-question, .blog-content-editor .faq-question { margin: 0 0 0.5rem; font-size: 1.0625rem; font-weight: 700; color: var(--color-primary-900); }
+  .blog-article .faq-answer, .blog-content-editor .faq-answer { color: var(--color-primary-700); }
+  .blog-article .faq-answer p, .blog-content-editor .faq-answer p { margin-bottom: 0; }
 
-  .blog-article .callout { margin: 1.5rem 0; padding: 1rem 1.25rem; border-radius: var(--radius-card); border: 1px solid var(--color-primary-200); }
-  .blog-article .callout p:last-child { margin-bottom: 0; }
-  .blog-article .callout-info { background: var(--color-info-100); border-color: var(--color-info-500); color: var(--color-primary-900); }
-  .blog-article .callout-warning { background: var(--color-warning-100); border-color: var(--color-warning-500); color: var(--color-primary-900); }
-  .blog-article .callout-tip { background: var(--color-success-100); border-color: var(--color-success-500); color: var(--color-primary-900); }
+  .blog-article .callout, .blog-content-editor .callout { margin: 1.5rem 0; padding: 1rem 1.25rem; border-radius: var(--radius-card); border: 1px solid var(--color-primary-200); }
+  .blog-article .callout p:last-child, .blog-content-editor .callout p:last-child { margin-bottom: 0; }
+  .blog-article .callout-info, .blog-content-editor .callout-info { background: var(--color-info-100); border-color: var(--color-info-500); color: var(--color-primary-900); }
+  .blog-article .callout-warning, .blog-content-editor .callout-warning { background: var(--color-warning-100); border-color: var(--color-warning-500); color: var(--color-primary-900); }
+  .blog-article .callout-tip, .blog-content-editor .callout-tip { background: var(--color-success-100); border-color: var(--color-success-500); color: var(--color-primary-900); }
 
-  .blog-article .cta-button-wrap { margin: 1.75rem 0; }
-  .blog-article .cta-button { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.5rem; border-radius: 0.75rem; background: var(--color-accent-600); color: white; font-weight: 700; text-decoration: none; transition: background-color 0.2s ease; }
-  .blog-article .cta-button:hover { background: var(--color-accent-700); color: white; }
+  .blog-article .cta-button-wrap, .blog-content-editor .cta-button-wrap { margin: 1.75rem 0; }
+  .blog-article .cta-button, .blog-content-editor .cta-button { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.5rem; border-radius: 0.75rem; background: var(--color-accent-600); color: white; font-weight: 700; text-decoration: none; transition: background-color 0.2s ease; }
+  .blog-article .cta-button:hover, .blog-content-editor .cta-button:hover { background: var(--color-accent-700); color: white; }
 }
