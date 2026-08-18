@@ -23,11 +23,15 @@ export function AdminBlogPosts() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  // Bumped on every reset()/edit() so BlogCoverUpload (which keeps its own local
+  // "optimized" success message in state) remounts and drops stale UI state instead of
+  // showing a previous upload's success message under a now-empty cover field.
+  const [formKey, setFormKey] = useState(0);
 
   const load = useCallback(async () => { setLoading(true); const { data, error } = await supabase.from('blog_posts').select('*').order('updated_at', { ascending: false }); if (!error) setPosts((data || []) as BlogPost[]); else setMessage('Blog posts could not be loaded.'); setLoading(false); }, []);
   useEffect(() => { void load(); }, [load]);
-  const reset = () => { setEditingId(null); setForm(EMPTY); setMessage(''); };
-  const edit = (post: BlogPost) => { setEditingId(post.id); setForm({ slug: post.slug, title: post.title, excerpt: post.excerpt, content: post.content, cover_image_url: post.cover_image_url, status: post.status, published_at: post.published_at, seo_title: post.seo_title, meta_description: post.meta_description, primary_keyword: post.primary_keyword, secondary_keywords: post.secondary_keywords || [], search_intent: post.search_intent, original_value_signals: post.original_value_signals || [], sources: post.sources || [] }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const reset = () => { setEditingId(null); setForm(EMPTY); setMessage(''); setFormKey(current => current + 1); };
+  const edit = (post: BlogPost) => { setEditingId(post.id); setForm({ slug: post.slug, title: post.title, excerpt: post.excerpt, content: post.content, cover_image_url: post.cover_image_url, status: post.status, published_at: post.published_at, seo_title: post.seo_title, meta_description: post.meta_description, primary_keyword: post.primary_keyword, secondary_keywords: post.secondary_keywords || [], search_intent: post.search_intent, original_value_signals: post.original_value_signals || [], sources: post.sources || [] }); setFormKey(current => current + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const setStatus = (status: BlogPostStatus) => setForm(current => ({ ...current, status, published_at: status === 'published' ? current.published_at || new Date().toISOString() : null }));
 
   const save = async (event: FormEvent) => {
@@ -79,7 +83,7 @@ export function AdminBlogPosts() {
         <Field label="Slug"><input value={form.slug} onChange={e => setForm(current => ({ ...current, slug: slugify(e.target.value) }))} required className="field" /></Field>
         <Field label="Excerpt"><textarea value={form.excerpt} onChange={e => setForm(current => ({ ...current, excerpt: e.target.value }))} required minLength={10} maxLength={600} rows={3} className="field" /></Field>
         <label className="block text-sm font-bold text-primary-800">Article content
-          <div className="mt-2"><BlogContentEditor value={form.content} onChange={html => setForm(current => ({ ...current, content: html }))} /></div>
+          <div className="mt-2 font-normal"><BlogContentEditor value={form.content} onChange={html => setForm(current => ({ ...current, content: html }))} /></div>
         </label>
       </div>
 
@@ -88,7 +92,7 @@ export function AdminBlogPosts() {
         <p className="mt-1 text-xs text-primary-500">Search title, meta description, and canonical URL are all handled automatically — see the snippet preview in the sidebar.</p>
         <div className="mt-4 space-y-4">
           <label className="block text-sm font-bold text-primary-800">Cover image
-            <div className="mt-2"><BlogCoverUpload value={form.cover_image_url || ''} onChange={url => setForm(current => ({ ...current, cover_image_url: url || null }))} /></div>
+            <div className="mt-2"><BlogCoverUpload key={formKey} value={form.cover_image_url || ''} onChange={url => setForm(current => ({ ...current, cover_image_url: url || null }))} /></div>
           </label>
           <Field label="Status"><select value={form.status} onChange={e => setStatus(e.target.value as BlogPostStatus)} className="field"><option value="draft">Draft</option><option value="published">Published</option></select></Field>
         </div>

@@ -131,7 +131,7 @@ export function computeContentSeoScore(input: ContentSeoScoreInput): ContentSeoS
     notes: technicalChecks.filter((c) => c.applicable && !c.passed).map((c) => c.label),
   };
 
-  const stub = (key: string, label: string): ScoreCategory => ({ key, label, weight: 0, status: 'stub', scorePercent: null, notes: ['Coming in a later phase — needs an AI API key that is not yet configured.'] });
+  const stub = (key: string, label: string): ScoreCategory => ({ key, label, weight: 0, status: 'stub', scorePercent: null, notes: ['Not included in this score — use Topic Coverage & Reader Questions below to check it with AI.'] });
 
   // --- Internal Links ---
   const internalLinkCounts = countInternalLinks(input.contentHtml);
