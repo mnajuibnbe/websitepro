@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, CircleAlert, Loader2, Mail, MessagesSquare, Paperclip, RotateCcw, Send } from 'lucide-react';
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
+import { ArrowLeft, CheckCircle2, CircleAlert, Loader2, Mail, MessagesSquare, Paperclip, RotateCcw, Send, Trash2 } from 'lucide-react';
+import { AdminSidebar, CONTACT_UNREAD_CHANGED_EVENT } from '../../components/admin/AdminSidebar';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { PortalLayout } from '../../components/layout/PortalLayout';
 import { RichTextEditor } from '../../components/ui/RichTextEditor';
 import { RICH_TEXT_TYPOGRAPHY_CLASS, isRichTextEmpty } from '../../lib/richTextHtml';
@@ -55,6 +56,8 @@ export function AdminContactMessages() {
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [togglingResolved, setTogglingResolved] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const toast = (type: ToastMessage['type'], message: string) => setToasts((current) => [...current, { id: crypto.randomUUID(), type, message }]);
 
@@ -89,11 +92,31 @@ export function AdminContactMessages() {
       setRows((current) => current.map((row) => (row.id === submission.id ? { ...row, read_at: now } : row)));
       const { error } = await supabase.rpc('admin_mark_contact_submission_read', { p_id: submission.id });
       if (error) console.error('[AdminContactMessages] mark-read failed', error);
+      else window.dispatchEvent(new Event(CONTACT_UNREAD_CHANGED_EVENT));
     }
   };
 
   const selected = useMemo(() => rows.find((row) => row.id === selectedId) || null, [rows, selectedId]);
   const unreadCount = useMemo(() => rows.filter((row) => !row.read_at).length, [rows]);
+
+  const deleteSelected = async () => {
+    if (!selected || deleting) return;
+    const wasUnread = !selected.read_at;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.rpc('admin_delete_contact_submission', { p_id: selected.id });
+      if (error) throw error;
+      setRows((current) => current.filter((row) => row.id !== selected.id));
+      setSelectedId(null);
+      setShowDeleteConfirm(false);
+      toast('success', 'Message deleted.');
+      if (wasUnread) window.dispatchEvent(new Event(CONTACT_UNREAD_CHANGED_EVENT));
+    } catch {
+      toast('error', 'Could not delete this message.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const toggleResolved = async () => {
     if (!selected || togglingResolved) return;
@@ -218,6 +241,15 @@ export function AdminContactMessages() {
                         {selected.resolved_at ? <RotateCcw className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                         {selected.resolved_at ? 'Reopen' : 'Mark resolved'}
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(true)}
+                        aria-label={`Delete message from ${selected.name}`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-danger-50 px-3 py-1 text-xs font-bold text-danger-600 transition-colors hover:bg-danger-100"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
+                      </button>
                     </div>
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-primary-800">{selected.message}</p>
@@ -292,6 +324,15 @@ export function AdminContactMessages() {
           </section>
         </div>
       </PortalLayout>
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete this message?"
+        description={selected ? `The message from ${selected.name} and its full reply thread will be permanently removed. This action cannot be undone.` : ''}
+        confirmLabel="Delete"
+        busy={deleting}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={() => void deleteSelected()}
+      />
       <ToastContainer toasts={toasts} onDismiss={(id) => setToasts((current) => current.filter((item) => item.id !== id))} />
     </>
   );
