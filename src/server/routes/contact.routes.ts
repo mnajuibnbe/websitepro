@@ -31,9 +31,11 @@ export const createContactHandler = (deps: ContactDependencies) => async (req: R
   const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
   const topic = normalizeTopic(req.body?.topic);
 
-  if (name.length < 1 || name.length > 200) { res.status(400).json({ error: 'Enter your full name.' }); return; }
+  if (name.length < 1) { res.status(400).json({ error: 'Enter your full name.' }); return; }
+  if (name.length > 200) { res.status(400).json({ error: 'Full name is too long (200 characters max).' }); return; }
   if (!EMAIL_PATTERN.test(email) || email.length > 320) { res.status(400).json({ error: 'Enter a valid email address.' }); return; }
-  if (message.length < 1 || message.length > 5000) { res.status(400).json({ error: 'Enter a message.' }); return; }
+  if (message.length < 1) { res.status(400).json({ error: 'Enter a message.' }); return; }
+  if (message.length > 5000) { res.status(400).json({ error: 'Message is too long (5000 characters max).' }); return; }
   if (phoneRaw.length > 40) { res.status(400).json({ error: 'Phone number is too long.' }); return; }
   const phone = phoneRaw.length > 0 ? phoneRaw : null;
 
@@ -98,7 +100,8 @@ export const createContactReplyHandler = (deps: ContactDependencies) => async (r
   if (!UUID_PATTERN.test(submissionId)) { res.status(400).json({ error: 'Invalid submission ID.' }); return; }
 
   const messageHtml = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
-  if (visibleHtmlLength(messageHtml) < 1 || messageHtml.length > 10000) { res.status(400).json({ error: 'Enter a reply message.' }); return; }
+  if (visibleHtmlLength(messageHtml) < 1) { res.status(400).json({ error: 'Enter a reply message.' }); return; }
+  if (messageHtml.length > 10000) { res.status(400).json({ error: 'Reply is too long (10000 characters max).' }); return; }
 
   const { data: submissionRow, error: fetchError } = await admin
     .from('contact_submissions')

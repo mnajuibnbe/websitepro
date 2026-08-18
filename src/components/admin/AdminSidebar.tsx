@@ -11,6 +11,9 @@ interface AdminSidebarProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
+/** Dispatched by AdminContactMessages whenever a read/unread or delete action changes the unread count, so this badge doesn't wait for a route change to catch up. */
+export const CONTACT_UNREAD_CHANGED_EVENT = 'contact-messages:unread-changed';
+
 export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
   const { logout, user } = useAuth();
   const { close, currentPath, isDrawerInteractive } = useMobileDrawerLifecycle({ authSessionKey: user?.id, isOpen, setIsOpen });
@@ -23,10 +26,20 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     supabase.rpc('admin_list_pending_payment_submissions').then(({ data }) => {
       if (!cancelled) setPendingPaymentCount(Array.isArray(data) ? data.length : 0);
     });
-    supabase.rpc('admin_count_unread_contact_submissions').then(({ data }) => {
-      if (!cancelled) setUnreadContactCount(typeof data === 'number' ? data : 0);
-    });
     return () => { cancelled = true; };
+  }, [user?.role, currentPath]);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    let cancelled = false;
+    const refreshUnreadContactCount = () => {
+      supabase.rpc('admin_count_unread_contact_submissions').then(({ data }) => {
+        if (!cancelled) setUnreadContactCount(typeof data === 'number' ? data : 0);
+      });
+    };
+    refreshUnreadContactCount();
+    window.addEventListener(CONTACT_UNREAD_CHANGED_EVENT, refreshUnreadContactCount);
+    return () => { cancelled = true; window.removeEventListener(CONTACT_UNREAD_CHANGED_EVENT, refreshUnreadContactCount); };
   }, [user?.role, currentPath]);
 
   const navItems = user?.role === 'admin' ? [

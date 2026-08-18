@@ -131,6 +131,7 @@ export function ContactPage() {
                       <input
                         type="text"
                         required
+                        maxLength={200}
                         value={form.name}
                         onChange={updateField('name')}
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
@@ -141,6 +142,7 @@ export function ContactPage() {
                       <label className="block text-sm font-bold text-primary-900 mb-2">Phone Number</label>
                       <input
                         type="tel"
+                        maxLength={40}
                         value={form.phone}
                         onChange={updateField('phone')}
                         className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
@@ -182,6 +184,7 @@ export function ContactPage() {
                     <textarea
                       required
                       rows={4}
+                      maxLength={5000}
                       value={form.message}
                       onChange={updateField('message')}
                       className="block w-full px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors resize-none"
