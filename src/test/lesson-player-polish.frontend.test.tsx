@@ -5,6 +5,7 @@ import { CourseLearningHeader } from '../components/player/CourseLearningHeader'
 import { CourseSidebar } from '../components/player/CourseSidebar';
 import { LessonNavigation } from '../components/player/LessonNavigation';
 import { VideoPlayer } from '../components/video/VideoPlayer';
+import { ExternalLinkLessonRenderer } from '../components/player/ExternalLinkLessonRenderer';
 import { renderFrontend } from './renderFrontend';
 
 const lesson = { id: 'lesson-1', title: 'Welcome', type: 'video', content_type: 'video', section_id: 'section-1', order_index: 0 } as Lesson;
@@ -45,4 +46,19 @@ test('playback-only video controls omit seeking, volume, and fullscreen actions'
   assert.match(markup, /aria-label="Play video"/);
   assert.doesNotMatch(markup, /type="range"/);
   assert.doesNotMatch(markup, /Mute video|Unmute video|fullscreen/);
+});
+
+test('external-link lesson renders its resource URL as an actionable link honoring the new-tab preference', () => {
+  const withResource = renderFrontend(<ExternalLinkLessonRenderer title="Reading list" url="https://example.com/qa-resource" openInNewTab />);
+  assert.match(withResource, /href="https:\/\/example\.com\/qa-resource"/);
+  assert.match(withResource, /target="_blank"/);
+  assert.match(withResource, /rel="noreferrer"/);
+  assert.match(withResource, /Open resource/);
+
+  const sameTab = renderFrontend(<ExternalLinkLessonRenderer title="Reading list" url="https://example.com/qa-resource" />);
+  assert.doesNotMatch(sameTab, /target="_blank"/);
+
+  const missing = renderFrontend(<ExternalLinkLessonRenderer title="Reading list" url={null} />);
+  assert.match(missing, /Resource unavailable/);
+  assert.doesNotMatch(missing, /<a /);
 });

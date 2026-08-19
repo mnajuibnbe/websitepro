@@ -10,6 +10,7 @@ import { CourseLearningHeader } from '../components/player/CourseLearningHeader'
 import { CourseSidebar } from '../components/player/CourseSidebar';
 import { VideoLessonRenderer } from '../components/player/VideoLessonRenderer';
 import { TextLessonRenderer } from '../components/player/TextLessonRenderer';
+import { ExternalLinkLessonRenderer } from '../components/player/ExternalLinkLessonRenderer';
 import { QuizLessonRenderer } from '../components/player/QuizLessonRenderer';
 import { AssignmentLessonRenderer } from '../components/player/AssignmentLessonRenderer';
 import { PdfLessonRenderer } from '../components/player/PdfLessonRenderer';
@@ -499,6 +500,8 @@ export function LessonPlayer() {
               <AssignmentLessonRenderer lessonId={currentLesson.id} />
             ) : currentLesson.content_type === 'pdf' || currentLesson.lesson_type === 'pdf' ? (
               <PdfLessonRenderer lessonId={currentLesson.id} title={currentLesson.title} />
+            ) : currentLesson.content_type === 'external_link' || currentLesson.lesson_type === 'external_link' ? (
+              <ExternalLinkLessonRenderer title={currentLesson.title} url={currentLesson.content_url ?? null} openInNewTab={currentLesson.open_in_new_tab} />
             ) : currentLesson.type === 'video' ? (
               <VideoLessonRenderer
                 lessonId={currentLesson.id}
