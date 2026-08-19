@@ -151,7 +151,11 @@ export async function fetchReceivedEmail(emailId: string): Promise<ReceivedEmail
   const response = await fetch(`${RESEND_RECEIVING_API_URL}/${encodeURIComponent(emailId)}`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    console.error('[Email] failed to fetch received email', { emailId, status: response.status, body: body.slice(0, 500) });
+    return null;
+  }
 
   const data = await response.json() as Partial<ReceivedEmail> & { to?: unknown; cc?: unknown; attachments?: unknown };
   return {
