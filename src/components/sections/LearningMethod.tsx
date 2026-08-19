@@ -1,31 +1,15 @@
-import { ArrowRight, BookOpenCheck, FlaskConical, ScanSearch } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { usePrimaryDiplomaOffer } from '../../hooks/useHomepageMarketing';
+import { usePrimaryDiplomaOffer, useHomepageLearningMethodContent } from '../../hooks/useHomepageMarketing';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { Reveal } from '../ui/Reveal';
-
-const curriculum = [
-  {
-    title: 'Skin layers and product targets',
-    description: 'Evaluate products intended for the dermis and hypodermis against skin structure.',
-    icon: ScanSearch,
-  },
-  {
-    title: 'Hyaluronic acid by molecular size',
-    description: 'Understand how molecular size changes penetration, effect, and the claims a formula can reasonably make.',
-    icon: FlaskConical,
-  },
-  {
-    title: 'From ingredient science to product comparison',
-    description: 'Use the scientific foundation to compare finished products by what they actually contain.',
-    icon: BookOpenCheck,
-  },
-];
+import { resolveHomepageIcon } from '../../lib/homepageIcons';
 
 export function LearningMethod() {
   const navigate = useNavigate();
   const { ctaText, coursePath } = usePrimaryDiplomaOffer();
+  const { data: content } = useHomepageLearningMethodContent();
 
   return (
     <section className="bg-primary-50 py-section-sm md:py-section">
@@ -33,9 +17,9 @@ export function LearningMethod() {
         <div className="grid gap-12 lg:grid-cols-12 lg:items-start lg:gap-16">
           <div className="text-center lg:col-span-4 lg:text-left">
             <Reveal>
-              <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">Featured curriculum</p>
-              <h2 className="mt-3 text-balance font-display text-3xl font-semibold leading-tight text-primary-900 md:text-4xl">Inside this featured course</h2>
-              <p className="mx-auto mt-5 max-w-sm text-pretty leading-relaxed text-primary-600 lg:mx-0">Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.</p>
+              <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">{content.eyebrowText}</p>
+              <h2 className="mt-3 text-balance font-display text-3xl font-semibold leading-tight text-primary-900 md:text-4xl">{content.heading}</h2>
+              <p className="mx-auto mt-5 max-w-sm text-pretty leading-relaxed text-primary-600 lg:mx-0">{content.subtext}</p>
               <Button variant="secondary" className="mt-7 w-full px-6 sm:w-auto" onClick={() => navigate(coursePath)}>
                 {ctaText} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
@@ -47,7 +31,9 @@ export function LearningMethod() {
                 order, and replaces the decorative connector line that never
                 lined up with the icon centres. */}
             <ol className="grid gap-8 lg:grid-cols-3">
-              {curriculum.map(({ title, description, icon: Icon }, index) => (
+              {content.curriculum.map(({ title, description, icon: iconKey }, index) => {
+                const Icon = resolveHomepageIcon(iconKey);
+                return (
                 <Reveal key={title} delay={index * 0.06} as="li" className="border-t border-primary-200 pt-6">
                   <div className="flex items-center gap-3">
                     <span className="flex h-12 w-12 flex-none items-center justify-center rounded-card border border-accent-100 bg-white text-accent-700 shadow-sm">
@@ -58,7 +44,8 @@ export function LearningMethod() {
                   <h3 className="mt-5 text-balance text-lg font-bold text-primary-900">{title}</h3>
                   <p className="mt-2 text-pretty leading-relaxed text-primary-600">{description}</p>
                 </Reveal>
-              ))}
+                );
+              })}
             </ol>
           </div>
         </div>

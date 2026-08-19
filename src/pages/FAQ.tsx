@@ -3,14 +3,14 @@ import { HelpCircle, ChevronDown } from 'lucide-react';
 import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { PageContainer } from '../components/layout/PageContainer';
-import { faqEntries } from '../lib/faqContent';
+import { useHomepageFaqEntries } from '../hooks/useHomepageMarketing';
 
 export function FAQ() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const faqs = faqEntries;
+  const { data: faqs } = useHomepageFaqEntries();
 
   return (
     <div className="min-h-screen bg-primary-50 font-sans" dir="ltr">
@@ -28,14 +28,14 @@ export function FAQ() {
           </div>
 
           <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={idx} className="group bg-white rounded-2xl border border-primary-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+            {faqs.map((faq) => (
+              <details key={faq.id} className="group bg-white rounded-2xl border border-primary-200 shadow-sm [&_summary::-webkit-details-marker]:hidden">
                 <summary className="flex items-center justify-between p-6 cursor-pointer font-bold text-lg text-primary-900">
-                  {faq.q}
+                  {faq.question}
                   <ChevronDown className="w-5 h-5 text-primary-400 group-open:rotate-180 transition-transform" />
                 </summary>
                 <div className="px-6 pb-6 text-primary-600 leading-relaxed border-t border-primary-50 pt-4">
-                  {faq.a}
+                  {faq.answer}
                 </div>
               </details>
             ))}

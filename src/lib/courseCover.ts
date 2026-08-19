@@ -14,7 +14,7 @@ export function coverCrop(sourceWidth:number,sourceHeight:number,targetWidth:num
   const height=sourceWidth/targetRatio;return{x:0,y:(sourceHeight-height)/2,width:sourceWidth,height};
 }
 
-function canvasBlob(canvas:HTMLCanvasElement,quality:number):Promise<Blob>{return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('This browser could not optimize the image.')),'image/webp',quality));}
+export function canvasBlob(canvas:HTMLCanvasElement,quality:number):Promise<Blob>{return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('This browser could not optimize the image.')),'image/webp',quality));}
 
 /** Shared by course covers and blog covers -- same crop/downscale/re-encode budget, different target dimensions. */
 export interface CoverImageBudget { width: number; height: number; maxBytes: number; minWidth: number; minHeight: number; }
