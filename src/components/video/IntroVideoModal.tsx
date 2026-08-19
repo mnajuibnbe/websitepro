@@ -61,8 +61,8 @@ export function IntroVideoModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-primary-900/85 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="secure-video-title" aria-describedby="secure-video-description" className="flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-primary-200 bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-5xl sm:rounded-3xl" onMouseDown={(event) => event.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-900/85 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="secure-video-title" aria-describedby="secure-video-description" className="flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-2xl sm:max-w-5xl" onMouseDown={(event) => event.stopPropagation()}>
         <header className="flex flex-none items-start justify-between gap-3 border-b border-primary-100 px-4 py-3 sm:px-6 sm:py-5">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-eyebrow text-accent-700">{eyebrow}</p>
