@@ -11,21 +11,13 @@ import { lazyNamed } from './lib/lazyNamed';
 import { LocaleProvider } from './contexts/LocaleContext';
 import { FEATURE_FLAGS } from './config/featureFlags';
 import { trackPageView } from './lib/analytics';
+import { PUBLIC_PAGES } from './config/publicPages';
 
-const Home = lazyNamed(() => import('./pages/Home'), 'Home');
-const About = lazyNamed(() => import('./pages/About'), 'About');
-const FAQ = lazyNamed(() => import('./pages/FAQ'), 'FAQ');
-const CoursesListing = lazyNamed(() => import('./pages/CoursesListing'), 'CoursesListing');
 const CourseDetail = lazyNamed(() => import('./pages/CourseDetail'), 'CourseDetail');
-const Blog = lazyNamed(() => import('./pages/Blog'), 'Blog');
 const BlogPost = lazyNamed(() => import('./pages/BlogPost'), 'BlogPost');
 const LoginPage = lazyNamed(() => import('./pages/LoginPage'), 'LoginPage');
 const ForgotPassword = lazyNamed(() => import('./pages/ForgotPassword'), 'ForgotPassword');
 const RegisterPage = lazyNamed(() => import('./pages/RegisterPage'), 'RegisterPage');
-const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
-const PrivacyPolicy = lazyNamed(() => import('./pages/PrivacyPolicy'), 'PrivacyPolicy');
-const Terms = lazyNamed(() => import('./pages/Terms'), 'Terms');
-const RefundPolicy = lazyNamed(() => import('./pages/RefundPolicy'), 'RefundPolicy');
 const UnauthorizedPage = lazyNamed(() => import('./pages/UnauthorizedPage'), 'UnauthorizedPage');
 const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPage');
 const UpdatePassword = lazyNamed(() => import('./pages/UpdatePassword'), 'UpdatePassword');
@@ -82,21 +74,15 @@ function AppContent() {
 
   return (
     <><PageMeta /><Suspense fallback={<RouteFallback />}><Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/courses" element={<CoursesListing />} />
+      {/* Public Routes — static pages are registered once in src/config/publicPages.ts */}
+      {PUBLIC_PAGES.map(({ path, component: Component }) => (
+        <Route key={path} path={path} element={<Component />} />
+      ))}
       <Route path="/course/:id" element={<CourseDetail />} />
-      <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/login" element={<RequireGuest><LoginPage /></RequireGuest>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/register" element={<RequireGuest><RegisterPage /></RequireGuest>} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* Authenticated Routes (Students, Instructors, Admins) */}

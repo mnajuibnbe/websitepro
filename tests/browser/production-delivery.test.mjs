@@ -20,7 +20,7 @@ async function waitForPreview(process) {
   throw new Error('Timed out waiting for Vite preview');
 }
 
-test('serves the production SPA entry point and its browser bundle', async t => {
+test('serves the prerendered homepage and its browser bundle', async t => {
   const preview = spawn(
     process.execPath,
     ['node_modules/vite/bin/vite.js', 'preview', '--host', host, '--port', String(port), '--strictPort'],
@@ -37,7 +37,14 @@ test('serves the production SPA entry point and its browser bundle', async t => 
   const html = await response.text();
 
   assert.match(response.headers.get('content-type') ?? '', /text\/html/);
-  assert.match(html, /<div id="root"><\/div>/);
+  // scripts/prerender.mjs bakes real, crawler-facing homepage markup into
+  // dist/index.html at build time (not the empty CSR shell), and fails the
+  // build if a route's snapshot is the app's own error boundary instead of
+  // real content — assert both properties here so a regression in either
+  // shows up as a test failure instead of a silently broken production page.
+  assert.doesNotMatch(html, /<div id="root"><\/div>/, 'homepage should ship prerendered content, not an empty CSR shell');
+  assert.doesNotMatch(html, /data-app-error-boundary="true"/, 'homepage snapshot should not be the app error boundary fallback');
+  assert.match(html, /<div id="root">\s*<div/, 'homepage should contain real prerendered markup inside #root');
 
   const scriptPath = html.match(/<script[^>]+src="([^"]+)"/)?.[1];
   assert.ok(scriptPath, 'production HTML should reference a browser entry bundle');
