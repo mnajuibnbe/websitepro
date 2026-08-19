@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 import { chromium } from 'playwright';
+import { PUBLIC_PAGES } from '../src/config/publicPages.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = join(root, 'dist');
@@ -52,7 +53,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const resolvedSupabaseUrl = supabaseUrl.startsWith('http') ? supabaseUrl : `https://${supabaseUrl}.supabase.co`;
 const supabase = createClient(resolvedSupabaseUrl, supabaseAnonKey);
 
-const STATIC_ROUTES = ['/', '/about', '/contact', '/faq', '/privacy', '/terms', '/refund-policy', '/courses', '/blog'];
+const STATIC_ROUTES = PUBLIC_PAGES.map((page) => page.path);
 
 // Third-party beacons we don't want firing (and polluting real analytics/
 // error dashboards) during a build-time crawl, and that could otherwise
@@ -135,6 +136,9 @@ async function launchBrowser() {
   }
 }
 
+const MAX_SNAPSHOT_ATTEMPTS = 3;
+const SNAPSHOT_RETRY_DELAY_MS = 1_000;
+
 async function snapshotRoute(context, route) {
   const page = await context.newPage();
   try {
@@ -144,11 +148,36 @@ async function snapshotRoute(context, route) {
     await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
 
     const rawHtml = await page.content();
+    // A transient failure during the crawl (a dropped connection mid dynamic-import,
+    // a slow API call outracing the waits above, etc.) trips the app's own
+    // AppErrorBoundary. Without this check, that "Application error" screen gets
+    // silently written to dist/ as the permanent, crawler-facing snapshot for the
+    // route, and the build reports success. Retry instead of shipping that.
+    if (rawHtml.includes('data-app-error-boundary="true"')) {
+      throw new Error(`${route} rendered the app's error boundary instead of real content (likely a transient load failure during the crawl)`);
+    }
+
     const html = rawHtml.split(previewOrigin).join(siteUrl);
     return html;
   } finally {
     await page.close();
   }
+}
+
+async function snapshotRouteWithRetries(context, route) {
+  let lastError;
+  for (let attempt = 1; attempt <= MAX_SNAPSHOT_ATTEMPTS; attempt += 1) {
+    try {
+      return await snapshotRoute(context, route);
+    } catch (error) {
+      lastError = error;
+      if (attempt < MAX_SNAPSHOT_ATTEMPTS) {
+        process.stdout.write(`retry ${attempt}/${MAX_SNAPSHOT_ATTEMPTS - 1} ... `);
+        await new Promise((resolve) => setTimeout(resolve, SNAPSHOT_RETRY_DELAY_MS));
+      }
+    }
+  }
+  throw new Error(`Failed to prerender ${route} after ${MAX_SNAPSHOT_ATTEMPTS} attempts: ${lastError.message}`);
 }
 
 async function main() {
@@ -204,7 +233,7 @@ async function main() {
 
     for (const route of routes) {
       process.stdout.write(`Prerendering ${route} ... `);
-      const html = await snapshotRoute(context, route);
+      const html = await snapshotRouteWithRetries(context, route);
       snapshots.push({ route, html });
       console.log('done');
     }

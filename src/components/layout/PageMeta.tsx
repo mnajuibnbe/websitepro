@@ -1,21 +1,20 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { PUBLIC_PAGES } from '../../config/publicPages';
 
 export const SITE_NAME = 'Tutiba';
 export const DEFAULT_OG_IMAGE_PATH = '/images/tutiba-instructor-logo.png';
 
+function exactPathRegex(path: string): RegExp {
+  const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${escaped}/?$`);
+}
+
 const metadata: Array<{ match: RegExp; title: string; description: string; robots?: string; type?: 'website' | 'article' }> = [
-  { match: /^\/$/, title: 'Professional Cosmeceutical Education', description: 'Build practical, evidence-based cosmeceutical expertise with Tutiba.' },
-  { match: /^\/courses/, title: 'Cosmeceutical Courses', description: 'Explore professional courses in skincare and cosmeceutical practice.' },
+  // Static public pages — registered once in src/config/publicPages.ts.
+  ...PUBLIC_PAGES.map(({ path, title, description }) => ({ match: exactPathRegex(path), title, description })),
   { match: /^\/course\//, title: 'Course Details', description: 'Review the curriculum, instructor, outcomes, and enrollment details.' },
-  { match: /^\/about/, title: 'About Tutiba', description: 'Learn about Tutiba’s mission and approach to professional education.' },
-  { match: /^\/faq/, title: 'Frequently Asked Questions', description: 'Find answers about Tutiba courses, enrollment, payments, and certificates.' },
   { match: /^\/blog\//, title: 'Cosmeceutical Insights', description: 'Read evidence-based insights for cosmeceutical professionals.', type: 'article' },
-  { match: /^\/blog/, title: 'Tutiba Blog', description: 'Research and practical guidance for cosmeceutical professionals.' },
-  { match: /^\/contact/, title: 'Contact Tutiba', description: 'Contact the Tutiba support team for course and account assistance.' },
-  { match: /^\/privacy/, title: 'Privacy Policy', description: 'Learn how Tutiba handles and protects personal information.' },
-  { match: /^\/terms/, title: 'Terms of Service', description: 'Review the terms that apply when using Tutiba.' },
-  { match: /^\/refund-policy/, title: 'Refund Policy', description: 'Review Tutiba’s refund and cancellation policy for digital courses.' },
   { match: /^\/login/, title: 'Sign In', description: 'Sign in to continue learning with Tutiba.', robots: 'noindex, nofollow' },
   { match: /^\/register/, title: 'Create an Account', description: 'Create your Tutiba learning account.', robots: 'noindex, nofollow' },
   { match: /^\/forgot-password|^\/update-password/, title: 'Account Recovery', description: 'Recover access to your Tutiba account.', robots: 'noindex, nofollow' },

@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { PUBLIC_PAGES } from '../src/config/publicPages.ts';
+import { buildSitemapXml } from '../src/lib/sitemap.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -44,42 +46,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const resolvedSupabaseUrl = supabaseUrl.startsWith('http') ? supabaseUrl : `https://${supabaseUrl}.supabase.co`;
 const supabase = createClient(resolvedSupabaseUrl, supabaseAnonKey);
 
-const STATIC_PAGES = [
-  { path: '/', changefreq: 'weekly', priority: '1.0' },
-  { path: '/courses', changefreq: 'daily', priority: '0.9' },
-  { path: '/blog', changefreq: 'daily', priority: '0.7' },
-  { path: '/about', changefreq: 'monthly', priority: '0.5' },
-  { path: '/faq', changefreq: 'monthly', priority: '0.5' },
-  { path: '/contact', changefreq: 'monthly', priority: '0.4' },
-  { path: '/privacy', changefreq: 'yearly', priority: '0.2' },
-  { path: '/terms', changefreq: 'yearly', priority: '0.2' },
-];
-
 // Kept in sync with the noindex routes in src/components/layout/PageMeta.tsx.
 const DISALLOWED_PATHS = [
   '/dashboard', '/profile', '/my-courses', '/learn', '/lesson', '/quiz',
   '/certificate', '/checkout', '/admin', '/instructor', '/unauthorized',
   '/login', '/register', '/forgot-password', '/update-password',
 ];
-
-function xmlEscape(value) {
-  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-}
-
-function isoDate(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString().slice(0, 10);
-}
-
-function urlEntry(loc, lastmod, changefreq, priority) {
-  const lines = ['  <url>', `    <loc>${xmlEscape(loc)}</loc>`];
-  if (lastmod) lines.push(`    <lastmod>${lastmod}</lastmod>`);
-  if (changefreq) lines.push(`    <changefreq>${changefreq}</changefreq>`);
-  if (priority) lines.push(`    <priority>${priority}</priority>`);
-  lines.push('  </url>');
-  return lines.join('\n');
-}
 
 async function main() {
   const [{ data: courses, error: coursesError }, { data: posts, error: postsError }] = await Promise.all([
@@ -91,12 +63,12 @@ async function main() {
   if (postsError) throw postsError;
 
   const entries = [
-    ...STATIC_PAGES.map((page) => urlEntry(`${siteUrl}${page.path}`, null, page.changefreq, page.priority)),
-    ...(courses || []).map((course) => urlEntry(`${siteUrl}/course/${course.id}`, isoDate(course.updated_at), 'weekly', '0.8')),
-    ...(posts || []).map((post) => urlEntry(`${siteUrl}/blog/${post.slug}`, isoDate(post.updated_at), 'monthly', '0.6')),
+    ...PUBLIC_PAGES.map((page) => ({ path: page.path, changefreq: page.changefreq, priority: page.priority })),
+    ...(courses || []).map((course) => ({ path: `/course/${course.id}`, updatedAt: course.updated_at, changefreq: 'weekly', priority: '0.8' })),
+    ...(posts || []).map((post) => ({ path: `/blog/${post.slug}`, updatedAt: post.updated_at, changefreq: 'monthly', priority: '0.6' })),
   ];
 
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+  const sitemap = buildSitemapXml(siteUrl, entries);
 
   const robots = [
     'User-agent: *',
@@ -113,7 +85,7 @@ async function main() {
   await writeFile(join(distDir, 'robots.txt'), robots);
 
   console.log(
-    `Generated sitemap.xml (${STATIC_PAGES.length} static, ${(courses || []).length} courses, ${(posts || []).length} posts) and robots.txt for ${siteUrl}`,
+    `Generated sitemap.xml (${PUBLIC_PAGES.length} static, ${(courses || []).length} courses, ${(posts || []).length} posts) and robots.txt for ${siteUrl}`,
   );
 }
 
