@@ -1,20 +1,15 @@
-import { ArrowRight, BookOpenCheck, Laptop, Microscope, PlayCircle, RefreshCw, UsersRound } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../layout/PageContainer';
 import { Button } from '../ui/Button';
 import { Reveal } from '../ui/Reveal';
-
-const features = [
-  { title: 'Evidence-Based', description: 'Built on published research and clear reasoning, explained without sales language.', icon: Microscope },
-  { title: 'Expert Instructors', description: 'Study with specialists who connect the science to real practice.', icon: UsersRound },
-  { title: 'Free Preview Lessons', description: 'Watch a complete lesson before you enroll, so you know exactly what you are paying for.', icon: PlayCircle },
-  { title: 'Lifetime Updates', description: 'Return to your courses as lessons and supporting resources are updated.', icon: RefreshCw },
-  { title: 'Learn Anywhere', description: 'Works on desktop, tablet, and mobile, wherever you study.', icon: Laptop },
-  { title: 'Practical Focus', description: 'Build the skill to evaluate real products, using the science underneath.', icon: BookOpenCheck },
-];
+import { useHomepageWhyChooseUs } from '../../hooks/useHomepageMarketing';
+import { resolveHomepageIcon } from '../../lib/homepageIcons';
 
 export function WhyChooseUs() {
   const navigate = useNavigate();
+  const { data: content } = useHomepageWhyChooseUs();
+  const features = content.features;
   const lastRowStart = features.length - (features.length % 2 === 0 ? 2 : 1);
 
   return (
@@ -24,15 +19,15 @@ export function WhyChooseUs() {
           <div className="text-center lg:col-span-4 lg:text-left">
             <div className="lg:sticky lg:top-28">
               <Reveal>
-                <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">The Tutiba Standard</p>
+                <p className="text-sm font-bold uppercase tracking-eyebrow text-accent-700">{content.eyebrowText}</p>
                 <h2 className="mt-3 text-balance font-display text-3xl font-semibold leading-tight text-primary-900 md:text-4xl">
-                  Why professionals <span className="italic text-accent-700">choose Tutiba.</span>
+                  {content.headingPrefix} <span className="italic text-accent-700">{content.headingHighlight}</span>
                 </h2>
                 <p className="mx-auto mt-5 max-w-md text-pretty leading-relaxed text-primary-600 lg:mx-0">
-                  Courses taught by a specialist, organized into clear stages, with lifetime access.
+                  {content.subtext}
                 </p>
                 <Button variant="secondary" className="mt-8" onClick={() => navigate('/courses')}>
-                  Compare all courses <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  {content.ctaLabel} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </Reveal>
             </div>
@@ -40,7 +35,8 @@ export function WhyChooseUs() {
 
           <div className="lg:col-span-8">
             <div className="grid grid-cols-1 border-t border-primary-100 sm:grid-cols-2">
-              {features.map(({ title, description, icon: Icon }, index) => {
+              {features.map(({ title, description, icon: iconKey }, index) => {
+                const Icon = resolveHomepageIcon(iconKey);
                 const isLastRow = index >= lastRowStart;
                 const isLeftCol = index % 2 === 0;
                 return (

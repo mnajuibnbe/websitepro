@@ -1,60 +1,38 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { PlayCircle, FileText, Play } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { PageContainer } from '../layout/PageContainer';
+import { useHomepageFreeContent } from '../../hooks/useHomepageMarketing';
+import { resolveHomepageIcon } from '../../lib/homepageIcons';
+
+function isInternalPath(url: string) {
+  return url.startsWith('/');
+}
 
 export function FreeContent() {
-  const contents = [
-    {
-      id: 1,
-      type: 'Guide',
-      title: 'A Practical Guide to Building a Professional Skin-Care Routine',
-      icon: FileText,
-      image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=600&auto=format&fit=crop',
-      cta: 'Read the Guide',
-      isProminent: false
-    },
-    {
-      id: 2,
-      type: 'Video Lesson',
-      title: 'How to Evaluate Active Ingredients in Skin-Care Products',
-      icon: PlayCircle,
-      image: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=600&auto=format&fit=crop',
-      cta: 'Watch the Lesson',
-      isProminent: true
-    },
-    {
-      id: 3,
-      type: 'Learning Resource',
-      title: 'How to Read and Understand an INCI Ingredient List',
-      icon: Play,
-      image: 'https://images.unsplash.com/photo-1556228720-192a6af4e86e?q=80&w=600&auto=format&fit=crop',
-      cta: 'Read the Guide',
-      isProminent: false
-    }
-  ];
+  const navigate = useNavigate();
+  const { data: content } = useHomepageFreeContent();
 
   return (
     <section className="py-16 md:py-24 bg-primary-50 border-t border-primary-100">
       <PageContainer>
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">
-            Explore Free Learning Resources
+            {content.heading}
           </h2>
           <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-            See our teaching approach in action with practical guides and free lessons.
+            {content.subtext}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 lg:items-center">
-          {contents.map((item) => {
-            const Icon = item.icon;
+          {content.items.map((item) => {
+            const Icon = resolveHomepageIcon(item.icon);
             const isProminent = item.isProminent;
             return (
               <div
-                key={item.id}
+                key={item.title}
                 className={`bg-white rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col group ${
                   isProminent
                     ? 'border-accent-500 shadow-lg md:scale-105 z-10'
@@ -62,13 +40,13 @@ export function FreeContent() {
                 }`}
               >
                 <div className="relative aspect-[16/10] bg-primary-200 overflow-hidden">
-                  <OptimizedImage src={item.image} alt={item.title} displayWidth={600} width="600" height="338" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <OptimizedImage src={item.imageUrl} alt={item.title} displayWidth={600} width="600" height="338" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute top-4 right-4 z-10">
                     <Badge variant={isProminent ? 'accent' : 'default'} className={isProminent ? 'bg-accent-600 text-white' : 'bg-white text-primary-700'}>
-                      {item.type}
+                      {item.typeLabel}
                     </Badge>
                   </div>
-                  {item.type !== 'Learning Resource' && (
+                  {item.typeLabel !== 'Learning Resource' && (
                     <div className="absolute inset-0 bg-primary-900/20 flex items-center justify-center z-10">
                       <div className={`rounded-full bg-white/95 flex items-center justify-center backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform duration-300 ${isProminent ? 'w-16 h-16 text-accent-600' : 'w-12 h-12 text-primary-900'}`}>
                         <Icon className={`${isProminent ? 'w-8 h-8' : 'w-6 h-6'} ms-1`} />
@@ -81,8 +59,12 @@ export function FreeContent() {
                   <h3 className={`font-bold text-primary-900 mb-6 flex-grow leading-snug ${isProminent ? 'text-2xl' : 'text-xl'}`}>
                     {item.title}
                   </h3>
-                  <Button variant={isProminent ? 'primary' : 'tertiary'} className={isProminent ? 'w-full h-12 text-lg' : 'p-0 h-auto justify-start text-accent-600 hover:text-accent-700 hover:bg-transparent px-0 font-bold'}>
-                    {item.cta}
+                  <Button
+                    variant={isProminent ? 'primary' : 'tertiary'}
+                    className={isProminent ? 'w-full h-12 text-lg' : 'p-0 h-auto justify-start text-accent-600 hover:text-accent-700 hover:bg-transparent px-0 font-bold'}
+                    onClick={() => { if (isInternalPath(item.linkUrl)) navigate(item.linkUrl); }}
+                  >
+                    {item.ctaLabel}
                   </Button>
                 </div>
               </div>
@@ -91,8 +73,8 @@ export function FreeContent() {
         </div>
 
         <div className="flex justify-center mt-12 md:mt-16">
-          <Button variant="secondary" className="px-8 text-lg h-12">
-            View All Free Resources
+          <Button variant="secondary" className="px-8 text-lg h-12" onClick={() => { if (isInternalPath(content.viewAllUrl)) navigate(content.viewAllUrl); }}>
+            {content.viewAllLabel}
           </Button>
         </div>
       </PageContainer>

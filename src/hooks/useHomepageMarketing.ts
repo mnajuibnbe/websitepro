@@ -1,9 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { HomepagePreviewLesson, HomepageStats, HomepageTestimonial } from '../lib/homepageMarketing';
 import {
+  DEFAULT_FREE_CONTENT,
+  DEFAULT_HERO_CONTENT,
+  DEFAULT_INSTRUCTOR_CONTENT,
+  DEFAULT_LEARNING_METHOD_CONTENT,
+  DEFAULT_OUTCOMES_CONTENT,
+  DEFAULT_SECTION_LAYOUT,
+  DEFAULT_WHY_CHOOSE_US_CONTENT,
+} from '../lib/homepageMarketing';
+import {
   fetchHomepageTestimonials,
   fetchHomepageStats,
   fetchHomepagePreviewLessons,
+  fetchHomepageHero,
+  fetchHomepageWhyChooseUs,
+  fetchHomepageLearningMethod,
+  fetchHomepageInstructor,
+  fetchHomepageOutcomes,
+  fetchHomepageFreeContent,
+  fetchHomepageFaqEntries,
+  fetchHomepageSectionLayout,
 } from '../services/homepageMarketing.service';
 import { useCourseCatalog } from './useCourseCatalog';
 import { usePricingContext } from '../contexts/PricingContext';
@@ -67,6 +84,38 @@ export function useHomepageStats() {
 
 export function useHomepagePreviewLessons() {
   return useHomepageData<HomepagePreviewLesson[]>(fetchHomepagePreviewLessons, []);
+}
+
+export function useHomepageHero() {
+  return useHomepageData(fetchHomepageHero, DEFAULT_HERO_CONTENT);
+}
+
+export function useHomepageWhyChooseUs() {
+  return useHomepageData(fetchHomepageWhyChooseUs, DEFAULT_WHY_CHOOSE_US_CONTENT);
+}
+
+export function useHomepageLearningMethodContent() {
+  return useHomepageData(fetchHomepageLearningMethod, DEFAULT_LEARNING_METHOD_CONTENT);
+}
+
+export function useHomepageInstructor() {
+  return useHomepageData(fetchHomepageInstructor, DEFAULT_INSTRUCTOR_CONTENT);
+}
+
+export function useHomepageOutcomes() {
+  return useHomepageData(fetchHomepageOutcomes, DEFAULT_OUTCOMES_CONTENT);
+}
+
+export function useHomepageFreeContent() {
+  return useHomepageData(fetchHomepageFreeContent, DEFAULT_FREE_CONTENT);
+}
+
+export function useHomepageFaqEntries() {
+  return useHomepageData(fetchHomepageFaqEntries, []);
+}
+
+export function useHomepageSectionLayout() {
+  return useHomepageData(fetchHomepageSectionLayout, DEFAULT_SECTION_LAYOUT);
 }
 
 /** The primary diploma's enrollment CTA, priced through the same dual-currency resolver as the course catalog. */

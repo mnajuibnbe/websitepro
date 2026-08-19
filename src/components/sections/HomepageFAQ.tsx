@@ -2,9 +2,11 @@ import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageContainer } from '../layout/PageContainer';
 import { Reveal } from '../ui/Reveal';
-import { faqEntries } from '../../lib/faqContent';
+import { useHomepageFaqEntries } from '../../hooks/useHomepageMarketing';
 
 export function HomepageFAQ() {
+  const { data: faqEntries } = useHomepageFaqEntries();
+
   return (
     <section className="bg-white py-section-sm md:py-section" aria-labelledby="homepage-faq-heading">
       <PageContainer>
@@ -18,13 +20,13 @@ export function HomepageFAQ() {
 
           <Reveal delay={0.06} className="space-y-3">
             {faqEntries.map((faq, index) => (
-              <details key={faq.q} className="group rounded-panel border border-primary-200 bg-white shadow-sm transition-colors duration-200 ease-out hover:border-primary-300 open:border-primary-300 open:bg-primary-50 [&_summary::-webkit-details-marker]:hidden" open={index === 0}>
+              <details key={faq.id} className="group rounded-panel border border-primary-200 bg-white shadow-sm transition-colors duration-200 ease-out hover:border-primary-300 open:border-primary-300 open:bg-primary-50 [&_summary::-webkit-details-marker]:hidden" open={index === 0}>
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-panel p-5 font-bold text-primary-900 transition-colors duration-200 ease-out hover:text-accent-800 md:p-6">
-                  {faq.q}
+                  {faq.question}
                   <ChevronDown className="h-5 w-5 flex-none text-primary-400 transition-transform duration-200 ease-out group-open:rotate-180" aria-hidden="true" />
                 </summary>
                 <div className="border-t border-primary-200 px-5 pb-5 pt-4 text-pretty leading-relaxed text-primary-600 md:px-6 md:pb-6">
-                  {faq.a}
+                  {faq.answer}
                 </div>
               </details>
             ))}
