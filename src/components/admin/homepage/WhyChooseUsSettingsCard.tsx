@@ -29,8 +29,8 @@ export function WhyChooseUsSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.eyebrowText.trim() || !values.headingPrefix.trim() || !values.headingHighlight.trim() || !values.subtext.trim() || !values.ctaLabel.trim()) {
-      setMessage({ kind: 'error', text: 'Fill in every field before saving.' });
+    if (values.eyebrowText.trim().length < 2 || values.headingPrefix.trim().length < 2 || values.headingHighlight.trim().length < 2 || values.subtext.trim().length < 10 || values.ctaLabel.trim().length < 2) {
+      setMessage({ kind: 'error', text: 'Fill in every field (subtext needs at least 10 characters; other fields need at least 2).' });
       return;
     }
     if (values.features.some(f => !f.title.trim() || !f.description.trim())) {

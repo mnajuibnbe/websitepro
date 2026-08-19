@@ -43,8 +43,8 @@ export function FreeContentSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.heading.trim() || !values.subtext.trim() || !values.viewAllLabel.trim() || !isInternalPath(values.viewAllUrl)) {
-      setMessage({ kind: 'error', text: '"View all" link must be an internal path starting with /, and every other field must be filled in.' });
+    if (values.heading.trim().length < 2 || values.subtext.trim().length < 10 || values.viewAllLabel.trim().length < 2 || !isInternalPath(values.viewAllUrl)) {
+      setMessage({ kind: 'error', text: '"View all" link must be an internal path starting with /. Heading and button label need at least 2 characters, and subtext needs at least 10.' });
       return;
     }
     if (values.items.some(item => !item.title.trim() || !item.imageUrl.trim() || !item.ctaLabel.trim() || !isInternalPath(item.linkUrl))) {

@@ -29,8 +29,8 @@ export function LearningMethodSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.eyebrowText.trim() || !values.heading.trim() || !values.subtext.trim()) {
-      setMessage({ kind: 'error', text: 'Fill in every field before saving.' });
+    if (values.eyebrowText.trim().length < 2 || values.heading.trim().length < 2 || values.subtext.trim().length < 10) {
+      setMessage({ kind: 'error', text: 'Fill in every field (subtext needs at least 10 characters; other fields need at least 2).' });
       return;
     }
     if (values.curriculum.some(item => !item.title.trim() || !item.description.trim())) {
