@@ -29,8 +29,8 @@ export function OutcomesSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.eyebrowText.trim() || !values.headingPrefix.trim() || !values.headingHighlight.trim()) {
-      setMessage({ kind: 'error', text: 'Fill in every field before saving.' });
+    if (values.eyebrowText.trim().length < 2 || values.headingPrefix.trim().length < 2 || values.headingHighlight.trim().length < 2) {
+      setMessage({ kind: 'error', text: 'Every field needs at least 2 characters.' });
       return;
     }
     if (values.outcomes.some(item => !item.title.trim() || !item.description.trim())) {

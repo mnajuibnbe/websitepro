@@ -45,8 +45,8 @@ export function HeroSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.eyebrowText.trim() || !values.headlinePrefix.trim() || !values.headlineHighlight.trim() || !values.subtext.trim() || !values.ctaLabel.trim() || !values.videoBadgeText.trim() || !values.videoHeading.trim() || !values.videoDescription.trim() || !values.videoPlayLabel.trim()) {
-      setMessage({ kind: 'error', text: 'Fill in every field before saving.' });
+    if (values.eyebrowText.trim().length < 2 || values.headlinePrefix.trim().length < 2 || values.headlineHighlight.trim().length < 2 || values.subtext.trim().length < 10 || values.ctaLabel.trim().length < 2 || values.videoBadgeText.trim().length < 2 || values.videoHeading.trim().length < 2 || values.videoDescription.trim().length < 10 || values.videoPlayLabel.trim().length < 2) {
+      setMessage({ kind: 'error', text: 'Fill in every field (subtext and video description need at least 10 characters; other fields need at least 2).' });
       return;
     }
     if (values.trustBadges.some(badge => !badge.label.trim())) {

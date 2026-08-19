@@ -47,8 +47,8 @@ export function InstructorSettingsCard() {
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!values.eyebrowText.trim() || !values.headingPrefix.trim() || !values.headingHighlight.trim() || !values.bio.trim() || !values.instructorName.trim() || !values.experienceBadgeValue.trim() || !values.experienceBadgeLabel.trim()) {
-      setMessage({ kind: 'error', text: 'Fill in every field before saving.' });
+    if (values.eyebrowText.trim().length < 2 || values.headingPrefix.trim().length < 2 || values.headingHighlight.trim().length < 2 || values.bio.trim().length < 10 || values.instructorName.trim().length < 2 || !values.experienceBadgeValue.trim() || values.experienceBadgeLabel.trim().length < 2) {
+      setMessage({ kind: 'error', text: 'Fill in every field (bio needs at least 10 characters; other fields need at least 2).' });
       return;
     }
     if (values.credentialPills.some(p => !p.label.trim())) { setMessage({ kind: 'error', text: 'Every credential pill needs a label.' }); return; }
