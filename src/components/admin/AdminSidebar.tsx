@@ -37,9 +37,19 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         if (!cancelled) setUnreadContactCount(typeof data === 'number' ? data : 0);
       });
     };
+    // A new visitor reply arrives via a server-side webhook, not any action
+    // taken in this tab, so no in-app event fires for it. Re-checking on
+    // visibility (switching back to this tab/window) catches that case
+    // without polling on a timer.
+    const onVisible = () => { if (document.visibilityState === 'visible') refreshUnreadContactCount(); };
     refreshUnreadContactCount();
     window.addEventListener(CONTACT_UNREAD_CHANGED_EVENT, refreshUnreadContactCount);
-    return () => { cancelled = true; window.removeEventListener(CONTACT_UNREAD_CHANGED_EVENT, refreshUnreadContactCount); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(CONTACT_UNREAD_CHANGED_EVENT, refreshUnreadContactCount);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [user?.role, currentPath]);
 
   const navItems = user?.role === 'admin' ? [

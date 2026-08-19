@@ -4,6 +4,7 @@ import { MarketingNavbar } from '../components/layout/MarketingNavbar';
 import { Footer } from '../components/layout/Footer';
 import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
+import { usePricingContext } from '../contexts/PricingContext';
 
 const INITIAL_FORM_STATE = {
   name: '',
@@ -14,6 +15,12 @@ const INITIAL_FORM_STATE = {
 };
 
 export function ContactPage() {
+  const { countryGroup, isLoading: pricingLoading } = usePricingContext();
+  // Defaults to hidden until the visitor's country is confirmed, so
+  // international visitors never see a flash of Egypt-only contact
+  // details -- the same fail-safe-to-international default the dual
+  // currency pricing feature already uses.
+  const isEgypt = !pricingLoading && countryGroup === 'egypt';
   const [form, setForm] = useState(INITIAL_FORM_STATE);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -56,7 +63,6 @@ export function ContactPage() {
 
       setIsSuccess(true);
       setForm(INITIAL_FORM_STATE);
-      setTimeout(() => setIsSuccess(false), 3000);
     } catch {
       setErrorMessage('Could not reach the server. Check your connection and try again.');
     } finally {
@@ -92,16 +98,30 @@ export function ContactPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-accent-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-accent-600" />
+                {isEgypt && (
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-accent-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-6 h-6 text-accent-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-primary-900 mb-1">Phone Support</h3>
+                      <p className="text-primary-600 mb-2">Available Sunday–Thursday, 9:00 AM–5:00 PM</p>
+                      <a href="tel:+201065826509" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">+20 106 582 6509</a>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-primary-900 mb-1">Phone Support</h3>
-                    <p className="text-primary-600 mb-2">Available Sunday–Thursday, 9:00 AM–5:00 PM</p>
-                    <a href="tel:+201065826509" className="font-bold text-accent-600 hover:text-accent-700" dir="ltr">+20 106 582 6509</a>
+                )}
+
+                {isEgypt && (
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-accent-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-accent-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-primary-900 mb-1">Address</h3>
+                      <p className="text-primary-600">Cairo, Egypt</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -116,6 +136,13 @@ export function ContactPage() {
                   </div>
                   <h3 className="font-bold text-lg mb-2">Message Sent</h3>
                   <p>Thank you for contacting us. We will respond as soon as possible.</p>
+                  <button
+                    type="button"
+                    onClick={() => setIsSuccess(false)}
+                    className="mt-4 text-sm font-bold text-success-700 underline underline-offset-2 hover:text-success-800"
+                  >
+                    Send another message
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
