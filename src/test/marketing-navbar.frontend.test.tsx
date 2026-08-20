@@ -22,7 +22,7 @@ test('renders a consistent course active state and honest navigation actions', (
   const markup = renderFrontend(<AuthContext.Provider value={guestAuth}><MarketingNavbar /></AuthContext.Provider>, { route: '/course/example' });
 
   assert.match(markup, /aria-current="page"[^>]*href="\/courses"/);
-  assert.match(markup, />Login<\/a>/);
+  assert.match(markup, />Sign In<\/a>/);
   assert.doesNotMatch(markup, /aria-label="Search courses"/);
   assert.match(markup, /aria-label="Open navigation menu"/);
   assert.match(markup, /aria-controls="marketing-navigation-drawer"/);
@@ -30,11 +30,16 @@ test('renders a consistent course active state and honest navigation actions', (
   assert.doesNotMatch(markup, /Course prices|Prices shown in|Course prices shown in/);
 });
 
-test('desktop navigation exposes Home and keeps Login in the account action group', () => {
+test('desktop navigation exposes Courses, About, Blog, FAQ and keeps Sign In in the account action group', () => {
   const markup = renderFrontend(<AuthContext.Provider value={guestAuth}><MarketingNavbar /></AuthContext.Provider>, { route: '/' });
-  assert.match(markup, /aria-current="page"[^>]*href="\/"[^>]*>Home<\/a>/);
+  assert.match(markup, /href="\/courses"[^>]*>Courses<\/a>/);
+  assert.match(markup, /href="\/about"[^>]*>About<\/a>/);
+  assert.match(markup, /href="\/blog"[^>]*>Blog<\/a>/);
+  assert.match(markup, /href="\/faq"[^>]*>FAQ<\/a>/);
+  assert.doesNotMatch(markup, />Home<\/a>/);
+  assert.doesNotMatch(markup, />Contact<\/a>/);
   assert.match(markup, /lg:justify-end/);
-  assert.match(markup, />Login<\/a>/);
+  assert.match(markup, />Sign In<\/a>/);
 });
 
 test('uses a solid header away from the homepage', () => {

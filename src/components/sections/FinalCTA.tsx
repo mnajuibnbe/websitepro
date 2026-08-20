@@ -1,21 +1,19 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, ShieldCheck } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { PageContainer } from '../layout/PageContainer';
 import { IntroVideoModal } from '../video/IntroVideoModal';
 import { Reveal } from '../ui/Reveal';
-import { useHomepagePreviewLessons, usePrimaryDiplomaOffer } from '../../hooks/useHomepageMarketing';
+import { useHomepagePreviewLessons } from '../../hooks/useHomepageMarketing';
 
 export function FinalCTA() {
   const navigate = useNavigate();
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const { data: previewLessons } = useHomepagePreviewLessons();
-  const { ctaText, coursePath } = usePrimaryDiplomaOffer();
   const previewLesson = previewLessons[0];
   const closeIntro = useCallback(() => setIsIntroOpen(false), []);
   return (
-    <section className="relative overflow-hidden bg-primary-900 py-section-lg text-center text-white md:py-section-xl">
+    <section className="relative overflow-hidden bg-primary-900 py-12 text-center text-white md:py-16">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.25] [mask-image:radial-gradient(50%_50%_at_50%_0%,black,transparent)]"
@@ -30,28 +28,27 @@ export function FinalCTA() {
         </svg>
       </div>
       <PageContainer className="relative">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-3xl">
           <Reveal>
-            <h2 className="mb-6 text-balance font-display text-4xl font-semibold leading-tight text-white md:text-6xl">
-              Start <span className="italic text-accent-300">with Part 1.</span>
+            <h2 className="mb-3 text-balance text-3xl font-bold leading-tight text-white md:text-4xl">
+              Ready to start?
             </h2>
-            <p className="mx-auto mb-10 max-w-2xl text-pretty text-lg leading-relaxed text-primary-300 md:text-xl">
-              Six published lessons cover skin structure, hyaluronic acid, and real product evaluation.
+            <p className="mx-auto mb-7 max-w-2xl text-pretty leading-relaxed text-primary-300 md:text-lg">
+              Browse the courses, preview a lesson, and choose the one that fits you.
             </p>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button variant="primary" onClick={() => navigate(coursePath)} className="h-14 border-none bg-accent-500 px-8 text-lg text-primary-900 shadow-lg shadow-accent-500/20 hover:bg-accent-400 hover:shadow-xl">
-                {ctaText}
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Button variant="primary" onClick={() => navigate('/courses')} className="h-12 border-none bg-accent-500 px-7 text-base text-primary-900 shadow-lg shadow-accent-500/20 hover:bg-accent-400 hover:shadow-xl">
+                Browse Courses
               </Button>
-              <Button variant="secondary" disabled={!previewLesson} onClick={() => previewLesson && setIsIntroOpen(true)} className="h-14 border-primary-600 px-8 text-lg text-white hover:border-primary-500 hover:bg-primary-800">
-                Watch a Free Lesson
+              <Button variant="secondary" disabled={!previewLesson} onClick={() => previewLesson && setIsIntroOpen(true)} className="h-12 border-primary-600 px-7 text-base text-white hover:border-primary-500 hover:bg-primary-800">
+                Watch a Course Preview
               </Button>
             </div>
-            <div className="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-primary-700 pt-8 text-sm font-semibold text-primary-300">
-              <div className="flex items-center gap-2"><Layers className="h-5 w-5 text-accent-300" aria-hidden="true" /><span>Staged diploma structure</span></div>
-              <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-accent-300" aria-hidden="true" /><span>Secure checkout</span></div>
-            </div>
+            <p className="mt-6 text-sm font-semibold text-primary-300">
+              Courses taught in Arabic • Learn at your own pace
+            </p>
           </Reveal>
         </div>
       </PageContainer>

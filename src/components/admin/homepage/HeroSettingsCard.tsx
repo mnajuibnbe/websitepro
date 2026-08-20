@@ -76,7 +76,7 @@ export function HeroSettingsCard() {
     <form onSubmit={save} className="rounded-2xl border border-primary-200 bg-white p-6 shadow-sm md:p-8">
       <div className="mb-6 flex items-center gap-3 border-b border-primary-100 pb-5">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-50 text-accent-700"><Sparkles className="h-5 w-5" /></div>
-        <div><h2 className="font-bold text-primary-900">Hero section</h2><p className="text-sm text-primary-500">The first thing visitors see: eyebrow badge, headline, subtext, primary button, trust badges, and the welcome-video panel copy.</p></div>
+        <div><h2 className="font-bold text-primary-900">Hero section</h2><p className="text-sm text-primary-500">The first thing visitors see: eyebrow badge, headline, subtext, primary button, trust badges, and the course-preview panel copy.</p></div>
       </div>
 
       {isLoading ? <div role="status" className="flex min-h-44 items-center justify-center text-primary-500"><Loader2 className="h-7 w-7 animate-spin" /><span className="sr-only">Loading settings</span></div> : (
@@ -110,11 +110,12 @@ export function HeroSettingsCard() {
           </div>
 
           <div className="border-t border-primary-100 pt-4">
-            <p className="mb-3 text-sm font-bold text-primary-800">Welcome-video panel</p>
+            <p className="mb-1 text-sm font-bold text-primary-800">Course preview panel</p>
+            <p className="mb-3 text-xs text-primary-500">The homepage plays a real, currently-available preview lesson here — its title and course name are pulled in automatically and override the heading/description below. These fields are shown only as a badge label and as a fallback while loading or if no preview lesson is available.</p>
             <div className="space-y-4">
               <label className="block text-sm font-bold text-primary-800">Badge text<input value={values.videoBadgeText} onChange={e => setValues(c => ({ ...c, videoBadgeText: e.target.value }))} maxLength={60} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
-              <label className="block text-sm font-bold text-primary-800">Heading<input value={values.videoHeading} onChange={e => setValues(c => ({ ...c, videoHeading: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
-              <label className="block text-sm font-bold text-primary-800">Description<textarea value={values.videoDescription} onChange={e => setValues(c => ({ ...c, videoDescription: e.target.value }))} rows={2} maxLength={400} disabled={loadFailed} className="mt-2 w-full rounded-xl border border-primary-200 bg-white p-3 font-normal disabled:opacity-60" /></label>
+              <label className="block text-sm font-bold text-primary-800">Heading (fallback only)<input value={values.videoHeading} onChange={e => setValues(c => ({ ...c, videoHeading: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
+              <label className="block text-sm font-bold text-primary-800">Description (fallback only)<textarea value={values.videoDescription} onChange={e => setValues(c => ({ ...c, videoDescription: e.target.value }))} rows={2} maxLength={400} disabled={loadFailed} className="mt-2 w-full rounded-xl border border-primary-200 bg-white p-3 font-normal disabled:opacity-60" /></label>
               <label className="block text-sm font-bold text-primary-800">Play button label<input value={values.videoPlayLabel} onChange={e => setValues(c => ({ ...c, videoPlayLabel: e.target.value }))} maxLength={60} disabled={loadFailed} className="mt-2 min-h-11 w-full max-w-xs rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
             </div>
           </div>

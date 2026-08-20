@@ -94,11 +94,12 @@ export async function fetchHomepageStats(): Promise<HomepageStats> {
 export async function fetchHomepagePreviewLessons(): Promise<HomepagePreviewLesson[]> {
   const { data, error } = await supabase.rpc('get_homepage_preview_lessons');
   if (error) throw error;
-  return ((data || []) as Array<{ lesson_id: string; lesson_title: string; course_id: string; course_title: string }>).map(row => ({
+  return ((data || []) as Array<{ lesson_id: string; lesson_title: string; course_id: string; course_title: string; course_thumbnail: string | null }>).map(row => ({
     lessonId: row.lesson_id,
     lessonTitle: row.lesson_title,
     courseId: row.course_id,
     courseTitle: row.course_title,
+    courseThumbnail: row.course_thumbnail,
   }));
 }
 

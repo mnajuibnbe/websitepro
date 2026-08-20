@@ -9,6 +9,7 @@ export interface HomepagePreviewLesson {
   lessonTitle: string;
   courseId: string;
   courseTitle: string;
+  courseThumbnail: string | null;
 }
 
 export const PRIMARY_DIPLOMA_COURSE_ID = 'e2b9b9dd-693c-48d4-a3e9-8c1b2cfe80d0';
@@ -61,20 +62,20 @@ export interface HomepageHeroContent {
   videoPlayLabel: string;
 }
 export const DEFAULT_HERO_CONTENT: HomepageHeroContent = {
-  eyebrowText: 'For Skincare & Cosmeceutical Professionals',
-  headlinePrefix: 'Turn ingredient science into',
-  headlineHighlight: 'decisions you can defend.',
-  subtext: 'Structured courses in skin science and cosmeceutical ingredients, built for professionals who evaluate products and advise clients with confidence.',
-  ctaLabel: 'See Courses & Pricing',
+  eyebrowText: 'Skincare science for professionals',
+  headlinePrefix: 'Learn the science behind skincare',
+  headlineHighlight: 'and use it in real practice.',
+  subtext: 'Online courses in skin, hair and cosmetic ingredients, taught in Arabic and built for pharmacists, pharmacy students and skincare professionals.',
+  ctaLabel: 'Browse Courses',
   trustBadges: [
     { label: 'Evidence-based content', icon: 'CheckCircle2' },
     { label: 'Expert-led courses', icon: 'BookOpen' },
     { label: 'Lifetime course access', icon: 'RefreshCw' },
   ],
-  videoBadgeText: 'Welcome to Tutiba',
-  videoHeading: 'This is how Tutiba teaches.',
-  videoDescription: 'A short look at how a Tutiba lesson connects the science to a real product decision.',
-  videoPlayLabel: 'Play welcome video',
+  videoBadgeText: 'Real course preview',
+  videoHeading: 'See what a Tutiba lesson feels like.',
+  videoDescription: 'Watch a lesson from the actual course before you enroll.',
+  videoPlayLabel: 'Watch Preview',
 };
 
 export interface HomepageWhyChooseUsContent {
@@ -86,18 +87,16 @@ export interface HomepageWhyChooseUsContent {
   features: HomepageIconItem[];
 }
 export const DEFAULT_WHY_CHOOSE_US_CONTENT: HomepageWhyChooseUsContent = {
-  eyebrowText: 'The Tutiba Standard',
-  headingPrefix: 'Why professionals',
-  headingHighlight: 'choose Tutiba.',
-  subtext: 'Courses taught by a specialist, organized into clear stages, with lifetime access.',
-  ctaLabel: 'Compare all courses',
+  eyebrowText: 'Why Tutiba',
+  headingPrefix: 'A simpler way to',
+  headingHighlight: 'learn skincare science.',
+  subtext: 'Courses built around real ingredients, real products, and real practice.',
+  ctaLabel: 'Browse courses',
   features: [
-    { title: 'Evidence-Based', description: 'Built on published research and clear reasoning, explained without sales language.', icon: 'Microscope' },
-    { title: 'Expert Instructors', description: 'Study with specialists who connect the science to real practice.', icon: 'UsersRound' },
-    { title: 'Free Preview Lessons', description: 'Watch a complete lesson before you enroll, so you know exactly what you are paying for.', icon: 'PlayCircle' },
-    { title: 'Lifetime Updates', description: 'Return to your courses as lessons and supporting resources are updated.', icon: 'RefreshCw' },
-    { title: 'Learn Anywhere', description: 'Works on desktop, tablet, and mobile, wherever you study.', icon: 'Laptop' },
-    { title: 'Practical Focus', description: 'Build the skill to evaluate real products, using the science underneath.', icon: 'BookOpenCheck' },
+    { title: 'Taught in Arabic', description: 'The explanation is in Arabic, while ingredient names and professional terms stay in English.', icon: 'BookOpen' },
+    { title: 'Practical, not just theoretical', description: 'Lessons connect the science to real ingredients and products.', icon: 'Target' },
+    { title: 'Preview before you pay', description: 'Watch selected lessons from the actual course before enrolling.', icon: 'PlayCircle' },
+    { title: 'Learn at your own pace', description: 'Study when it suits you, and keep access to your course whenever you want to come back to it.', icon: 'Clock3' },
   ],
 };
 
@@ -108,13 +107,13 @@ export interface HomepageLearningMethodContent {
   curriculum: HomepageIconItem[];
 }
 export const DEFAULT_LEARNING_METHOD_CONTENT: HomepageLearningMethodContent = {
-  eyebrowText: 'Featured curriculum',
-  heading: 'Inside this featured course',
-  subtext: 'Part 1 moves from skin anatomy into hyaluronic-acid science, ingredient comparison, and product-level application.',
+  eyebrowText: "Who it's for",
+  heading: 'Built for people who want to understand skincare, not just memorize products.',
+  subtext: 'Wherever you are in your career, the courses start from the same scientific foundation.',
   curriculum: [
-    { title: 'Skin layers and product targets', description: 'Evaluate products intended for the dermis and hypodermis against skin structure.', icon: 'ScanSearch' },
-    { title: 'Hyaluronic acid by molecular size', description: 'Understand how molecular size changes penetration, effect, and the claims a formula can reasonably make.', icon: 'FlaskConical' },
-    { title: 'From ingredient science to product comparison', description: 'Use the scientific foundation to compare finished products by what they actually contain.', icon: 'BookOpenCheck' },
+    { title: 'Pharmacists', description: 'Build the scientific knowledge needed to evaluate skincare products, ingredients, and claims with greater confidence.', icon: 'ScanSearch' },
+    { title: 'Pharmacy Students & Graduates', description: 'Develop a structured foundation in skincare and cosmeceuticals beyond what you learn from brands and social media.', icon: 'FlaskConical' },
+    { title: 'Skincare & Beauty Professionals', description: 'Strengthen your understanding of ingredients, formulations, and evidence behind skincare products.', icon: 'BookOpenCheck' },
   ],
 };
 
@@ -133,8 +132,8 @@ export interface HomepageInstructorContent {
 }
 export const DEFAULT_INSTRUCTOR_CONTENT: HomepageInstructorContent = {
   eyebrowText: 'Your Instructor',
-  headingPrefix: 'Meet',
-  headingHighlight: 'your instructor.',
+  headingPrefix: 'Taught by',
+  headingHighlight: 'Dr. Aya Elbrashy',
   bio: 'Learn skin, hair, and beauty-nutrition science from an educator who has spent more than a decade turning research into decisions professionals use every day.',
   instructorName: 'Dr. Aya Elbrashy — Skin, Hair and Beauty Nutrition',
   photoUrl: '/images/tutiba-instructor-logo.png',
@@ -158,14 +157,14 @@ export interface HomepageOutcomesContent {
   outcomes: HomepageIconItem[];
 }
 export const DEFAULT_OUTCOMES_CONTENT: HomepageOutcomesContent = {
-  eyebrowText: 'Why enroll with confidence',
-  headingPrefix: 'Built so you can',
-  headingHighlight: 'learn it, then use it.',
+  eyebrowText: "What you'll get better at",
+  headingPrefix: 'Practical skills,',
+  headingHighlight: 'not just facts.',
   outcomes: [
-    { title: 'Clear course stages', description: 'Move through ordered stages, like Part 1 and Part 2, so you always know what comes next.', icon: 'Layers' },
-    { title: 'Evidence-based curriculum', description: 'Every lesson is grounded in current science and reasoned argument.', icon: 'Microscope' },
-    { title: 'Apply it immediately', description: 'Apply the science to real product evaluations and decisions you can stand behind.', icon: 'ScanSearch' },
-    { title: 'Secure enrollment', description: 'Checkout and account access are secured end-to-end.', icon: 'ShieldCheck' },
+    { title: 'Understand ingredients', description: 'Know what key ingredients do and why they are used.', icon: 'ScanSearch' },
+    { title: 'Read products better', description: 'Look beyond the front label and understand what is actually in the product.', icon: 'FileText' },
+    { title: 'Compare options', description: 'Compare products using the ingredients and the science behind them.', icon: 'Layers' },
+    { title: 'Connect science to practice', description: 'Use what you learn when looking at real skincare products and cases.', icon: 'Target' },
   ],
 };
 
@@ -232,21 +231,23 @@ export interface HomepageFaqEntry {
 export const HOMEPAGE_SECTION_KEYS = [
   'stats', 'why_choose_us', 'featured_courses', 'instructor', 'learning_method',
   'outcomes', 'testimonials', 'free_content', 'latest_articles', 'faq', 'final_cta',
+  'course_previews',
 ] as const;
 export type HomepageSectionKey = typeof HOMEPAGE_SECTION_KEYS[number];
 
 export const HOMEPAGE_SECTION_LABELS: Record<HomepageSectionKey, string> = {
   stats: 'Marketing statistics band',
-  why_choose_us: 'Why Choose Us',
+  why_choose_us: 'Why Tutiba',
   featured_courses: 'Featured courses',
   instructor: 'Instructor',
-  learning_method: 'Featured curriculum',
-  outcomes: 'Outcomes ("Why enroll with confidence")',
+  learning_method: "Audience (\"Who it's for\")",
+  outcomes: 'Learning outcomes',
   testimonials: 'Testimonials',
-  free_content: 'Free learning resources',
+  free_content: 'Free learning resources (retired from default layout)',
   latest_articles: 'Latest articles',
   faq: 'FAQ preview',
   final_cta: 'Final call to action',
+  course_previews: 'Course preview lessons',
 };
 
 export interface HomepageSectionLayoutEntry {

@@ -83,13 +83,13 @@ export function AdminHomepageSettings() {
               <form onSubmit={save} className="rounded-2xl border border-primary-200 bg-white p-6 shadow-sm md:p-8">
                 <div className="mb-6 flex items-center gap-3 border-b border-primary-100 pb-5">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-50 text-accent-700"><TrendingUp className="h-5 w-5" /></div>
-                  <div><h2 className="font-bold text-primary-900">Marketing statistics</h2><p className="text-sm text-primary-500">The historical totals shown below the hero. The labels remain fixed so the layout stays consistent; these values are intentionally separate from live database counts.</p></div>
+                  <div><h2 className="font-bold text-primary-900">Marketing statistics</h2><p className="text-sm text-primary-500">The historical totals shown below the hero. The labels remain fixed so the layout stays consistent; these values are intentionally separate from live database counts. "Courses delivered" is stored here for future use but is not currently shown on the homepage — its stats-band slot now shows the instructor's "Years of Experience" badge instead.</p></div>
                 </div>
 
                 {isLoading ? <div role="status" className="flex min-h-44 items-center justify-center text-primary-500"><Loader2 className="h-7 w-7 animate-spin" /><span className="sr-only">Loading settings</span></div> : (
                   <div className="grid gap-5 sm:grid-cols-3">
                     <StatField id="students-value" label="Students taught" value={values.studentsValue} onChange={studentsValue => setValues(current => ({ ...current, studentsValue }))} disabled={loadFailed} />
-                    <StatField id="courses-value" label="Courses delivered" value={values.coursesValue} onChange={coursesValue => setValues(current => ({ ...current, coursesValue }))} disabled={loadFailed} />
+                    <StatField id="courses-value" label="Courses delivered (not shown on homepage)" value={values.coursesValue} onChange={coursesValue => setValues(current => ({ ...current, coursesValue }))} disabled={loadFailed} />
                     <StatField id="hours-value" label="Hours of learning" value={values.learningHoursValue} onChange={learningHoursValue => setValues(current => ({ ...current, learningHoursValue }))} disabled={loadFailed} />
                   </div>
                 )}
@@ -99,12 +99,18 @@ export function AdminHomepageSettings() {
               </form>
 
               <HeroSettingsCard />
-              <WhyChooseUsSettingsCard />
               <LearningMethodSettingsCard />
-              <InstructorSettingsCard />
               <OutcomesSettingsCard />
-              <FreeContentSettingsCard />
+              <WhyChooseUsSettingsCard />
+              <InstructorSettingsCard />
               <FaqEntriesCard />
+
+              <div className="rounded-2xl border border-dashed border-primary-300 bg-primary-50 p-6 text-sm text-primary-600">
+                <p className="font-bold text-primary-800">No separate form for Courses, Course Preview Lessons, Student Reviews, Blog, or Final CTA</p>
+                <p className="mt-1">Courses and Course Preview Lessons pull entirely from your real course/lesson catalog (no manual selection). Student Reviews shows your real, moderated course reviews. Blog shows your published posts. Final CTA uses fixed copy. Use the Homepage layout card above to show, hide, or reorder any of them.</p>
+              </div>
+
+              <FreeContentSettingsCard />
             </div>
           </div>
         </PageContainer>

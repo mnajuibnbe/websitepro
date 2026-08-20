@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import { BookOpen, Home, Info, LayoutDashboard, LogIn, Mail, Menu, Newspaper, X } from 'lucide-react';
+import { BookOpen, HelpCircle, Info, LayoutDashboard, LogIn, Menu, Newspaper, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { TutibaBrand } from './TutibaBrand';
 import { PageContainer } from './PageContainer';
 
 const navigationItems = [
-  { icon: Home, label: 'Home', to: '/', matches: (pathname: string) => pathname === '/' },
   { icon: BookOpen, label: 'Courses', to: '/courses', matches: (pathname: string) => pathname.startsWith('/course') },
   { icon: Info, label: 'About', to: '/about', matches: (pathname: string) => pathname === '/about' },
   { icon: Newspaper, label: 'Blog', to: '/blog', matches: (pathname: string) => pathname.startsWith('/blog') },
-  { icon: Mail, label: 'Contact', to: '/contact', matches: (pathname: string) => pathname === '/contact' },
+  { icon: HelpCircle, label: 'FAQ', to: '/faq', matches: (pathname: string) => pathname === '/faq' },
 ] as const;
 
 export function MarketingNavbar() {
@@ -94,11 +93,11 @@ export function MarketingNavbar() {
             {isAuthenticated ? (
               <Link to="/dashboard" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Dashboard</Link>
             ) : (
-              <Link to="/login" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Login</Link>
+              <Link to="/login" className="text-primary-900 hover:text-accent-600 font-medium transition-colors">Sign In</Link>
             )}
 
             <Button variant="primary" onClick={() => navigate('/courses')}>
-              Enroll Now
+              Browse Courses
             </Button>
           </div>
 
@@ -168,13 +167,13 @@ export function MarketingNavbar() {
               {isAuthenticated ? (
                 <Link to="/dashboard" className="mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-900" onClick={() => setIsMobileMenuOpen(false)}><LayoutDashboard className="h-5 w-5 text-primary-400" /> Dashboard</Link>
               ) : (
-                <Link to="/login" className="mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-900" onClick={() => setIsMobileMenuOpen(false)}><LogIn className="h-5 w-5 text-primary-400" /> Login</Link>
+                <Link to="/login" className="mb-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-900" onClick={() => setIsMobileMenuOpen(false)}><LogIn className="h-5 w-5 text-primary-400" /> Sign In</Link>
               )}
               <Button variant="primary" className="w-full" onClick={() => {
                 navigate('/courses');
                 setIsMobileMenuOpen(false);
               }}>
-                Enroll Now
+                Browse Courses
               </Button>
             </div>
           </div>
