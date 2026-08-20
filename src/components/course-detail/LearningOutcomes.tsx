@@ -8,10 +8,10 @@ export function LearningOutcomes({ outcomes }: { outcomes: string[] }) {
   return (
     <div className="mb-12 md:mb-16">
       <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-6">
-        Learning outcomes
+        What you'll be able to do
       </h2>
       {visibleOutcomes.length === 0 ? <div className="rounded-xl border border-dashed border-accent-200 bg-accent-50 p-6 text-primary-600">Learning outcomes have not been published for this course yet.</div> : (
-        <Collapsible collapsedClassName="max-h-[460px] md:max-h-[220px]">
+        <Collapsible collapsedClassName="max-h-[460px] md:max-h-[220px]" fadeClassName="from-transparent via-transparent" expandLabel="Show all learning outcomes" collapseLabel="Show fewer learning outcomes">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             {visibleOutcomes.map((outcome, index) => (
               <div key={index} className="flex items-start gap-3">

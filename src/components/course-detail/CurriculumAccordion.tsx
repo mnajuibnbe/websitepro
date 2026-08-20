@@ -36,11 +36,11 @@ const typeIcon = (type: LessonContentType) => {
 const minutesLabel = (minutes: number) => minutes > 0 ? `${minutes} min` : null;
 
 export function CurriculumAccordion({ sections }: { sections: PublicCurriculumSection[] }) {
-  const [openSection, setOpenSection] = useState<string | null>(sections[0]?.id || null);
+  const [openSectionIds, setOpenSectionIds] = useState<Set<string>>(() => new Set(sections[0] ? [sections[0].id] : []));
   const [previewLesson, setPreviewLesson] = useState<PublicCurriculumLesson | null>(null);
   const previewDialogRef = useRef<HTMLDivElement>(null);
   const previewCloseRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => { if (!openSection && sections[0]) setOpenSection(sections[0].id); }, [openSection, sections]);
+  useEffect(() => { if (openSectionIds.size === 0 && sections[0]) setOpenSectionIds(new Set([sections[0].id])); }, [sections]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!previewLesson) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -62,26 +62,42 @@ export function CurriculumAccordion({ sections }: { sections: PublicCurriculumSe
   }, [previewLesson]);
   const lessonCount = sections.reduce((total, section) => total + Number(section.lesson_count || 0), 0);
   const totalMinutes = sections.reduce((total, section) => total + Number(section.total_minutes || 0), 0);
+  const allOpen = sections.length > 0 && sections.every(section => openSectionIds.has(section.id));
+
+  const toggleSection = (sectionId: string) => setOpenSectionIds(current => {
+    const next = new Set(current);
+    if (next.has(sectionId)) next.delete(sectionId); else next.add(sectionId);
+    return next;
+  });
 
   return <section className="mb-12 md:mb-16" aria-labelledby="curriculum-heading">
-    <div className="mb-6">
-      <h2 id="curriculum-heading" className="mb-2 text-2xl font-bold text-primary-900 md:text-3xl">Course curriculum</h2>
-      <p className="font-medium text-primary-600">{sections.length} sections · {lessonCount} lessons{totalMinutes > 0 ? ` · ${totalMinutes} min of video` : ''}</p>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 id="curriculum-heading" className="mb-2 text-2xl font-bold text-primary-900 md:text-3xl">Course curriculum</h2>
+        <p className="font-medium text-primary-600">{sections.length} sections · {lessonCount} lessons{totalMinutes > 0 ? ` · ${totalMinutes} min of video` : ''}</p>
+      </div>
+      {sections.length > 0 && <button
+        type="button"
+        onClick={() => setOpenSectionIds(allOpen ? new Set() : new Set(sections.map(section => section.id)))}
+        className="font-bold text-accent-700 hover:text-accent-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 rounded"
+      >
+        {allOpen ? 'Collapse all' : 'Expand all'}
+      </button>}
     </div>
     {sections.length === 0 ? <div className="rounded-xl border border-primary-200 bg-primary-50 p-6 text-primary-600">Curriculum details will be available soon.</div> :
-      <div className="overflow-hidden rounded-xl border border-primary-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-panel border border-primary-200 bg-white shadow-sm">
         {sections.map((section, index) => {
-          const open = openSection === section.id;
+          const open = openSectionIds.has(section.id);
           return <div key={section.id} className={index < sections.length - 1 ? 'border-b border-primary-200' : ''}>
-            <button type="button" aria-expanded={open} aria-controls={`curriculum-${section.id}`} onClick={() => setOpenSection(open ? null : section.id)} className="flex min-h-16 w-full items-center justify-between gap-4 bg-primary-50 p-5 text-left transition-colors hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500 md:p-6">
+            <button type="button" aria-expanded={open} aria-controls={`curriculum-${section.id}`} onClick={() => toggleSection(section.id)} className={`flex min-h-16 w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500 md:p-6 ${open ? 'bg-primary-100 border-s-4 border-accent-500' : 'bg-primary-50 border-s-4 border-transparent'}`}>
               <span><span className="block text-lg font-bold text-primary-900">{section.title}</span><span className="mt-1 block text-sm font-medium text-primary-500">{section.lesson_count} lessons{Number(section.total_minutes) > 0 ? ` · ${section.total_minutes} min` : ''}</span></span>
               <ChevronDown aria-hidden="true" className={`h-5 w-5 flex-none text-primary-500 transition-transform ${open ? 'rotate-180' : ''}`} />
             </button>
             {open && <div id={`curriculum-${section.id}`} className="p-2 md:p-4">
               {section.description && <p className="px-3 pb-3 text-sm text-primary-600">{section.description}</p>}
-              {section.lessons.map(lesson => { const Icon = typeIcon(lesson.content_type); return <div key={lesson.id} className="flex min-h-14 items-center justify-between gap-4 rounded-lg p-3 hover:bg-primary-50 md:p-4">
-                <span className="flex min-w-0 items-center gap-3"><span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-primary-100 text-primary-600"><Icon className="h-4 w-4" aria-hidden="true" /></span><span className="break-words font-medium text-primary-800">{lesson.title}</span></span>
-                <span className="flex flex-none items-center gap-3 text-sm text-primary-500">{minutesLabel(Number(lesson.estimated_minutes || 0)) && <span>{minutesLabel(Number(lesson.estimated_minutes))}</span>}{lesson.is_preview && lesson.video_url ? <button type="button" onClick={() => setPreviewLesson(lesson)} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-2 font-bold text-accent-700 hover:bg-accent-50 focus:outline-none focus:ring-2 focus:ring-accent-500"><PlayCircle className="h-4 w-4" /> Free preview</button> : lesson.is_preview ? <span className="font-bold text-primary-500">Preview unavailable</span> : <Lock className="h-4 w-4" aria-label="Enrollment required" />}</span>
+              {section.lessons.map(lesson => { const Icon = typeIcon(lesson.content_type); return <div key={lesson.id} className="flex flex-col gap-2 rounded-lg p-3 hover:bg-primary-50 sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:p-4">
+                <span className="flex min-w-0 items-center gap-3"><span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-primary-100 text-primary-600 sm:h-9 sm:w-9"><Icon className="h-4 w-4" aria-hidden="true" /></span><span className="break-words font-medium text-primary-800">{lesson.title}</span></span>
+                <span className="flex flex-none items-center gap-3 text-sm text-primary-500 ps-11 sm:ps-0">{minutesLabel(Number(lesson.estimated_minutes || 0)) && <span>{minutesLabel(Number(lesson.estimated_minutes))}</span>}{lesson.is_preview && lesson.video_url ? <button type="button" onClick={() => setPreviewLesson(lesson)} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-2 font-bold text-accent-700 hover:bg-accent-50 focus:outline-none focus:ring-2 focus:ring-accent-500"><PlayCircle className="h-4 w-4" /> Preview</button> : lesson.is_preview ? <span className="font-bold text-primary-500">Preview unavailable</span> : <Lock className="h-4 w-4" aria-label="Enrollment required" />}</span>
               </div>; })}
             </div>}
           </div>;
@@ -89,7 +105,7 @@ export function CurriculumAccordion({ sections }: { sections: PublicCurriculumSe
       </div>}
     {previewLesson && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-900/85 p-4 backdrop-blur-sm" onMouseDown={event => event.target === event.currentTarget && setPreviewLesson(null)}>
       <div ref={previewDialogRef} role="dialog" aria-modal="true" aria-labelledby="preview-lesson-title" aria-describedby="preview-lesson-description" className="flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-2xl sm:max-w-4xl" onMouseDown={event => event.stopPropagation()}>
-        <header className="flex flex-none items-start justify-between gap-3 border-b border-primary-100 px-4 py-3 sm:px-6 sm:py-5"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wider text-accent-700">Free preview</p><h2 id="preview-lesson-title" className="truncate text-lg font-bold text-primary-900 sm:text-xl">{previewLesson.title}</h2><p id="preview-lesson-description" className="mt-1 text-sm text-primary-500">Watch this lesson before enrolling.</p></div><button ref={previewCloseRef} type="button" onClick={() => setPreviewLesson(null)} aria-label="Close video preview" className="flex h-11 w-11 flex-none items-center justify-center rounded-full text-primary-500 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-accent-500"><X className="h-5 w-5" /></button></header>
+        <header className="flex flex-none items-start justify-between gap-3 border-b border-primary-100 px-4 py-3 sm:px-6 sm:py-5"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wider text-accent-700">Preview</p><h2 id="preview-lesson-title" className="truncate text-lg font-bold text-primary-900 sm:text-xl">{previewLesson.title}</h2><p id="preview-lesson-description" className="mt-1 text-sm text-primary-500">Watch this lesson before enrolling.</p></div><button ref={previewCloseRef} type="button" onClick={() => setPreviewLesson(null)} aria-label="Close video preview" className="flex h-11 w-11 flex-none items-center justify-center rounded-full text-primary-500 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-accent-500"><X className="h-5 w-5" /></button></header>
         <div className="min-h-0 overflow-y-auto bg-primary-900 p-0 sm:bg-white sm:p-6"><Suspense fallback={<div className="flex aspect-video items-center justify-center bg-primary-900 text-sm font-medium text-white sm:rounded-2xl">Loading video preview…</div>}><PreviewVideoRenderer lessonId={previewLesson.id} videoUrl={previewLesson.video_url || null} title={previewLesson.title} publicPreview /></Suspense></div>
         <footer className="flex flex-none justify-end border-t border-primary-100 bg-white p-3 sm:hidden"><button type="button" onClick={() => setPreviewLesson(null)} className="min-h-11 w-full rounded-xl bg-primary-100 px-5 font-bold text-primary-900">Close preview</button></footer>
       </div>

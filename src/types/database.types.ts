@@ -34,6 +34,12 @@ export interface Course {
   curriculum_highlights: string[] | null;
   home_order: number | null;
   certificate_enabled: boolean | null;
+  display_rating: number | string | null;
+  display_rating_count: number | null;
+  display_rating_source: string | null;
+  display_rating_source_url: string | null;
+  display_rating_verified_at: string | null;
+  display_students_count: number | null;
   sequential_learning: boolean | null;
   drip_enabled: boolean | null;
   discussion_enabled: boolean | null;

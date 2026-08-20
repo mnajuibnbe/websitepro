@@ -50,7 +50,7 @@ export function AdminCourseCreate() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced' | 'all_levels'>('all_levels');
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState('Arabic');
   const [priceEgp, setPriceEgp] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [coverImage, setCoverImage] = useState('');
