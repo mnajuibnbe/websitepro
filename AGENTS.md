@@ -22,6 +22,7 @@
 - For database work, re-run the relevant query plus Supabase security and performance advisors after the change.
 - For UI work, run the local site and verify the affected flow in the browser against the connected Supabase project.
 - Treat missing `SUPABASE_SERVICE_ROLE_KEY`, `STREAMING_TOKEN_SECRET`, or `GOOGLE_SERVICE_ACCOUNT_JSON` as a server-start blocker; frontend-only Vite preview may still be used when appropriate.
+- `GOOGLE_SEARCH_CONSOLE_CREDENTIALS` (separate service account from `GOOGLE_SERVICE_ACCOUNT_JSON`, "Restricted" access on the `tutiba.com` Domain property) powers the Search Console performance panels in the blog editor and course admin. It is optional, not a server-start blocker — missing/invalid credentials degrade to a "not configured" state in those panels rather than failing the request (`src/server/services/searchConsole.service.ts`).
 - At the end of every UI phase, overwrite the tracked homepage QA screenshots at exactly 390px, 768px, and 1440px in `qa-screenshots/home-mobile.png`, `qa-screenshots/home-tablet.png`, and `qa-screenshots/home-desktop.png`. For every other page changed in that phase, capture the same three widths using stable page-specific names (for example, `course-detail-mobile.png`). Never add timestamps or version suffixes; `artifacts/` remains separate and untracked.
 
 ## Deployment safety

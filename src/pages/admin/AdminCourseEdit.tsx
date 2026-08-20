@@ -16,6 +16,7 @@ import {
   Sparkle,
   Video,
   Flame,
+  TrendingUp,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/layout/PageContainer';
@@ -31,6 +32,7 @@ import { CourseCoverUpload } from '../../components/admin/course/CourseCoverUplo
 import { InstructorPicker } from '../../components/admin/course/InstructorPicker';
 import { CourseEditorGuide } from '../../components/admin/course/CourseEditorGuide';
 import { CategoryField } from '../../components/admin/course/CategoryField';
+import { CoursePerformancePanel } from '../../components/admin/course/CoursePerformancePanel';
 import { COURSE_LANGUAGES } from '../../domain/courseTaxonomy';
 import { useAuth } from '../../contexts/AuthContext';
 import { COURSE_DESCRIPTION_MIN_LENGTH, COURSE_SUMMARY_MIN_LENGTH } from '../../domain/courseReadiness';
@@ -535,6 +537,14 @@ export function AdminCourseEdit() {
                 <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
                 <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="course-trailer-video" className="mb-2 flex items-center gap-2 text-sm font-bold text-primary-900"><Video className="h-4 w-4 text-accent-600" />Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="course-trailer-video" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-accent-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-500" /><p className="mt-2 text-xs leading-relaxed text-primary-500">When empty, the sales page uses the published preview lesson. If neither is available, the cover remains a static image.</p></div>
               </div>
+
+              {/* Live Search Console data for this course's public page -- read-only, no form state. Admin-only: the server route requires role === 'admin', and instructors can also reach this page (Permission.CREATE_COURSE), so this needs the same !isInstructor gate as Catalog curation above -- otherwise an instructor's course page would render a 403 error here. */}
+              {!isInstructor && courseId && (
+                <div id="course-performance" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+                  <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-accent-600" /><span>Google Search Console performance</span></h2>
+                  <CoursePerformancePanel courseId={courseId} />
+                </div>
+              )}
 
               {/* Bottom Actions */}
               <div className="flex items-center justify-end gap-4 pt-4">

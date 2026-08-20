@@ -7,6 +7,7 @@ import { SourcesPanel } from '../components/blog/SourcesPanel';
 import { BlogSourcesList } from '../components/blog/BlogSourcesList';
 import { TopicInsightsPanel } from '../components/blog/TopicInsightsPanel';
 import { DuplicateContentPanel } from '../components/blog/DuplicateContentPanel';
+import { GooglePerformancePanel } from '../components/blog/GooglePerformancePanel';
 import type { BlogPost } from '../services/blogPosts.service';
 
 test('internal linking assistant shows a loading state before its Supabase fetch resolves', () => {
@@ -56,6 +57,26 @@ test('topic insights panel offers an explicit Analyze trigger once a topic exist
   assert.match(markup, />Analyze</);
   assert.doesNotMatch(markup, /Analyzing…/);
   assert.doesNotMatch(markup, /Questions readers may have/);
+});
+
+test('Google performance panel asks the admin to save first when the post has never been saved, even if a slug has already been auto-filled from the title', () => {
+  // Regression: SeoSidebar auto-fills `slug` from `title` before the post is ever saved
+  // (see AdminBlogPosts.tsx's Title onChange), so a non-empty slug alone does not mean a
+  // real, indexed post exists yet -- only `postId !== null` does.
+  const markup = renderFrontend(<GooglePerformancePanel postId={null} slug="draft-title-not-saved-yet" />);
+  assert.match(markup, /Save this post to see its live Google Search Console performance/);
+  assert.doesNotMatch(markup, /Loading Search Console data/);
+});
+
+test('Google performance panel asks the admin to save first when there is no slug yet either', () => {
+  const markup = renderFrontend(<GooglePerformancePanel postId={null} slug="" />);
+  assert.match(markup, /Save this post to see its live Google Search Console performance/);
+});
+
+test('Google performance panel starts loading once the post has a real id and slug', () => {
+  const markup = renderFrontend(<GooglePerformancePanel postId={42} slug="retinol-guide" />);
+  assert.match(markup, /Loading Search Console data/);
+  assert.doesNotMatch(markup, /Save this post/);
 });
 
 const makePost = (overrides: Partial<BlogPost>): BlogPost => ({

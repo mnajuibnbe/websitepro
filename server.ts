@@ -12,6 +12,7 @@ import documentRoutes from './src/server/routes/document.routes.js';
 import contactRoutes from './src/server/routes/contact.routes.js';
 import contactInboundRoutes from './src/server/routes/contact-inbound.routes.js';
 import blogInsightsRoutes from './src/server/routes/blog-insights.routes.js';
+import searchConsoleRoutes from './src/server/routes/search-console.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -42,6 +43,7 @@ app.use('/api/instructors', instructorRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/blog', blogInsightsRoutes);
+app.use('/api/search-console', searchConsoleRoutes);
 
 // Setup Vite middleware for development or static serving for production
 async function setupVite() {

@@ -1,5 +1,148 @@
 # Implementation Log
 
+## 2026-08-20 — Search Console feature audit: 5 confirmed defects found and fixed
+
+End-to-end audit of the Phase 5 Search Console integration (below), done as a separate
+pass rather than assumed-correct from having just built it. Discovered all user-facing
+behaviors from scratch (not just the one issue already known), tested each as a real user
+would, and ran an 8-angle automated code review (correctness x3, reuse, simplification,
+efficiency, altitude, CLAUDE.md/AGENTS.md conventions) against the full diff to catch what
+manual reading missed.
+
+**Confirmed and fixed:**
+
+1. **Blog editor panel fired a live GSC query for brand-new, never-saved posts.**
+   `GooglePerformancePanel` gated only on `slug`, but `AdminBlogPosts.tsx` auto-fills
+   `slug` from the title the moment an admin starts typing — before the post is ever
+   saved. Opening "New post" and typing a title immediately triggered a real external API
+   call for a URL that never existed. Fixed by gating on `postId !== null` as well
+   (`GooglePerformancePanel.tsx`), with a regression test locking in the exact scenario
+   (non-null slug, null postId → still shows "Save this post first").
+2. **Course performance panel 403'd for instructors.** `AdminCourseEdit.tsx` is reachable
+   by both `admin` and `instructor` roles (`Permission.CREATE_COURSE`), and the file
+   already had five other `{!isInstructor && ...}` gates around admin-only sections
+   (Catalog curation, Featured/Bestseller, Instructor picker) — the new performance
+   section was missing that same gate, so every instructor opening their own course would
+   see a broken "Admin access required" error box, since the server route strictly
+   requires `role === 'admin'`. Fixed by adding the same `!isInstructor` gate used
+   everywhere else in that file.
+3. **Editing an existing post's slug re-fired a live query on every keystroke.** Found
+   independently by three review angles: `postId` is already non-null for a saved post,
+   so fix #1 didn't cover it — each keystroke in the Slug field produced a new `pageUrl`,
+   a cache miss, and two real `searchanalytics.query` calls, capable of approaching the
+   route's 60-req/10-min limiter on a single edit. Fixed with an 800ms debounce before the
+   fetch fires (`GooglePerformancePanel.tsx`).
+4. **An unhandled promise rejection could hang a request indefinitely.** The route
+   handler had no top-level try/catch; this app's global Express error middleware only
+   catches synchronous throws, not a rejected promise from an async handler. A transient
+   Supabase Auth hiccup inside `authenticateAdmin` would leave the client's fetch hanging
+   until its own timeout instead of surfacing the panel's error state. Fixed by wrapping
+   the handler body and converting any unexpected rejection to a clean 503
+   (`search-console.routes.ts`), with a test simulating the Supabase call throwing.
+5. **A mixed-case course id would silently return zero data instead of real numbers.**
+   `UUID_PATTERN` validates case-insensitively but `buildPageUrl` embedded the id
+   verbatim, while the site's real course URLs are always lowercase (Postgres normalizes
+   `uuid` columns on output) — a differently-cased id in the address bar would build a URL
+   that never matches what Search Console actually indexed. Fixed by lowercasing the
+   course id in `buildPageUrl` (`searchConsole.service.ts`), with a regression test.
+
+Also added a clarifying comment on the two-`searchanalytics.query`-calls design after the
+review's "simplification" angle suggested merging them: doing so is actually wrong, not
+just less clean — Search Console omits individual low-volume query rows from a dimensioned
+report for privacy while still counting them in the undimensioned aggregate, so summing
+only the returned query rows would undercount real totals. Left as-is with the reasoning
+now written down.
+
+**Investigated and confirmed NOT a defect, no change made:** three review angles
+independently flagged that `authenticateAdmin`'s bearer-token-plus-role-check is now a
+third copy-pasted instance of the exact pattern in `contact.routes.ts`/
+`blog-insights.routes.ts` (both of which already comment on the same gap), and that
+`GooglePerformancePanel`/`CoursePerformancePanel` are near-duplicate components whose
+styling has already started to drift. Both are real code-quality observations, but
+neither is broken *behavior* — extracting a shared admin-auth helper or a shared
+performance-panel component would be a refactor across working code, not a fix for
+something a user can observe going wrong, so left out of scope per this audit's
+instructions (fix confirmed defects, don't redesign). Worth doing as deliberate follow-up
+work, not bundled into a bug-fix pass.
+
+**Verification:** loaded both panels in a real browser against a temporary, local-only
+harness (`window.fetch` mocked with canned success/empty/unavailable/error responses,
+mounted via a throwaway dev route, deleted immediately after) since neither real admin
+login nor `GOOGLE_SEARCH_CONSOLE_CREDENTIALS` is available in this environment and writing
+a test admin account into the production Supabase project to get real auth was avoided as
+an unnecessary write to live data (same precedent as Phase 3/4/5's own log entries).
+Confirmed all four states render correctly with real Tailwind styling (checked computed
+CSS, not just class names) and a clean console. This is real in-browser verification of
+the panels' rendering and state machine, but not literal `qa-screenshots/*.png` files or a
+walkthrough of the actual authenticated admin pages — those remain blocked by the same
+missing credentials noted in every prior phase of this rebuild. `npm run lint`, `npm test`
+(278 pass, up from 276), `npm run test:frontend` (65 pass), `npm run build` all clean
+after every fix.
+
+## 2026-08-20 — Blog SEO editor Phase 5: real Search Console performance data
+
+Final phase of the blog SEO editor rebuild — the panels from Phases 1-4 are all
+self-contained (heuristics, on-page checks, an AI proxy); this one is the first to pull
+in live external data. Google Search Console access was already fully provisioned
+before this session started (domain property verified, a dedicated "Restricted" service
+account granted, its JSON stored in Vercel as `GOOGLE_SEARCH_CONSOLE_CREDENTIALS`) — this
+phase was purely the integration code.
+
+- **Confirmed the current API shape before writing code**, since `siteUrl` format is the
+  one thing that's easy to get subtly wrong for a Domain property: `tutiba.com` is
+  verified as a Domain property (not URL-prefix), so `searchanalytics.query`'s `siteUrl`
+  must be `sc-domain:tutiba.com` (no protocol) — a URL-prefix-style `https://tutiba.com/`
+  would silently return zero rows rather than error. Used the current `searchconsole` v1
+  namespace (`google.searchconsole('v1')`, already bundled in this project's pinned
+  `googleapis@173`) over the legacy `webmasters` v3 one — same request/response shape,
+  same `webmasters.readonly` scope.
+- **`src/server/config/google.ts`**: added `getSearchConsoleClient()` alongside the
+  existing `getDriveClient()`, same lazy-singleton-in-module-scope pattern, its own
+  service account/scope (`GOOGLE_SEARCH_CONSOLE_CREDENTIALS` /
+  `webmasters.readonly`) so it stays independent of the Drive integration. Extracted the
+  JSON-or-base64 credential parsing both now share into `parseGoogleCredentials()` —
+  identical logic, was about to be copy-pasted a second time verbatim.
+- **`src/server/services/searchConsole.service.ts`** (new): `fetchPagePerformance(pageUrl)`
+  issues two `searchanalytics.query` calls per page — one with no output dimensions
+  (page-filtered aggregate: clicks/impressions/CTR/position) and one with
+  `dimensions: ['query']` (top 10 queries driving traffic to that URL) — both filtered via
+  `dimensionFilterGroups: [{ filters: [{ dimension: 'page', operator: 'equals', expression:
+  pageUrl }] }]`. Date range is the last 28 days ending 3 days ago, not "today", since GSC
+  data is incomplete for the most recent 2-3 days and querying through today would read as
+  a fake traffic dip. `buildPageUrl(type, identifier)` derives the exact public URL
+  server-side (`/blog/{slug}` or `/course/{id}` — courses use the raw UUID in their public
+  URL, not a slug, confirmed against `CourseDetail.tsx`/`generate-seo-files.mjs`) rather
+  than trusting a client-supplied URL, so the admin-only proxy can't be used to probe
+  arbitrary URLs against the property. Results cache in an in-memory `Map` for 6 hours
+  (matches this codebase's existing `driveMetadataCache` pattern in
+  `video.controller.ts` — good enough at this project's admin-only request volume);
+  failures are never cached, so a transient quota/network error self-heals on the next
+  visit instead of being pinned for 6 hours.
+- **`src/server/routes/search-console.routes.ts`** (new, mounted at
+  `/api/search-console` in both `server.ts` and `api/index.ts`): `GET /performance?
+  type=blog_post&slug=...` or `?type=course&id=...`, admin-only via the same inline
+  bearer-token-plus-role-check duplicated in `contact.routes.ts`/`blog-insights.routes.ts`
+  (no shared `requireAdmin` helper exists yet in this codebase). Missing credentials or a
+  failed API call both return 503 with a `reason` field, never a raw error message,
+  matching the Gemini proxy's `missing_key`/`api_error` convention.
+- **Client**: `src/services/searchConsole.service.ts` (bearer-token fetch, same shape as
+  `blogInsights.service.ts`), surfaced through two read-only panels that both auto-load on
+  mount (unlike the Gemini panels, this is a cheap server-cached read, not a billed
+  per-click action): `GooglePerformancePanel` as a new "4. Google performance" tier in
+  `SeoSidebar.tsx` (renumbered "Strengthen" from 4 to 5), and `CoursePerformancePanel` as
+  a new card section in `AdminCourseEdit.tsx` (course admin has no equivalent sidebar, so
+  it's a full-width section after "Course media").
+
+Verified: `npm run lint`, `npm test` (276 pass, incl. new
+`searchConsole.service.test.ts` and `search-console.routes.test.ts` — auth/validation/
+caching/error-mapping all covered with an injected fake `searchanalytics.query`, no real
+network calls), `npm run test:frontend` (all pass, no regressions), `npm run build`.
+**Not verified live in a browser or against the real Search Console API:** this
+environment has neither `GOOGLE_SEARCH_CONSOLE_CREDENTIALS` nor admin login credentials
+locally, and the property's real traffic data can only be confirmed once this deploys
+where the Vercel-stored credential is actually present — same limitation noted in the
+Phase 3/4 log entries above for their own live-data checks.
+
 ## 2026-08-16 — Blog editor audit: crash fix + table/Gemini bugs + UX overhaul
 
 Real hands-on testing of the block editor (Phases 1-4) surfaced a live Sentry crash and
