@@ -79,13 +79,14 @@ export function InstructorSettingsCard() {
     <form onSubmit={save} className="rounded-2xl border border-primary-200 bg-white p-6 shadow-sm md:p-8">
       <div className="mb-6 flex items-center gap-3 border-b border-primary-100 pb-5">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-50 text-accent-700"><User className="h-5 w-5" /></div>
-        <div><h2 className="font-bold text-primary-900">Instructor section</h2><p className="text-sm text-primary-500">The instructor photo, bio, credentials, and bullet points.</p></div>
+        <div><h2 className="font-bold text-primary-900">Instructor section</h2><p className="text-sm text-primary-500">Name, bio, and credentials for the homepage instructor section. The homepage intentionally shows an icon graphic instead of a photo — see the note below.</p></div>
       </div>
 
       {isLoading ? <div role="status" className="flex min-h-44 items-center justify-center text-primary-500"><Loader2 className="h-7 w-7 animate-spin" /><span className="sr-only">Loading settings</span></div> : (
         <div className="space-y-4">
           <div>
-            <p className="mb-2 text-sm font-bold text-primary-800">Photo</p>
+            <p className="mb-2 text-sm font-bold text-primary-800">Photo (not currently shown on the homepage)</p>
+            <p className="mb-2 text-xs text-primary-500">The public homepage shows a decorative science-icon graphic instead of a photo by design. This upload is kept for potential future use and does not currently change what visitors see.</p>
             <InstructorPhotoUpload value={values.photoUrl} onChange={photoUrl => setValues(c => ({ ...c, photoUrl }))} disabled={loadFailed} />
           </div>
           <label className="block text-sm font-bold text-primary-800">Instructor name / photo alt text<input value={values.instructorName} onChange={e => setValues(c => ({ ...c, instructorName: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
@@ -120,7 +121,7 @@ export function InstructorSettingsCard() {
             </div>
           </div>
 
-          <DynamicListEditor id="instructor-bullets" label="Bullet points" description="The checklist under the credential pills." value={values.bullets} onChange={bullets => setValues(c => ({ ...c, bullets }))} />
+          <DynamicListEditor id="instructor-bullets" label="Bullet points (not currently shown on the homepage)" description="Kept for potential future use — the redesigned homepage section no longer displays this checklist." value={values.bullets} onChange={bullets => setValues(c => ({ ...c, bullets }))} />
         </div>
       )}
 

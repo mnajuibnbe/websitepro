@@ -54,16 +54,17 @@ export function OutcomesSettingsCard() {
     <form onSubmit={save} className="rounded-2xl border border-primary-200 bg-white p-6 shadow-sm md:p-8">
       <div className="mb-6 flex items-center gap-3 border-b border-primary-100 pb-5">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-50 text-accent-700"><ShieldCheck className="h-5 w-5" /></div>
-        <div><h2 className="font-bold text-primary-900">Outcomes section</h2><p className="text-sm text-primary-500">The dark "Why enroll with confidence" band with four outcome cards.</p></div>
+        <div><h2 className="font-bold text-primary-900">Learning outcomes section</h2><p className="text-sm text-primary-500">The compact "What you'll get better at" row with four outcome cards.</p></div>
       </div>
 
       {isLoading ? <div role="status" className="flex min-h-44 items-center justify-center text-primary-500"><Loader2 className="h-7 w-7 animate-spin" /><span className="sr-only">Loading settings</span></div> : (
         <div className="space-y-4">
           <label className="block text-sm font-bold text-primary-800">Eyebrow badge<input value={values.eyebrowText} onChange={e => setValues(c => ({ ...c, eyebrowText: e.target.value }))} maxLength={120} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-bold text-primary-800">Heading (plain part)<input value={values.headingPrefix} onChange={e => setValues(c => ({ ...c, headingPrefix: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
-            <label className="block text-sm font-bold text-primary-800">Heading (highlighted part)<input value={values.headingHighlight} onChange={e => setValues(c => ({ ...c, headingHighlight: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
+            <label className="block text-sm font-bold text-primary-800">Heading (plain part) — not currently shown on the homepage<input value={values.headingPrefix} onChange={e => setValues(c => ({ ...c, headingPrefix: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
+            <label className="block text-sm font-bold text-primary-800">Heading (highlighted part) — not currently shown on the homepage<input value={values.headingHighlight} onChange={e => setValues(c => ({ ...c, headingHighlight: e.target.value }))} maxLength={160} disabled={loadFailed} className="mt-2 min-h-11 w-full rounded-xl border border-primary-200 bg-white px-3 font-normal disabled:opacity-60" /></label>
           </div>
+          <p className="text-xs text-primary-500">The redesigned section only shows the eyebrow badge above (styled as a compact section title) — the heading fields are kept for potential future use.</p>
 
           <div>
             <p className="mb-3 text-sm font-bold text-primary-800">Outcomes</p>
