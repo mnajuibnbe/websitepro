@@ -9,7 +9,7 @@ const course = (overrides: Partial<Course>): Course => ({
   learning_outcomes: [], requirements: [], target_audience: [],
   thumbnail: null, cover_image: null, trailer_video: null,
   status: 'published', instructor_id: null, level: 'all_levels', language: null, visibility: 'public',
-  is_featured: false, is_bestseller: false, curriculum_highlights: null, home_order: null, certificate_enabled: false, sequential_learning: false, drip_enabled: false,
+  is_featured: false, is_bestseller: false, curriculum_highlights: null, home_order: null, certificate_enabled: false, display_rating: null, display_rating_count: null, display_rating_source: null, display_rating_source_url: null, display_rating_verified_at: null, display_students_count: null, sequential_learning: false, drip_enabled: false,
   discussion_enabled: false, seo_title: null, seo_description: null, seo_keywords: null,
   published_at: null, archived_at: null, created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z',
   ...overrides,

@@ -17,6 +17,7 @@ import {
   Video,
   Flame,
   TrendingUp,
+  Star,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { PageContainer } from '../../components/layout/PageContainer';
@@ -73,6 +74,12 @@ export function AdminCourseEdit() {
   const [curriculumHighlights, setCurriculumHighlights] = useState<string[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isBestseller, setIsBestseller] = useState(false);
+  const [displayRating, setDisplayRating] = useState('');
+  const [displayRatingCount, setDisplayRatingCount] = useState('');
+  const [displayRatingSource, setDisplayRatingSource] = useState('');
+  const [displayRatingSourceUrl, setDisplayRatingSourceUrl] = useState('');
+  const [displayStudentsCount, setDisplayStudentsCount] = useState('');
+  const [displayRatingVerifiedAt, setDisplayRatingVerifiedAt] = useState<string | null>(null);
 
 
   // Validation & Toasts
@@ -142,6 +149,12 @@ export function AdminCourseEdit() {
       setCurriculumHighlights(Array.isArray(course.curriculum_highlights) ? course.curriculum_highlights : []);
       setIsFeatured(Boolean(course.is_featured));
       setIsBestseller(Boolean(course.is_bestseller));
+      setDisplayRating(course.display_rating == null ? '' : String(course.display_rating));
+      setDisplayRatingCount(course.display_rating_count == null ? '' : String(course.display_rating_count));
+      setDisplayRatingSource(course.display_rating_source || '');
+      setDisplayRatingSourceUrl(course.display_rating_source_url || '');
+      setDisplayStudentsCount(course.display_students_count == null ? '' : String(course.display_students_count));
+      setDisplayRatingVerifiedAt(course.display_rating_verified_at || null);
     } catch (err: any) {
       console.error('Error fetching course details:', err);
       setErrorMessage(err.message || 'Build practical skills with structured, expert-led course content..');
@@ -162,7 +175,7 @@ export function AdminCourseEdit() {
     if (!courseId || isSubmitting) return;
 
     // Validation
-    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd, learningOutcomes, requirements, targetAudience, curriculumHighlights });
+    const newErrors = validateCourseForm({ title, slug, shortDescription, description, priceEgp, priceUsd, learningOutcomes, requirements, targetAudience, curriculumHighlights, displayRating, displayRatingCount, displayRatingSource, displayRatingSourceUrl, displayStudentsCount });
     const cleanSlug = slug.trim() ? sanitizeSlug(slug) : '';
 
     if (Object.keys(newErrors).length > 0) {
@@ -218,6 +231,26 @@ export function AdminCourseEdit() {
       if (!isInstructor) {
         updates.is_featured = isFeatured;
         updates.is_bestseller = isBestseller;
+      }
+
+      const nextDisplayRating = displayRating.trim() ? Number(displayRating.trim()) : null;
+      const nextDisplayRatingCount = displayRatingCount.trim() ? Number(displayRatingCount.trim()) : null;
+      const nextDisplayRatingSource = displayRatingSource.trim() || null;
+      const nextDisplayRatingSourceUrl = displayRatingSourceUrl.trim() || null;
+      const nextDisplayStudentsCount = displayStudentsCount.trim() ? Number(displayStudentsCount.trim()) : null;
+      const externalProofChanged = nextDisplayRating !== (originalCourse?.display_rating == null ? null : Number(originalCourse.display_rating))
+        || nextDisplayRatingCount !== (originalCourse?.display_rating_count ?? null)
+        || nextDisplayRatingSource !== (originalCourse?.display_rating_source ?? null)
+        || nextDisplayRatingSourceUrl !== (originalCourse?.display_rating_source_url ?? null)
+        || nextDisplayStudentsCount !== (originalCourse?.display_students_count ?? null);
+
+      updates.display_rating = nextDisplayRating;
+      updates.display_rating_count = nextDisplayRatingCount;
+      updates.display_rating_source = nextDisplayRatingSource;
+      updates.display_rating_source_url = nextDisplayRatingSourceUrl;
+      updates.display_students_count = nextDisplayStudentsCount;
+      if (externalProofChanged) {
+        updates.display_rating_verified_at = nextDisplayRating ? new Date().toISOString().slice(0, 10) : null;
       }
 
       if (status === 'published') {
@@ -536,6 +569,44 @@ export function AdminCourseEdit() {
                 <h2 className="text-xl font-bold text-primary-900 mb-6 pb-3 border-b border-primary-100 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-accent-600" /><span>Course media</span></h2>
                 <CourseCoverUpload value={coverImage} onChange={setCoverImage} />
                 <div className="mt-6 border-t border-primary-100 pt-6"><label htmlFor="course-trailer-video" className="mb-2 flex items-center gap-2 text-sm font-bold text-primary-900"><Video className="h-4 w-4 text-accent-600" />Promotional trailer URL <span className="font-normal text-primary-500">(optional)</span></label><input id="course-trailer-video" type="url" value={trailerVideo} onChange={event => setTrailerVideo(event.target.value)} placeholder="Google Drive, YouTube, Vimeo, or direct video URL" className="min-h-12 w-full rounded-xl border border-primary-200 bg-primary-50 px-4 text-sm focus:border-accent-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent-500" /><p className="mt-2 text-xs leading-relaxed text-primary-500">When empty, the sales page uses the published preview lesson. If neither is available, the cover remains a static image.</p></div>
+              </div>
+
+              {/* External proof (optional): verified rating/learner data from an external platform (e.g. Udemy), shown transparently on the public sales page. Never fabricated -- leave blank if unverified. */}
+              <div id="course-external-proof" className="scroll-mt-24 bg-white rounded-2xl border border-primary-200 p-6 md:p-8 shadow-2xs">
+                <h2 className="text-xl font-bold text-primary-900 mb-2 pb-3 border-b border-primary-100 flex items-center gap-2"><Star className="w-5 h-5 text-accent-600" /><span>External proof (optional)</span></h2>
+                <p className="mb-6 text-xs text-primary-500">Only fill this in with a verified rating from a real external source (e.g. an official Udemy course page). Leave blank if there is nothing to verify -- the public page omits this section gracefully when empty.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Rating (0-5)</label>
+                    <input type="text" inputMode="decimal" placeholder="4.4" value={displayRating} onChange={(e) => setDisplayRating(e.target.value)} dir="ltr" className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.displayRating ? 'border-danger-400' : 'border-primary-200'}`} />
+                    {errors.displayRating && <p className="text-xs text-danger-600 mt-1">{errors.displayRating}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Rating count</label>
+                    <input type="text" inputMode="numeric" placeholder="154" value={displayRatingCount} onChange={(e) => setDisplayRatingCount(e.target.value)} dir="ltr" className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.displayRatingCount ? 'border-danger-400' : 'border-primary-200'}`} />
+                    {errors.displayRatingCount && <p className="text-xs text-danger-600 mt-1">{errors.displayRatingCount}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Source platform</label>
+                    <input type="text" placeholder="Udemy" value={displayRatingSource} onChange={(e) => setDisplayRatingSource(e.target.value)} className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.displayRatingSource ? 'border-danger-400' : 'border-primary-200'}`} />
+                    {errors.displayRatingSource && <p className="text-xs text-danger-600 mt-1">{errors.displayRatingSource}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Source URL</label>
+                    <input type="url" placeholder="https://www.udemy.com/course/..." value={displayRatingSourceUrl} onChange={(e) => setDisplayRatingSourceUrl(e.target.value)} dir="ltr" className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.displayRatingSourceUrl ? 'border-danger-400' : 'border-primary-200'}`} />
+                    {errors.displayRatingSourceUrl && <p className="text-xs text-danger-600 mt-1">{errors.displayRatingSourceUrl}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Students taught (via source)</label>
+                    <input type="text" inputMode="numeric" placeholder="1058" value={displayStudentsCount} onChange={(e) => setDisplayStudentsCount(e.target.value)} dir="ltr" className={`w-full px-4 py-3 bg-primary-50 border rounded-xl focus:ring-2 focus:ring-accent-500 focus:bg-white transition-all text-sm ${errors.displayStudentsCount ? 'border-danger-400' : 'border-primary-200'}`} />
+                    {errors.displayStudentsCount && <p className="text-xs text-danger-600 mt-1">{errors.displayStudentsCount}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-primary-900 mb-2">Last verified</label>
+                    <p className="px-4 py-3 bg-primary-100 border border-primary-200 rounded-xl text-sm text-primary-600">{displayRatingVerifiedAt ? new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(displayRatingVerifiedAt)) : 'Not yet verified'}</p>
+                    <p className="mt-1.5 text-xs text-primary-500">Updates automatically when you change the rating fields above and save.</p>
+                  </div>
+                </div>
               </div>
 
               {/* Live Search Console data for this course's public page -- read-only, no form state. Admin-only: the server route requires role === 'admin', and instructors can also reach this page (Permission.CREATE_COURSE), so this needs the same !isInstructor gate as Catalog curation above -- otherwise an instructor's course page would render a 403 error here. */}

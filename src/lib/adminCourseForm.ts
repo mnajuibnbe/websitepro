@@ -12,6 +12,11 @@ export interface CourseFormValues {
   requirements?: string[];
   targetAudience?: string[];
   curriculumHighlights?: string[];
+  displayRating?: string;
+  displayRatingCount?: string;
+  displayRatingSource?: string;
+  displayRatingSourceUrl?: string;
+  displayStudentsCount?: string;
 }
 
 export function sanitizeCourseSlug(input: string): string {
@@ -32,5 +37,16 @@ export function validateCourseForm(values: CourseFormValues): Record<string, str
   if (values.requirements?.some(item => !item.trim())) errors.requirements = 'Remove or complete every empty requirement.';
   if (values.targetAudience?.some(item => !item.trim())) errors.targetAudience = 'Remove or complete every empty audience item.';
   if (values.curriculumHighlights?.some(item => !item.trim())) errors.curriculumHighlights = 'Remove or complete every empty highlight.';
+
+  const rating = values.displayRating?.trim();
+  if (rating && (!/^\d(\.\d)?$/.test(rating) || Number(rating) < 0 || Number(rating) > 5)) errors.displayRating = 'Enter a rating between 0 and 5, e.g. 4.4.';
+  const ratingCount = values.displayRatingCount?.trim();
+  if (ratingCount && !/^\d+$/.test(ratingCount)) errors.displayRatingCount = 'Enter a whole number of ratings.';
+  const studentsCount = values.displayStudentsCount?.trim();
+  if (studentsCount && !/^\d+$/.test(studentsCount)) errors.displayStudentsCount = 'Enter a whole number of students.';
+  const sourceUrl = values.displayRatingSourceUrl?.trim();
+  if (sourceUrl && !/^https:\/\//i.test(sourceUrl)) errors.displayRatingSourceUrl = 'Enter a valid https:// source URL.';
+  if (rating && !values.displayRatingSource?.trim()) errors.displayRatingSource = 'Enter the source platform (e.g. Udemy) for this rating.';
+
   return errors;
 }

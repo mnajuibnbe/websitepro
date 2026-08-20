@@ -1,1 +1,1 @@
-export const COURSE_LANGUAGES = ['English'] as const;
+export const COURSE_LANGUAGES = ['Arabic', 'English'] as const;

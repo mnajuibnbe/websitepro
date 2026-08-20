@@ -104,3 +104,11 @@ export function trackPaymentProofSubmitted(orderId: string): void {
 export function trackEnrollmentActivated(courseId: string, orderId?: string): void {
   trackEvent('enrollment_activated', { course_id: courseId, order_id: orderId });
 }
+
+export function trackCoursePreviewStarted(courseId: string): void {
+  trackEvent('course_preview_started', { course_id: courseId });
+}
+
+export function trackCourseContentViewed(courseId: string): void {
+  trackEvent('course_content_viewed', { course_id: courseId });
+}

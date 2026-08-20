@@ -9,8 +9,7 @@ import { CourseInstructor } from '../components/course-detail/CourseInstructor';
 import { AddCurriculumItemDialog } from '../components/admin/curriculum/AddCurriculumItemDialog';
 import { DynamicListEditor } from '../components/admin/course/DynamicListEditor';
 import { LearningOutcomes } from '../components/course-detail/LearningOutcomes';
-import { Requirements } from '../components/course-detail/Requirements';
-import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
+import { CourseFitSection } from '../components/course-detail/CourseFitSection';
 import { AdminStudentReviews } from '../pages/admin/AdminStudentReviews';
 import { CourseReviews } from '../components/course-detail/CourseReviews';
 import { CoursePerformancePanel } from '../components/admin/course/CoursePerformancePanel';
@@ -39,14 +38,26 @@ const sections: PublicCurriculumSection[] = [{
   ],
 }];
 
-test('renders authored curriculum descriptions and an actionable free preview', () => {
+test('renders authored curriculum descriptions and an actionable preview', () => {
   const markup = renderFrontend(<CurriculumAccordion sections={sections} />);
   assert.match(markup, /Getting started/);
   assert.match(markup, /Welcome video/);
   assert.match(markup, /2 lessons · 25 min of video/);
   assert.match(markup, /Course orientation/);
-  assert.match(markup, /Free preview/);
+  assert.match(markup, />\s*Preview\s*</);
+  assert.doesNotMatch(markup, /Free preview/);
   assert.doesNotMatch(markup, /12345678901|content_url/);
+});
+
+test('curriculum accordion supports expand all / collapse all across multiple open sections', () => {
+  const twoSections: PublicCurriculumSection[] = [
+    ...sections,
+    { id: 'section-2', title: 'Deep dive', description: null, order_index: 1, lesson_count: 1, total_minutes: 10, lessons: [{ id: 'lesson-3', title: 'Advanced topic', content_type: 'video', estimated_minutes: 10, is_preview: false, order_index: 0 }] },
+  ];
+  const markup = renderFrontend(<CurriculumAccordion sections={twoSections} />);
+  assert.match(markup, />Expand all</);
+  assert.match(markup, /Getting started/);
+  assert.match(markup, /Deep dive/);
 });
 
 test('unsaved changes dialog exposes both recovery choices', () => {
@@ -76,11 +87,12 @@ test('course Search Console performance panel starts loading for an existing cou
   assert.match(markup, /Loading Search Console data/);
 });
 
-test('sales page instructor block renders only assigned public profile data', () => {
-  const markup = renderFrontend(<CourseInstructor instructor={{ professional_name: 'Dr. Samira', bio: 'Evidence-based educator with extensive professional experience across clinical teaching and cosmetic science.', expertise: ['Cosmetic science'], credentials: 'Board-certified professional educator', avatar_url: null }} />);
+test('sales page instructor block renders only assigned public profile data, with no portrait', () => {
+  const markup = renderFrontend(<CourseInstructor instructor={{ professional_name: 'Dr. Samira', bio: 'Evidence-based educator with extensive professional experience across clinical teaching and cosmetic science.', expertise: ['Cosmetic science'], credentials: 'Board-certified professional educator', avatar_url: 'https://example.com/avatar.jpg' }} />);
   assert.match(markup, /Dr\. Samira/);
   assert.match(markup, /Cosmetic science/);
-  assert.match(markup, /Admin-approved instructor/);
+  assert.doesNotMatch(markup, /Admin-approved instructor/);
+  assert.doesNotMatch(markup, /avatar\.jpg|<img/);
   assert.doesNotMatch(markup, /@|email/);
 });
 
@@ -96,19 +108,25 @@ test('sales page instructor block renders its empty state when no public profile
 });
 
 test('course detail sections render persisted list content and ignore blank legacy items', () => {
-  const markup = renderFrontend(<><LearningOutcomes outcomes={['  Assess a formulation  ', '']} /><Requirements requirements={['Patch-test products']} /><WhoIsThisFor audiences={['Skin-care professionals']} /></>);
-  assert.match(markup, /Learning outcomes/);
+  const markup = renderFrontend(<><LearningOutcomes outcomes={['  Assess a formulation  ', '']} /><CourseFitSection requirements={['Patch-test products']} audiences={['Skin-care professionals']} /></>);
+  assert.match(markup, /What you.{1,6}ll be able to do/);
   assert.match(markup, /Assess a formulation/);
-  assert.match(markup, /Requirements/);
-  assert.match(markup, /Who this course is for/);
+  assert.match(markup, /Is this course right for you\?/);
+  assert.match(markup, /This course is for/);
+  assert.match(markup, /Before you start/);
   assert.doesNotMatch(markup, />\s{2,}Assess a formulation\s{2,}</);
 });
 
 test('course detail sections render clear empty states instead of placeholders', () => {
-  const markup = renderFrontend(<><LearningOutcomes outcomes={[]} /><Requirements requirements={[]} /><WhoIsThisFor audiences={[]} /></>);
+  const markup = renderFrontend(<><LearningOutcomes outcomes={[]} /><CourseFitSection requirements={[]} audiences={[]} /></>);
   assert.match(markup, /Learning outcomes have not been published/);
-  assert.match(markup, /No course requirements have been published/);
-  assert.match(markup, /Target audience details have not been published/);
+  assert.match(markup, /No specific requirements have been published/);
+  assert.match(markup, /Audience details have not been published/);
+});
+
+test('empty native course reviews render nothing publicly', () => {
+  const markup = renderFrontend(<CourseReviews reviews={[]} />);
+  assert.equal(markup.trim(), '');
 });
 
 test('public reviews render only provided moderated review data without a duplicate aggregate', () => {

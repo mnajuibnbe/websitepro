@@ -10,6 +10,7 @@ export interface PublicCourseReview {
 }
 
 export function CourseReviews({ reviews }: { reviews: PublicCourseReview[] }) {
+  if (reviews.length === 0) return null;
 
   return (
     <div className="mb-12 md:mb-16">
@@ -17,8 +18,8 @@ export function CourseReviews({ reviews }: { reviews: PublicCourseReview[] }) {
         Student reviews
       </h2>
 
-      <div className="bg-white border border-primary-200 rounded-2xl p-6 md:p-8 shadow-sm">
-        {reviews.length === 0 ? <div className="rounded-xl border border-dashed border-primary-300 bg-primary-50 p-6 text-center text-primary-600"><p className="font-bold text-primary-800">No approved reviews yet</p><p className="mt-1 text-sm">Student feedback will appear here after moderation.</p></div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-white border border-primary-200 rounded-panel p-6 md:p-8 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {reviews.map((review) => (
             <article key={review.review_id} className="bg-primary-50 p-6 rounded-xl border border-primary-100">
               <div className="flex items-center justify-between mb-4">
@@ -26,10 +27,7 @@ export function CourseReviews({ reviews }: { reviews: PublicCourseReview[] }) {
                   <div className="w-10 h-10 rounded-full bg-primary-200 flex items-center justify-center text-primary-700 font-bold">
                     {review.reviewer_name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-primary-900">{review.reviewer_name}</h3>
-                    <div className="text-xs text-primary-500 font-medium">Verified learner</div>
-                  </div>
+                  <h3 className="font-bold text-primary-900">{review.reviewer_name}</h3>
                 </div>
                 <time dateTime={review.created_at} className="text-xs text-primary-400 font-medium">{new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(new Date(review.created_at))}</time>
               </div>
@@ -38,12 +36,12 @@ export function CourseReviews({ reviews }: { reviews: PublicCourseReview[] }) {
                   <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-primary-300'}`} />
                 ))}
               </div>
-              <p className="text-primary-700 text-sm leading-relaxed font-medium">
+              <p className="text-primary-700 text-sm leading-relaxed font-medium" dir="auto">
                 “{review.comment}”
               </p>
             </article>
           ))}
-        </div>}
+        </div>
       </div>
     </div>
   );
