@@ -13,6 +13,7 @@ import { Requirements } from '../components/course-detail/Requirements';
 import { WhoIsThisFor } from '../components/course-detail/WhoIsThisFor';
 import { AdminStudentReviews } from '../pages/admin/AdminStudentReviews';
 import { CourseReviews } from '../components/course-detail/CourseReviews';
+import { CoursePerformancePanel } from '../components/admin/course/CoursePerformancePanel';
 import { AuthContext, AuthContextType } from '../contexts/AuthContext';
 
 const adminAuthContext: AuthContextType = {
@@ -68,6 +69,11 @@ test('category field loads governed categories from the catalog source', () => {
   const markup = renderFrontend(<CategoryField value="Skin care" onChange={() => {}} />);
   assert.match(markup, /Loading categories/);
   assert.doesNotMatch(markup, /type="text"/);
+});
+
+test('course Search Console performance panel starts loading for an existing course id', () => {
+  const markup = renderFrontend(<CoursePerformancePanel courseId="5d1436b8-229c-4853-ba75-4756ce52ada0" />);
+  assert.match(markup, /Loading Search Console data/);
 });
 
 test('sales page instructor block renders only assigned public profile data', () => {

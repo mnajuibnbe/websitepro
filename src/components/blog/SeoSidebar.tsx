@@ -1,11 +1,12 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { AlertTriangle, BadgeCheck, BookMarked, ChevronDown, CheckCircle2, Copy, Gauge, Heading2, Info, Link2, ListChecks, Plus, Sparkles, Target, Type, X } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, BookMarked, ChevronDown, CheckCircle2, Copy, Gauge, Heading2, Info, Link2, ListChecks, Plus, Sparkles, Target, TrendingUp, Type, X } from 'lucide-react';
 import type { BlogPost, BlogSearchIntent, BlogSource, OriginalValueSignal } from '../../services/blogPosts.service';
 import { deriveCanonicalUrl, genericTitleHint, metaDescriptionHint, seoTitleHint, textLikelyMentionsQuery } from '../../lib/blogSeo';
 import { sanitizeBlogContentHtml } from '../../lib/blogContentHtml';
 import { analyzeHeadingStructure, analyzeIntroduction, analyzeReadability, articleWordCount } from '../../lib/blogSeoAnalysis';
 import { computeContentSeoScore } from '../../lib/blogSeoScore';
 import { DuplicateContentPanel } from './DuplicateContentPanel';
+import { GooglePerformancePanel } from './GooglePerformancePanel';
 import { InternalLinkingPanel } from './InternalLinkingPanel';
 import { OriginalValuePanel } from './OriginalValuePanel';
 import { SourcesPanel } from './SourcesPanel';
@@ -208,9 +209,15 @@ export function SeoSidebar({ postId, title, slug, effectiveSeoTitle, effectiveMe
         </Panel>
       </Tier>
 
+      <Tier label="4. Google performance">
+        <Panel icon={TrendingUp} title="Google Search Console">
+          <GooglePerformancePanel postId={postId} slug={slug} />
+        </Panel>
+      </Tier>
+
       <details className="group" open={strengthenOpen} onToggle={(e) => setStrengthenOpen(e.currentTarget.open)}>
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg px-1 py-1 text-xs font-bold uppercase tracking-eyebrow text-primary-400 hover:text-primary-600">
-          <span>4. Strengthen (once you have a draft)</span>
+          <span>5. Strengthen (once you have a draft)</span>
           <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
         </summary>
         <div className="mt-3 space-y-3">
